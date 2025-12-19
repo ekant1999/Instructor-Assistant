@@ -1,0 +1,307 @@
+Replit Prompt — Modular ChatGPT-Style UI
+
+Build a modern, highly modular ChatGPT-style web UI for an “Instructor Assistant” application.
+
+The application must be chat-first, with the main chat experience as the front page, and all other pages implemented as independent, lazy-loaded modules that do not depend on each other.
+
+1️⃣ Tech Stack (required)
+
+React + TypeScript
+
+Vite
+
+Tailwind CSS
+
+Zustand for global state
+
+React Router
+
+No backend logic — use mocked API calls
+
+2️⃣ Global App Rules (important)
+
+The App Shell (top bar + chat) is always mounted
+
+Feature pages do not share state directly
+
+Each page is:
+
+Self-contained
+
+Can be removed without breaking the app
+
+Communicates only via typed interfaces
+
+Chat is global and persistent across navigation
+
+Dark mode supported via CSS variables
+
+3️⃣ App Layout (ChatGPT-like)
+-------------------------------------------------
+| Top Bar: Logo | Chat | Library | Notes | QSets |
+-------------------------------------------------
+|                                                 |
+|   Main Content Area (varies by route)           |
+|                                                 |
+-------------------------------------------------
+| Floating Chat Input (ChatGPT-style)             |
+-------------------------------------------------
+
+4️⃣ FRONT PAGE — Chat (Primary Experience)
+
+Route: /
+
+This page should feel like ChatGPT.
+
+UI Requirements
+
+Full-height chat conversation
+
+Message bubbles (user vs assistant)
+
+Streaming response simulation
+
+Tool usage indicators:
+
+“Reading PDFs…”
+
+“Searching Notes…”
+
+Message actions:
+
+Save to Notes
+
+Copy Markdown
+
+Sticky input bar at bottom:
+
+Multiline textarea
+
+Enter = send, Shift+Enter = newline
+
+Send button
+
+Behavior
+
+Chat can:
+
+Answer questions
+
+Suggest actions like:
+
+“Open Research Library”
+
+“Save this as a note”
+
+“Generate questions”
+
+Chat does not directly render other pages — it routes the user
+
+This is the default landing page.
+
+5️⃣ Research Library Page
+
+Route: /library
+
+UI Layout
+
+Left column: list of papers
+
+Right panel: PDF preview area
+
+Features
+
+Upload paper by:
+
+DOI
+
+URL
+
+Title (mocked)
+
+Paper card:
+
+Title
+
+Source
+
+Actions:
+
+Preview
+
+Summarize
+
+Delete
+
+“Summarize” sends content to Chat and allows saving to Notes
+
+Independence Rule
+
+Does not know about Notes internals
+
+Emits events like:
+
+onSummarize(paperId)
+
+6️⃣ Notes Workspace Page
+
+Route: /notes
+
+UI Layout
+
+Left sidebar: searchable notes list
+
+Main panel: note editor
+
+Features
+
+Markdown editor + preview
+
+Word count
+
+Inline text highlighting
+
+Global search inside notes
+
+Save / delete notes
+
+Integration
+
+Chat responses can be saved as notes
+
+Notes page does not control chat
+
+7️⃣ Question Sets Page
+
+Route: /questions
+
+Two Tabs
+A. Generate
+
+Chat-like panel for generation
+
+Stream questions one-by-one
+
+Output Markdown preview
+
+Buttons:
+
+Regenerate question
+
+Save set
+
+B. Upload
+
+Upload Markdown file
+
+Edit existing sets
+
+Delete sets
+
+Question Model
+
+Question
+
+Options
+
+Correct answer
+
+Explanation
+
+8️⃣ RAG System Page
+
+Route: /rag
+
+UI Layout
+
+Simple query input
+
+Answer panel
+
+Source citations list
+
+Features
+
+Simulated retrieval
+
+Highlight cited chunks
+
+“Send answer to Chat” button
+
+9️⃣ Floating Agent (Global)
+
+Component: QwenAgent
+
+Behavior
+
+Floating bubble bottom-right
+
+Expand / minimize
+
+Can:
+
+Navigate pages
+
+Trigger actions
+
+Explain what tool it’s using
+
+Uses mock intent classification:
+
+research
+
+notes
+
+questions
+
+🔟 Folder Structure (mandatory)
+src/
+  app/
+    AppShell.tsx
+    routes.tsx
+  chat/
+    ChatPage.tsx
+    ChatInput.tsx
+    ChatMessage.tsx
+    store.ts
+  library/
+    LibraryPage.tsx
+    PaperList.tsx
+    PdfPreview.tsx
+  notes/
+    NotesPage.tsx
+    NotesEditor.tsx
+  questions/
+    QuestionSetsPage.tsx
+  rag/
+    RagPage.tsx
+  agent/
+    QwenAgent.tsx
+  shared/
+    ui/
+    hooks/
+    types/
+
+🎨 Design Goals
+
+ChatGPT-like simplicity
+
+No clutter
+
+Modular, readable components
+
+Easy to add/remove features
+
+Feels fast and intentional
+
+✅ Output Expectations
+
+Generate full React project
+
+Include placeholder data
+
+Focus on UI + architecture
+
+Clean Tailwind styling
+
+No backend required
