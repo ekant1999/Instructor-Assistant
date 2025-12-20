@@ -11,12 +11,20 @@ export interface Message {
   }[];
 }
 
+export interface Section {
+  id: string;
+  title: string;
+  content: string;
+  selected?: boolean;
+}
+
 export interface Paper {
   id: string;
   title: string;
   source: string;
   year: string;
   abstract?: string;
+  sections?: Section[];
 }
 
 export interface Note {

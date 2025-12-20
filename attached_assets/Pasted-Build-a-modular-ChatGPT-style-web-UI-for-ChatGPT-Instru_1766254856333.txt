@@ -1,0 +1,314 @@
+Build a modular, ChatGPT-style web UI for “ChatGPT Instructor Assistant”
+
+The app is chat-first. The front page must look and behave like ChatGPT, while all other pages are fully modular, independent, and lazy-loaded.
+
+1. Tech Stack (strict)
+
+React + TypeScript
+
+Vite
+
+Tailwind CSS
+
+Zustand (minimal global state)
+
+React Router
+
+Mock API calls only (no real API keys)
+
+2. Global App Rules (important)
+
+Chat is the primary interface
+
+Chat persists across all pages
+
+Each page is self-contained and removable
+
+Pages communicate only via typed events
+
+Dark mode ready
+
+Clean, minimal, ChatGPT-like UX
+
+3. App Layout
+┌──────────────────────────────────────────────┐
+│ Top Bar: Logo | Chat | Library | Notes | QSets│
+├──────────────────────────────────────────────┤
+│ Main Page Content (route-based)               │
+├──────────────────────────────────────────────┤
+│ Sticky Chat Input (ChatGPT-style)             │
+└──────────────────────────────────────────────┘
+
+4. FRONT PAGE — Chat (Default Route /)
+
+This must feel like ChatGPT.
+
+UI
+
+Full-height conversation
+
+User / Assistant message bubbles
+
+Streaming assistant responses
+
+Tool status indicators:
+
+“Summarizing PDF…”
+
+“Using local Qwen model…”
+
+“Calling web model…”
+
+Message actions:
+
+Save as Note
+
+Copy Markdown
+
+Behavior
+
+Chat does not render pages
+
+Chat routes the user (e.g. “Go to Library”)
+
+Chat can trigger:
+
+Summarization
+
+Question generation
+
+Note saving
+
+5. Research Library Page (/library)
+
+This is the most important page after chat.
+
+Layout
+
+Left: Paper list
+
+Right: Tabbed panel
+
+PDF Preview
+
+Sections
+
+Summaries
+
+A. Multi-Upload Section (NEW)
+
+At the top of the page:
+
+Upload multiple papers at once
+
+Accept:
+
+DOI
+
+URL
+
+Title
+
+Show upload progress per paper
+
+Papers appear immediately in the list
+
+B. Section-Aware View (NEW)
+
+Each paper shows extracted sections:
+
+Abstract
+
+Introduction
+
+Methods
+
+Results
+
+Discussion
+
+User can:
+
+Select multiple sections
+
+Or select entire document
+
+C. Summarization Panel (CRITICAL)
+
+A dedicated “Summarize” panel with options:
+
+Summarization Scope
+
+☐ Full document
+
+☐ Selected sections only
+
+☐ Multiple papers at once
+
+Summarization Method (No API Keys)
+
+🔘 Local Model (Qwen via Ollama)
+
+🔘 GPT (simulated web call)
+
+🔘 Gemini (simulated web call)
+
+These are UI choices only — backend calls are mocked.
+
+Summarization Style
+
+Short bullet summary
+
+Detailed academic summary
+
+Teaching / exam-focused summary
+
+Custom prompt input
+
+D. Editable Summary Output (NEW)
+
+Summary opens in a Markdown editor
+
+User can:
+
+Edit text
+
+Highlight sections
+
+Add headings
+
+Buttons:
+
+💾 Save as Note
+
+➕ Append to existing Note
+
+📄 Export Markdown
+
+Independence Rule
+
+The Library page:
+
+Does NOT know Notes internals
+
+Emits events like:
+
+onSaveSummary(summaryMarkdown)
+
+6. Notes Workspace (/notes)
+Layout
+
+Left: searchable notes list
+
+Right: Markdown editor + preview
+
+Features
+
+Edit notes
+
+Inline highlights
+
+Word count
+
+Notes can originate from:
+
+Chat
+
+Library summaries
+
+RAG answers
+
+7. Question Sets (/questions)
+Tabs
+Generate
+
+Chat-like UI
+
+Uses selected notes / papers
+
+Streams questions
+
+Shows Markdown preview
+
+Upload
+
+Upload Markdown
+
+Edit questions
+
+Save sets
+
+8. RAG Page (/rag)
+
+Simple query input
+
+Answer panel
+
+Source citations
+
+Button:
+
+“Send answer to Chat”
+
+“Save as Note”
+
+9. Floating Qwen Agent (Global)
+Behavior
+
+Bottom-right bubble
+
+Expand / minimize
+
+Explains what tool it’s using
+
+Can:
+
+Navigate pages
+
+Trigger summarization
+
+Save notes
+
+10. Folder Structure (required)
+src/
+  app/
+    AppShell.tsx
+    routes.tsx
+  chat/
+  library/
+    LibraryPage.tsx
+    UploadPanel.tsx
+    SectionSelector.tsx
+    SummarizePanel.tsx
+    SummaryEditor.tsx
+  notes/
+  questions/
+  rag/
+  agent/
+  shared/
+
+11. Design Goals
+
+ChatGPT-like simplicity
+
+Zero clutter
+
+Extremely modular
+
+Instructor-friendly
+
+Local-first mindset
+
+12. Output Requirements
+
+Generate full React app
+
+Mock backend calls
+
+Focus on UI correctness
+
+Clean Tailwind styling
+
+No real API keys
+
+End of prompt
