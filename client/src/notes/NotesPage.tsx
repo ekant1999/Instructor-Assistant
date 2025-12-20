@@ -3,7 +3,7 @@ import { Note } from '@/shared/types';
 import { NotesEditor } from './NotesEditor';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, Trash2, Save } from 'lucide-react';
+import { Search, Plus, Trash2, Save, Tag, Bold, Italic, Heading2, List } from 'lucide-react';
 import { useChatStore } from '@/chat/store';
 
 export default function NotesPage() {
@@ -35,9 +35,17 @@ export default function NotesPage() {
     }
   };
 
+  const handleUpdateTags = (tagsString: string) => {
+    if (selectedId) {
+      const tags = tagsString.split(',').map(t => t.trim()).filter(t => t.length > 0);
+      setNotes(notes.map(n => n.id === selectedId ? { ...n, tags } : n));
+    }
+  };
+
   const filteredNotes = notes.filter(n => 
     n.title.toLowerCase().includes(search.toLowerCase()) || 
-    n.content.toLowerCase().includes(search.toLowerCase())
+    n.content.toLowerCase().includes(search.toLowerCase()) ||
+    n.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -70,7 +78,17 @@ export default function NotesPage() {
                className={`p-4 border-b cursor-pointer hover:bg-muted/50 transition-colors ${selectedId === note.id ? 'bg-secondary border-l-2 border-l-primary' : ''}`}
              >
                <h3 className="font-medium text-sm truncate">{note.title}</h3>
-               <p className="text-xs text-muted-foreground mt-1 truncate">
+               {note.tags.length > 0 && (
+                 <div className="flex flex-wrap gap-1 mt-2">
+                   {note.tags.slice(0, 2).map(tag => (
+                     <span key={tag} className="inline-block px-2 py-0.5 text-[10px] bg-primary/10 text-primary rounded">
+                       {tag}
+                     </span>
+                   ))}
+                   {note.tags.length > 2 && <span className="text-[10px] text-muted-foreground">+{note.tags.length - 2}</span>}
+                 </div>
+               )}
+               <p className="text-xs text-muted-foreground mt-2 truncate">
                  {note.content.substring(0, 50) || "No content"}
                </p>
                <div className="text-[10px] text-muted-foreground mt-2 flex justify-between">
@@ -105,6 +123,28 @@ export default function NotesPage() {
                 <Save className="h-4 w-4 mr-2" /> Saved
               </Button>
             </div>
+
+            {/* Toolbar */}
+            <div className="h-12 border-b bg-muted/5 px-4 flex items-center gap-1">
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-sm" title="Bold"><Bold className="h-3.5 w-3.5" /></Button>
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-sm" title="Italic"><Italic className="h-3.5 w-3.5" /></Button>
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-sm" title="Heading"><Heading2 className="h-3.5 w-3.5" /></Button>
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-sm" title="List"><List className="h-3.5 w-3.5" /></Button>
+              <div className="flex-1" />
+              <span className="text-xs text-muted-foreground">{activeNote.content.length} chars</span>
+            </div>
+
+            {/* Tags */}
+            <div className="h-10 border-b px-4 flex items-center gap-2 bg-muted/5">
+              <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+              <Input 
+                placeholder="Add tags (comma-separated)" 
+                value={activeNote.tags.join(', ')}
+                onChange={(e) => handleUpdateTags(e.target.value)}
+                className="border-0 bg-transparent h-8 text-xs placeholder-muted-foreground/50"
+              />
+            </div>
+
             <div className="flex-1 overflow-hidden">
                <NotesEditor content={activeNote.content} onChange={handleUpdate} />
             </div>

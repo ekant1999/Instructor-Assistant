@@ -4,20 +4,39 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, RefreshCw, Save, CheckCircle2, FileUp } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Loader2, RefreshCw, Save, CheckCircle2, FileUp, BookOpen } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export default function QuestionSetsPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState('');
+  const [selectedPapers, setSelectedPapers] = useState<Set<string>>(new Set(['1']));
+  const [questionType, setQuestionType] = useState('multiple-choice');
   
+  const papers = [
+    { id: '1', title: 'Attention Is All You Need', year: '2017' },
+    { id: '2', title: 'BERT: Pre-training of Deep Bidirectional...', year: '2018' },
+    { id: '3', title: 'GPT-4 Technical Report', year: '2023' }
+  ];
+
+  const togglePaper = (id: string) => {
+    const newSet = new Set(selectedPapers);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    setSelectedPapers(newSet);
+  };
+
   const handleGenerate = async () => {
     setIsGenerating(true);
     setGeneratedContent('');
     
     const questions = [
-      "### Question 1\n**What is the primary mechanism of the Transformer architecture?**\nA) LSTM cells\nB) Self-Attention\nC) Convolutions\nD) Backpropagation through time\n\n*Correct Answer: B*",
-      "\n\n### Question 2\n**Which of the following is NOT a benefit of Reinforcement Learning from Human Feedback (RLHF)?**\nA) Reduced toxicity\nB) Better alignment with user intent\nC) Reduced training compute cost\nD) Improved factual accuracy\n\n*Correct Answer: C*"
+      "### Question 1\n**What is the primary mechanism of the Transformer architecture?**\nA) LSTM cells\nB) Self-Attention\nC) Convolutions\nD) Backpropagation through time\n\n*Correct Answer: B*\n*Explanation: The Transformer relies entirely on self-attention mechanisms, as introduced in the 'Attention Is All You Need' paper.*",
+      "\n\n### Question 2\n**Which of the following is NOT a benefit of the Transformer architecture?**\nA) Better parallelization\nB) Reduced toxicity\nC) Longer-range dependencies\nD) Faster training\n\n*Correct Answer: B*\n*Explanation: Reduced toxicity is not a direct architectural benefit of Transformers.*"
     ];
 
     for (const q of questions) {
@@ -29,50 +48,85 @@ export default function QuestionSetsPage() {
   };
 
   return (
-    <div className="h-full p-6 max-w-5xl mx-auto space-y-6">
+    <div className="h-full p-6 max-w-6xl mx-auto space-y-6 flex flex-col">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Question Sets</h1>
-        <Button>
+        <Button disabled={!generatedContent}>
           <Save className="h-4 w-4 mr-2" /> Save Set
         </Button>
       </div>
 
-      <Tabs defaultValue="generate" className="h-full flex flex-col">
-        <TabsList className="w-[400px]">
+      <Tabs defaultValue="generate" className="flex-1 flex flex-col">
+        <TabsList className="w-[300px]">
           <TabsTrigger value="generate">Generate</TabsTrigger>
           <TabsTrigger value="upload">Upload & Edit</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="generate" className="flex-1 mt-6 border rounded-xl overflow-hidden bg-background shadow-sm flex flex-col md:flex-row h-[600px]">
-           {/* Controls */}
-           <div className="w-full md:w-1/3 border-r bg-muted/10 p-6 flex flex-col gap-4">
-             <div className="space-y-2">
-               <label className="text-sm font-medium">Topic / Source Material</label>
-               <Textarea 
-                 placeholder="Paste text or describe the topic..." 
-                 className="min-h-[150px] bg-background"
-               />
+        <TabsContent value="generate" className="flex-1 mt-6 border rounded-xl overflow-hidden bg-background shadow-sm flex flex-col md:flex-row">
+           {/* Left Panel - Controls */}
+           <div className="w-full md:w-1/3 border-r bg-muted/10 p-6 flex flex-col gap-6 overflow-auto">
+             {/* Source Material */}
+             <div className="space-y-3">
+               <h3 className="font-semibold text-sm flex items-center gap-2">
+                 <BookOpen className="h-4 w-4" />
+                 Source Materials
+               </h3>
+               <Card className="p-3 space-y-2 border-primary/20 bg-primary/5">
+                 {papers.map(paper => (
+                   <div key={paper.id} className="flex items-center gap-2">
+                     <Checkbox 
+                       checked={selectedPapers.has(paper.id)}
+                       onCheckedChange={() => togglePaper(paper.id)}
+                     />
+                     <label className="text-sm flex-1 cursor-pointer">
+                       <span className="font-medium">{paper.title}</span>
+                       <span className="text-xs text-muted-foreground block">{paper.year}</span>
+                     </label>
+                   </div>
+                 ))}
+               </Card>
              </div>
-             
-             <div className="space-y-2">
-               <label className="text-sm font-medium">Question Type</label>
+
+             {/* Question Type */}
+             <div className="space-y-3">
+               <h3 className="font-semibold text-sm">Question Type</h3>
                <div className="grid grid-cols-2 gap-2">
-                 <Button variant="outline" size="sm" className="justify-start">Multiple Choice</Button>
-                 <Button variant="outline" size="sm" className="justify-start">True/False</Button>
-                 <Button variant="outline" size="sm" className="justify-start">Short Answer</Button>
-                 <Button variant="outline" size="sm" className="justify-start">Mixed</Button>
+                 {[
+                   { id: 'multiple-choice', label: 'Multiple Choice' },
+                   { id: 'true-false', label: 'True/False' },
+                   { id: 'short-answer', label: 'Short Answer' },
+                   { id: 'mixed', label: 'Mixed' }
+                 ].map(type => (
+                   <Button 
+                     key={type.id}
+                     variant={questionType === type.id ? 'default' : 'outline'} 
+                     size="sm" 
+                     className="h-8 text-xs justify-start"
+                     onClick={() => setQuestionType(type.id)}
+                   >
+                     {type.label}
+                   </Button>
+                 ))}
                </div>
+             </div>
+
+             {/* Model Selection */}
+             <div className="space-y-3">
+               <h3 className="font-semibold text-sm">Model</h3>
+               <Button variant="outline" size="sm" className="w-full h-8 text-xs justify-start">
+                 ⚡ Qwen (Local) - Recommended
+               </Button>
              </div>
 
              <div className="flex-1" />
              
-             <Button onClick={handleGenerate} disabled={isGenerating} className="w-full">
+             <Button onClick={handleGenerate} disabled={isGenerating || selectedPapers.size === 0} className="w-full">
                {isGenerating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
                {isGenerating ? 'Generating...' : 'Generate Questions'}
              </Button>
            </div>
 
-           {/* Preview */}
+           {/* Right Panel - Preview */}
            <div className="flex-1 bg-background flex flex-col">
              <div className="p-3 border-b bg-muted/5 flex justify-between items-center text-xs text-muted-foreground">
                <span>Preview</span>
@@ -86,7 +140,7 @@ export default function QuestionSetsPage() {
                ) : (
                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-50">
                    <FileUp className="h-12 w-12 mb-2" />
-                   <p>Enter a topic and click generate</p>
+                   <p>{selectedPapers.size === 0 ? 'Select source materials' : 'Click generate to create questions'}</p>
                  </div>
                )}
              </ScrollArea>

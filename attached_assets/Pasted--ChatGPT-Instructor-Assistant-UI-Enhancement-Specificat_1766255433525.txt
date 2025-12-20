@@ -1,0 +1,665 @@
+# ChatGPT Instructor Assistant - UI Enhancement Specification
+
+Build upon the existing modular Instructor Assistant application. This spec focuses on refinements and missing features based on the current implementation.
+
+## 🎯 Current State Analysis
+
+**What's Already Built:**
+- ✅ Home dashboard with feature cards
+- ✅ Research Papers page (empty state)
+- ✅ Notes Editor with sidebar
+- ✅ Question Sets page with generation/upload tabs
+- ✅ Qwen Agent page (chat interface with tools)
+- ✅ RAG System page (query interface)
+- ✅ Navigation header with pill-style buttons
+- ✅ Floating chat bubble (bottom-right)
+- ✅ Dark blue gradient sidebar design
+- ✅ Consistent white card layouts
+
+**What Needs Enhancement:**
+- Research Papers functionality (upload, preview, sections)
+- Paper summarization workflow
+- Integration between pages
+- Chat streaming effects
+- More polished interactions
+
+---
+
+## 📚 Tech Stack (Current)
+
+- React 18 + TypeScript
+- Vite
+- Tailwind CSS
+- React Router v6
+- Mock backend responses
+- No real API integrations
+
+---
+
+## 🎨 Design System (Maintain Consistency)
+
+**Colors:**
+- Primary Blue: `#3B82F6` (your current button color)
+- Dark Blue Gradient: `from-blue-900 to-blue-700` (sidebar)
+- Dark Background: `#1E293B` (content areas)
+- Light Background: `#F8FAFC` (main areas)
+- White Cards: `#FFFFFF` with subtle shadows
+
+**Typography:**
+- Headers: Bold, large (text-2xl, text-3xl)
+- Body: Medium weight (text-base)
+- Descriptions: Light gray (text-gray-600)
+
+**Components:**
+- Pill buttons with rounded-full
+- Cards with rounded-xl and shadow
+- Dark sidebars with gradient
+- White content areas
+
+---
+
+## 🔧 Priority Enhancements
+
+### 1. Research Papers Page - CRITICAL UPDATES
+
+#### Current State:
+- Empty library with "Sync" button
+- "View Your Research Papers" and "Download and Summarize Papers" tabs
+- Empty preview area
+
+#### Required Features:
+
+**A. Multi-Upload Panel (Add to top)**
+
+```
+┌─────────────────────────────────────────────┐
+│  Add Papers                                  │
+│  ┌─────────┬─────────┬─────────┬──────────┐ │
+│  │   DOI   │   URL   │  Title  │   File   │ │
+│  └─────────┴─────────┴─────────┴──────────┘ │
+│                                              │
+│  [Paste DOI/URL/Title or drag PDF here]     │
+│  [+ Add Another] [Upload All]                │
+└─────────────────────────────────────────────┘
+```
+
+**Implementation:**
+- Tabbed input: DOI | URL | Title | Upload PDF
+- Support multiple entries at once
+- Show upload progress per paper
+- Papers appear immediately in library
+- Mock the metadata extraction
+
+**B. Paper List with Metadata**
+
+Replace "Papers (0)" with rich list:
+
+```
+┌─────────────────────────────────┐
+│ LIBRARY                    Sync │
+│ Papers (3)                      │
+│                                 │
+│ ☑ Attention Is All You Need    │
+│   Vaswani et al. • 2017        │
+│   📄 Sections: 6 • 8 pages     │
+│                                 │
+│ ☐ BERT: Pre-training...        │
+│   Devlin et al. • 2018         │
+│   📄 Sections: 7 • 12 pages    │
+│                                 │
+│ ☐ GPT-4 Technical Report       │
+│   OpenAI • 2023                │
+│   📄 Sections: 8 • 100 pages   │
+└─────────────────────────────────┘
+```
+
+**Features:**
+- Checkboxes for multi-select
+- Click to preview
+- Quick actions menu (•••)
+- Visual selected state
+
+**C. Tabbed Right Panel**
+
+Replace empty preview with:
+
+```
+┌──────────────────────────────────────┐
+│ [PDF] [Sections] [Summaries]         │
+├──────────────────────────────────────┤
+│                                      │
+│  When PDF tab:                       │
+│  • Show embedded PDF viewer          │
+│  • "Open Source" | "Fullscreen"      │
+│                                      │
+│  When Sections tab:                  │
+│  • ☐ Abstract                        │
+│  • ☐ Introduction                    │
+│  • ☐ Methods                         │
+│  • ☐ Results                         │
+│  • ☐ Discussion                      │
+│  • ☐ References                      │
+│  [Select All] [Summarize Selected]   │
+│                                      │
+│  When Summaries tab:                 │
+│  • List of saved summaries           │
+│  • Click to open in editor           │
+└──────────────────────────────────────┘
+```
+
+**D. Summarization Workflow**
+
+Add "Summarize" button that opens modal:
+
+```
+┌─────────────────────────────────────┐
+│  Summarize Papers                   │
+├─────────────────────────────────────┤
+│  Scope:                             │
+│  ○ Full document(s)                 │
+│  ○ Selected sections only           │
+│                                     │
+│  Model:                             │
+│  ○ Qwen (Local) ⚡ Recommended      │
+│  ○ GPT-4 (Simulated)                │
+│  ○ Gemini (Simulated)               │
+│                                     │
+│  Style:                             │
+│  ○ Brief bullet points              │
+│  ○ Detailed academic                │
+│  ○ Teaching/exam notes              │
+│  ○ Custom: [________________]       │
+│                                     │
+│  [Cancel]  [Generate Summary]       │
+└─────────────────────────────────────┘
+```
+
+**After generation:**
+- Open summary in modal with Markdown editor
+- Live preview toggle
+- Actions: Save as Note | Export MD | Copy
+
+---
+
+### 2. Notes Editor - ENHANCEMENTS
+
+#### Current State:
+- Working sidebar with stats
+- Basic text editor
+- "Create Note" button
+
+#### Add These Features:
+
+**A. Rich Markdown Editor**
+```typescript
+// Add toolbar above editor
+[B] [I] [H1] [H2] [•] [1.] [Link] [Code]
+
+// Features:
+- Bold, italic, headers
+- Lists (bullet, numbered)
+- Links and images
+- Code blocks
+- Live preview toggle
+```
+
+**B. Note Metadata**
+- Add tags field (comma-separated)
+- Show source (chat/library/rag)
+- Display word count live
+- Auto-save indicator
+
+**C. Note List Improvements**
+- Search/filter by tags
+- Sort options (date, name)
+- Preview snippet (first 50 chars)
+- Visual tags as pills
+
+---
+
+### 3. Question Sets - ENHANCEMENTS
+
+#### Current State:
+- Two tabs: Generate | Upload
+- LLM provider selector
+- Empty source materials area
+
+#### Add These Features:
+
+**A. Source Material Selection**
+```
+Source Materials:
+[Select from Library ▼]
+
+☑ Attention Is All You Need
+☑ BERT: Pre-training...
+☐ GPT-4 Technical Report
+
+Or upload directly:
+[Upload PDF/Markdown]
+```
+
+**B. Chat-Style Generation**
+
+In "Generate" tab:
+```
+┌────────────────────────────────────┐
+│ 💬 Question Generation Chat        │
+├────────────────────────────────────┤
+│                                    │
+│ You: Generate 10 multiple choice   │
+│      questions from the BERT paper │
+│                                    │
+│ Assistant: I'll generate questions │
+│           about BERT's key concepts│
+│           [typing indicator...]    │
+│                                    │
+│ [Show generated questions below]   │
+└────────────────────────────────────┘
+
+Generated Questions:
+┌────────────────────────────────────┐
+│ ## Question 1                      │
+│ What does BERT stand for?          │
+│ - A) Bidirectional...              │
+│ - B) Binary...                     │
+│                                    │
+│ [Edit] [Preview] [Save Set]        │
+└────────────────────────────────────┘
+```
+
+**C. Preview Mode**
+- Show rendered Markdown
+- Toggle between edit/preview
+- Export options (PDF, Canvas)
+
+---
+
+### 4. Qwen Agent - ENHANCEMENTS
+
+#### Current State:
+- Working chat interface
+- Tool list on left
+- Quick links
+
+#### Add These Features:
+
+**A. Tool Status Indicators**
+
+When agent uses a tool:
+```
+QWEN
+🔍 Using Web Search...
+[progress bar]
+
+Found 5 results from DuckDuckGo
+```
+
+**B. Rich Message Actions**
+
+Add to each assistant message:
+```
+┌──────────────────────────────────┐
+│ Here's what I found about BERT... │
+│                                  │
+│ [📝 Save as Note] [📋 Copy]      │
+└──────────────────────────────────┘
+```
+
+**C. Navigation Commands**
+
+Agent can route user:
+```
+User: "Show me my papers"
+Agent: "Let me take you to the Research Library"
+      [Go to Library →]
+```
+
+---
+
+### 5. RAG System - ENHANCEMENTS
+
+#### Current State:
+- "Ingest PDFs" | "Query System" tabs
+- Index status indicator
+- Login checkbox
+- Query input area
+
+#### Add These Features:
+
+**A. Better Query Interface**
+
+```
+┌────────────────────────────────────┐
+│ Ask about your PDF library         │
+│                                    │
+│ [What are the key findings in     │
+│  the Transformer architecture?]   │
+│                                    │
+│ Advanced:                          │
+│ ☐ Include citations               │
+│ ☐ Search specific papers          │
+│ Max chunks: [5 ▼]                 │
+│                                    │
+│ [Ask Question]                     │
+└────────────────────────────────────┘
+```
+
+**B. Answer with Citations**
+
+```
+┌────────────────────────────────────┐
+│ 📝 Answer                          │
+│                                    │
+│ The Transformer architecture uses  │
+│ self-attention mechanisms [1] to   │
+│ process sequences in parallel [2]. │
+│                                    │
+│ Sources:                           │
+│ [1] Attention Is All You Need, p.3 │
+│ [2] Attention Is All You Need, p.5 │
+│                                    │
+│ [💬 Send to Chat] [📝 Save as Note]│
+└────────────────────────────────────┘
+```
+
+---
+
+### 6. Global Chat Enhancement
+
+Add a global sticky chat at the bottom of every page (except Qwen Agent):
+
+```
+┌─────────────────────────────────────────────┐
+│ [💬 Ask the assistant anything...]    [Send]│
+└─────────────────────────────────────────────┘
+```
+
+**Behavior:**
+- Appears on all pages
+- Expands to show conversation
+- Can minimize
+- Persists across navigation
+- Routes user to appropriate page
+
+---
+
+## 🔗 Page Integration Events
+
+Pages should communicate via events:
+
+```typescript
+// From Library → Notes
+window.dispatchEvent(new CustomEvent('saveSummary', {
+  detail: {
+    markdown: summaryContent,
+    source: 'library',
+    paperTitle: 'Attention Is All You Need'
+  }
+}));
+
+// From RAG → Chat
+window.dispatchEvent(new CustomEvent('sendToChat', {
+  detail: {
+    message: ragAnswer,
+    citations: [...sources]
+  }
+}));
+
+// From Agent → Navigation
+window.dispatchEvent(new CustomEvent('navigate', {
+  detail: { page: '/library' }
+}));
+```
+
+**Implementation:**
+- Use custom events for loose coupling
+- Each page listens for relevant events
+- Maintain independence
+
+---
+
+## 📁 Updated Folder Structure
+
+```
+src/
+├── app/
+│   ├── AppShell.tsx          # Main layout
+│   ├── routes.tsx            
+│   └── Header.tsx            
+├── pages/
+│   ├── home/
+│   │   └── HomePage.tsx
+│   ├── library/
+│   │   ├── LibraryPage.tsx
+│   │   ├── UploadPanel.tsx        # NEW
+│   │   ├── PaperList.tsx          # NEW
+│   │   ├── PaperPreview.tsx       # NEW
+│   │   ├── SectionSelector.tsx    # NEW
+│   │   ├── SummarizeModal.tsx     # NEW
+│   │   └── SummaryEditor.tsx      # NEW
+│   ├── notes/
+│   │   ├── NotesPage.tsx
+│   │   ├── NotesList.tsx          # Enhanced
+│   │   ├── NoteEditor.tsx         # Enhanced
+│   │   └── MarkdownToolbar.tsx    # NEW
+│   ├── questions/
+│   │   ├── QuestionsPage.tsx
+│   │   ├── GenerateTab.tsx        # Enhanced
+│   │   ├── UploadTab.tsx
+│   │   └── SourceSelector.tsx     # NEW
+│   ├── agent/
+│   │   ├── AgentPage.tsx
+│   │   └── ToolStatusIndicator.tsx # NEW
+│   └── rag/
+│       ├── RAGPage.tsx
+│       ├── QueryInterface.tsx      # NEW
+│       └── AnswerPanel.tsx         # NEW
+├── components/
+│   ├── GlobalChat.tsx              # NEW
+│   ├── FloatingChatBubble.tsx
+│   ├── MessageBubble.tsx
+│   ├── StreamingText.tsx           # NEW
+│   └── PDFViewer.tsx               # NEW
+├── hooks/
+│   ├── useEventBus.ts              # NEW
+│   ├── useLocalStorage.ts
+│   └── useStreamingText.ts         # NEW
+├── services/
+│   ├── mockAPI.ts
+│   ├── paperService.ts             # NEW
+│   └── summarizationService.ts     # NEW
+├── types/
+│   ├── paper.types.ts              # NEW
+│   ├── note.types.ts
+│   └── events.types.ts             # NEW
+└── utils/
+    ├── markdown.ts
+    └── eventBus.ts                 # NEW
+```
+
+---
+
+## 🎯 Implementation Priority
+
+### Phase 1 (Critical - Do First)
+1. **Research Papers Upload** - Multi-upload panel
+2. **Paper List UI** - Display papers with metadata
+3. **Section Selector** - Checkboxes for sections
+4. **PDF Preview** - Basic viewer
+
+### Phase 2 (High Priority)
+5. **Summarization Modal** - 3-step wizard
+6. **Summary Editor** - Markdown editor with preview
+7. **Save to Notes** - Integration event
+8. **Notes Enhancements** - Tags, search, metadata
+
+### Phase 3 (Medium Priority)
+9. **Question Generation** - Source selection + chat
+10. **RAG Citations** - Answer with sources
+11. **Global Chat** - Sticky bottom chat
+12. **Streaming Effects** - Typewriter text
+
+### Phase 4 (Polish)
+13. **Tool Status** - Visual indicators
+14. **Navigation Events** - Cross-page routing
+15. **Message Actions** - Save, copy buttons
+16. **Dark Mode** - Toggle (if needed)
+
+---
+
+## 💻 Key Implementation Patterns
+
+### 1. Mock Data Examples
+
+```typescript
+// Mock papers
+export const mockPapers = [
+  {
+    id: 'paper-1',
+    title: 'Attention Is All You Need',
+    authors: ['Vaswani', 'Shazeer', 'Parmar'],
+    year: 2017,
+    sections: [
+      { id: 'abstract', title: 'Abstract', content: '...' },
+      { id: 'intro', title: 'Introduction', content: '...' },
+      { id: 'methods', title: 'Methods', content: '...' },
+    ],
+    pdfUrl: '/mock/attention.pdf',
+    pageCount: 8
+  }
+];
+
+// Mock summarization
+export const mockSummarize = async (
+  paperIds: string[],
+  sections: string[],
+  model: 'qwen' | 'gpt' | 'gemini',
+  style: string
+): Promise<string> => {
+  await delay(2000); // Simulate processing
+  
+  return `# Summary of ${paperIds.length} paper(s)
+
+## Key Points
+- Point 1 from the paper
+- Point 2 about methodology
+- Point 3 about results
+
+## Detailed Analysis
+The paper discusses...`;
+};
+```
+
+### 2. Event Bus Pattern
+
+```typescript
+// hooks/useEventBus.ts
+export const useEventBus = () => {
+  const emit = (event: string, detail: any) => {
+    window.dispatchEvent(new CustomEvent(event, { detail }));
+  };
+
+  const on = (event: string, handler: (e: CustomEvent) => void) => {
+    window.addEventListener(event, handler as any);
+    return () => window.removeEventListener(event, handler as any);
+  };
+
+  return { emit, on };
+};
+
+// Usage in Notes page
+const { on } = useEventBus();
+
+useEffect(() => {
+  return on('saveSummary', (e) => {
+    const { markdown, source, paperTitle } = e.detail;
+    createNote({ content: markdown, source, title: paperTitle });
+  });
+}, []);
+```
+
+### 3. Streaming Text Effect
+
+```typescript
+// hooks/useStreamingText.ts
+export const useStreamingText = (text: string, speed = 30) => {
+  const [displayed, setDisplayed] = useState('');
+  
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        setDisplayed(text.slice(0, i + 1));
+        i++;
+      } else {
+        clearInterval(timer);
+      }
+    }, speed);
+    
+    return () => clearInterval(timer);
+  }, [text, speed]);
+  
+  return displayed;
+};
+
+// Usage
+const displayed = useStreamingText(message.content);
+```
+
+---
+
+## ✅ Definition of Done
+
+Each feature is complete when:
+- [ ] UI matches the design system
+- [ ] Mock API calls work with realistic delays
+- [ ] TypeScript types are properly defined
+- [ ] Component is responsive (mobile works)
+- [ ] Loading states are visible
+- [ ] Error states are handled
+- [ ] Integration events work (if applicable)
+- [ ] No console errors
+
+---
+
+## 🚀 Quick Start Checklist
+
+1. **Review existing code**
+   - Understand current routing
+   - Check existing components
+   - Note the styling patterns
+
+2. **Start with Library page**
+   - Add upload panel component
+   - Create paper list component
+   - Implement section selector
+   - Add summarization modal
+
+3. **Connect to Notes**
+   - Implement event emission
+   - Add event listener in Notes
+   - Test the integration
+
+4. **Enhance remaining pages**
+   - Follow the same patterns
+   - Reuse components
+   - Maintain consistency
+
+---
+
+## 🎨 UI Consistency Checklist
+
+For every new component:
+- [ ] Uses Tailwind classes (no custom CSS)
+- [ ] Matches existing color scheme
+- [ ] Uses consistent spacing (p-4, p-6, p-8)
+- [ ] Has proper rounded corners (rounded-xl)
+- [ ] Includes hover states
+- [ ] Has loading states
+- [ ] Handles empty states
+- [ ] Works on mobile (responsive)
+
+---
+
+**This spec builds on your existing work. Focus on the Library page first—it's the most critical missing piece. The rest will flow naturally once you have papers to work with.**
