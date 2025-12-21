@@ -27,10 +27,10 @@ export function ChatInput({ className }: { className?: string }) {
   }, [input]);
 
   return (
-    <div className={cn("relative w-full max-w-3xl mx-auto p-4", className)}>
-      <div className="relative flex items-end gap-2 bg-secondary/50 p-2 rounded-2xl border border-border shadow-sm focus-within:ring-1 focus-within:ring-ring transition-all">
-        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full text-muted-foreground hover:text-foreground shrink-0 mb-1">
-          <Paperclip className="h-5 w-5" />
+    <div className={cn("relative w-full max-w-4xl mx-auto p-6", className)}>
+      <div className="relative flex items-end gap-3 bg-secondary/50 p-3 rounded-2xl border border-border shadow-sm focus-within:ring-1 focus-within:ring-ring transition-all">
+        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground shrink-0 mb-1">
+          <Paperclip className="h-6 w-6" />
         </Button>
         
         <Textarea
@@ -39,28 +39,28 @@ export function ChatInput({ className }: { className?: string }) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask anything..."
-          className="min-h-[44px] max-h-[200px] w-full resize-none border-0 bg-transparent py-3 px-2 focus-visible:ring-0 shadow-none text-base"
+          className="min-h-[52px] max-h-[240px] w-full resize-none border-0 bg-transparent py-4 px-3 focus-visible:ring-0 shadow-none text-lg"
           rows={1}
         />
 
         <div className="flex gap-2 shrink-0 mb-1">
            {input.length === 0 ? (
-             <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full text-muted-foreground hover:text-foreground">
-               <Mic className="h-5 w-5" />
+             <Button variant="ghost" size="icon" className="h-12 w-12 rounded-full text-muted-foreground hover:text-foreground">
+               <Mic className="h-6 w-6" />
              </Button>
            ) : (
              <Button 
                 onClick={() => sendMessage(input)} 
                 disabled={isStreaming || !input.trim()}
                 size="icon"
-                className="h-10 w-10 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
+                className="h-12 w-12 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-5 w-5" />
              </Button>
            )}
         </div>
       </div>
-      <div className="text-center text-xs text-muted-foreground mt-2">
+      <div className="text-center text-sm text-muted-foreground mt-3">
         AI can make mistakes. Check important info.
       </div>
     </div>

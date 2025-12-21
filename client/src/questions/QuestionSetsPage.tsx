@@ -50,9 +50,9 @@ export default function QuestionSetsPage() {
   return (
     <div className="h-full p-6 max-w-6xl mx-auto space-y-6 flex flex-col">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Question Sets</h1>
-        <Button disabled={!generatedContent}>
-          <Save className="h-4 w-4 mr-2" /> Save Set
+        <h1 className="text-3xl font-bold tracking-tight">Question Sets</h1>
+        <Button disabled={!generatedContent} size="lg">
+          <Save className="h-5 w-5 mr-2" /> Save Set
         </Button>
       </div>
 
@@ -67,20 +67,20 @@ export default function QuestionSetsPage() {
            <div className="w-full md:w-1/3 border-r bg-muted/10 p-6 flex flex-col gap-6 overflow-auto">
              {/* Source Material */}
              <div className="space-y-3">
-               <h3 className="font-semibold text-sm flex items-center gap-2">
-                 <BookOpen className="h-4 w-4" />
+               <h3 className="font-semibold text-base flex items-center gap-2">
+                 <BookOpen className="h-5 w-5" />
                  Source Materials
                </h3>
-               <Card className="p-3 space-y-2 border-primary/20 bg-primary/5">
+               <Card className="p-4 space-y-3 border-primary/20 bg-primary/5">
                  {papers.map(paper => (
-                   <div key={paper.id} className="flex items-center gap-2">
+                   <div key={paper.id} className="flex items-center gap-3">
                      <Checkbox 
                        checked={selectedPapers.has(paper.id)}
                        onCheckedChange={() => togglePaper(paper.id)}
                      />
-                     <label className="text-sm flex-1 cursor-pointer">
+                     <label className="text-base flex-1 cursor-pointer">
                        <span className="font-medium">{paper.title}</span>
-                       <span className="text-xs text-muted-foreground block">{paper.year}</span>
+                       <span className="text-sm text-muted-foreground block">{paper.year}</span>
                      </label>
                    </div>
                  ))}
@@ -89,7 +89,7 @@ export default function QuestionSetsPage() {
 
              {/* Question Type */}
              <div className="space-y-3">
-               <h3 className="font-semibold text-sm">Question Type</h3>
+               <h3 className="font-semibold text-base">Question Type</h3>
                <div className="grid grid-cols-2 gap-2">
                  {[
                    { id: 'multiple-choice', label: 'Multiple Choice' },
@@ -100,8 +100,8 @@ export default function QuestionSetsPage() {
                    <Button 
                      key={type.id}
                      variant={questionType === type.id ? 'default' : 'outline'} 
-                     size="sm" 
-                     className="h-8 text-xs justify-start"
+                     size="default" 
+                     className="h-10 text-base justify-start"
                      onClick={() => setQuestionType(type.id)}
                    >
                      {type.label}
@@ -112,35 +112,35 @@ export default function QuestionSetsPage() {
 
              {/* Model Selection */}
              <div className="space-y-3">
-               <h3 className="font-semibold text-sm">Model</h3>
-               <Button variant="outline" size="sm" className="w-full h-8 text-xs justify-start">
+               <h3 className="font-semibold text-base">Model</h3>
+               <Button variant="outline" size="default" className="w-full h-10 text-base justify-start">
                  ⚡ Qwen (Local) - Recommended
                </Button>
              </div>
 
              <div className="flex-1" />
              
-             <Button onClick={handleGenerate} disabled={isGenerating || selectedPapers.size === 0} className="w-full">
-               {isGenerating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+             <Button onClick={handleGenerate} disabled={isGenerating || selectedPapers.size === 0} className="w-full" size="lg">
+               {isGenerating ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <RefreshCw className="h-5 w-5 mr-2" />}
                {isGenerating ? 'Generating...' : 'Generate Questions'}
              </Button>
            </div>
 
            {/* Right Panel - Preview */}
            <div className="flex-1 bg-background flex flex-col">
-             <div className="p-3 border-b bg-muted/5 flex justify-between items-center text-xs text-muted-foreground">
+             <div className="p-4 border-b bg-muted/5 flex justify-between items-center text-sm text-muted-foreground">
                <span>Preview</span>
                <span>Markdown</span>
              </div>
              <ScrollArea className="flex-1 p-8">
                {generatedContent ? (
-                 <div className="prose prose-sm dark:prose-invert max-w-none">
+                 <div className="prose prose-base dark:prose-invert max-w-none">
                    <ReactMarkdown>{generatedContent}</ReactMarkdown>
                  </div>
                ) : (
                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-50">
-                   <FileUp className="h-12 w-12 mb-2" />
-                   <p>{selectedPapers.size === 0 ? 'Select source materials' : 'Click generate to create questions'}</p>
+                   <FileUp className="h-16 w-16 mb-3" />
+                   <p className="text-lg">{selectedPapers.size === 0 ? 'Select source materials' : 'Click generate to create questions'}</p>
                  </div>
                )}
              </ScrollArea>
@@ -154,8 +154,8 @@ export default function QuestionSetsPage() {
                 <FileUp className="h-8 w-8 text-muted-foreground" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg">Upload Question Set</h3>
-                <p className="text-muted-foreground">Drag and drop Markdown or CSV files</p>
+                <h3 className="font-semibold text-xl">Upload Question Set</h3>
+                <p className="text-muted-foreground text-base">Drag and drop Markdown or CSV files</p>
               </div>
               <Button variant="outline">Select File</Button>
             </div>

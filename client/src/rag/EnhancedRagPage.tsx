@@ -6,7 +6,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, Network, Loader2, Globe, Monitor, Database } from 'lucide-react';
 import { DocumentIngestionPanel } from './DocumentIngestionPanel';
 import { QueryHistory } from './QueryHistory';
@@ -186,16 +185,16 @@ export default function EnhancedRagPage() {
 
   return (
     <div className="flex flex-col h-full max-w-7xl mx-auto w-full p-6 space-y-6">
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 mb-4">
-          <Network className="h-6 w-6 text-primary" />
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-primary/10 mb-5">
+          <Network className="h-8 w-8 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Knowledge Retrieval</h1>
-        <p className="text-muted-foreground">Search across all your papers, notes, and external sources.</p>
+        <h1 className="text-4xl font-bold tracking-tight mb-3">Knowledge Retrieval</h1>
+        <p className="text-muted-foreground text-lg">Search across all your papers, notes, and external sources.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
-        {/* Left Sidebar - Document Selection */}
+        {/* Left Sidebar - Document Selection & PDF Ingestion */}
         <div className="lg:col-span-1 space-y-4 overflow-auto">
           <DocumentIngestionPanel
             papers={papers}
@@ -210,6 +209,10 @@ export default function EnhancedRagPage() {
             onSaveTemplate={handleSaveTemplate}
             onLoadTemplate={handleLoadTemplate}
             onDeleteTemplate={handleDeleteTemplate}
+            onIngestionComplete={() => {
+              toast.success('PDFs ingested successfully');
+              // Refresh papers list or update state after ingestion
+            }}
           />
 
           {queryHistory.length > 0 && (
@@ -233,7 +236,7 @@ export default function EnhancedRagPage() {
           {/* Agent Selection */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
-              <Label className="text-sm font-medium">Query Using:</Label>
+              <Label className="text-base font-medium">Query Using:</Label>
               <div className="flex gap-2 flex-1">
                 <Button
                   variant={agent === 'GPT Web' ? 'default' : 'outline'}

@@ -26,20 +26,20 @@ export default function AppShell({ children }: AppShellProps) {
   return (
     <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
       {/* Top Bar */}
-      <header className="h-14 border-b border-border flex items-center justify-between px-4 bg-background/80 backdrop-blur-sm z-50 sticky top-0">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
+      <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-background/80 backdrop-blur-sm z-50 sticky top-0">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="md:hidden h-10 w-10">
+            <Menu className="h-6 w-6" />
           </Button>
-          <div className="font-bold text-lg tracking-tight flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
+          <div className="font-bold text-xl tracking-tight flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-lg">
               IA
             </div>
             <span className="hidden md:inline">Instructor Assistant</span>
           </div>
         </div>
 
-        <nav className="flex items-center gap-1 bg-secondary/30 p-1 rounded-lg">
+        <nav className="flex items-center gap-2 bg-secondary/30 p-1.5 rounded-lg">
           {navItems.map((item) => {
             const isActive = location === item.path;
             const Icon = item.icon;
@@ -49,13 +49,13 @@ export default function AppShell({ children }: AppShellProps) {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-8 px-3 rounded-md transition-all text-sm font-medium",
+                    "h-10 px-4 rounded-md transition-all text-base font-medium",
                     isActive 
                       ? "bg-background shadow-sm text-foreground" 
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                   )}
                 >
-                  <Icon className="h-4 w-4 mr-2" />
+                  <Icon className="h-5 w-5 mr-2" />
                   {item.label}
                 </Button>
               </Link>
@@ -64,7 +64,7 @@ export default function AppShell({ children }: AppShellProps) {
         </nav>
 
         <div className="flex items-center gap-2">
-           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500" />
+           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500" />
         </div>
       </header>
 
@@ -87,7 +87,7 @@ export default function AppShell({ children }: AppShellProps) {
             If we are on other pages, maybe we rely on the Floating Agent.
         */}
         {isChatPage && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent z-40">
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background to-transparent z-40">
              <ChatInput />
           </div>
         )}

@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Paper, Document } from '@/shared/types';
-import { BookOpen, FileText, Search, X, Save, FolderOpen, Trash2 } from 'lucide-react';
+import { BookOpen, FileText, Search, X, Save, FolderOpen, Trash2, Loader2, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { ContextTemplate } from '@/shared/types';
+import { toast } from 'sonner';
 
 interface DocumentIngestionPanelProps {
   papers: Paper[];
@@ -24,6 +26,7 @@ interface DocumentIngestionPanelProps {
   onSaveTemplate?: (name: string, paperIds: string[], noteIds: string[]) => void;
   onLoadTemplate?: (template: ContextTemplate) => void;
   onDeleteTemplate?: (id: string) => void;
+  onIngestionComplete?: () => void;
 }
 
 export function DocumentIngestionPanel({
@@ -38,13 +41,77 @@ export function DocumentIngestionPanel({
   contextTemplates = [],
   onSaveTemplate,
   onLoadTemplate,
-  onDeleteTemplate
+  onDeleteTemplate,
+  onIngestionComplete
 }: DocumentIngestionPanelProps) {
   const [paperSearch, setPaperSearch] = useState('');
   const [noteSearch, setNoteSearch] = useState('');
   const [noteTypeFilter, setNoteTypeFilter] = useState<string>('all');
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   const [templateName, setTemplateName] = useState('');
+  
+  // PDF Ingestion state
+  const [indexDirectory, setIndexDirectory] = useState('index');
+  const [chunkSize, setChunkSize] = useState('1200');
+  const [chunkOverlap, setChunkOverlap] = useState('200');
+  const [isIngesting, setIsIngesting] = useState(false);
+  const [indexStatus, setIndexStatus] = useState<'ready' | 'not_ready' | 'checking'>('checking');
+  const [indexPath, setIndexPath] = useState('');
+
+  // Check index status on mount
+  useEffect(() => {
+    checkIndexStatus();
+  }, []);
+
+  const checkIndexStatus = async () => {
+    setIndexStatus('checking');
+    try {
+      // In a real app, this would call an API endpoint
+      // const response = await fetch('/api/rag/index-status');
+      // const data = await response.json();
+      
+      // Mock for now - in real app, get from API
+      const mockPath = '/Documents/PersonalWork/chatgpt-instructor-assistant/index';
+      setIndexPath(mockPath);
+      setIndexStatus('ready');
+    } catch (error) {
+      setIndexStatus('not_ready');
+      toast.error('Failed to check index status');
+    }
+  };
+
+  const handleStartIngestion = async () => {
+    if (selectedPaperIds.size === 0) {
+      toast.error('Please select at least one PDF to ingest');
+      return;
+    }
+
+    setIsIngesting(true);
+    try {
+      // In a real app, this would call an API endpoint with selected paper IDs
+      // const response = await fetch('/api/rag/ingest', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     paperIds: Array.from(selectedPaperIds),
+      //     indexDirectory,
+      //     chunkSize: parseInt(chunkSize),
+      //     chunkOverlap: parseInt(chunkOverlap)
+      //   })
+      // });
+
+      // Simulate ingestion process
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      toast.success(`Successfully ingested ${selectedPaperIds.size} PDF(s)`);
+      setIndexStatus('ready');
+      onIngestionComplete?.();
+    } catch (error) {
+      toast.error('Failed to ingest PDFs');
+    } finally {
+      setIsIngesting(false);
+    }
+  };
 
   const filteredPapers = papers.filter(p =>
     p.title.toLowerCase().includes(paperSearch.toLowerCase()) ||
@@ -310,6 +377,128 @@ export function DocumentIngestionPanel({
           )}
         </div>
       )}
+
+      {/* PDF Ingestion Section */}
+      <div className="pt-4 border-t space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-base flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            PDF Ingestion
+          </h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={checkIndexStatus}
+            className="h-8 text-xs"
+            disabled={indexStatus === 'checking'}
+          >
+            <RefreshCw className={`h-4 w-4 ${indexStatus === 'checking' ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
+
+        {/* Index Status */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Label className="text-sm font-medium">Index Status:</Label>
+            {indexStatus === 'checking' && (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            )}
+            {indexStatus === 'ready' && (
+              <div className="flex items-center gap-1 text-green-600">
+                <CheckCircle2 className="h-4 w-4" />
+                <span className="text-sm">Index is ready</span>
+              </div>
+            )}
+            {indexStatus === 'not_ready' && (
+              <div className="flex items-center gap-1 text-yellow-600">
+                <AlertCircle className="h-4 w-4" />
+                <span className="text-sm">Index not found</span>
+              </div>
+            )}
+          </div>
+          {indexPath && (
+            <p className="text-xs text-muted-foreground font-mono break-all">
+              ({indexPath})
+            </p>
+          )}
+        </div>
+
+        {/* Ingestion Info */}
+        {selectedPaperIds.size > 0 && (
+          <div className="text-sm text-muted-foreground bg-muted/30 p-2 rounded">
+            {selectedPaperIds.size} PDF{selectedPaperIds.size > 1 ? 's' : ''} selected for ingestion
+          </div>
+        )}
+
+        {/* PDF Ingestion Form */}
+        <div className="space-y-3">
+          <div>
+            <Label htmlFor="index-dir" className="text-sm font-medium mb-2 block">
+              Index Directory
+            </Label>
+            <Input
+              id="index-dir"
+              value={indexDirectory}
+              onChange={(e) => setIndexDirectory(e.target.value)}
+              placeholder="index"
+              className="text-base"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="chunk-size" className="text-sm font-medium mb-2 block">
+                Chunk Size
+              </Label>
+              <Input
+                id="chunk-size"
+                type="number"
+                value={chunkSize}
+                onChange={(e) => setChunkSize(e.target.value)}
+                placeholder="1200"
+                className="text-base"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="chunk-overlap" className="text-sm font-medium mb-2 block">
+                Chunk Overlap
+              </Label>
+              <Input
+                id="chunk-overlap"
+                type="number"
+                value={chunkOverlap}
+                onChange={(e) => setChunkOverlap(e.target.value)}
+                placeholder="200"
+                className="text-base"
+              />
+            </div>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            Extract text from selected PDFs, split into chunks, create embeddings, and build a FAISS index.
+          </p>
+
+          <Button
+            onClick={handleStartIngestion}
+            disabled={isIngesting || selectedPaperIds.size === 0}
+            className="w-full"
+            size="lg"
+          >
+            {isIngesting ? (
+              <>
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                Ingesting {selectedPaperIds.size} PDF{selectedPaperIds.size > 1 ? 's' : ''}...
+              </>
+            ) : (
+              <>
+                <FileText className="h-5 w-5 mr-2" />
+                Start Ingestion
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
 
       {/* Save Template Dialog */}
       <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>

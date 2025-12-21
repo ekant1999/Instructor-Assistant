@@ -15,14 +15,14 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col h-full w-full bg-background relative">
       <ScrollArea className="flex-1 w-full">
-        <div className="flex flex-col min-h-full pb-32"> {/* Padding for fixed input */}
+        <div className="flex flex-col min-h-full pb-40"> {/* Padding for fixed input */}
           {messages.length === 0 && (
-            <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8">
-              <div className="w-16 h-16 bg-secondary/50 rounded-2xl flex items-center justify-center mb-4">
-                <span className="text-4xl">👋</span>
+            <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-12">
+              <div className="w-20 h-20 bg-secondary/50 rounded-2xl flex items-center justify-center mb-6">
+                <span className="text-5xl">👋</span>
               </div>
-              <h2 className="text-2xl font-semibold mb-2 text-foreground">Instructor Assistant</h2>
-              <p>Ready to help with research, notes, and curriculum.</p>
+              <h2 className="text-3xl font-semibold mb-3 text-foreground">Instructor Assistant</h2>
+              <p className="text-lg">Ready to help with research, notes, and curriculum.</p>
             </div>
           )}
           
@@ -31,8 +31,8 @@ export default function ChatPage() {
           ))}
 
           {status && (
-            <div className="max-w-3xl mx-auto px-14 py-4 flex items-center gap-3 text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2">
-               <Loader2 className="h-4 w-4 animate-spin" />
+            <div className="max-w-4xl mx-auto px-16 py-5 flex items-center gap-4 text-base text-muted-foreground animate-in fade-in slide-in-from-bottom-2">
+               <Loader2 className="h-5 w-5 animate-spin" />
                <span>{status}</span>
             </div>
           )}
