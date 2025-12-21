@@ -1,0 +1,582 @@
+# Instructor Assistant - Feature Enhancement Prompt
+
+Add comprehensive functionality to the existing Replit-based Instructor Assistant application. Focus on multi-document operations, flexible exports, unified notes system, and advanced integration features.
+
+---
+
+## 📚 1. RESEARCH LIBRARY - Enhanced Features
+
+### 1.1 Paper Search System
+- Add search bar at the top of the papers sidebar
+- Implement real-time search across paper titles, authors, and keywords
+- Add filter dropdowns for:
+  - Year (All, 2024, 2023, 2022, etc.)
+  - Author (dropdown of all authors)
+  - Sort options (Recent, Title A-Z, Most Cited)
+- Display search results count
+- Clear search button to reset filters
+- Highlight search terms in results
+
+### 1.2 Multi-Paper Selection & Batch Summarization
+- Add checkboxes next to each paper in the sidebar
+- Show "Selected: X papers" counter when papers are selected
+- Add "Select All" and "Clear Selection" buttons
+- Dropdown button "Summarize Selected" with agent options:
+  - Gemini
+  - ChatGPT Web
+  - Qwen Local
+- When multiple papers selected, combine them into single comprehensive summary
+- Show progress indicator during batch summarization
+- Display which paper is currently being processed
+
+### 1.3 Multiple Summaries Per Paper
+- Each paper can have multiple summaries stored
+- Display summary history in a tab or panel:
+  - Summary 1: Gemini (Brief) - Dec 20, 2024
+  - Summary 2: GPT (Detailed) - Dec 19, 2024
+  - Summary 3: Qwen (Teaching) - Dec 18, 2024
+- Each summary shows:
+  - Agent used
+  - Style (brief/detailed/teaching)
+  - Timestamp
+  - Word count
+- Click any summary to view/edit it
+- Option to delete individual summaries
+- Option to compare summaries side-by-side
+
+### 1.4 Save Summary to Notes
+- After generating summary, show modal with options:
+  - "Save as New Note" - Creates new note in Notes section
+  - "Append to Existing Note" - Choose from dropdown of existing notes
+  - "Save as Paper Summary" - Keeps in Research Library
+- When saving to notes, auto-populate:
+  - Title: "Summary: [Paper Title]"
+  - Tags: paper title, authors, year, "summary"
+  - Source link back to original paper
+  - Metadata: agent used, generation date
+- Show success notification with "View in Notes" button
+
+### 1.5 Edit Summaries
+- Click "Edit" button on any summary to open Markdown editor
+- Editor features:
+  - Live preview toggle (Edit | Preview | Split)
+  - Markdown toolbar (Bold, Italic, Headers, Lists, Links)
+  - Word count and character count
+  - Auto-save every 30 seconds
+  - Manual save button
+- Track edit history with timestamps
+- Show "Edited" badge on modified summaries
+
+### 1.6 Multi-Paper Summary Management
+- When multiple papers are summarized together:
+  - Create single combined summary document
+  - Add section headers for each paper
+  - Include references to all source papers
+- Save options:
+  - "Save as Single Note" - One note with all papers
+  - "Save as Separate Notes" - Individual note per paper
+  - "Save as Collection" - Group of linked notes
+- Collection naming: "Summary Collection: [Topic] - [Date]"
+
+### 1.7 Export Summary Options
+- Add "Export" dropdown button with formats:
+  - **PDF**: Formatted document with headers, proper spacing
+  - **TXT**: Plain text version
+  - **LaTeX**: Academic paper format with proper formatting
+  - **Markdown**: Raw markdown file
+  - **DOCX**: Microsoft Word format
+- Export includes:
+  - Paper metadata (title, authors, year)
+  - Summary content
+  - Generation details (agent, date, style)
+  - Source citations
+- Filename format: "[PaperTitle]_Summary_[Date].[ext]"
+- For multi-paper exports, include all paper titles in filename
+
+---
+
+## 📝 2. NOTES SECTION - Unified Document Library
+
+### 2.1 Unified Document Structure
+- Notes section becomes central repository for ALL generated content
+- Document types stored:
+  - **Summaries** - From Research Library
+  - **Q&A Sets** - From Q-Set Generation page
+  - **RAG Responses** - From RAG page
+  - **Manual Notes** - User-created notes
+- Each document shows type badge (Summary | Q&A | RAG | Manual)
+- Filter by document type in sidebar
+
+### 2.2 Document Organization
+- Left sidebar shows hierarchical structure:
+  ```
+  All Documents (45)
+  ├── Summaries (15)
+  ├── Q&A Sets (12)
+  ├── RAG Responses (8)
+  └── Manual Notes (10)
+  ```
+- Click category to filter
+- Search bar searches across ALL document types
+- Tag-based filtering (show all documents with specific tag)
+
+### 2.3 Document Linking System
+- Each document tracks its source:
+  - Summary: Links to original paper(s)
+  - Q&A: Links to source papers/notes used
+  - RAG: Links to queried documents
+- Click source link to navigate to original
+- Show "Used in X other documents" for cross-references
+- Backlinks panel showing where document is referenced
+
+### 2.4 Document Metadata
+- Every document displays:
+  - Title (editable)
+  - Type badge
+  - Creation date and time
+  - Last modified date
+  - Word count / Question count
+  - Tags (editable, comma-separated)
+  - Source links
+  - Agent used (if applicable)
+- Metadata editable in sidebar panel
+
+### 2.5 Enhanced Editing
+- All document types editable in Notes section
+- For Q&A documents: Edit questions, answers, explanations
+- For Summaries: Full markdown editing
+- For RAG responses: Edit and annotate
+- Track edit history with version control
+- Revert to previous version option
+
+### 2.6 Notes as Input Source
+- Notes can be selected as input for:
+  - Q&A generation (use existing summaries)
+  - RAG queries (search across notes)
+  - New summary generation (summarize notes)
+- Add checkbox "Include in Q&A Generation Pool"
+- Add checkbox "Include in RAG Index"
+
+---
+
+## ❓ 3. Q-SET GENERATION PAGE - Advanced Features
+
+### 3.1 Custom Question Configuration
+- Question type selector with individual counts:
+  ```
+  Multiple Choice: [5] questions
+  True/False: [3] questions
+  Short Answer: [2] questions
+  Essay: [1] questions
+  
+  Total: 11 questions
+  ```
+- Each type has separate counter input
+- Checkboxes to enable/disable question types
+- "Generate" button creates specified mix
+
+### 3.2 Question Type Details
+- For Multiple Choice:
+  - Number of options (3, 4, 5)
+  - Include "All of the above" / "None of the above" options
+  - Difficulty level per question
+- For True/False:
+  - Include explanation toggle
+- For Short Answer:
+  - Expected answer length (1 sentence, paragraph, etc.)
+  - Include sample answer
+- For Essay:
+  - Word count range
+  - Rubric generation option
+
+### 3.3 Incremental Question Generation
+- After generating initial question set, show "Add More Questions" section:
+  ```
+  Current Set: 10 questions
+  
+  Add More:
+  Multiple Choice: [3] questions
+  True/False: [2] questions
+  
+  [Generate Additional Questions]
+  ```
+- New questions append to existing set
+- Maintain context from previous generation
+- Avoid duplicate questions
+- Show "Added 5 new questions" confirmation
+
+### 3.4 Question Editing Interface
+- Each question card shows:
+  - Question number
+  - Question text (editable)
+  - Options/Answer (editable)
+  - Correct answer indicator
+  - Explanation (editable)
+  - Difficulty badge
+  - Delete button
+  - Move up/down buttons
+- "Add Custom Question" button to manually insert questions
+- Drag-and-drop to reorder questions
+- Bulk actions: Delete selected, Change difficulty
+
+### 3.5 Insert Custom Questions
+- "Add Question" modal with form:
+  - Type selector (MC, TF, Short, Essay)
+  - Question text input
+  - Dynamic options based on type
+  - Correct answer selector
+  - Explanation input (optional)
+  - Difficulty selector
+  - Tags input
+- Insert at specific position or append to end
+- Duplicate question to create variations
+
+### 3.6 Document Selection from Notes
+- Add "Source Documents" panel on left sidebar
+- Two tabs:
+  - **Papers** - From Research Library
+  - **Notes** - From Notes section
+- Show all available documents with checkboxes:
+  ```
+  Papers (3)
+  ☑ Attention Is All You Need
+  ☐ BERT Paper
+  
+  Notes (5)
+  ☑ Transformers Summary
+  ☑ Attention Mechanisms
+  ☐ My Study Notes
+  ```
+- Selected documents highlighted
+- Show selection count: "Using 3 sources"
+- "Clear Selection" button
+
+### 3.7 Notes Library Integration
+- Notes section documents appear as selectable sources
+- Filter notes by type:
+  - Show only summaries
+  - Show only manual notes
+  - Show all
+- Search notes by title/tags
+- Preview note content on hover
+- Checkbox "Use this note for Q&A generation"
+
+### 3.8 Question Set Export
+- "Export" button with format options:
+  - **PDF** - Formatted quiz with answer key
+  - **TXT** - Plain text version
+  - **Markdown** - With proper formatting
+  - **Canvas LMS** - Quiz import format
+  - **Moodle XML** - For Moodle import
+  - **JSON** - Structured data format
+- Export options:
+  - Include answers (Yes/No toggle)
+  - Include explanations (Yes/No toggle)
+  - Separate answer key (creates two files)
+- Filename: "QSet_[Topic]_[Date]_[NumQuestions]Q.[ext]"
+
+### 3.9 Save Question Set to Notes
+- After generation, show "Save to Notes" button
+- Save as special document type "Q&A Set"
+- Auto-populate metadata:
+  - Title: "Q&A Set: [Source Papers]"
+  - Type: Q&A
+  - Question count
+  - Source documents linked
+  - Generation date
+  - Agent used
+- Appears in Notes section under "Q&A Sets" category
+- Can be re-opened and edited later
+- Can be used as input for new question generation
+
+---
+
+## 🔍 4. RAG PAGE - Advanced Query System
+
+### 4.1 Web-Based Agent Integration
+- Add "Agent Selection" at top:
+  ```
+  Query Using:
+  ○ GPT Web (via Selenium)
+  ○ Gemini Web (via Selenium)
+  ○ Qwen Local
+  ```
+- When web agents selected, show status:
+  - "Opening browser..."
+  - "Navigating to ChatGPT..."
+  - "Sending query..."
+  - "Receiving response..."
+- Display browser automation status in real-time
+
+### 4.2 Selenium Web Integration
+- For GPT Web:
+  - Open ChatGPT web interface
+  - Input combined context + user query
+  - Wait for response
+  - Extract response text
+  - Close browser
+- For Gemini Web:
+  - Open Gemini web interface
+  - Similar automation flow
+- Show "Browser View" toggle to watch automation
+- Configurable settings:
+  - Headless mode (Yes/No)
+  - Timeout duration
+  - Retry attempts
+
+### 4.3 Selective Document Ingestion
+- Left sidebar shows "Document Selection" panel:
+  ```
+  Index Status: Ready (45 documents)
+  
+  Select Documents for This Query:
+  
+  Papers (3)
+  ☑ Attention Is All You Need
+  ☑ BERT Paper
+  ☐ GPT-4 Report
+  
+  Notes (5)
+  ☑ Transformers Summary
+  ☐ My Study Notes
+  ☐ Previous RAG Response
+  
+  [Apply Selection] [Use All]
+  ```
+- Only selected documents included in context
+- Show token count estimate
+- Warning if selection too large
+- Save selection as "Context Template" for reuse
+
+### 4.4 Context Management
+- "Context Templates" dropdown:
+  - Save current selection with name
+  - Load saved selections
+  - Manage templates (rename, delete)
+- Examples:
+  - "Transformer Papers Only"
+  - "All Summaries"
+  - "Core Research + My Notes"
+- Quick actions:
+  - Select All Papers
+  - Select All Notes
+  - Select Recent Documents (last 7 days)
+
+### 4.5 Enhanced Query Interface
+- Query input area with options:
+  ```
+  Your Question:
+  [Large text area]
+  
+  Options:
+  ☑ Include citations
+  ☐ Verbose mode
+  ☐ Compare across sources
+  Max chunks: [5 ▼]
+  Temperature: [0.7 ──────o── 1.0]
+  ```
+- Character count for query
+- "Example Questions" dropdown for guidance
+
+### 4.6 Response Display
+- Show response with sections:
+  ```
+  Answer:
+  [Formatted response with markdown]
+  
+  Sources Used:
+  1. Attention Is All You Need (p. 3) - "Self-attention..."
+  2. BERT Paper (p. 7) - "Bidirectional training..."
+  
+  Documents Queried: 5
+  Relevant Chunks: 8
+  Response Time: 3.2s
+  Agent: GPT Web
+  ```
+- Clickable citations jump to source
+- Expandable chunk previews
+- Relevance score per source
+
+### 4.7 Save RAG Response to Notes
+- "Save Response" button after each query
+- Save options:
+  - "Save as Note" - Full response as document
+  - "Save Q&A Pair" - Question + Answer format
+  - "Append to Existing Note"
+- Auto-populated metadata:
+  - Title: "RAG: [Query shortened]"
+  - Type: RAG Response
+  - Source documents linked
+  - Query text preserved
+  - Agent and settings saved
+  - Timestamp
+- Appears in Notes section under "RAG Responses"
+
+### 4.8 Query History
+- Sidebar shows recent queries:
+  ```
+  Recent Queries (10)
+  
+  1. "What is self-attention?" - 2 min ago
+  2. "Explain BERT architecture" - 1 hour ago
+  3. "Compare transformers..." - 2 hours ago
+  ```
+- Click to reload query and response
+- Star important queries
+- Delete query from history
+- Export query history
+
+### 4.9 Batch Query Mode
+- "Batch Queries" tab for multiple questions:
+  ```
+  Question 1: [input]
+  Question 2: [input]
+  Question 3: [input]
+  
+  [Add Question] [Generate All Answers]
+  ```
+- Process all questions sequentially
+- Show progress: "Processing 2 of 5..."
+- Save all responses as single document
+- Option to save as separate notes
+
+---
+
+## 🔗 5. CROSS-SYSTEM INTEGRATION
+
+### 5.1 Document Lineage Tracking
+- Every document knows its source chain:
+  - Summary → Paper → Original upload
+  - Q&A Set → Papers + Notes → Source documents
+  - RAG Response → Query + Selected docs
+- Visual lineage tree in document view
+- Click any ancestor to navigate
+
+### 5.2 Smart Suggestions
+- When viewing paper: "Generate questions from this?"
+- When viewing summary: "Add to RAG index?"
+- When viewing Q&A: "Export to Canvas?"
+- Context-aware action buttons
+
+### 5.3 Export Management
+- Global "Exports" page showing all exports:
+  - Export history
+  - Re-download previous exports
+  - Batch export multiple documents
+  - Schedule recurring exports
+
+### 5.4 Workflow Templates
+- Save common workflows:
+  - "Upload → Summarize → Generate Q&A"
+  - "Multi-paper → Combined summary → Export PDF"
+  - "RAG query → Save to notes → Generate follow-up questions"
+- One-click execution of workflows
+
+---
+
+## 📊 6. UI/UX REQUIREMENTS
+
+### 6.1 Consistent Patterns
+- All pages maintain sidebar + content layout
+- Checkboxes for multi-select everywhere
+- Consistent "Save to Notes" flow across features
+- Export buttons in same position on all pages
+
+### 6.2 Loading States
+- Show progress during:
+  - Multi-paper summarization (per-paper progress)
+  - Batch question generation
+  - Web automation (step-by-step status)
+  - Document indexing
+- Cancel button for long operations
+
+### 6.3 Error Handling
+- Graceful failures with retry options
+- Clear error messages
+- "Something went wrong" doesn't exist - be specific
+- Auto-save drafts to prevent data loss
+
+### 6.4 Notifications
+- Success: "Summary saved to Notes" with view link
+- Info: "5 documents selected for RAG"
+- Warning: "Selection too large, using top 10"
+- Error: "Failed to export PDF - try again"
+
+### 6.5 Keyboard Shortcuts
+- Ctrl+S: Save current document
+- Ctrl+E: Export current view
+- Ctrl+K: Open command palette
+- Ctrl+F: Search current page
+
+---
+
+## ✅ IMPLEMENTATION CHECKLIST
+
+### Research Library
+- [ ] Search bar with filters
+- [ ] Multi-select with checkboxes
+- [ ] Batch summarization
+- [ ] Multiple summaries per paper
+- [ ] Edit summaries in place
+- [ ] Save to Notes integration
+- [ ] Multi-paper summary handling
+- [ ] Export in PDF/TXT/LaTeX
+
+### Notes Section
+- [ ] Unified document types (Summary/Q&A/RAG/Manual)
+- [ ] Type filtering and badges
+- [ ] Document linking system
+- [ ] Enhanced metadata display
+- [ ] Cross-document search
+- [ ] Edit all document types
+- [ ] Source tracking
+
+### Q-Set Generation
+- [ ] Custom question count per type
+- [ ] Incremental generation ("Add More")
+- [ ] Edit existing questions
+- [ ] Insert custom questions
+- [ ] Document selection from Notes
+- [ ] Reorder questions (drag-drop)
+- [ ] Export in multiple formats
+- [ ] Save to Notes as Q&A type
+
+### RAG Page
+- [ ] Web agent integration (GPT/Gemini via Selenium)
+- [ ] Selective document ingestion
+- [ ] Context templates
+- [ ] Enhanced query options
+- [ ] Formatted responses with citations
+- [ ] Save response to Notes
+- [ ] Query history panel
+- [ ] Batch query mode
+
+### Integration
+- [ ] Document lineage tracking
+- [ ] Smart contextual suggestions
+- [ ] Global export management
+- [ ] Workflow templates
+- [ ] Consistent UI patterns
+- [ ] Proper error handling
+- [ ] Keyboard shortcuts
+
+---
+
+## 🎯 SUCCESS CRITERIA
+
+The implementation is successful when:
+
+1. User can select 5 papers, summarize with Gemini, and save as single note
+2. User can generate 20 questions (10 MC, 5 TF, 5 Short) from 3 papers + 2 notes
+3. User can add 5 more questions to existing set without regenerating all
+4. User can export summary as PDF with proper formatting
+5. User can query RAG with only 2 selected papers (not all indexed docs)
+6. RAG can use GPT web via Selenium and save response to Notes
+7. All summaries, Q&A sets, and RAG responses appear in Notes section
+8. User can edit any document type in Notes section
+9. User can trace document back to original source papers
+10. Export works for all formats (PDF, TXT, LaTeX, Markdown)
+
+---
+
+This specification provides complete feature requirements without implementation details. Use this prompt with your development team or AI coding assistant to build these features into your Replit application.
