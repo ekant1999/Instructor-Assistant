@@ -141,10 +141,10 @@ export function DocumentIngestionPanel({
   };
 
   return (
-    <Card className="p-4 space-y-4">
+    <Card className="p-3 space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-sm flex items-center gap-2">
-          <BookOpen className="h-4 w-4" />
+        <h3 className="font-semibold text-xs flex items-center gap-1.5">
+          <BookOpen className="h-3.5 w-3.5" />
           Document Selection
         </h3>
         <div className="flex items-center gap-2">
@@ -290,8 +290,8 @@ export function DocumentIngestionPanel({
                     onClick={(e) => e.stopPropagation()}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{paper.title}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs font-medium truncate">{paper.title}</p>
+                    <p className="text-[10px] text-muted-foreground">
                       {paper.source} • {paper.year}
                     </p>
                   </div>
@@ -345,7 +345,7 @@ export function DocumentIngestionPanel({
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <p className="text-sm font-medium truncate">{note.title}</p>
+                      <p className="text-xs font-medium truncate">{note.title}</p>
                       <Badge className="text-[10px] px-1.5 py-0">
                         {note.type.replace('_', ' ')}
                       </Badge>
@@ -379,45 +379,45 @@ export function DocumentIngestionPanel({
       )}
 
       {/* PDF Ingestion Section */}
-      <div className="pt-4 border-t space-y-4">
+      <div className="pt-3 border-t space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-base flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+          <h3 className="font-semibold text-xs flex items-center gap-1.5">
+            <FileText className="h-3.5 w-3.5" />
             PDF Ingestion
           </h3>
           <Button
             variant="ghost"
             size="sm"
             onClick={checkIndexStatus}
-            className="h-8 text-xs"
+            className="h-7 text-xs"
             disabled={indexStatus === 'checking'}
           >
-            <RefreshCw className={`h-4 w-4 ${indexStatus === 'checking' ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-3 w-3 ${indexStatus === 'checking' ? 'animate-spin' : ''}`} />
           </Button>
         </div>
 
         {/* Index Status */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <Label className="text-sm font-medium">Index Status:</Label>
+            <Label className="text-xs font-medium">Index Status:</Label>
             {indexStatus === 'checking' && (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
             )}
             {indexStatus === 'ready' && (
               <div className="flex items-center gap-1 text-green-600">
-                <CheckCircle2 className="h-4 w-4" />
-                <span className="text-sm">Index is ready</span>
+                <CheckCircle2 className="h-3 w-3" />
+                <span className="text-xs">Index is ready</span>
               </div>
             )}
             {indexStatus === 'not_ready' && (
               <div className="flex items-center gap-1 text-yellow-600">
-                <AlertCircle className="h-4 w-4" />
-                <span className="text-sm">Index not found</span>
+                <AlertCircle className="h-3 w-3" />
+                <span className="text-xs">Index not found</span>
               </div>
             )}
           </div>
           {indexPath && (
-            <p className="text-xs text-muted-foreground font-mono break-all">
+            <p className="text-[10px] text-muted-foreground font-mono break-all">
               ({indexPath})
             </p>
           )}
@@ -425,15 +425,15 @@ export function DocumentIngestionPanel({
 
         {/* Ingestion Info */}
         {selectedPaperIds.size > 0 && (
-          <div className="text-sm text-muted-foreground bg-muted/30 p-2 rounded">
+          <div className="text-xs text-muted-foreground bg-muted/30 p-1.5 rounded">
             {selectedPaperIds.size} PDF{selectedPaperIds.size > 1 ? 's' : ''} selected for ingestion
           </div>
         )}
 
         {/* PDF Ingestion Form */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div>
-            <Label htmlFor="index-dir" className="text-sm font-medium mb-2 block">
+            <Label htmlFor="index-dir" className="text-xs font-medium mb-1 block">
               Index Directory
             </Label>
             <Input
@@ -441,13 +441,13 @@ export function DocumentIngestionPanel({
               value={indexDirectory}
               onChange={(e) => setIndexDirectory(e.target.value)}
               placeholder="index"
-              className="text-base"
+              className="text-sm h-8"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label htmlFor="chunk-size" className="text-sm font-medium mb-2 block">
+              <Label htmlFor="chunk-size" className="text-xs font-medium mb-1 block">
                 Chunk Size
               </Label>
               <Input
@@ -456,12 +456,12 @@ export function DocumentIngestionPanel({
                 value={chunkSize}
                 onChange={(e) => setChunkSize(e.target.value)}
                 placeholder="1200"
-                className="text-base"
+                className="text-sm h-8"
               />
             </div>
 
             <div>
-              <Label htmlFor="chunk-overlap" className="text-sm font-medium mb-2 block">
+              <Label htmlFor="chunk-overlap" className="text-xs font-medium mb-1 block">
                 Chunk Overlap
               </Label>
               <Input
@@ -470,12 +470,12 @@ export function DocumentIngestionPanel({
                 value={chunkOverlap}
                 onChange={(e) => setChunkOverlap(e.target.value)}
                 placeholder="200"
-                className="text-base"
+                className="text-sm h-8"
               />
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[10px] text-muted-foreground">
             Extract text from selected PDFs, split into chunks, create embeddings, and build a FAISS index.
           </p>
 
@@ -483,16 +483,16 @@ export function DocumentIngestionPanel({
             onClick={handleStartIngestion}
             disabled={isIngesting || selectedPaperIds.size === 0}
             className="w-full"
-            size="lg"
+            size="default"
           >
             {isIngesting ? (
               <>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
                 Ingesting {selectedPaperIds.size} PDF{selectedPaperIds.size > 1 ? 's' : ''}...
               </>
             ) : (
               <>
-                <FileText className="h-5 w-5 mr-2" />
+                <FileText className="h-3.5 w-3.5 mr-2" />
                 Start Ingestion
               </>
             )}

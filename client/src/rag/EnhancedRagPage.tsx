@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Search, Network, Loader2, Globe, Monitor, Database } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Search, Network, Loader2, Globe, Database, Send, Bot, User, ChevronDown, ChevronUp, Settings } from 'lucide-react';
 import { DocumentIngestionPanel } from './DocumentIngestionPanel';
 import { QueryHistory } from './QueryHistory';
-import { EnhancedRagResponse } from './EnhancedRagResponse';
 import { RagQuery, Paper, Document, ContextTemplate } from '@/shared/types';
 import { toast } from 'sonner';
+import ReactMarkdown from 'react-markdown';
+import { cn } from '@/lib/utils';
 
 export default function EnhancedRagPage() {
   const [query, setQuery] = useState('');
@@ -25,6 +29,9 @@ export default function EnhancedRagPage() {
   const [currentQuery, setCurrentQuery] = useState<RagQuery | null>(null);
   const [queryHistory, setQueryHistory] = useState<RagQuery[]>([]);
   const [starredQueries, setStarredQueries] = useState<Set<string>>(new Set());
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
   
   const [selectedPaperIds, setSelectedPaperIds] = useState<Set<string>>(new Set(['1']));
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(new Set());
@@ -94,7 +101,30 @@ export default function EnhancedRagPage() {
     setCurrentQuery(newQuery);
     setQueryHistory([newQuery, ...queryHistory]);
     setIsQuerying(false);
+    setQuery(''); // Clear input after query
     toast.success('Query completed');
+  };
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [queryHistory, isQuerying]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
+    }
+  }, [query]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (query.trim() && !isQuerying) {
+        handleQuery(e as any);
+      }
+    }
   };
 
   const handleSelectPaper = (id: string) => {
@@ -184,16 +214,16 @@ export default function EnhancedRagPage() {
   };
 
   return (
-    <div className="flex flex-col h-full max-w-7xl mx-auto w-full p-6 space-y-6">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-primary/10 mb-5">
-          <Network className="h-8 w-8 text-primary" />
+    <div className="flex flex-col h-full max-w-7xl mx-auto w-full p-4 space-y-4">
+      <div className="text-center mb-4">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 mb-3">
+          <Network className="h-6 w-6 text-primary" />
         </div>
-        <h1 className="text-4xl font-bold tracking-tight mb-3">Knowledge Retrieval</h1>
-        <p className="text-muted-foreground text-lg">Search across all your papers, notes, and external sources.</p>
+        <h1 className="text-2xl font-bold tracking-tight mb-2">Knowledge Retrieval</h1>
+        <p className="text-muted-foreground text-sm">Search across all your papers, notes, and external sources.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 overflow-hidden">
         {/* Left Sidebar - Document Selection & PDF Ingestion */}
         <div className="lg:col-span-1 space-y-4 overflow-auto">
           <DocumentIngestionPanel
@@ -231,139 +261,206 @@ export default function EnhancedRagPage() {
           )}
         </div>
 
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6 overflow-auto">
-          {/* Agent Selection */}
-          <Card className="p-4">
-            <div className="flex items-center gap-4">
-              <Label className="text-base font-medium">Query Using:</Label>
-              <div className="flex gap-2 flex-1">
-                <Button
-                  variant={agent === 'GPT Web' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setAgent('GPT Web')}
-                  className="flex-1"
-                >
-                  <Globe className="h-4 w-4 mr-2" />
-                  GPT Web
-                </Button>
-                <Button
-                  variant={agent === 'Gemini Web' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setAgent('Gemini Web')}
-                  className="flex-1"
-                >
-                  <Globe className="h-4 w-4 mr-2" />
-                  Gemini Web
-                </Button>
-                <Button
-                  variant={agent === 'Qwen Local' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setAgent('Qwen Local')}
-                  className="flex-1"
-                >
-                  <Database className="h-4 w-4 mr-2" />
-                  Qwen Local
-                </Button>
-              </div>
-            </div>
-          </Card>
+        {/* Main Content - Chat Interface */}
+        <div className="lg:col-span-2 flex flex-col h-full overflow-hidden">
+          {/* Advanced Options - Collapsible Above Chat */}
+          <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced} className="mb-2">
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="w-full justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <Settings className="h-3.5 w-3.5" />
+                  <span>Advanced Options</span>
+                </div>
+                {showAdvanced ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Card className="p-3 bg-muted/5 mb-2">
+                <div className="space-y-3">
+                  {/* Agent Selection */}
+                  <div>
+                    <Label className="text-xs font-medium mb-2 block">Query Using:</Label>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={agent === 'GPT Web' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setAgent('GPT Web')}
+                        className="flex-1 text-xs"
+                      >
+                        <Globe className="h-3 w-3 mr-1" />
+                        GPT Web
+                      </Button>
+                      <Button
+                        variant={agent === 'Gemini Web' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setAgent('Gemini Web')}
+                        className="flex-1 text-xs"
+                      >
+                        <Globe className="h-3 w-3 mr-1" />
+                        Gemini Web
+                      </Button>
+                      <Button
+                        variant={agent === 'Qwen Local' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setAgent('Qwen Local')}
+                        className="flex-1 text-xs"
+                      >
+                        <Database className="h-3 w-3 mr-1" />
+                        Qwen Local
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="citations"
+                        checked={includeCitations}
+                        onCheckedChange={(checked) => setIncludeCitations(checked as boolean)}
+                      />
+                      <Label htmlFor="citations" className="text-xs cursor-pointer">Include citations</Label>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="verbose"
+                        checked={verboseMode}
+                        onCheckedChange={(checked) => setVerboseMode(checked as boolean)}
+                      />
+                      <Label htmlFor="verbose" className="text-xs cursor-pointer">Verbose mode</Label>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="compare"
+                        checked={compareSources}
+                        onCheckedChange={(checked) => setCompareSources(checked as boolean)}
+                      />
+                      <Label htmlFor="compare" className="text-xs cursor-pointer">Compare sources</Label>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <Label htmlFor="chunks" className="text-xs">Max chunks: {maxChunks}</Label>
+                      <Input
+                        id="chunks"
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={maxChunks}
+                        onChange={(e) => setMaxChunks(parseInt(e.target.value) || 5)}
+                        className="h-7 text-xs"
+                      />
+                    </div>
+                  </div>
 
-          {/* Query Input */}
-          <form onSubmit={handleQuery} className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input
-                className="pl-10 h-11 text-lg shadow-sm"
-                placeholder="Ask a question about your knowledge base..."
+                  <div className="space-y-1">
+                    <Label className="text-xs">Temperature: {temperature.toFixed(1)}</Label>
+                    <Slider
+                      value={[temperature]}
+                      onValueChange={(values) => setTemperature(values[0])}
+                      min={0}
+                      max={1}
+                      step={0.1}
+                    />
+                  </div>
+                </div>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Chat Messages Area */}
+          <ScrollArea className="flex-1 mb-4">
+            <div className="space-y-4 pr-4">
+              {queryHistory.length === 0 && !isQuerying && (
+                <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+                  <Network className="h-12 w-12 mb-4 opacity-50" />
+                  <p className="text-sm">Ask a question about your knowledge base to get started</p>
+                </div>
+              )}
+
+              {queryHistory.map((q) => (
+                <div key={q.id} className="space-y-4">
+                  {/* User Query */}
+                  <div className="flex gap-3 max-w-4xl">
+                    <div className="h-8 w-8 rounded-sm flex items-center justify-center shrink-0 bg-secondary text-secondary-foreground shadow-sm">
+                      <User className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
+                        {q.query}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bot Response */}
+                  <div className="flex gap-3 max-w-4xl">
+                    <div className="h-8 w-8 rounded-sm flex items-center justify-center shrink-0 bg-primary text-primary-foreground shadow-sm">
+                      <Bot className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
+                        <ReactMarkdown>{q.response}</ReactMarkdown>
+                      </div>
+                      {q.citations && q.citations.length > 0 && (
+                        <div className="text-xs text-muted-foreground pt-2 border-t">
+                          <strong>Sources:</strong> {q.citations.map((c, i) => (
+                            <span key={i}>
+                              {i > 0 && ', '}
+                              {c.documentTitle}
+                              {c.page && ` (p.${c.page})`}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Loading Indicator */}
+              {isQuerying && (
+                <div className="flex gap-3 max-w-4xl">
+                  <div className="h-8 w-8 rounded-sm flex items-center justify-center shrink-0 bg-primary text-primary-foreground shadow-sm">
+                    <Bot className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Searching knowledge base...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={bottomRef} />
+            </div>
+          </ScrollArea>
+
+          {/* Chat Input */}
+          <form onSubmit={handleQuery} className="relative">
+            <div className="relative flex items-end gap-2 bg-secondary/50 p-2 rounded-xl border border-border shadow-sm focus-within:ring-1 focus-within:ring-ring transition-all">
+              <Textarea
+                ref={textareaRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask a question about your knowledge base..."
+                className="min-h-[44px] max-h-[150px] w-full resize-none border-0 bg-transparent py-2 px-3 focus-visible:ring-0 shadow-none text-sm"
+                rows={1}
               />
+              <Button
+                type="submit"
+                disabled={isQuerying || !query.trim()}
+                size="icon"
+                className="h-9 w-9 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 shrink-0 mb-1"
+              >
+                {isQuerying ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
             </div>
-
-            {/* Advanced Options */}
-            <Card className="p-4 bg-muted/5">
-              <div className="space-y-4">
-                <p className="text-xs font-semibold uppercase text-muted-foreground">Advanced Options</p>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="citations"
-                      checked={includeCitations}
-                      onCheckedChange={(checked) => setIncludeCitations(checked as boolean)}
-                    />
-                    <Label htmlFor="citations" className="text-sm cursor-pointer">Include citations</Label>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="verbose"
-                      checked={verboseMode}
-                      onCheckedChange={(checked) => setVerboseMode(checked as boolean)}
-                    />
-                    <Label htmlFor="verbose" className="text-sm cursor-pointer">Verbose mode</Label>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="compare"
-                      checked={compareSources}
-                      onCheckedChange={(checked) => setCompareSources(checked as boolean)}
-                    />
-                    <Label htmlFor="compare" className="text-sm cursor-pointer">Compare across sources</Label>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <Label htmlFor="chunks" className="text-sm">Max chunks: {maxChunks}</Label>
-                    <Input
-                      id="chunks"
-                      type="number"
-                      min="1"
-                      max="20"
-                      value={maxChunks}
-                      onChange={(e) => setMaxChunks(parseInt(e.target.value) || 5)}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm">Temperature: {temperature.toFixed(1)}</Label>
-                  <Slider
-                    value={[temperature]}
-                    onValueChange={(values) => setTemperature(values[0])}
-                    min={0}
-                    max={1}
-                    step={0.1}
-                  />
-                </div>
-              </div>
-            </Card>
-
-            <Button type="submit" size="lg" className="w-full" disabled={isQuerying}>
-              {isQuerying ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Querying...
-                </>
-              ) : (
-                <>
-                  <Search className="h-4 w-4 mr-2" />
-                  Search
-                </>
-              )}
-            </Button>
           </form>
-
-          {/* Response */}
-          {currentQuery && (
-            <EnhancedRagResponse
-              query={currentQuery}
-              onSaveToNotes={handleSaveToNotes}
-              onSendToChat={handleSendToChat}
-            />
-          )}
         </div>
       </div>
     </div>
