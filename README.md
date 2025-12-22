@@ -5,6 +5,8 @@ A comprehensive web application designed to help instructors manage research pap
 ## 🎯 Features
 
 ### 📚 Research Library
+<img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/42174f6e-ee1a-464e-b289-8d25edf2f275" />
+
 - **Search & Filter**: Search papers by title, author, keywords with real-time filtering
 - **Multi-Paper Operations**: Select multiple papers with checkboxes for batch operations
 - **Batch Summarization**: Generate summaries for multiple papers simultaneously with progress tracking
@@ -14,6 +16,8 @@ A comprehensive web application designed to help instructors manage research pap
 - **Save to Notes**: Seamlessly save summaries to your notes library
 
 ### 📝 Notes Section
+<img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/a6af7e3f-affd-4c89-ba74-0acf01d92b9b" />
+
 - **Unified Library**: Centralized document management for all content types (Summaries, Q&A, RAG responses, Manual notes)
 - **Smart Filtering**: Filter by document type, tags, and search across all documents
 - **Hierarchical Organization**: Organize documents by type with clear visual hierarchy
@@ -21,6 +25,8 @@ A comprehensive web application designed to help instructors manage research pap
 - **Metadata Display**: View word counts, creation dates, and generation agents
 
 ### ❓ Question Set Generation
+<img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/4f2f8e16-2cd7-45ef-8686-7fe28afe59d3" />
+
 - **Custom Configuration**: Configure question types individually (Multiple Choice, True/False, Short Answer, Essay)
 - **Advanced Options**: Set number of options, include explanations, word count ranges, and rubrics
 - **Incremental Generation**: Add more questions to existing sets without regenerating
@@ -30,6 +36,8 @@ A comprehensive web application designed to help instructors manage research pap
 - **Export Options**: Include/exclude answers, explanations, and generate separate answer keys
 
 ### 🔍 RAG (Retrieval-Augmented Generation)
+<img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/365b8a15-0812-412c-b545-8ef382d3322c" />
+
 - **Multiple Agents**: Support for GPT Web, Gemini Web, and Qwen Local agents
 - **Selective Ingestion**: Choose specific documents to include in RAG queries
 - **Context Templates**: Save and load document selection templates for repeated use
