@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { X, Upload, Plus, Link as LinkIcon, Loader2 } from 'lucide-react';
+import { X, Upload, Plus, Loader2 } from 'lucide-react';
+import { Paper } from '@/shared/types';
+import { mapApiPaper } from '@/lib/mappers';
+import { toast } from 'sonner';
 
 interface UploadItem {
   id: string;
@@ -13,10 +16,11 @@ interface UploadItem {
 }
 
 interface UploadPanelProps {
-  onUpload: (uploads: any[]) => void;
+  onUpload: (papers: Paper[]) => void;
+  onDownload: (input: { source: string; source_url?: string }) => Promise<any>;
 }
 
-export function UploadPanel({ onUpload }: UploadPanelProps) {
+export function UploadPanel({ onUpload, onDownload }: UploadPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
   const [inputType, setInputType] = useState<'doi' | 'url'>('url');
@@ -36,23 +40,29 @@ export function UploadPanel({ onUpload }: UploadPanelProps) {
   };
 
   const handleProcess = async () => {
+    if (uploads.length === 0) return;
     setIsProcessing(true);
-    
-    // Simulate processing
+
+    const results: Paper[] = [];
     for (let i = 0; i < uploads.length; i++) {
-      for (let p = 0; p <= 100; p += 20) {
-        await new Promise(r => setTimeout(r, 100));
-        setUploads(u => u.map((x, idx) => idx === i ? { ...x, progress: p } : x));
+      const upload = uploads[i];
+      setUploads((u) => u.map((x, idx) => (idx === i ? { ...x, progress: 15 } : x)));
+      try {
+        const apiPaper = await onDownload({
+          source: upload.value,
+          source_url: upload.type === 'url' ? upload.value : undefined
+        });
+        results.push(mapApiPaper(apiPaper));
+        setUploads((u) => u.map((x, idx) => (idx === i ? { ...x, progress: 100 } : x)));
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Failed to download paper');
+        setUploads((u) => u.map((x, idx) => (idx === i ? { ...x, progress: 0 } : x)));
       }
     }
 
-    // Call the callback with mock data
-    const results = uploads.map(u => ({
-      title: u.type === 'doi' ? `Paper from DOI: ${u.value}` : u.value,
-      source: u.type === 'file' ? 'File' : 'Online'
-    }));
-    
-    onUpload(results);
+    if (results.length > 0) {
+      onUpload(results);
+    }
     setUploads([]);
     setIsProcessing(false);
     setIsOpen(false);

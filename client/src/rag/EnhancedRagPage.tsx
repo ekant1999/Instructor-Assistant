@@ -5,17 +5,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Search, Network, Loader2, Globe, Database, Send, Bot, User, ChevronDown, ChevronUp, Settings } from 'lucide-react';
+import { Network, Loader2, Globe, Database, Send, Bot, User, ChevronDown, ChevronUp, Settings } from 'lucide-react';
 import { DocumentIngestionPanel } from './DocumentIngestionPanel';
 import { QueryHistory } from './QueryHistory';
 import { RagQuery, Paper, Document, ContextTemplate } from '@/shared/types';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
-import { cn } from '@/lib/utils';
+import { createNote, listNotes, listPapers, ragQuery } from '@/lib/api';
+import { mapApiNote, mapApiPaper } from '@/lib/mappers';
 
 export default function EnhancedRagPage() {
   const [query, setQuery] = useState('');
@@ -33,27 +33,34 @@ export default function EnhancedRagPage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   
-  const [selectedPaperIds, setSelectedPaperIds] = useState<Set<string>>(new Set(['1']));
+  const [papers, setPapers] = useState<Paper[]>([]);
+  const [notes, setNotes] = useState<Document[]>([]);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+  const [indexDirectory, setIndexDirectory] = useState('index');
+  const [selectedPaperIds, setSelectedPaperIds] = useState<Set<string>>(new Set());
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(new Set());
   const [contextTemplates, setContextTemplates] = useState<ContextTemplate[]>([]);
 
-  // Mock data
-  const papers: Paper[] = [
-    { id: '1', title: 'Attention Is All You Need', year: '2017', source: 'ArXiv', authors: 'Vaswani et al.' },
-    { id: '2', title: 'BERT Paper', year: '2018', source: 'ArXiv' }
-  ];
-
-  const notes: Document[] = [
-    {
-      id: '1',
-      type: 'summary',
-      title: 'Summary: Transformers',
-      content: 'Key points...',
-      tags: ['transformer'],
-      createdAt: Date.now(),
-      updatedAt: Date.now()
+  useEffect(() => {
+    let isMounted = true;
+    async function loadDocs() {
+      setIsLoadingDocs(true);
+      try {
+        const [paperRows, noteRows] = await Promise.all([listPapers(), listNotes()]);
+        if (!isMounted) return;
+        setPapers(paperRows.map(mapApiPaper));
+        setNotes(noteRows.map(mapApiNote));
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Failed to load documents');
+      } finally {
+        if (isMounted) setIsLoadingDocs(false);
+      }
     }
-  ];
+    loadDocs();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleQuery = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,40 +76,47 @@ export default function EnhancedRagPage() {
 
     setIsQuerying(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      const result = await ragQuery({
+        question: query,
+        index_dir: indexDirectory || undefined,
+        k: maxChunks || undefined
+      });
 
-    const response = `Based on the selected documents, ${query} is addressed through several key mechanisms. The primary approach involves self-attention mechanisms that allow the model to weigh the importance of different parts of the input sequence.`;
+      const citations = includeCitations
+        ? result.context.map((ctx, idx) => ({
+            documentId: `${ctx.paper || 'source'}-${idx}`,
+            documentTitle: ctx.paper || 'Unknown source',
+            excerpt: ctx.source || ''
+          }))
+        : [];
 
-    const newQuery: RagQuery = {
-      id: Math.random().toString(),
-      query,
-      response,
-      agent,
-      selectedDocumentIds: [...Array.from(selectedPaperIds), ...Array.from(selectedNoteIds)],
-      citations: [
-        {
-          documentId: '1',
-          documentTitle: 'Attention Is All You Need',
-          page: 3,
-          excerpt: 'Self-attention mechanisms allow...'
-        }
-      ],
-      settings: {
-        includeCitations,
-        verboseMode,
-        compareSources,
-        maxChunks,
-        temperature
-      },
-      createdAt: Date.now()
-    };
+      const newQuery: RagQuery = {
+        id: Math.random().toString(),
+        query,
+        response: result.answer,
+        agent,
+        selectedDocumentIds: [...Array.from(selectedPaperIds), ...Array.from(selectedNoteIds)],
+        citations,
+        settings: {
+          includeCitations,
+          verboseMode,
+          compareSources,
+          maxChunks,
+          temperature
+        },
+        createdAt: Date.now()
+      };
 
-    setCurrentQuery(newQuery);
-    setQueryHistory([newQuery, ...queryHistory]);
-    setIsQuerying(false);
-    setQuery(''); // Clear input after query
-    toast.success('Query completed');
+      setCurrentQuery(newQuery);
+      setQueryHistory((prev) => [newQuery, ...prev]);
+      setQuery('');
+      toast.success('Query completed');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Query failed');
+    } finally {
+      setIsQuerying(false);
+    }
   };
 
   // Auto-scroll to bottom when new messages arrive
@@ -199,10 +213,29 @@ export default function EnhancedRagPage() {
     setStarredQueries(newSet);
   };
 
-  const handleSaveToNotes = () => {
-    if (!currentQuery) {
+  const handleSaveToNotes = async () => {
+    if (!currentQuery) return;
+    try {
+      const title = `RAG: ${currentQuery.query.slice(0, 60)}`.trim();
+      const sources = currentQuery.citations?.length
+        ? `\n\nSources:\n${currentQuery.citations
+            .map((c) => `- ${c.documentTitle}${c.excerpt ? ` (${c.excerpt})` : ''}`)
+            .join('\n')}`
+        : '';
+      const body = `Question:\n${currentQuery.query}\n\nAnswer:\n${currentQuery.response}${sources}`;
+      const rawPaperId =
+        selectedPaperIds.size === 1 ? Number(Array.from(selectedPaperIds)[0]) : null;
+      const paperId = rawPaperId !== null && Number.isFinite(rawPaperId) ? rawPaperId : null;
+      const created = await createNote({
+        title,
+        body,
+        paper_id: paperId,
+        tags: ['rag_response']
+      });
+      setNotes((prev) => [mapApiNote(created), ...prev]);
       toast.success('Response saved to Notes');
-      // In real app, would save to Notes section
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to save response');
     }
   };
 
@@ -235,14 +268,12 @@ export default function EnhancedRagPage() {
             onNoteToggle={handleSelectNote}
             onSelectAll={handleSelectAll}
             onClearSelection={handleClearSelection}
+            indexDirectory={indexDirectory}
+            onIndexDirectoryChange={setIndexDirectory}
             contextTemplates={contextTemplates}
             onSaveTemplate={handleSaveTemplate}
             onLoadTemplate={handleLoadTemplate}
             onDeleteTemplate={handleDeleteTemplate}
-            onIngestionComplete={() => {
-              toast.success('PDFs ingested successfully');
-              // Refresh papers list or update state after ingestion
-            }}
           />
 
           {queryHistory.length > 0 && (
@@ -466,4 +497,3 @@ export default function EnhancedRagPage() {
     </div>
   );
 }
-

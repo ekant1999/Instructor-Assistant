@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Document } from '@/shared/types';
 import { NotesEditor } from './NotesEditor';
 import { Input } from '@/components/ui/input';
@@ -7,63 +7,46 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Plus, Trash2, Save, Tag, FileText, MessageSquare, Network, BookOpen, Filter, Link2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { createNote, deleteNote, listNotes, updateNote } from '@/lib/api';
+import { mapApiNote } from '@/lib/mappers';
+import { toast } from 'sonner';
 
 export default function EnhancedNotesPage() {
-  const [documents, setDocuments] = useState<Document[]>([
-    {
-      id: '1',
-      type: 'summary',
-      title: 'Summary: Attention Is All You Need',
-      content: '# Summary\n\nKey points...',
-      tags: ['transformer', 'attention', 'summary'],
-      wordCount: 500,
-      sourceLinks: [{ type: 'paper', id: '1', title: 'Attention Is All You Need' }],
-      agent: 'Gemini',
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    },
-    {
-      id: '2',
-      type: 'qa_set',
-      title: 'Q&A Set: Transformers',
-      content: '## Questions\n\n1. What is...',
-      tags: ['transformer', 'questions'],
-      questionCount: 10,
-      sourceLinks: [{ type: 'paper', id: '1', title: 'Attention Is All You Need' }],
-      agent: 'Qwen',
-      createdAt: Date.now() - 100000,
-      updatedAt: Date.now() - 100000
-    },
-    {
-      id: '3',
-      type: 'rag_response',
-      title: 'RAG: What is self-attention?',
-      content: 'Self-attention is...',
-      tags: ['rag', 'attention'],
-      wordCount: 300,
-      sourceLinks: [{ type: 'paper', id: '1', title: 'Attention Is All You Need' }],
-      agent: 'GPT Web',
-      createdAt: Date.now() - 200000,
-      updatedAt: Date.now() - 200000
-    },
-    {
-      id: '4',
-      type: 'manual',
-      title: 'Lecture 1: Introduction to AI',
-      content: '# Lecture 1\n\nKey topics...',
-      tags: ['AI', 'Intro'],
-      wordCount: 800,
-      createdAt: Date.now() - 300000,
-      updatedAt: Date.now() - 300000
-    }
-  ]);
+  const [documents, setDocuments] = useState<Document[]>([]);
 
-  const [selectedId, setSelectedId] = useState<string | null>('1');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [tagFilter, setTagFilter] = useState<string>('all');
+  const [isLoading, setIsLoading] = useState(false);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSaveRef = useRef<{ id: string; updates: { title?: string; body?: string; tags?: string[] } } | null>(null);
 
   const activeDocument = documents.find(d => d.id === selectedId);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadNotes() {
+      setIsLoading(true);
+      try {
+        const rows = await listNotes();
+        if (!isMounted) return;
+        const mapped = rows.map(mapApiNote);
+        setDocuments(mapped);
+        if (mapped.length > 0) {
+          setSelectedId(mapped[0].id);
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Failed to load notes');
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+    loadNotes();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Extract unique tags
   const allTags = useMemo(() => {
@@ -125,48 +108,83 @@ export default function EnhancedNotesPage() {
     }
   };
 
-  const handleCreate = () => {
-    const newDoc: Document = {
-      id: Math.random().toString(),
-      type: 'manual',
-      title: 'Untitled Note',
-      content: '',
-      tags: [],
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-    setDocuments([newDoc, ...documents]);
-    setSelectedId(newDoc.id);
+  const scheduleSave = (id: string, updates: { title?: string; body?: string; tags?: string[] }) => {
+    const current = pendingSaveRef.current;
+    if (current && current.id === id) {
+      pendingSaveRef.current = { id, updates: { ...current.updates, ...updates } };
+    } else {
+      pendingSaveRef.current = { id, updates };
+    }
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      const pending = pendingSaveRef.current;
+      if (!pending) return;
+      pendingSaveRef.current = null;
+      try {
+        const updated = await updateNote(Number(pending.id), pending.updates);
+        setDocuments((prev) => prev.map((doc) => (doc.id === pending.id ? mapApiNote(updated) : doc)));
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Failed to save note');
+      }
+    }, 600);
+  };
+
+  const handleCreate = async () => {
+    try {
+      const created = await createNote({ title: 'Untitled Note', body: '', tags: [] });
+      const doc = mapApiNote(created);
+      setDocuments((prev) => [doc, ...prev]);
+      setSelectedId(doc.id);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to create note');
+    }
   };
 
   const handleUpdate = (content: string) => {
     if (selectedId) {
-      setDocuments(documents.map(d => 
-        d.id === selectedId 
-          ? { ...d, content, updatedAt: Date.now() } 
-          : d
-      ));
+      setDocuments((prev) =>
+        prev.map((d) =>
+          d.id === selectedId ? { ...d, content, updatedAt: Date.now() } : d
+        )
+      );
+      scheduleSave(selectedId, { body: content });
     }
   };
 
   const handleUpdateTags = (tagsString: string) => {
     if (selectedId) {
-      const tags = tagsString.split(',').map(t => t.trim()).filter(Boolean);
-      setDocuments(documents.map(d => 
-        d.id === selectedId 
-          ? { ...d, tags, updatedAt: Date.now() } 
-          : d
-      ));
+      const tags = tagsString.split(',').map((t) => t.trim()).filter(Boolean);
+      setDocuments((prev) =>
+        prev.map((d) =>
+          d.id === selectedId ? { ...d, tags, updatedAt: Date.now() } : d
+        )
+      );
+      scheduleSave(selectedId, { tags });
     }
   };
 
   const handleUpdateTitle = (title: string) => {
     if (selectedId) {
-      setDocuments(documents.map(d => 
-        d.id === selectedId 
-          ? { ...d, title, updatedAt: Date.now() } 
-          : d
-      ));
+      setDocuments((prev) =>
+        prev.map((d) =>
+          d.id === selectedId ? { ...d, title, updatedAt: Date.now() } : d
+        )
+      );
+      scheduleSave(selectedId, { title });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteNote(Number(id));
+      setDocuments((prev) => prev.filter((d) => d.id !== id));
+      if (selectedId === id) setSelectedId(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete note');
     }
   };
 
@@ -236,10 +254,7 @@ export default function EnhancedNotesPage() {
                     doc={doc}
                     isSelected={selectedId === doc.id}
                     onClick={() => setSelectedId(doc.id)}
-                    onDelete={() => {
-                      setDocuments(documents.filter(d => d.id !== doc.id));
-                      if (selectedId === doc.id) setSelectedId(null);
-                    }}
+                    onDelete={() => handleDelete(doc.id)}
                     getTypeIcon={getTypeIcon}
                     getTypeBadgeColor={getTypeBadgeColor}
                   />
@@ -258,10 +273,7 @@ export default function EnhancedNotesPage() {
                     doc={doc}
                     isSelected={selectedId === doc.id}
                     onClick={() => setSelectedId(doc.id)}
-                    onDelete={() => {
-                      setDocuments(documents.filter(d => d.id !== doc.id));
-                      if (selectedId === doc.id) setSelectedId(null);
-                    }}
+                    onDelete={() => handleDelete(doc.id)}
                     getTypeIcon={getTypeIcon}
                     getTypeBadgeColor={getTypeBadgeColor}
                   />
@@ -280,10 +292,7 @@ export default function EnhancedNotesPage() {
                     doc={doc}
                     isSelected={selectedId === doc.id}
                     onClick={() => setSelectedId(doc.id)}
-                    onDelete={() => {
-                      setDocuments(documents.filter(d => d.id !== doc.id));
-                      if (selectedId === doc.id) setSelectedId(null);
-                    }}
+                    onDelete={() => handleDelete(doc.id)}
                     getTypeIcon={getTypeIcon}
                     getTypeBadgeColor={getTypeBadgeColor}
                   />
@@ -302,10 +311,7 @@ export default function EnhancedNotesPage() {
                     doc={doc}
                     isSelected={selectedId === doc.id}
                     onClick={() => setSelectedId(doc.id)}
-                    onDelete={() => {
-                      setDocuments(documents.filter(d => d.id !== doc.id));
-                      if (selectedId === doc.id) setSelectedId(null);
-                    }}
+                    onDelete={() => handleDelete(doc.id)}
                     getTypeIcon={getTypeIcon}
                     getTypeBadgeColor={getTypeBadgeColor}
                   />
@@ -320,10 +326,7 @@ export default function EnhancedNotesPage() {
                   doc={doc}
                   isSelected={selectedId === doc.id}
                   onClick={() => setSelectedId(doc.id)}
-                  onDelete={() => {
-                    setDocuments(documents.filter(d => d.id !== doc.id));
-                    if (selectedId === doc.id) setSelectedId(null);
-                  }}
+                  onDelete={() => handleDelete(doc.id)}
                   getTypeIcon={getTypeIcon}
                   getTypeBadgeColor={getTypeBadgeColor}
                 />
@@ -478,4 +481,3 @@ function DocumentItem({ doc, isSelected, onClick, onDelete, getTypeIcon, getType
     </div>
   );
 }
-

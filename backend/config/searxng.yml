@@ -1,0 +1,27 @@
+server:
+  port: 8080
+  bind_address: 0.0.0.0
+  base_url: "http://localhost:8080/"
+
+search:
+  safe_search: 0
+  autocomplete: "duckduckgo"
+
+engines:
+  - name: duckduckgo
+    disabled: false
+  - name: google
+    disabled: true
+  - name: startpage
+    disabled: true
+  - name: brave
+    disabled: true
+  - name: wikipedia
+    disabled: false
+  - name: bing
+    disabled: true
+  - name: qwant
+    disabled: true
+
+ui:
+  default_theme: simple

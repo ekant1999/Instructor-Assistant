@@ -9,9 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Paper, Document } from '@/shared/types';
-import { BookOpen, FileText, Search, X, Save, FolderOpen, Trash2, Loader2, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { BookOpen, FileText, Search, X, Save, Trash2, Loader2, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { ContextTemplate } from '@/shared/types';
 import { toast } from 'sonner';
+import { ragGetStatus, ragIngest } from '@/lib/api';
 
 interface DocumentIngestionPanelProps {
   papers: Paper[];
@@ -22,6 +23,8 @@ interface DocumentIngestionPanelProps {
   onNoteToggle: (id: string) => void;
   onSelectAll: (type: 'papers' | 'notes') => void;
   onClearSelection: () => void;
+  indexDirectory?: string;
+  onIndexDirectoryChange?: (value: string) => void;
   contextTemplates?: ContextTemplate[];
   onSaveTemplate?: (name: string, paperIds: string[], noteIds: string[]) => void;
   onLoadTemplate?: (template: ContextTemplate) => void;
@@ -38,6 +41,8 @@ export function DocumentIngestionPanel({
   onNoteToggle,
   onSelectAll,
   onClearSelection,
+  indexDirectory: controlledIndexDirectory,
+  onIndexDirectoryChange,
   contextTemplates = [],
   onSaveTemplate,
   onLoadTemplate,
@@ -51,12 +56,22 @@ export function DocumentIngestionPanel({
   const [templateName, setTemplateName] = useState('');
   
   // PDF Ingestion state
-  const [indexDirectory, setIndexDirectory] = useState('index');
+  const [localIndexDirectory, setLocalIndexDirectory] = useState('index');
   const [chunkSize, setChunkSize] = useState('1200');
   const [chunkOverlap, setChunkOverlap] = useState('200');
   const [isIngesting, setIsIngesting] = useState(false);
   const [indexStatus, setIndexStatus] = useState<'ready' | 'not_ready' | 'checking'>('checking');
   const [indexPath, setIndexPath] = useState('');
+  const indexDirectory = controlledIndexDirectory ?? localIndexDirectory;
+
+  const setIndexDirectory = (value: string) => {
+    if (onIndexDirectoryChange) {
+      onIndexDirectoryChange(value);
+    }
+    if (controlledIndexDirectory === undefined) {
+      setLocalIndexDirectory(value);
+    }
+  };
 
   // Check index status on mount
   useEffect(() => {
@@ -66,14 +81,9 @@ export function DocumentIngestionPanel({
   const checkIndexStatus = async () => {
     setIndexStatus('checking');
     try {
-      // In a real app, this would call an API endpoint
-      // const response = await fetch('/api/rag/index-status');
-      // const data = await response.json();
-      
-      // Mock for now - in real app, get from API
-      const mockPath = '/Documents/PersonalWork/chatgpt-instructor-assistant/index';
-      setIndexPath(mockPath);
-      setIndexStatus('ready');
+      const status = await ragGetStatus(indexDirectory || undefined);
+      setIndexPath(status.index_dir || '');
+      setIndexStatus(status.exists ? 'ready' : 'not_ready');
     } catch (error) {
       setIndexStatus('not_ready');
       toast.error('Failed to check index status');
@@ -88,26 +98,26 @@ export function DocumentIngestionPanel({
 
     setIsIngesting(true);
     try {
-      // In a real app, this would call an API endpoint with selected paper IDs
-      // const response = await fetch('/api/rag/ingest', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     paperIds: Array.from(selectedPaperIds),
-      //     indexDirectory,
-      //     chunkSize: parseInt(chunkSize),
-      //     chunkOverlap: parseInt(chunkOverlap)
-      //   })
-      // });
+      const paperIds = Array.from(selectedPaperIds)
+        .map((id) => Number(id))
+        .filter((id) => Number.isFinite(id));
+      const result = await ragIngest({
+        paper_ids: paperIds,
+        index_dir: indexDirectory || undefined,
+        chunk_size: parseInt(chunkSize, 10) || undefined,
+        chunk_overlap: parseInt(chunkOverlap, 10) || undefined
+      });
 
-      // Simulate ingestion process
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      toast.success(`Successfully ingested ${selectedPaperIds.size} PDF(s)`);
-      setIndexStatus('ready');
-      onIngestionComplete?.();
+      if (result.success) {
+        toast.success(result.message || `Successfully ingested ${selectedPaperIds.size} PDF(s)`);
+        setIndexStatus('ready');
+        setIndexPath(result.index_dir || indexPath);
+        onIngestionComplete?.();
+      } else {
+        toast.error(result.message || 'Failed to ingest PDFs');
+      }
     } catch (error) {
-      toast.error('Failed to ingest PDFs');
+      toast.error(error instanceof Error ? error.message : 'Failed to ingest PDFs');
     } finally {
       setIsIngesting(false);
     }
@@ -535,4 +545,3 @@ export function DocumentIngestionPanel({
     </Card>
   );
 }
-

@@ -22,12 +22,15 @@ export interface Paper {
   id: string;
   title: string;
   source: string;
+  sourceUrl?: string;
+  pdfUrl?: string;
   year: string;
   authors?: string;
   abstract?: string;
   keywords?: string;
   sections?: Section[];
   metadata?: Record<string, any>;
+  noteCount?: number;
   createdAt?: number;
   updatedAt?: number;
 }
@@ -56,6 +59,8 @@ export interface Document {
   wordCount?: number;
   questionCount?: number;
   sourceLinks?: Array<{ type: string; id: string; title: string }>;
+  paperId?: string;
+  paperTitle?: string;
   agent?: string;
   metadata?: Record<string, any>;
   createdAt: number;
@@ -82,6 +87,7 @@ export interface QuestionSet {
   questions: Question[];
   sourceDocumentIds?: string[];
   agent?: string;
+  prompt?: string;
   metadata?: Record<string, any>;
   createdAt: number;
   updatedAt: number;

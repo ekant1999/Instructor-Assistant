@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Download, FileText, FileCode, File, FileType, Code } from 'lucide-react';
 import { QuestionSet } from '@/shared/types';
 
@@ -18,6 +19,9 @@ interface ExportOptions {
   includeAnswers: boolean;
   includeExplanations: boolean;
   separateAnswerKey: boolean;
+  courseId?: string;
+  publish?: boolean;
+  timeLimit?: number;
 }
 
 export function ExportQuestionSetDialog({
@@ -30,7 +34,10 @@ export function ExportQuestionSetDialog({
   const [options, setOptions] = useState<ExportOptions>({
     includeAnswers: false,
     includeExplanations: true,
-    separateAnswerKey: true
+    separateAnswerKey: true,
+    courseId: '',
+    publish: false,
+    timeLimit: 30
   });
 
   const formatOptions = [
@@ -133,6 +140,42 @@ export function ExportQuestionSetDialog({
                 Create separate answer key file
               </Label>
             </div>
+
+            {format === 'canvas' && (
+              <div className="space-y-3 pt-2">
+                <div>
+                  <Label htmlFor="canvas-course" className="text-sm">Canvas Course ID</Label>
+                  <Input
+                    id="canvas-course"
+                    value={options.courseId || ''}
+                    onChange={(e) => setOptions({ ...options, courseId: e.target.value })}
+                    placeholder="e.g., 12345"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="canvas-time" className="text-sm">Time Limit (minutes)</Label>
+                  <Input
+                    id="canvas-time"
+                    type="number"
+                    min="1"
+                    value={options.timeLimit ?? 30}
+                    onChange={(e) => setOptions({ ...options, timeLimit: Number(e.target.value) || 30 })}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="canvas-publish"
+                    checked={options.publish || false}
+                    onCheckedChange={(checked) =>
+                      setOptions({ ...options, publish: checked as boolean })
+                    }
+                  />
+                  <Label htmlFor="canvas-publish" className="text-sm cursor-pointer">
+                    Publish immediately
+                  </Label>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="bg-muted/50 p-3 rounded-lg space-y-2 text-sm">
@@ -165,4 +208,3 @@ export function ExportQuestionSetDialog({
     </Dialog>
   );
 }
-

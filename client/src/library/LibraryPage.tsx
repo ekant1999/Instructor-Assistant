@@ -9,6 +9,7 @@ import { Paper } from '@/shared/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Layers, Sparkles, BookOpen, Loader2 } from 'lucide-react';
 import { useChatStore } from '@/chat/store';
+import { downloadPaper } from '@/lib/api';
 
 export default function LibraryPage() {
   const [papers, setPapers] = useState<Paper[]>([
@@ -37,14 +38,7 @@ export default function LibraryPage() {
 
   const selectedPaper = papers.find(p => p.id === selectedId) || null;
 
-  const handleAddPapers = (uploads: any[]) => {
-    const newPapers = uploads.map(u => ({
-      id: Math.random().toString(),
-      title: u.title,
-      source: u.source === 'file' ? 'Upload' : 'Online',
-      year: new Date().getFullYear().toString(),
-      abstract: 'Newly uploaded paper'
-    }));
+  const handleAddPapers = (newPapers: Paper[]) => {
     setPapers([...newPapers, ...papers]);
   };
 
@@ -139,7 +133,7 @@ Self-attention mechanism: Each element can directly attend to every other elemen
   return (
     <div className="flex h-full w-full flex-col bg-background">
       {/* Upload Panel - Full Width */}
-      <UploadPanel onUpload={handleAddPapers} />
+      <UploadPanel onUpload={handleAddPapers} onDownload={downloadPaper} />
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">

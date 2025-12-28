@@ -219,6 +219,7 @@ export function EnhancedPaperList({
           {filteredPapers.map((paper) => {
             const isSelected = selectedIds.has(paper.id);
             const isActive = selectedId === paper.id;
+            const meta = [paper.source, paper.year, paper.authors?.split(',')[0]].filter(Boolean).join(' • ');
             
             return (
               <Card
@@ -254,8 +255,7 @@ export function EnhancedPaperList({
                       }}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      {paper.source} • {paper.year}
-                      {paper.authors && ` • ${paper.authors.split(',')[0]}`}
+                      {meta || 'Metadata pending'}
                     </p>
                   </div>
                 </div>
@@ -309,4 +309,3 @@ export function EnhancedPaperList({
     </div>
   );
 }
-
