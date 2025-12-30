@@ -42,6 +42,7 @@ else:
 MAX_TOKENS = int(os.getenv("LITELLM_MAX_TOKENS", "4000"))
 MAX_CONTEXT_CHARS = int(os.getenv("QUESTION_CONTEXT_CHAR_LIMIT", "60000"))
 DEFAULT_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()
+SUMMARY_PROVIDER = (os.getenv("SUMMARY_PROVIDER") or os.getenv("LLM_PROVIDER") or "openai").strip().lower()
 LOCAL_LLM_URL = (os.getenv("LOCAL_LLM_URL") or "http://localhost:11434").rstrip("/")
 LOCAL_LLM_MODEL = os.getenv("LOCAL_LLM_MODEL", "llama3.1:8b")
 LOCAL_LLM_TIMEOUT = int(os.getenv("LOCAL_LLM_TIMEOUT", "60"))
@@ -549,17 +550,23 @@ def summarize_paper_chat(paper_id: int, messages: List[PaperChatMessage]) -> Dic
     for msg in messages:
         base_messages.append({"role": msg.role, "content": msg.content})
 
-    try:
-        response = completion(
-            model=DEFAULT_MODEL,
-            messages=base_messages,
-            temperature=TEMPERATURE,
-            **_completion_limit_args(DEFAULT_MODEL),
-        )
-    except Exception as exc:
-        raise QuestionGenerationError(f"LLM request failed: {exc}") from exc
+    if SUMMARY_PROVIDER == "local":
+        try:
+            text = _call_local_llm(base_messages).strip()
+        except Exception as exc:
+            raise QuestionGenerationError(f"Local LLM request failed: {exc}") from exc
+    else:
+        try:
+            response = completion(
+                model=DEFAULT_MODEL,
+                messages=base_messages,
+                temperature=TEMPERATURE,
+                **_completion_limit_args(DEFAULT_MODEL),
+            )
+        except Exception as exc:
+            raise QuestionGenerationError(f"LLM request failed: {exc}") from exc
 
-    text = response["choices"][0]["message"]["content"].strip()
+        text = response["choices"][0]["message"]["content"].strip()
     note_title = paper["title"] or "Paper Summary"
     return {
         "message": text,

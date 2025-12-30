@@ -65,6 +65,24 @@ def _init_core_tables(conn: sqlite3.Connection) -> None:
         );
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS summaries(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          paper_id INTEGER NOT NULL,
+          title TEXT,
+          content TEXT NOT NULL,
+          agent TEXT,
+          style TEXT,
+          word_count INTEGER,
+          is_edited INTEGER DEFAULT 0,
+          metadata_json TEXT,
+          created_at TEXT DEFAULT (datetime('now')),
+          updated_at TEXT DEFAULT (datetime('now')),
+          FOREIGN KEY(paper_id) REFERENCES papers(id) ON DELETE CASCADE
+        );
+        """
+    )
     conn.commit()
 
 

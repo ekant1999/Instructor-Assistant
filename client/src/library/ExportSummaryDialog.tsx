@@ -44,7 +44,8 @@ export function ExportSummaryDialog({
       year,
       agent,
       style,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
+      filename: getFilename()
     };
     onExport(format, content, metadata);
     onOpenChange(false);
@@ -59,7 +60,7 @@ export function ExportSummaryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="w-full max-w-[90vw] sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Export Summary</DialogTitle>
           <DialogDescription>
@@ -68,10 +69,10 @@ export function ExportSummaryDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div>
+          <div className="min-w-0">
             <label className="text-sm font-medium mb-2 block">Format</label>
             <Select value={format} onValueChange={(v) => setFormat(v as any)}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -93,10 +94,12 @@ export function ExportSummaryDialog({
             </Select>
           </div>
 
-          <div className="bg-muted/50 p-3 rounded-lg space-y-2 text-sm">
+          <div className="bg-muted/50 p-3 rounded-lg space-y-2 text-sm min-w-0">
             <div className="font-medium">Export Details</div>
             <div className="text-xs text-muted-foreground space-y-1">
-              <div>Filename: <code className="bg-background px-1 rounded">{getFilename()}</code></div>
+              <div className="break-words">
+                Filename: <code className="bg-background px-1 rounded break-all">{getFilename()}</code>
+              </div>
               {paperTitle && <div>Paper: {paperTitle}</div>}
               {authors && <div>Authors: {authors}</div>}
               {year && <div>Year: {year}</div>}
@@ -106,11 +109,15 @@ export function ExportSummaryDialog({
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="w-full sm:w-auto"
+          >
             Cancel
           </Button>
-          <Button onClick={handleExport}>
+          <Button onClick={handleExport} className="w-full sm:w-auto">
             <Download className="h-4 w-4 mr-2" />
             Export {format.toUpperCase()}
           </Button>
@@ -119,4 +126,3 @@ export function ExportSummaryDialog({
     </Dialog>
   );
 }
-

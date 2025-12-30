@@ -24,6 +24,20 @@ export interface ApiNote {
   paper_title?: string | null;
 }
 
+export interface ApiSummary {
+  id: number;
+  paper_id: number;
+  title?: string | null;
+  content: string;
+  agent?: string | null;
+  style?: string | null;
+  word_count?: number | null;
+  is_edited?: boolean | null;
+  metadata?: Record<string, any> | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
 export interface ApiQuestion {
   id?: number;
   set_id?: number;

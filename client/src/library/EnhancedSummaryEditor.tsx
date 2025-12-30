@@ -294,4 +294,3 @@ export function EnhancedSummaryEditor({
     </div>
   );
 }
-

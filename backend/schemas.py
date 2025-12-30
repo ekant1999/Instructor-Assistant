@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -18,6 +18,26 @@ class NoteUpdate(BaseModel):
     body: Optional[str] = Field(default=None, min_length=1)
     paper_id: Optional[int] = Field(default=None, ge=1)
     tags: Optional[List[str]] = Field(default=None)
+
+
+class SummaryCreate(BaseModel):
+    title: Optional[str] = Field(default=None, max_length=255)
+    content: str = Field(..., min_length=1)
+    agent: Optional[str] = Field(default=None, max_length=50)
+    style: Optional[str] = Field(default=None, max_length=50)
+    word_count: Optional[int] = Field(default=None, ge=0)
+    is_edited: Optional[bool] = Field(default=None)
+    metadata: Optional[Dict[str, Any]] = Field(default=None)
+
+
+class SummaryUpdate(BaseModel):
+    title: Optional[str] = Field(default=None, max_length=255)
+    content: Optional[str] = Field(default=None, min_length=1)
+    agent: Optional[str] = Field(default=None, max_length=50)
+    style: Optional[str] = Field(default=None, max_length=50)
+    word_count: Optional[int] = Field(default=None, ge=0)
+    is_edited: Optional[bool] = Field(default=None)
+    metadata: Optional[Dict[str, Any]] = Field(default=None)
 
 
 class Question(BaseModel):

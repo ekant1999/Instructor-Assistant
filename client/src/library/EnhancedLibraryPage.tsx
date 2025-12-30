@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { EnhancedPaperList } from './EnhancedPaperList';
 import { PdfPreview } from './PdfPreview';
 import { UploadPanel } from './UploadPanel';
@@ -16,14 +18,28 @@ import { toast } from 'sonner';
 import {
   chatPaper,
   deletePaper,
+  deleteSummary,
+  createPaperSummary,
   downloadPaper,
   listNotes,
   listPaperSections,
   listPapers,
+  listPaperSummaries,
+  updateSummary,
   updateNote,
   createNote,
 } from '@/lib/api';
-import { mapApiNote, mapApiPaper, mapApiSection } from '@/lib/mappers';
+import { mapApiNote, mapApiPaper, mapApiSection, mapApiSummary } from '@/lib/mappers';
+
+const countWords = (text: string) => text.split(/\s+/).filter(Boolean).length;
+
+const normalizeSummaryStyle = (
+  style?: SummarizeConfig['style'] | Summary['style']
+): Summary['style'] | undefined => {
+  if (!style) return undefined;
+  if (style === 'bullet') return 'brief';
+  return style as Summary['style'];
+};
 
 export default function EnhancedLibraryPage() {
   const [papers, setPapers] = useState<Paper[]>([]);
@@ -53,6 +69,17 @@ export default function EnhancedLibraryPage() {
   }, [papers, selectedId, sectionsByPaperId]);
 
   const paperSummaries = selectedPaper ? summaries.get(selectedPaper.id) || [] : [];
+
+  const upsertSummaryForPaper = (paperId: string, summary: Summary, replaceId?: string) => {
+    setSummaries((prev) => {
+      const next = new Map(prev);
+      const existing = next.get(paperId) || [];
+      const filtered = existing.filter((item) => item.id !== summary.id && item.id !== replaceId);
+      const sorted = [...filtered, summary].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      next.set(paperId, sorted);
+      return next;
+    });
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -86,6 +113,11 @@ export default function EnhancedLibraryPage() {
     void ensureSections(selectedId);
   }, [selectedId, sectionsByPaperId]);
 
+  useEffect(() => {
+    if (!selectedId || summaries.get(selectedId)) return;
+    void ensureSummaries(selectedId);
+  }, [selectedId, summaries]);
+
   async function ensureSections(paperId: string): Promise<Section[]> {
     const cached = sectionsByPaperId[paperId];
     if (cached) return cached;
@@ -96,6 +128,24 @@ export default function EnhancedLibraryPage() {
       return mapped;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to load paper sections');
+      return [];
+    }
+  }
+
+  async function ensureSummaries(paperId: string): Promise<Summary[]> {
+    const cached = summaries.get(paperId);
+    if (cached) return cached;
+    try {
+      const apiSummaries = await listPaperSummaries(Number(paperId));
+      const mapped = apiSummaries.map(mapApiSummary);
+      setSummaries((prev) => {
+        const next = new Map(prev);
+        next.set(paperId, mapped);
+        return next;
+      });
+      return mapped;
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to load summary history');
       return [];
     }
   }
@@ -132,9 +182,12 @@ export default function EnhancedLibraryPage() {
   const buildSummaryPrompt = (config: SummarizeConfig, sections: Section[]) => {
     const style = config.style || 'bullet';
     const styleInstructions = {
-      bullet: 'Summarize the paper in concise bullet points.',
-      detailed: 'Provide a detailed summary with sections for background, methodology, and results.',
-      teaching: 'Create a teaching-focused summary with key concepts, definitions, and potential exam questions.'
+      bullet:
+        'Summarize the paper as concise Markdown bullet points. Use "-" for each bullet and keep each bullet to 1-2 sentences.',
+      detailed:
+        'Provide a detailed Markdown summary with headings: "## Background", "## Methodology", "## Results", and "## Implications". Use bullets where appropriate.',
+      teaching:
+        'Create a teaching-focused Markdown summary with headings: "## Key Concepts", "## Definitions", and "## Exam Questions". Use numbered questions under "## Exam Questions".'
     };
 
     const selectedContent = sections
@@ -149,7 +202,8 @@ export default function EnhancedLibraryPage() {
 
     const custom = config.customPrompt ? `\n\nAdditional instructions:\n${config.customPrompt}` : '';
 
-    return `${styleInstructions[style as keyof typeof styleInstructions] || styleInstructions.bullet}\n${focusBlock}${custom}`;
+    const formatNote = 'Return only Markdown (no code fences, no preamble).';
+    return `${styleInstructions[style as keyof typeof styleInstructions] || styleInstructions.bullet}\n${formatNote}\n${focusBlock}${custom}`;
   };
 
   const generateSummary = async (
@@ -172,23 +226,20 @@ export default function EnhancedLibraryPage() {
     try {
       const content = await generateSummary(selectedPaper.id, config, agent);
       const wordCount = content.split(/\s+/).filter(Boolean).length;
+      const summaryStyle = normalizeSummaryStyle(config.style);
 
-      const newSummary: Summary = {
-        id: Math.random().toString(),
-        paperId: selectedPaper.id,
+      const created = await createPaperSummary(Number(selectedPaper.id), {
         title: `Summary: ${selectedPaper.title}`,
         content,
         agent,
-        style: config.style,
-        wordCount,
-        isEdited: false,
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      };
-
-      const existing = summaries.get(selectedPaper.id) || [];
-      setSummaries(new Map(summaries.set(selectedPaper.id, [...existing, newSummary])));
-      setCurrentSummary(newSummary);
+        style: summaryStyle,
+        word_count: wordCount,
+        is_edited: false,
+        metadata: { scope: config.scope, method: config.method }
+      });
+      const mapped = mapApiSummary(created);
+      upsertSummaryForPaper(selectedPaper.id, mapped);
+      setCurrentSummary(mapped);
       setActiveTab('output');
       toast.success('Summary generated successfully');
     } catch (error) {
@@ -223,23 +274,19 @@ export default function EnhancedLibraryPage() {
         );
 
         const wordCount = content.split(/\s+/).filter(Boolean).length;
-        const summary: Summary = {
-          id: Math.random().toString(),
-          paperId: paper.id,
+        const summaryStyle = normalizeSummaryStyle('detailed');
+        const created = await createPaperSummary(Number(paper.id), {
           title: `Summary: ${paper.title}`,
           content: `## ${paper.title}\n\n${content}`,
           agent,
-          style: 'detailed',
-          wordCount,
-          isEdited: false,
-          createdAt: Date.now(),
-          updatedAt: Date.now()
-        };
-
-        combinedSummaries.push(summary);
-
-        const existing = summaries.get(paper.id) || [];
-        setSummaries(new Map(summaries.set(paper.id, [...existing, summary])));
+          style: summaryStyle,
+          word_count: wordCount,
+          is_edited: false,
+          metadata: { scope: 'multiple', method: agent.toLowerCase() }
+        });
+        const mapped = mapApiSummary(created);
+        upsertSummaryForPaper(paper.id, mapped);
+        combinedSummaries.push(mapped);
       }
 
       const combinedContent = combinedSummaries.map((s) => s.content).join('\n\n---\n\n');
@@ -252,7 +299,8 @@ export default function EnhancedLibraryPage() {
         wordCount: combinedContent.split(/\s+/).filter(Boolean).length,
         isEdited: false,
         createdAt: Date.now(),
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        metadata: { source: 'local' }
       };
 
       setCurrentSummary(combinedSummary);
@@ -296,6 +344,328 @@ export default function EnhancedLibraryPage() {
     }
   };
 
+  const handleUpdateSummary = async (markdown: string) => {
+    if (!currentSummary) return;
+    const updatedSummary: Summary = {
+      ...currentSummary,
+      content: markdown,
+      isEdited: true,
+      updatedAt: Date.now(),
+      wordCount: countWords(markdown)
+    };
+    setCurrentSummary(updatedSummary);
+    if (updatedSummary.paperId) {
+      upsertSummaryForPaper(updatedSummary.paperId, updatedSummary);
+    }
+
+    const summaryId = Number(updatedSummary.id);
+    if (Number.isNaN(summaryId)) {
+      return;
+    }
+    try {
+      const updated = await updateSummary(summaryId, {
+        title: updatedSummary.title,
+        content: markdown,
+        agent: updatedSummary.agent,
+        style: updatedSummary.style,
+        word_count: updatedSummary.wordCount,
+        is_edited: true,
+        metadata: updatedSummary.metadata
+      });
+      const mapped = mapApiSummary(updated);
+      if (mapped.paperId) {
+        upsertSummaryForPaper(mapped.paperId, mapped, updatedSummary.id);
+      }
+      setCurrentSummary(mapped);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update summary history');
+    }
+  };
+
+  const removeSummaryFromState = (paperId: string, summaryId: string) => {
+    setSummaries((prev) => {
+      const next = new Map(prev);
+      const existing = next.get(paperId) || [];
+      const filtered = existing.filter((s) => s.id !== summaryId);
+      if (filtered.length > 0) {
+        next.set(paperId, filtered);
+      } else {
+        next.delete(paperId);
+      }
+      return next;
+    });
+    if (currentSummary?.id === summaryId) {
+      setCurrentSummary(null);
+    }
+  };
+
+  const handleDeleteSummary = async (summary: Summary) => {
+    if (!summary.paperId) return;
+    const summaryId = Number(summary.id);
+    try {
+      if (!Number.isNaN(summaryId)) {
+        await deleteSummary(summaryId);
+      }
+      removeSummaryFromState(summary.paperId, summary.id);
+      toast.success('Summary deleted');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete summary');
+    }
+  };
+
+  const escapeHtml = (value: string) =>
+    value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+  const escapeLatex = (value: string) =>
+    value.replace(/[\\{}$#%&_^\~]/g, (match) => {
+      switch (match) {
+        case '\\':
+          return '\\textbackslash{}';
+        case '~':
+          return '\\textasciitilde{}';
+        case '^':
+          return '\\textasciicircum{}';
+        default:
+          return `\\${match}`;
+      }
+    });
+
+  const downloadTextFile = (content: string, filename: string) => {
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const renderMarkdownToHtml = (markdown: string) =>
+    renderToStaticMarkup(<ReactMarkdown>{markdown}</ReactMarkdown>);
+
+  const exportAsPdf = (content: string, metadata: any) => {
+    const title = metadata?.paperTitle || 'Summary';
+    const win = window.open('', '_blank');
+    if (!win) {
+      toast.error('Please allow popups to export a PDF.');
+      return;
+    }
+    const metaItems = [
+      { label: 'Authors', value: metadata?.authors },
+      { label: 'Year', value: metadata?.year },
+      { label: 'Agent', value: metadata?.agent },
+      { label: 'Style', value: metadata?.style }
+    ].filter((item) => item.value);
+    const metaHtml = metaItems
+      .map(
+        (item) =>
+          `<div><strong>${escapeHtml(item.label)}:</strong> ${escapeHtml(String(item.value))}</div>`
+      )
+      .join('');
+    const htmlContent = renderMarkdownToHtml(content);
+    const body = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>${escapeHtml(title)} Summary</title>
+          <style>
+            body { font-family: "Georgia", "Times New Roman", serif; padding: 48px; color: #111; }
+            h1, h2, h3, h4 { font-family: "Helvetica Neue", Arial, sans-serif; }
+            h1 { font-size: 22px; margin-bottom: 8px; }
+            h2 { font-size: 18px; margin-top: 24px; }
+            h3 { font-size: 16px; margin-top: 20px; }
+            p { line-height: 1.6; margin: 12px 0; }
+            ul, ol { margin: 12px 0 12px 24px; }
+            li { margin: 6px 0; }
+            strong { font-weight: 600; }
+            code { font-family: "SFMono-Regular", Menlo, monospace; background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
+            pre code { display: block; padding: 12px; }
+            .meta { font-size: 12px; color: #555; margin-bottom: 20px; }
+            hr { border: none; border-top: 1px solid #e5e5e5; margin: 20px 0; }
+            @page { margin: 1in; }
+          </style>
+        </head>
+        <body>
+          <h1>${escapeHtml(title)} Summary</h1>
+          ${metaHtml ? `<div class="meta">${metaHtml}</div><hr />` : ''}
+          <div class="content">${htmlContent}</div>
+        </body>
+      </html>
+    `;
+    win.document.write(body);
+    win.document.close();
+    win.focus();
+    win.print();
+  };
+
+  const handleExportSummary = async (
+    format: 'pdf' | 'txt' | 'latex' | 'markdown' | 'docx',
+    content: string,
+    metadata: any
+  ) => {
+    if (!content || !content.trim()) {
+      toast.error('No summary content to export');
+      return;
+    }
+    const filename = metadata?.filename || `Summary_${Date.now()}.${format === 'markdown' ? 'md' : format}`;
+
+    if (format === 'pdf') {
+      exportAsPdf(content, metadata);
+      return;
+    }
+
+    if (format === 'docx') {
+      try {
+        const { Document: DocxDocument, Paragraph, TextRun, HeadingLevel, Packer } = await import('docx');
+        const title = metadata?.paperTitle || 'Summary';
+        const lines = content.split(/\r?\n/);
+        const paragraphs: any[] = [];
+
+        const metaItems = [
+          { label: 'Authors', value: metadata?.authors },
+          { label: 'Year', value: metadata?.year },
+          { label: 'Agent', value: metadata?.agent },
+          { label: 'Style', value: metadata?.style }
+        ].filter((item) => item.value);
+
+        const parseInlineMarkdown = (text: string) => {
+          const runs: any[] = [];
+          const regex = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              runs.push(new TextRun(text.slice(lastIndex, match.index)));
+            }
+            const token = match[0];
+            if (token.startsWith('**')) {
+              runs.push(new TextRun({ text: token.slice(2, -2), bold: true }));
+            } else {
+              runs.push(new TextRun({ text: token.slice(1, -1), italics: true }));
+            }
+            lastIndex = match.index + token.length;
+          }
+          if (lastIndex < text.length) {
+            runs.push(new TextRun(text.slice(lastIndex)));
+          }
+          return runs.length ? runs : [new TextRun(text)];
+        };
+
+        paragraphs.push(
+          new Paragraph({
+            text: `${title} Summary`,
+            heading: HeadingLevel.HEADING_1
+          })
+        );
+
+        metaItems.forEach((item) => {
+          paragraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: `${item.label}: `, bold: true }),
+                new TextRun(String(item.value))
+              ]
+            })
+          );
+        });
+
+        if (metaItems.length > 0) {
+          paragraphs.push(new Paragraph(''));
+        }
+
+        const headingMap: Record<number, any> = {
+          1: HeadingLevel.HEADING_1,
+          2: HeadingLevel.HEADING_2,
+          3: HeadingLevel.HEADING_3,
+          4: HeadingLevel.HEADING_4,
+          5: HeadingLevel.HEADING_5,
+          6: HeadingLevel.HEADING_6
+        };
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) {
+            paragraphs.push(new Paragraph(''));
+            continue;
+          }
+          const headingMatch = /^(#{1,6})\s+(.*)/.exec(trimmed);
+          if (headingMatch) {
+            const level = headingMatch[1].length;
+            paragraphs.push(
+              new Paragraph({
+                text: headingMatch[2],
+                heading: headingMap[level] || HeadingLevel.HEADING_2
+              })
+            );
+            continue;
+          }
+          if (/^[-*+]\s+/.test(trimmed)) {
+            paragraphs.push(
+              new Paragraph({
+                children: parseInlineMarkdown(trimmed.replace(/^[-*+]\s+/, '')),
+                bullet: { level: 0 }
+              })
+            );
+            continue;
+          }
+          if (/^\d+\.\s+/.test(trimmed)) {
+            paragraphs.push(
+              new Paragraph({
+                children: parseInlineMarkdown(trimmed.replace(/^\d+\.\s+/, '')),
+                bullet: { level: 0 }
+              })
+            );
+            continue;
+          }
+          paragraphs.push(new Paragraph({ children: parseInlineMarkdown(trimmed) }));
+        }
+
+        const doc = new DocxDocument({
+          sections: [
+            {
+              children: paragraphs
+            }
+          ]
+        });
+
+        const blob = await Packer.toBlob(doc);
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename.endsWith('.docx') ? filename : `${filename}.docx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'DOCX export failed');
+      }
+      return;
+    }
+
+    if (format === 'latex') {
+      const title = metadata?.paperTitle || 'Summary';
+      const latex = [
+        '\\documentclass{article}',
+        '\\usepackage[margin=1in]{geometry}',
+        '\\begin{document}',
+        `\\section*{${escapeLatex(title)} Summary}`,
+        escapeLatex(content),
+        '\\end{document}'
+      ].join('\n');
+      downloadTextFile(latex, filename);
+      return;
+    }
+
+    downloadTextFile(content, filename);
+  };
+
   const handleDeletePaper = async (id: string) => {
     try {
       await deletePaper(Number(id));
@@ -308,6 +678,11 @@ export default function EnhancedLibraryPage() {
       setSectionsByPaperId((prev) => {
         const { [id]: _, ...rest } = prev;
         return rest;
+      });
+      setSummaries((prev) => {
+        const next = new Map(prev);
+        next.delete(id);
+        return next;
       });
       if (selectedId === id) {
         const nextPaper = papers.find((p) => p.id !== id);
@@ -428,11 +803,14 @@ export default function EnhancedLibraryPage() {
                     setCurrentSummary(summary);
                     setActiveTab('output');
                   }}
+                  onEdit={(summary) => {
+                    setCurrentSummary(summary);
+                    setActiveTab('output');
+                  }}
                   onDelete={(id) => {
-                    const existing = summaries.get(selectedPaper.id) || [];
-                    setSummaries(new Map(summaries.set(selectedPaper.id, existing.filter((s) => s.id !== id))));
-                    if (currentSummary?.id === id) {
-                      setCurrentSummary(null);
+                    const summary = paperSummaries.find((item) => item.id === id);
+                    if (summary) {
+                      void handleDeleteSummary(summary);
                     }
                   }}
                 />
@@ -443,14 +821,7 @@ export default function EnhancedLibraryPage() {
                   <EnhancedSummaryEditor
                     summary={currentSummary}
                     paperTitle={selectedPaper.title}
-                    onSave={(markdown: string) => {
-                      setCurrentSummary({
-                        ...currentSummary,
-                        content: markdown,
-                        isEdited: true,
-                        updatedAt: Date.now()
-                      });
-                    }}
+                    onSave={handleUpdateSummary}
                     onExport={() => setExportDialogOpen(true)}
                     onSaveToNotes={() => setSaveModalOpen(true)}
                   />
@@ -481,7 +852,13 @@ export default function EnhancedLibraryPage() {
       <ExportSummaryDialog
         open={exportDialogOpen}
         onOpenChange={setExportDialogOpen}
-        summary={currentSummary}
+        onExport={handleExportSummary}
+        content={currentSummary?.content || ''}
+        paperTitle={selectedPaper?.title}
+        authors={selectedPaper?.authors}
+        year={selectedPaper?.year}
+        agent={currentSummary?.agent}
+        style={currentSummary?.style}
       />
     </div>
   );

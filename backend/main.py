@@ -27,6 +27,8 @@ from .schemas import (
     CanvasPushResponse,
     NoteCreate,
     NoteUpdate,
+    SummaryCreate,
+    SummaryUpdate,
     PaperChatRequest,
     PaperDownloadRequest,
     PaperRecord,
@@ -89,6 +91,18 @@ def _parse_tags(raw: Optional[str]) -> List[str]:
     if isinstance(data, list):
         return [str(tag).strip() for tag in data if str(tag).strip()]
     return []
+
+
+def _parse_metadata(raw: Optional[str]) -> Dict[str, Any]:
+    if not raw:
+        return {}
+    try:
+        data = json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return {}
+    if isinstance(data, dict):
+        return data
+    return {}
 
 
 def _get_paper(paper_id: int) -> Optional[Dict[str, Any]]:
@@ -311,6 +325,144 @@ def remove_note(note_id: int) -> Response:
         conn.commit()
     if cur.rowcount == 0:
         raise HTTPException(status_code=404, detail="Note not found.")
+    return Response(status_code=204)
+
+
+@app.get("/api/papers/{paper_id}/summaries")
+def list_summaries(paper_id: int) -> Dict[str, List[Dict]]:
+    with get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT id, paper_id, title, content, agent, style, word_count, is_edited,
+                   metadata_json, created_at, updated_at
+            FROM summaries
+            WHERE paper_id=?
+            ORDER BY datetime(created_at) DESC, id DESC
+            """,
+            (paper_id,),
+        ).fetchall()
+    summaries: List[Dict[str, Any]] = []
+    for row in rows:
+        summary = dict(row)
+        summary["metadata"] = _parse_metadata(summary.pop("metadata_json", None))
+        summary["is_edited"] = bool(summary.get("is_edited"))
+        summaries.append(summary)
+    return {"summaries": summaries}
+
+
+@app.post("/api/papers/{paper_id}/summaries", status_code=201)
+def create_summary(paper_id: int, payload: SummaryCreate) -> Dict[str, Dict]:
+    metadata_json = (
+        json.dumps(payload.metadata, ensure_ascii=False)
+        if payload.metadata is not None
+        else None
+    )
+    with get_conn() as conn:
+        existing = conn.execute("SELECT id FROM papers WHERE id=?", (paper_id,)).fetchone()
+        if not existing:
+            raise HTTPException(status_code=404, detail="Paper not found.")
+        conn.execute(
+            """
+            INSERT INTO summaries (paper_id, title, content, agent, style, word_count, is_edited, metadata_json,
+                                   created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            """,
+            (
+                paper_id,
+                payload.title,
+                payload.content,
+                payload.agent,
+                payload.style,
+                payload.word_count,
+                1 if payload.is_edited else 0,
+                metadata_json,
+            ),
+        )
+        summary_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+        row = conn.execute(
+            """
+            SELECT id, paper_id, title, content, agent, style, word_count, is_edited,
+                   metadata_json, created_at, updated_at
+            FROM summaries
+            WHERE id=?
+            """,
+            (summary_id,),
+        ).fetchone()
+    summary = dict(row)
+    summary["metadata"] = _parse_metadata(summary.pop("metadata_json", None))
+    summary["is_edited"] = bool(summary.get("is_edited"))
+    return {"summary": summary}
+
+
+@app.put("/api/summaries/{summary_id}")
+def update_summary_record(summary_id: int, payload: SummaryUpdate) -> Dict[str, Dict]:
+    with get_conn() as conn:
+        existing = conn.execute(
+            """
+            SELECT id, paper_id, title, content, agent, style, word_count, is_edited,
+                   metadata_json, created_at, updated_at
+            FROM summaries
+            WHERE id=?
+            """,
+            (summary_id,),
+        ).fetchone()
+        if not existing:
+            raise HTTPException(status_code=404, detail="Summary not found.")
+        new_title = payload.title if payload.title is not None else existing["title"]
+        new_content = payload.content if payload.content is not None else existing["content"]
+        new_agent = payload.agent if payload.agent is not None else existing["agent"]
+        new_style = payload.style if payload.style is not None else existing["style"]
+        new_word_count = (
+            payload.word_count if payload.word_count is not None else existing["word_count"]
+        )
+        new_is_edited = (
+            1 if payload.is_edited is True else 0 if payload.is_edited is False else existing["is_edited"]
+        )
+        new_metadata_json = (
+            json.dumps(payload.metadata, ensure_ascii=False)
+            if payload.metadata is not None
+            else existing["metadata_json"]
+        )
+        conn.execute(
+            """
+            UPDATE summaries
+            SET title=?, content=?, agent=?, style=?, word_count=?, is_edited=?, metadata_json=?,
+                updated_at=CURRENT_TIMESTAMP
+            WHERE id=?
+            """,
+            (
+                new_title,
+                new_content,
+                new_agent,
+                new_style,
+                new_word_count,
+                new_is_edited,
+                new_metadata_json,
+                summary_id,
+            ),
+        )
+        row = conn.execute(
+            """
+            SELECT id, paper_id, title, content, agent, style, word_count, is_edited,
+                   metadata_json, created_at, updated_at
+            FROM summaries
+            WHERE id=?
+            """,
+            (summary_id,),
+        ).fetchone()
+    summary = dict(row)
+    summary["metadata"] = _parse_metadata(summary.pop("metadata_json", None))
+    summary["is_edited"] = bool(summary.get("is_edited"))
+    return {"summary": summary}
+
+
+@app.delete("/api/summaries/{summary_id}", status_code=204, response_class=Response)
+def delete_summary_record(summary_id: int) -> Response:
+    with get_conn() as conn:
+        cur = conn.execute("DELETE FROM summaries WHERE id=?", (summary_id,))
+        conn.commit()
+    if cur.rowcount == 0:
+        raise HTTPException(status_code=404, detail="Summary not found.")
     return Response(status_code=204)
 
 

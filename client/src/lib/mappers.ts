@@ -3,9 +3,10 @@ import {
   ApiPaper,
   ApiPaperSection,
   ApiQuestion,
-  ApiQuestionSetPayload
+  ApiQuestionSetPayload,
+  ApiSummary
 } from "./api-types";
-import { Document, Paper, Question, QuestionSet, Section } from "@/shared/types";
+import { Document, Paper, Question, QuestionSet, Section, Summary } from "@/shared/types";
 
 function parseTimestamp(value?: string | null): number | undefined {
   if (!value) return undefined;
@@ -56,6 +57,24 @@ export function mapApiSection(section: ApiPaperSection): Section {
   };
 }
 
+function normalizeSummaryAgent(agent?: string | null): "Gemini" | "GPT" | "Qwen" {
+  if (!agent) return "Qwen";
+  const normalized = agent.toLowerCase();
+  if (normalized.includes("gpt") || normalized.includes("openai")) return "GPT";
+  if (normalized.includes("gemini")) return "Gemini";
+  if (normalized.includes("qwen") || normalized.includes("local")) return "Qwen";
+  return "Qwen";
+}
+
+function normalizeSummaryStyle(style?: string | null): Summary["style"] | undefined {
+  if (!style) return undefined;
+  const normalized = style.toLowerCase();
+  if (normalized === "bullet" || normalized === "brief") return "brief";
+  if (normalized === "detailed") return "detailed";
+  if (normalized === "teaching") return "teaching";
+  return undefined;
+}
+
 function inferNoteType(api: ApiNote): Document["type"] {
   const tags = (api.tags || []).map((tag) => tag.toLowerCase());
   const title = (api.title || "").toLowerCase();
@@ -96,6 +115,25 @@ export function mapApiNote(api: ApiNote): Document {
     paperId: api.paper_id ? String(api.paper_id) : undefined,
     paperTitle: api.paper_title || undefined,
     wordCount: countWords(content),
+  };
+}
+
+export function mapApiSummary(api: ApiSummary): Summary {
+  const createdAt = parseTimestamp(api.created_at) || Date.now();
+  const updatedAt = parseTimestamp(api.updated_at) || createdAt;
+  const content = api.content || "";
+  return {
+    id: String(api.id),
+    paperId: String(api.paper_id),
+    title: api.title || "Summary",
+    content,
+    agent: normalizeSummaryAgent(api.agent),
+    style: normalizeSummaryStyle(api.style),
+    wordCount: api.word_count ?? countWords(content),
+    isEdited: Boolean(api.is_edited),
+    metadata: api.metadata || undefined,
+    createdAt,
+    updatedAt,
   };
 }
 

@@ -18,7 +18,8 @@ import {
   ApiRagIngestRequest,
   ApiRagIngestResponse,
   ApiRagQueryRequest,
-  ApiRagQueryResponse
+  ApiRagQueryResponse,
+  ApiSummary
 } from "./api-types";
 
 const DEFAULT_BASE = (import.meta.env.VITE_API_BASE as string | undefined) || "http://localhost:8010/api";
@@ -135,6 +136,53 @@ export async function updateNote(
 
 export async function deleteNote(noteId: number): Promise<void> {
   await request<void>(`/notes/${noteId}`, { method: "DELETE" });
+}
+
+export async function listPaperSummaries(paperId: number): Promise<ApiSummary[]> {
+  const data = await request<{ summaries: ApiSummary[] }>(`/papers/${paperId}/summaries`);
+  return data.summaries;
+}
+
+export async function createPaperSummary(
+  paperId: number,
+  input: {
+    title?: string;
+    content: string;
+    agent?: string;
+    style?: string;
+    word_count?: number;
+    is_edited?: boolean;
+    metadata?: Record<string, any>;
+  }
+): Promise<ApiSummary> {
+  const data = await request<{ summary: ApiSummary }>(`/papers/${paperId}/summaries`, {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+  return data.summary;
+}
+
+export async function updateSummary(
+  summaryId: number,
+  input: {
+    title?: string;
+    content?: string;
+    agent?: string;
+    style?: string;
+    word_count?: number;
+    is_edited?: boolean;
+    metadata?: Record<string, any>;
+  }
+): Promise<ApiSummary> {
+  const data = await request<{ summary: ApiSummary }>(`/summaries/${summaryId}`, {
+    method: "PUT",
+    body: JSON.stringify(input)
+  });
+  return data.summary;
+}
+
+export async function deleteSummary(summaryId: number): Promise<void> {
+  await request<void>(`/summaries/${summaryId}`, { method: "DELETE" });
 }
 
 export async function listQuestionSets(): Promise<ApiQuestionSetMeta[]> {
