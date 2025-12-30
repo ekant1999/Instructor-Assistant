@@ -8,14 +8,14 @@ from pydantic import BaseModel, Field
 
 class NoteCreate(BaseModel):
     title: Optional[str] = Field(default=None, max_length=255)
-    body: str = Field(..., min_length=1)
+    body: str = Field(...)
     paper_id: Optional[int] = Field(default=None, ge=1)
     tags: Optional[List[str]] = Field(default=None)
 
 
 class NoteUpdate(BaseModel):
     title: Optional[str] = Field(default=None, max_length=255)
-    body: Optional[str] = Field(default=None, min_length=1)
+    body: Optional[str] = Field(default=None)
     paper_id: Optional[int] = Field(default=None, ge=1)
     tags: Optional[List[str]] = Field(default=None)
 

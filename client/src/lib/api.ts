@@ -37,7 +37,24 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     let detail = res.statusText;
     try {
       const data = await res.json();
-      detail = data.detail || JSON.stringify(data);
+      const rawDetail = data?.detail ?? data;
+      if (Array.isArray(rawDetail)) {
+        detail = rawDetail
+          .map((entry) => {
+            if (typeof entry === "string") return entry;
+            if (entry && typeof entry === "object") {
+              return entry.msg || entry.message || JSON.stringify(entry);
+            }
+            return String(entry);
+          })
+          .join("; ");
+      } else if (typeof rawDetail === "string") {
+        detail = rawDetail;
+      } else if (rawDetail && typeof rawDetail === "object") {
+        detail = JSON.stringify(rawDetail);
+      } else if (rawDetail != null) {
+        detail = String(rawDetail);
+      }
     } catch {
       // ignore
     }
