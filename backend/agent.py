@@ -10,10 +10,11 @@ import ollama
 from backend.core.database import get_conn
 
 from . import qwen_tools
+from backend import context_store
 from backend.core.library import add_local_pdf
 from backend.services import summarize_paper_chat
 from backend.schemas import PaperChatMessage
-from backend.mcp_client import call_tool as call_mcp_tool
+from backend.mcp_client import MCPClientError, call_tool as call_mcp_tool, is_configured as mcp_configured
 
 # Define the function-calling tool schemas for the model
 TOOL_DEFS: List[Dict[str, Any]] = [
@@ -353,15 +354,57 @@ def _summarize_paper(paper_id: int) -> Dict[str, Any]:
 
 
 def _list_contexts() -> Dict[str, Any]:
-    payload = call_mcp_tool("list_contexts", {})
-    return payload or {}
+    if mcp_configured():
+        try:
+            payload = call_mcp_tool("list_contexts", {})
+            return payload or {}
+        except MCPClientError as exc:
+            logger.warning("MCP list_contexts failed, falling back to local context store: %s", exc)
+    contexts = []
+    for ctx in context_store.list_contexts():
+        contexts.append(
+            {
+                "context_id": ctx.context_id,
+                "filename": ctx.filename,
+                "characters": ctx.characters,
+                "preview": ctx.preview,
+            }
+        )
+    return {"contexts": contexts}
 
 
 def _read_context(context_id: str, start: int | None = None, length: int | None = None) -> Dict[str, Any]:
-    return call_mcp_tool(
-        "read_context",
-        {"context_id": context_id, "start": start, "length": length},
-    )
+    if mcp_configured():
+        try:
+            return call_mcp_tool(
+                "read_context",
+                {"context_id": context_id, "start": start, "length": length},
+            )
+        except MCPClientError as exc:
+            logger.warning("MCP read_context failed, falling back to local context store: %s", exc)
+    if not context_id:
+        return {"error": "missing_context_id"}
+    ctx = context_store.get_context(context_id)
+    if not ctx:
+        return {"error": "not_found"}
+    text = ctx.text or ""
+    try:
+        start_idx = max(0, int(start or 0))
+    except (TypeError, ValueError):
+        start_idx = 0
+    try:
+        requested_len = int(length) if length is not None else 4000
+    except (TypeError, ValueError):
+        requested_len = 4000
+    requested_len = max(500, min(requested_len, 6000))
+    snippet = text[start_idx : start_idx + requested_len]
+    return {
+        "context_id": context_id,
+        "start": start_idx,
+        "length": len(snippet),
+        "has_more": start_idx + len(snippet) < len(text),
+        "content": snippet,
+    }
 
 
 def _combine_contexts_text(context_ids: List[str] | None, max_chars: int = 60000) -> str:

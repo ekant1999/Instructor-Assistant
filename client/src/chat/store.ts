@@ -6,14 +6,25 @@ import { ApiAgentChatMessage } from '@/lib/api-types';
 // Simple ID generator to avoid external dependency for mockup
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
+export interface ChatAttachment {
+  id: string;
+  filename: string;
+  characters: number;
+  preview: string;
+}
+
 interface ChatState {
   messages: Message[];
   agentMessages: ApiAgentChatMessage[];
   isStreaming: boolean;
   status: string | null;
   input: string;
+  attachments: ChatAttachment[];
   setInput: (input: string) => void;
   sendMessage: (content: string) => Promise<void>;
+  addAttachments: (attachments: ChatAttachment[]) => void;
+  removeAttachment: (id: string) => void;
+  clearAttachments: () => void;
   addMessage: (message: Message) => void;
   clearChat: () => void;
 }
@@ -35,25 +46,53 @@ export const useChatStore = create<ChatState>((set, get) => ({
   isStreaming: false,
   status: null,
   input: '',
+  attachments: [],
   setInput: (input) => set({ input }),
+  addAttachments: (attachments) =>
+    set((state) => ({ attachments: [...attachments, ...state.attachments] })),
+  removeAttachment: (id) =>
+    set((state) => ({ attachments: state.attachments.filter((item) => item.id !== id) })),
+  clearAttachments: () => set({ attachments: [] }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
-  clearChat: () => set({ messages: [], agentMessages: [] }),
+  clearChat: () => set({ messages: [], agentMessages: [], attachments: [] }),
   sendMessage: async (content) => {
-    const { addMessage, agentMessages } = get();
+    const { addMessage, agentMessages, attachments, clearAttachments } = get();
+    const trimmed = content.trim();
+    if (!trimmed && attachments.length === 0) {
+      return;
+    }
+    const messageContent = trimmed || 'Use the attached documents.';
 
     const userMsg: Message = {
       id: generateId(),
       role: 'user',
-      content,
+      content: messageContent,
       timestamp: Date.now()
     };
     addMessage(userMsg);
     set({ input: '', isStreaming: true, status: 'Thinking...' });
 
     try {
+      const contextIds = attachments.map((attachment) => attachment.id);
+      const contexts = attachments.map((attachment) => ({
+        context_id: attachment.id,
+        filename: attachment.filename,
+        characters: attachment.characters,
+        preview: attachment.preview
+      }));
+      const toolMessages: ApiAgentChatMessage[] = contextIds.length
+        ? [
+            {
+              role: 'tool',
+              name: 'context_hint',
+              content: JSON.stringify({ context_ids: contextIds, contexts })
+            }
+          ]
+        : [];
       const nextAgentMessages: ApiAgentChatMessage[] = [
         ...agentMessages,
-        { role: 'user', content }
+        ...toolMessages,
+        { role: 'user', content: messageContent }
       ];
       const responseMessages = await agentChat(nextAgentMessages);
       const uiMessages = responseMessages
@@ -83,6 +122,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         isStreaming: false,
         status: null
       });
+      clearAttachments();
     } catch (error) {
       addMessage({
         id: generateId(),

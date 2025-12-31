@@ -72,6 +72,7 @@ from .mcp_client import (
 from .canvas_service import CanvasPushError, push_question_set_to_canvas
 from . import qwen_tools
 from .rag import ingest, query
+from . import context_store
 
 BACKEND_ROOT = Path(__file__).resolve().parent
 DATA_DIR = BACKEND_ROOT / "data"
@@ -536,7 +537,9 @@ async def upload_question_context(file: UploadFile = File(...)) -> QuestionConte
     try:
         filename = file.filename or "upload"
         if not mcp_configured():
-            return await extract_context_from_upload(filename, contents)
+            context = await extract_context_from_upload(filename, contents)
+            context_store.save_context(context)
+            return context
         data_b64 = base64.b64encode(contents).decode("utf-8")
         try:
             payload = await call_mcp_tool_async(
@@ -548,11 +551,15 @@ async def upload_question_context(file: UploadFile = File(...)) -> QuestionConte
             )
         except Exception as exc:
             logger.warning("MCP upload_context failed, falling back to local extraction: %s", exc)
-            return await extract_context_from_upload(filename, contents)
+            context = await extract_context_from_upload(filename, contents)
+            context_store.save_context(context)
+            return context
         context_data = (payload or {}).get("context")
         if not context_data:
             raise HTTPException(status_code=500, detail="MCP server did not return context metadata.")
-        return QuestionContextUploadResponse(**context_data)
+        context = QuestionContextUploadResponse(**context_data)
+        context_store.save_context(context)
+        return context
     except QuestionGenerationError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
