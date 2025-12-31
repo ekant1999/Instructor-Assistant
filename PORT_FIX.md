@@ -15,7 +15,7 @@ Changed the Vite dev server port from 5000 to 5173 (Vite's default port).
 
 The application should now be accessible at:
 - **http://localhost:5173** (Vite dev server)
-- **http://localhost:5000** (Express server - if running)
+- **http://localhost:8010** (FastAPI server - if running)
 
 ## Alternative Solutions
 
@@ -41,4 +41,3 @@ After the fix, test the application at:
 - http://localhost:5173/notes
 - http://localhost:5173/questions
 - http://localhost:5173/rag
-

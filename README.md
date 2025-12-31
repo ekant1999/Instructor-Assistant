@@ -1,269 +1,177 @@
 # Instructor Assistant
 
-A comprehensive web application designed to help instructors manage research papers, generate summaries, create question sets, and interact with documents using RAG (Retrieval-Augmented Generation) technology.
+A full-stack web application that helps instructors manage research papers, generate summaries, build question sets, and query documents using RAG (Retrieval-Augmented Generation).
 
 ## 🎯 Features
 
 ### 📚 Research Library
 <img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/42174f6e-ee1a-464e-b289-8d25edf2f275" />
 
-- **Search & Filter**: Search papers by title, author, keywords with real-time filtering
-- **Multi-Paper Operations**: Select multiple papers with checkboxes for batch operations
-- **Batch Summarization**: Generate summaries for multiple papers simultaneously with progress tracking
-- **Multiple Summaries**: Create and manage multiple summaries per paper with full history
+- **Search & Filter**: Find papers by title, author, or keywords with real-time filtering
+- **Batch Operations**: Select multiple papers to summarize or delete at once
+- **Multiple Summaries**: Generate and manage multiple summaries per paper with history
 - **Advanced Editor**: Markdown editor with Edit/Preview/Split modes and auto-save
-- **Export Options**: Export summaries in PDF, TXT, LaTeX, Markdown, and DOCX formats
-- **Save to Notes**: Seamlessly save summaries to your notes library
+- **Exports**: Export summaries in PDF, TXT, LaTeX, Markdown, and DOCX formats
+- **Save to Notes**: Save summaries to the notes library on demand
 
 ### 📝 Notes Section
 <img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/a6af7e3f-affd-4c89-ba74-0acf01d92b9b" />
 
-- **Unified Library**: Centralized document management for all content types (Summaries, Q&A, RAG responses, Manual notes)
-- **Smart Filtering**: Filter by document type, tags, and search across all documents
-- **Hierarchical Organization**: Organize documents by type with clear visual hierarchy
-- **Source Tracking**: Navigate back to source papers and linked documents
-- **Metadata Display**: View word counts, creation dates, and generation agents
+- **Unified Library**: Centralized document management for all content types
+- **Smart Filtering**: Filter by document type, tags, and search across content
+- **Source Tracking**: Jump back to source papers and linked documents
+- **Metadata Display**: Word counts, timestamps, and generation agents
 
 ### ❓ Question Set Generation
 <img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/4f2f8e16-2cd7-45ef-8686-7fe28afe59d3" />
 
-- **Custom Configuration**: Configure question types individually (Multiple Choice, True/False, Short Answer, Essay)
-- **Advanced Options**: Set number of options, include explanations, word count ranges, and rubrics
-- **Incremental Generation**: Add more questions to existing sets without regenerating
-- **Question Editor**: Edit, reorder, and delete individual questions with a user-friendly interface
-- **Document Selection**: Select source documents from your Notes library
-- **Multiple Export Formats**: Export in Canvas, Moodle, JSON, PDF, TXT, and Markdown formats
-- **Export Options**: Include/exclude answers, explanations, and generate separate answer keys
+- **Flexible Inputs**: Use Papers, Notes, or upload PDFs/PPT/PPTX files
+- **Custom Configuration**: Configure question types, counts, and explanations
+- **Incremental Generation**: Add more questions without regenerating the set
+- **Question Editor**: Edit, reorder, and delete individual questions
+- **Exports**: Export to Canvas, Moodle, JSON, PDF, TXT, and Markdown
+- **Answer Keys**: Generate separate answer keys when exporting
 
 ### 🔍 RAG (Retrieval-Augmented Generation)
 <img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/365b8a15-0812-412c-b545-8ef382d3322c" />
 
-- **Multiple Agents**: Support for GPT Web, Gemini Web, and Qwen Local agents
-- **Selective Ingestion**: Choose specific documents to include in RAG queries
-- **Context Templates**: Save and load document selection templates for repeated use
-- **Query History**: View past queries with favorites and search functionality
-- **Enhanced Responses**: Display responses with citations and source tracking
-- **Advanced Options**: Configure max chunks, temperature, verbose mode, and citation preferences
-- **Integration**: Save responses to Notes or send directly to Chat
+- **Multiple Agents**: GPT Web, Gemini Web, and Qwen Local
+- **Selective Ingestion**: Choose which papers to index
+- **Context Templates**: Save and reuse ingestion presets
+- **Query History**: Past queries with favorites and search
+- **Citations**: Context-backed answers with sources
 
 ### 💬 Chat Interface
-- **AI-Powered Conversations**: Interactive chat interface for general assistance
-- **Context-Aware**: Integrates with your documents and research library
+- **AI-Powered Conversations**: General assistant for research tasks
+- **Attachments**: Upload PDF/PPT/PPTX in chat and ask questions against them
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 19** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Wouter** - Lightweight routing
-- **TanStack Query** - Data fetching and caching
-- **Zustand** - State management
-- **Radix UI** - Accessible component primitives
-- **Tailwind CSS** - Styling
-- **Framer Motion** - Animations
-- **React Markdown** - Markdown rendering
+- **React 19** + **TypeScript**
+- **Vite** for dev/build
+- **Wouter** for routing
+- **TanStack Query** for data fetching
+- **Zustand** for state
+- **Radix UI** + **Tailwind CSS**
 
 ### Backend
-- **Express** - Web server
-- **PostgreSQL** - Database
-- **Drizzle ORM** - Database toolkit
-- **WebSocket (ws)** - Real-time communication
-- **Passport** - Authentication
+- **FastAPI** + **Uvicorn**
+- **SQLite** (local, in `backend/data/app.db`)
+- **LiteLLM** for OpenAI/local providers
+- **PyPDF** + **python-pptx** for document parsing
+- **Ollama** for local LLMs
+- **MCP Server** for tool-driven context uploads
 
-### Development Tools
-- **TypeScript** - Type checking
-- **ESBuild** - Fast bundling
-- **Drizzle Kit** - Database migrations
+### Legacy (not used by the current app)
+- `server/` and `shared/` contain an older Express/Drizzle prototype and are not required to run the FastAPI stack.
 
-## 📦 Installation
+## 📦 Setup
 
 ### Prerequisites
 - Node.js 18+ and npm
-- PostgreSQL database
-- Environment variables configured
+- Python 3.11+
+- Ollama for local LLMs
 
-### Setup Steps
+### Backend Setup (FastAPI)
+```bash
+python -m venv backend/.webenv
+source backend/.webenv/bin/activate
+pip install -r backend/requirements.txt
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd Instructor-Assistant
-   ```
+Create `backend/.env` (copy from `backend/.env.example`) and set your API keys and models:
+```bash
+cp backend/.env.example backend/.env
+```
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### Frontend Setup (Vite)
+```bash
+npm install
+```
 
-3. **Configure environment variables**
-   Create a `.env` file in the root directory:
-   ```env
-   DATABASE_URL=postgresql://user:password@localhost:5432/instructor_assistant
-   PORT=5000
-   NODE_ENV=development
-   ```
+Create a root `.env` for the frontend:
+```env
+VITE_API_BASE=http://localhost:8010/api
+```
 
-4. **Set up the database**
-   ```bash
-   npm run db:push
-   ```
+### Run the App
+```bash
+# Terminal 1 - Backend
+source backend/.webenv/bin/activate
+uvicorn backend.main:app --host 0.0.0.0 --port 8010 --reload
 
-5. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+# Terminal 2 - Frontend
+npm run dev:client
+```
 
-The application will be available at:
-- **Main Application**: http://localhost:5000
-- **Client Dev Server** (if running separately): http://localhost:5173
+Open the app at: **http://localhost:5173**
 
-## 🚀 Usage
+### MCP Server (local tool calls)
+The MCP server powers tool-based context uploads for local LLMs.
+```bash
+source backend/.webenv/bin/activate
+python -m backend.mcp_server.app
+```
+Set `LOCAL_MCP_SERVER_URL=http://127.0.0.1:8020/mcp` in `backend/.env`.
 
-### Accessing Features
+### ChatGPT SDK App
+The ChatGPT SDK widget lives in `chatgpt-sdk-app/`. Follow `chatgpt-sdk-app/README.md` to run it independently.
 
-- **Chat**: Navigate to `/` for the main chat interface
-- **Research Library**: Navigate to `/library` to manage papers and generate summaries
-- **Notes**: Navigate to `/notes` to view and manage all your documents
-- **Question Sets**: Navigate to `/questions` to generate and edit question sets
-- **RAG**: Navigate to `/rag` to query your documents with AI assistance
+## 📁 Data & Storage
 
-### Quick Start Workflow
+- **SQLite DB**: `backend/data/app.db`
+- **Downloaded PDFs**: `backend/data/pdfs/`
+- **Exports**: `backend/exports/`
 
-1. **Upload Papers**: Go to Library page and upload PDF papers
-2. **Generate Summaries**: Select papers and generate summaries with your preferred agent
-3. **Save to Notes**: Save summaries to your Notes library for easy access
-4. **Create Questions**: Use saved documents in Notes to generate question sets
-5. **Query with RAG**: Select documents and ask questions using the RAG interface
-6. **Export**: Export any content in your preferred format
+These are local artifacts and are not meant to be committed.
 
 ## 📁 Project Structure
 
 ```
 Instructor-Assistant/
-├── client/                 # Frontend React application
-│   ├── src/
-│   │   ├── agent/         # AI agent implementations
-│   │   ├── app/           # App shell and routing
-│   │   ├── chat/          # Chat interface components
-│   │   ├── components/    # Reusable UI components
-│   │   ├── library/       # Research library features
-│   │   ├── notes/         # Notes management
-│   │   ├── questions/     # Question set generation
-│   │   ├── rag/           # RAG functionality
-│   │   └── shared/        # Shared types and utilities
-│   └── public/            # Static assets
-├── server/                 # Backend Express server
-│   ├── index.ts           # Server entry point
-│   ├── routes.ts          # API routes
-│   └── storage.ts         # File storage utilities
-├── shared/                 # Shared code between client and server
-│   └── schema.ts          # Database schema definitions
+├── backend/               # FastAPI app, SQLite data, services
+├── client/                # React + Vite SPA
+├── chatgpt-sdk-app/        # ChatGPT Apps SDK widget (optional)
+├── server/                 # Legacy Express prototype (not used)
+├── shared/                 # Legacy schema (not used)
 └── script/                 # Build and utility scripts
 ```
 
-## 🗄️ Database Schema
+## 📝 API Overview
 
-The application uses PostgreSQL with the following main tables:
+Main endpoints (FastAPI):
 
-- **users** - User accounts and authentication
-- **papers** - Research papers with metadata
-- **summaries** - Multiple summaries per paper
-- **documents** - Unified document library (Notes)
-- **questionSets** - Generated question sets
-- **ragQueries** - RAG query history
-- **contextTemplates** - Saved RAG context templates
-- **exports** - Export history
-
-See `shared/schema.ts` for complete schema definitions.
-
-## 🧪 Development
-
-### Available Scripts
-
-- `npm run dev` - Start development server (runs both client and server)
-- `npm run dev:client` - Start only the client dev server (port 5173)
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run check` - Type check with TypeScript
-- `npm run db:push` - Push database schema changes
-
-### Development Workflow
-
-1. Make changes to the codebase
-2. The dev server will automatically reload
-3. Check the browser console for any errors
-4. Use `npm run check` to verify TypeScript types
-
-## 🔧 Configuration
-
-### Port Configuration
-The application runs on port 5000 by default. You can change this by setting the `PORT` environment variable.
-
-### Database Configuration
-Ensure your `DATABASE_URL` environment variable is correctly set to your PostgreSQL connection string.
-
-## 📝 API Documentation
-
-The application uses RESTful API endpoints. Main endpoints include:
-
-- `/api/papers` - Paper CRUD operations
-- `/api/summaries` - Summary management
-- `/api/documents` - Document library operations
-- `/api/questions` - Question set generation
-- `/api/rag` - RAG query processing
-- `/api/export` - Export generation
+- `/api/papers` - List papers
+- `/api/papers/download` - Download paper by DOI/URL
+- `/api/papers/{id}/sections` - Paper sections
+- `/api/papers/{id}/context` - Extracted context
+- `/api/papers/{id}/chat` - Paper Q&A / summarization
+- `/api/papers/{id}/summaries` - Summary history per paper
+- `/api/summaries/{id}` - Update/delete summaries
+- `/api/notes` - Notes CRUD
+- `/api/question-sets` - Question set CRUD
+- `/api/question-sets/generate` - Generate questions (JSON)
+- `/api/question-sets/generate/stream` - Streaming generation
+- `/api/question-sets/context` - Upload PDF/PPT/PPTX for context
+- `/api/rag/ingest` - Build FAISS index
+- `/api/rag/query` - RAG queries
+- `/api/agent/chat` - Qwen agent chat
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+1. **API not reachable**
+   - Ensure FastAPI is running on `http://localhost:8010`
+   - Check `VITE_API_BASE` in the root `.env`
+   - Ensure mcp server is running (python -m backend.mcp_server.app)
 
-1. **Port Already in Use**
-   ```bash
-   # Check what's using the port
-   lsof -ti:5000
-   # Kill the process if needed
-   kill -9 <PID>
-   ```
+2. **Port conflicts**
+   - Vite uses `5173`. See `PORT_FIX.md` for common macOS port issues.
 
-2. **Database Connection Errors**
-   - Verify PostgreSQL is running
-   - Check `DATABASE_URL` environment variable
-   - Ensure database exists and user has proper permissions
-
-3. **Component Import Errors**
-   - Run `npm install` to ensure all dependencies are installed
-   - Check that all UI components exist in `client/src/components/ui/`
-   - Verify TypeScript compilation: `npm run check`
-
-4. **Build Errors**
-   - Clear `node_modules` and reinstall: `rm -rf node_modules && npm install`
-   - Check for TypeScript errors: `npm run check`
-
-## 🚧 Roadmap
-
-- [ ] Server-side API implementation for all features
-- [ ] Selenium integration for GPT/Gemini web agents
-- [ ] Server-side export generation (PDF, LaTeX, DOCX)
-- [ ] Enhanced document lineage tracking
-- [ ] Smart contextual suggestions
-- [ ] User authentication and multi-user support
-- [ ] Advanced search and filtering
-- [ ] Collaborative features
+3. **Local model issues**
+   - Make sure Ollama is running: `ollama serve`
+   - Verify `LOCAL_LLM_URL` and model names in `backend/.env`
 
 ## 📄 License
 
 MIT License - see LICENSE file for details
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📧 Support
-
-For issues, questions, or contributions, please open an issue on the repository.
-
----
-
-**Built with ❤️ for instructors and researchers**
-

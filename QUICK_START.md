@@ -1,107 +1,65 @@
-# Quick Start Guide - Enhanced Instructor Assistant
+# Quick Start Guide - Instructor Assistant
 
-## ✅ What's Been Implemented
+## ✅ What's Included
 
-All requested features have been implemented and integrated! The application now includes:
+The main app is a FastAPI backend + React/Vite frontend. Core features:
 
-### 🎯 Key Features
-
-1. **Research Library** - Enhanced with search, multi-select, batch operations, multiple summaries
-2. **Notes Section** - Unified document library supporting all content types
-3. **Q-Set Generation** - Advanced question configuration and editing
-4. **RAG Page** - Selective document ingestion, context templates, query history
+1. **Research Library** - Search, multi-select, summaries with history
+2. **Notes Section** - Unified document library
+3. **Question Sets** - Generate/edit/export with uploads (PDF/PPT/PPTX)
+4. **RAG Page** - Selective ingestion, templates, query history
+5. **Chat** - Agent chat with optional attachments
 
 ## 🚀 Running the Application
 
+### 1) Backend (FastAPI)
 ```bash
-# Install dependencies (if not already done)
-npm install
+python -m venv backend/.webenv
+source backend/.webenv/bin/activate
+pip install -r backend/requirements.txt
+cp backend/.env.example backend/.env
 
-# Start development server
-npm run dev
+uvicorn backend.main:app --host 0.0.0.0 --port 8010 --reload
 ```
 
-The application will be available at:
-- Client: http://localhost:5000
-- Server: http://localhost:5001
+### 2) Frontend (Vite)
+```bash
+npm install
+```
+
+Create a root `.env` with:
+```env
+VITE_API_BASE=http://localhost:8010/api
+```
+
+Then run:
+```bash
+npm run dev:client
+```
+
+The app will be available at:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8010/api
 
 ## 📍 Routes
 
-All enhanced pages are now active:
-
 - `/` - Chat Page
-- `/library` - **Enhanced Library Page** (with all new features)
-- `/notes` - **Enhanced Notes Page** (unified document library)
-- `/questions` - **Enhanced Question Sets Page** (advanced Q&A generation)
-- `/rag` - **Enhanced RAG Page** (selective ingestion, templates)
+- `/library` - Research Library
+- `/notes` - Notes
+- `/questions` - Question Sets
+- `/rag` - RAG
 
-Original pages are still available at:
-- `/library/original`
-- `/notes/original`
-- `/questions/original`
-- `/rag/original`
+## MCP Server
 
-## 🎨 New Features Overview
-
-### Research Library (`/library`)
-- ✅ Search papers by title, author, keywords
-- ✅ Filter by year and author
-- ✅ Multi-paper selection with checkboxes
-- ✅ Batch summarization with progress tracking
-- ✅ Multiple summaries per paper with history
-- ✅ Enhanced markdown editor (Edit/Preview/Split)
-- ✅ Save summaries to Notes
-- ✅ Export in multiple formats
-
-### Notes Section (`/notes`)
-- ✅ Unified library for all document types
-- ✅ Filter by type (Summary/Q&A/RAG/Manual)
-- ✅ Hierarchical organization
-- ✅ Source link navigation
-- ✅ Tag-based filtering
-- ✅ Cross-document search
-
-### Q-Set Generation (`/questions`)
-- ✅ Custom question configuration per type
-- ✅ Individual question counts
-- ✅ Incremental generation ("Add More")
-- ✅ Question editing with reordering
-- ✅ Document selection from Notes
-- ✅ Export in Canvas, Moodle, JSON formats
-
-### RAG Page (`/rag`)
-- ✅ Selective document ingestion
-- ✅ Context templates (save/load)
-- ✅ Query history with favorites
-- ✅ Enhanced response with citations
-- ✅ Multiple agent support (GPT Web, Gemini Web, Qwen Local)
-- ✅ Advanced query options
-
-## 🔧 Configuration
-
-### Database
-The schema is defined in `shared/schema.ts`. To set up:
 ```bash
-npm run db:push
+source backend/.webenv/bin/activate
+python -m backend.mcp_server.app
 ```
 
-### Environment Variables
-Make sure `DATABASE_URL` is set in your environment.
-
-## 📝 Next Steps
-
-1. **Server-Side APIs**: Implement endpoints for:
-   - Paper CRUD operations
-   - Summary generation and storage
-   - Document management
-   - Export generation
-   - RAG query processing
-
-2. **Selenium Integration**: Add server-side automation for GPT/Gemini web agents
-
-3. **Export Generation**: Implement server-side PDF/LaTeX/DOCX generation
-
-4. **Testing**: Test all new features and integrations
+Set in `backend/.env`:
+```
+LOCAL_MCP_SERVER_URL=http://127.0.0.1:8020/mcp
+```
 
 ## 🐛 Troubleshooting
 
@@ -112,10 +70,6 @@ If you encounter import errors:
 
 ## 📚 Documentation
 
-- `IMPLEMENTATION_COMPLETE.md` - Full implementation details
-- `IMPLEMENTATION_STATUS.md` - Feature status tracking
-
-## 🎉 Enjoy!
-
-All features are now integrated and ready to use. Navigate to any page to see the enhanced functionality!
-
+- `README.md` - Full setup and architecture
+- `IMPLEMENTATION_COMPLETE.md` - Implementation notes
+- `PORT_FIX.md` - Port troubleshooting
