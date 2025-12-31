@@ -1,36 +1,55 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Paper, Document } from '@/shared/types';
-import { BookOpen, FileText, Search, X } from 'lucide-react';
+import { BookOpen, FileText, Search, Upload, X } from 'lucide-react';
+
+export interface UploadContext {
+  id: string;
+  filename: string;
+  characters: number;
+  preview: string;
+  text: string;
+}
 
 interface DocumentSelectorProps {
   papers: Paper[];
   notes: Document[];
+  uploads: UploadContext[];
   selectedPaperIds: Set<string>;
   selectedNoteIds: Set<string>;
+  selectedUploadIds: Set<string>;
   onPaperToggle: (id: string) => void;
   onNoteToggle: (id: string) => void;
+  onUploadToggle: (id: string) => void;
+  onUpload: (files: FileList | File[]) => void;
   onClearSelection: () => void;
+  isUploading?: boolean;
 }
 
 export function DocumentSelector({
   papers,
   notes,
+  uploads,
   selectedPaperIds,
   selectedNoteIds,
+  selectedUploadIds,
   onPaperToggle,
   onNoteToggle,
-  onClearSelection
+  onUploadToggle,
+  onUpload,
+  onClearSelection,
+  isUploading = false
 }: DocumentSelectorProps) {
   const [paperSearch, setPaperSearch] = useState('');
   const [noteSearch, setNoteSearch] = useState('');
   const [noteTypeFilter, setNoteTypeFilter] = useState<string>('all');
+  const [uploadSearch, setUploadSearch] = useState('');
+  const uploadInputRef = useRef<HTMLInputElement>(null);
 
   const filteredPapers = papers.filter(p =>
     p.title.toLowerCase().includes(paperSearch.toLowerCase()) ||
@@ -47,7 +66,11 @@ export function DocumentSelector({
     return matchesSearch && matchesType;
   });
 
-  const totalSelected = selectedPaperIds.size + selectedNoteIds.size;
+  const filteredUploads = uploads.filter((upload) =>
+    upload.filename.toLowerCase().includes(uploadSearch.toLowerCase())
+  );
+
+  const totalSelected = selectedPaperIds.size + selectedNoteIds.size + selectedUploadIds.size;
 
   return (
     <Card className="p-5 space-y-4 overflow-hidden">
@@ -73,8 +96,11 @@ export function DocumentSelector({
         )}
       </div>
 
-      <Tabs defaultValue="papers" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-auto">
+      <Tabs defaultValue="uploads" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsTrigger value="uploads" className="text-xs py-2">
+            Uploads ({uploads.length})
+          </TabsTrigger>
           <TabsTrigger value="papers" className="text-xs py-2">
             Papers ({papers.length})
           </TabsTrigger>
@@ -82,6 +108,85 @@ export function DocumentSelector({
             Notes ({notes.length})
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="uploads" className="space-y-3 mt-4">
+          <div className="flex items-center gap-2">
+            <input
+              ref={uploadInputRef}
+              type="file"
+              accept=".pdf,.ppt,.pptx"
+              multiple
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  onUpload(e.target.files);
+                  e.target.value = '';
+                }
+              }}
+              className="hidden"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
+              onClick={() => uploadInputRef.current?.click()}
+              disabled={isUploading}
+            >
+              <Upload className="h-3 w-3 mr-2" />
+              {isUploading ? 'Uploading...' : 'Upload PDF/PPT'}
+            </Button>
+            <span className="text-[11px] text-muted-foreground">
+              PDF, PPT, PPTX
+            </span>
+          </div>
+
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search uploads..."
+              value={uploadSearch}
+              onChange={(e) => setUploadSearch(e.target.value)}
+              className="pl-8 h-8 text-xs"
+            />
+          </div>
+
+          <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2">
+            {filteredUploads.map((upload) => (
+              <div
+                key={upload.id}
+                className={`p-2 sm:p-3 border rounded-lg cursor-pointer transition-colors ${
+                  selectedUploadIds.has(upload.id)
+                    ? 'bg-primary/10 border-primary'
+                    : 'hover:bg-muted/50'
+                }`}
+                onClick={() => onUploadToggle(upload.id)}
+              >
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    checked={selectedUploadIds.has(upload.id)}
+                    onCheckedChange={() => onUploadToggle(upload.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="mt-0.5"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{upload.filename}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {upload.preview || 'No preview available'}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      {upload.characters.toLocaleString()} chars
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {filteredUploads.length === 0 && (
+              <p className="text-xs text-muted-foreground text-center py-4">
+                No uploads yet
+              </p>
+            )}
+          </div>
+        </TabsContent>
 
         <TabsContent value="papers" className="space-y-3 mt-4">
           <div className="relative">
@@ -210,4 +315,3 @@ export function DocumentSelector({
     </Card>
   );
 }
-

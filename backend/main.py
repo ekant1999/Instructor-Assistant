@@ -56,6 +56,7 @@ from .schemas import (
 )
 from .services import (
     QuestionGenerationError,
+    extract_context_from_upload,
     generate_insertion_preview,
     generate_questions,
     summarize_paper_chat,
@@ -533,19 +534,21 @@ async def upload_question_context(file: UploadFile = File(...)) -> QuestionConte
     if not contents:
         raise HTTPException(status_code=400, detail="Uploaded file was empty.")
     try:
+        filename = file.filename or "upload"
         if not mcp_configured():
-            raise HTTPException(status_code=500, detail="LOCAL_MCP_SERVER_URL must be configured to upload contexts.")
+            return await extract_context_from_upload(filename, contents)
         data_b64 = base64.b64encode(contents).decode("utf-8")
         try:
             payload = await call_mcp_tool_async(
                 "upload_context",
                 {
-                    "filename": file.filename or "upload",
+                    "filename": filename,
                     "data_b64": data_b64,
                 },
             )
-        except MCPClientError as exc:
-            raise HTTPException(status_code=500, detail=str(exc))
+        except Exception as exc:
+            logger.warning("MCP upload_context failed, falling back to local extraction: %s", exc)
+            return await extract_context_from_upload(filename, contents)
         context_data = (payload or {}).get("context")
         if not context_data:
             raise HTTPException(status_code=500, detail="MCP server did not return context metadata.")

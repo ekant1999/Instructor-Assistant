@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, RefreshCw, Save, Plus, Download } from 'lucide-react';
 import { QuestionConfigPanel, QuestionTypeConfig } from './QuestionConfigPanel';
 import { QuestionEditor } from './QuestionEditor';
-import { DocumentSelector } from './DocumentSelector';
+import { DocumentSelector, UploadContext } from './DocumentSelector';
 import { ExportQuestionSetDialog } from './ExportQuestionSetDialog';
 import { Question, QuestionSet, Paper, Document } from '@/shared/types';
 import { toast } from 'sonner';
@@ -19,6 +19,7 @@ import {
   getPaperContext,
   listNotes,
   listPapers,
+  uploadQuestionContext,
   pushQuestionSetToCanvas,
   updateQuestionSet
 } from '@/lib/api';
@@ -37,10 +38,13 @@ export default function EnhancedQuestionSetsPage() {
   const [questionMarkdown, setQuestionMarkdown] = useState<string | null>(null);
   const [papers, setPapers] = useState<Paper[]>([]);
   const [notes, setNotes] = useState<Document[]>([]);
+  const [uploads, setUploads] = useState<UploadContext[]>([]);
+  const [selectedUploadIds, setSelectedUploadIds] = useState<Set<string>>(new Set());
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
   const [selectedPaperIds, setSelectedPaperIds] = useState<Set<string>>(new Set());
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(new Set());
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   useEffect(() => {
     let isMounted = true;
@@ -147,14 +151,17 @@ export default function EnhancedQuestionSetsPage() {
 
   const buildContext = async () => {
     const maxCharsPerPaper = 12000;
+    const maxCharsPerUpload = 12000;
     const maxTotalChars = 60000;
     const paperIds = Array.from(selectedPaperIds)
       .map((id) => Number(id))
       .filter((id) => Number.isFinite(id));
     const noteIds = Array.from(selectedNoteIds);
+    const uploadIds = Array.from(selectedUploadIds);
 
     const paperById = new Map(papers.map((p) => [p.id, p]));
     const noteById = new Map(notes.map((n) => [n.id, n]));
+    const uploadById = new Map(uploads.map((u) => [u.id, u]));
 
     const paperParts = await Promise.all(
       paperIds.map(async (id) => {
@@ -175,7 +182,17 @@ export default function EnhancedQuestionSetsPage() {
       .filter(Boolean)
       .map((note) => `Note: ${note?.title}\n\n${note?.content}`);
 
-    const combined = [...paperParts, ...noteParts].filter(Boolean).join('\n\n---\n\n');
+    const uploadParts = uploadIds
+      .map((id) => uploadById.get(id))
+      .filter(Boolean)
+      .map((upload) => {
+        const text = (upload?.text || '').trim();
+        if (!text) return null;
+        const clipped = text.slice(0, maxCharsPerUpload);
+        return `Upload: ${upload?.filename}\n\n${clipped}`;
+      });
+
+    const combined = [...paperParts, ...noteParts, ...uploadParts].filter(Boolean).join('\n\n---\n\n');
     return combined.slice(0, maxTotalChars);
   };
 
@@ -206,6 +223,46 @@ export default function EnhancedQuestionSetsPage() {
         return text.trim();
       })
       .join('\n\n---\n\n');
+  };
+
+  const isSupportedUpload = (file: File) => {
+    const name = file.name.toLowerCase();
+    return name.endsWith('.pdf') || name.endsWith('.ppt') || name.endsWith('.pptx');
+  };
+
+  const handleUploadFiles = async (files: FileList | File[]) => {
+    const list = Array.from(files || []);
+    if (list.length === 0) return;
+    setIsUploading(true);
+    try {
+      for (const file of list) {
+        if (!isSupportedUpload(file)) {
+          toast.error(`Unsupported file type: ${file.name}`);
+          continue;
+        }
+        try {
+          const context = await uploadQuestionContext(file);
+          const upload: UploadContext = {
+            id: context.context_id,
+            filename: context.filename,
+            characters: context.characters,
+            preview: context.preview,
+            text: context.text
+          };
+          setUploads((prev) => [upload, ...prev]);
+          setSelectedUploadIds((prev) => {
+            const next = new Set(prev);
+            next.add(upload.id);
+            return next;
+          });
+          toast.success(`Uploaded ${upload.filename}`);
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : `Failed to upload ${file.name}`);
+        }
+      }
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const stripPromptFromMarkdown = (markdown: string, prompt?: string) => {
@@ -288,7 +345,7 @@ export default function EnhancedQuestionSetsPage() {
   };
 
   const handleGenerate = async () => {
-    if (selectedPaperIds.size === 0 && selectedNoteIds.size === 0) {
+    if (selectedPaperIds.size === 0 && selectedNoteIds.size === 0 && selectedUploadIds.size === 0) {
       toast.error('Please select at least one source document');
       return;
     }
@@ -303,6 +360,11 @@ export default function EnhancedQuestionSetsPage() {
 
     setIsGenerating(true);
     try {
+      const selectedSourceIds = [
+        ...Array.from(selectedPaperIds),
+        ...Array.from(selectedNoteIds),
+        ...Array.from(selectedUploadIds)
+      ];
       const instructions = buildInstructions(questionConfigs);
       const context = await buildContext();
       const questionTypes = enabledConfigs.map((c) => questionTypeToKind[c.type]);
@@ -328,7 +390,7 @@ export default function EnhancedQuestionSetsPage() {
         savedSet = {
           ...mapped,
           questions: generatedQuestions,
-          sourceDocumentIds: [...Array.from(selectedPaperIds), ...Array.from(selectedNoteIds)],
+          sourceDocumentIds: selectedSourceIds,
           prompt: instructions
         };
       } catch (error) {
@@ -338,9 +400,9 @@ export default function EnhancedQuestionSetsPage() {
       setQuestionSet(
         savedSet || {
           id: Math.random().toString(),
-          title: `Q&A Set: ${Array.from(selectedPaperIds).length} papers, ${Array.from(selectedNoteIds).length} notes`,
+          title: `Q&A Set: ${Array.from(selectedPaperIds).length} papers, ${Array.from(selectedNoteIds).length} notes, ${Array.from(selectedUploadIds).length} uploads`,
           questions: generatedQuestions,
-          sourceDocumentIds: [...Array.from(selectedPaperIds), ...Array.from(selectedNoteIds)],
+          sourceDocumentIds: selectedSourceIds,
           agent: 'Qwen',
           createdAt: Date.now(),
           updatedAt: Date.now(),
@@ -370,6 +432,14 @@ export default function EnhancedQuestionSetsPage() {
         toast.error('Generate a question set first');
         return;
       }
+      const nextSourceIds = Array.from(
+        new Set([
+          ...(questionSet.sourceDocumentIds || []),
+          ...Array.from(selectedPaperIds),
+          ...Array.from(selectedNoteIds),
+          ...Array.from(selectedUploadIds)
+        ])
+      );
       const instructions = buildInstructions(questionConfigs);
       const context = await buildContext();
       const questionTypes = enabledConfigs.map((c) => questionTypeToKind[c.type]);
@@ -401,7 +471,7 @@ export default function EnhancedQuestionSetsPage() {
           setQuestionSet({
             ...mapped,
             questions: combined,
-            sourceDocumentIds: questionSet.sourceDocumentIds,
+            sourceDocumentIds: nextSourceIds,
             prompt: questionSet.prompt || instructions
           });
         } else {
@@ -413,7 +483,7 @@ export default function EnhancedQuestionSetsPage() {
           setQuestionSet({
             ...mapped,
             questions: combined,
-            sourceDocumentIds: questionSet.sourceDocumentIds,
+            sourceDocumentIds: nextSourceIds,
             prompt: questionSet.prompt || instructions
           });
         }
@@ -598,9 +668,20 @@ export default function EnhancedQuestionSetsPage() {
     setSelectedNoteIds(newSet);
   };
 
+  const toggleUpload = (id: string) => {
+    const newSet = new Set(selectedUploadIds);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    setSelectedUploadIds(newSet);
+  };
+
   const clearSelection = () => {
     setSelectedPaperIds(new Set());
     setSelectedNoteIds(new Set());
+    setSelectedUploadIds(new Set());
   };
 
   return (
@@ -637,11 +718,16 @@ export default function EnhancedQuestionSetsPage() {
                 <DocumentSelector
                   papers={papers}
                   notes={notes}
+                  uploads={uploads}
                   selectedPaperIds={selectedPaperIds}
                   selectedNoteIds={selectedNoteIds}
+                  selectedUploadIds={selectedUploadIds}
                   onPaperToggle={togglePaper}
                   onNoteToggle={toggleNote}
+                  onUploadToggle={toggleUpload}
+                  onUpload={handleUploadFiles}
                   onClearSelection={clearSelection}
+                  isUploading={isUploading}
                 />
               </div>
 
@@ -668,7 +754,12 @@ export default function EnhancedQuestionSetsPage() {
               <div className="space-y-2">
                 <Button
                   onClick={handleGenerate}
-                  disabled={isGenerating || (selectedPaperIds.size === 0 && selectedNoteIds.size === 0)}
+                  disabled={
+                    isGenerating ||
+                    (selectedPaperIds.size === 0 &&
+                      selectedNoteIds.size === 0 &&
+                      selectedUploadIds.size === 0)
+                  }
                   className="w-full"
                 >
                   {isGenerating ? (
