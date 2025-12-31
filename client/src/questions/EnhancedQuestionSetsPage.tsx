@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -206,6 +208,85 @@ export default function EnhancedQuestionSetsPage() {
       .join('\n\n---\n\n');
   };
 
+  const stripPromptFromMarkdown = (markdown: string, prompt?: string) => {
+    let cleaned = markdown.replace(/<!--\s*Prompt:.*?-->\s*\n?/gis, '').trimStart();
+    if (!prompt) {
+      return cleaned;
+    }
+    const normalized = prompt.trim();
+    if (!normalized) return cleaned;
+    const leadingPromptMatch = cleaned.match(/^Prompt:\s*\n([\s\S]*?)(\n{2,}|$)/i);
+    if (leadingPromptMatch) {
+      const block = leadingPromptMatch[1].trim();
+      if (block === normalized) {
+        cleaned = cleaned.slice(leadingPromptMatch[0].length).trimStart();
+      }
+    }
+    return cleaned;
+  };
+
+  const escapeHtml = (value: string) =>
+    value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+  const renderMarkdownToHtml = (markdown: string) =>
+    renderToStaticMarkup(<ReactMarkdown>{markdown}</ReactMarkdown>);
+
+  const openPdfWindow = (title: string, markdown: string, meta: Array<{ label: string; value?: string | number }>) => {
+    const win = window.open('', '_blank');
+    if (!win) {
+      toast.error('Please allow popups to export a PDF.');
+      return false;
+    }
+    const metaHtml = meta
+      .filter((item) => item.value !== undefined && item.value !== null && String(item.value).trim() !== '')
+      .map(
+        (item) =>
+          `<div><strong>${escapeHtml(item.label)}:</strong> ${escapeHtml(String(item.value))}</div>`
+      )
+      .join('');
+    const htmlContent = renderMarkdownToHtml(markdown);
+    const body = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>${escapeHtml(title)}</title>
+          <style>
+            body { font-family: "Georgia", "Times New Roman", serif; padding: 48px; color: #111; }
+            h1, h2, h3, h4 { font-family: "Helvetica Neue", Arial, sans-serif; }
+            h1 { font-size: 22px; margin-bottom: 8px; }
+            h2 { font-size: 18px; margin-top: 24px; }
+            h3 { font-size: 16px; margin-top: 20px; }
+            p { line-height: 1.6; margin: 12px 0; }
+            ul, ol { margin: 12px 0 12px 24px; }
+            li { margin: 6px 0; }
+            strong { font-weight: 600; }
+            code { font-family: "SFMono-Regular", Menlo, monospace; background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
+            pre code { display: block; padding: 12px; }
+            .meta { font-size: 12px; color: #555; margin-bottom: 20px; }
+            hr { border: none; border-top: 1px solid #e5e5e5; margin: 20px 0; }
+            @page { margin: 1in; }
+          </style>
+        </head>
+        <body>
+          <h1>${escapeHtml(title)}</h1>
+          ${metaHtml ? `<div class="meta">${metaHtml}</div><hr />` : ''}
+          <div class="content">${htmlContent}</div>
+        </body>
+      </html>
+    `;
+    win.document.write(body);
+    win.document.close();
+    win.focus();
+    win.print();
+    return true;
+  };
+
   const handleGenerate = async () => {
     if (selectedPaperIds.size === 0 && selectedNoteIds.size === 0) {
       toast.error('Please select at least one source document');
@@ -350,7 +431,9 @@ export default function EnhancedQuestionSetsPage() {
     if (!questionSet) return;
     try {
       const title = questionSet.title || 'Question Set';
-      const markdown = questionMarkdown || buildQuestionMarkdown(questions, { includeAnswers: true, includeExplanations: true });
+      const rawMarkdown =
+        questionMarkdown || buildQuestionMarkdown(questions, { includeAnswers: true, includeExplanations: true });
+      const markdown = stripPromptFromMarkdown(rawMarkdown, questionSet.prompt || '');
       const header = questionSet.prompt ? `Prompt:\n${questionSet.prompt}\n\n` : '';
       const body = `${header}${markdown}`.trim();
       const rawPaperId =
@@ -444,6 +527,34 @@ export default function EnhancedQuestionSetsPage() {
       element.click();
       document.body.removeChild(element);
       toast.success(`Exported as ${format.toUpperCase()}`);
+      return;
+    }
+
+    if (format === 'pdf') {
+      const includeAnswers = Boolean(options?.includeAnswers);
+      const includeExplanations = Boolean(options?.includeExplanations);
+      const title = questionSet.title || 'Question Set';
+      const meta = [
+        { label: 'Questions', value: questions.length },
+        { label: 'Includes answers', value: includeAnswers ? 'Yes' : 'No' },
+        { label: 'Includes explanations', value: includeExplanations ? 'Yes' : 'No' },
+        { label: 'Prompt', value: questionSet.prompt || '' }
+      ];
+      const content = buildQuestionMarkdown(questions, { includeAnswers, includeExplanations });
+      const ok = openPdfWindow(`${title} (${includeAnswers ? 'With Answers' : 'Questions'})`, content, meta);
+
+      if (!includeAnswers && options?.separateAnswerKey) {
+        const keyContent = buildQuestionMarkdown(questions, { includeAnswers: true, includeExplanations });
+        openPdfWindow(`${title} Answer Key`, keyContent, [
+          { label: 'Questions', value: questions.length },
+          { label: 'Answer key', value: 'Yes' },
+          { label: 'Includes explanations', value: includeExplanations ? 'Yes' : 'No' }
+        ]);
+      }
+
+      if (ok) {
+        toast.success('PDF export ready');
+      }
       return;
     }
 
