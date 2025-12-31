@@ -63,9 +63,6 @@ A full-stack web application that helps instructors manage research papers, gene
 - **Ollama** for local LLMs
 - **MCP Server** for tool-driven context uploads
 
-### Legacy (not used by the current app)
-- `server/` and `shared/` contain an older Express/Drizzle prototype and are not required to run the FastAPI stack.
-
 ## 📦 Setup
 
 ### Prerequisites
@@ -133,9 +130,7 @@ Instructor-Assistant/
 ├── backend/               # FastAPI app, SQLite data, services
 ├── client/                # React + Vite SPA
 ├── chatgpt-sdk-app/        # ChatGPT Apps SDK widget (optional)
-├── server/                 # Legacy Express prototype (not used)
-├── shared/                 # Legacy schema (not used)
-└── script/                 # Build and utility scripts
+└── attached_assets/        # Static assets for the frontend
 ```
 
 ## 📝 API Overview
