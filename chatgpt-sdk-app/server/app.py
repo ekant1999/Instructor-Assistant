@@ -1,15 +1,35 @@
 from __future__ import annotations
 
+import os
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+import base64
 import json
 import re
 import secrets
-from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, List
 
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp.server import Context
-from mcp.types import CallToolResult, TextContent
+from mcp.types import (
+    CallToolResult,
+    Resource,
+    TextContent,
+    ReadResourceRequest,
+    ReadResourceResult,
+    ServerResult,
+    TextResourceContents,
+    BlobResourceContents,
+)
+from starlette.requests import Request
+from starlette.responses import PlainTextResponse, Response
 
 from server.db import init_db, get_conn
 from server.tools.render_library import render_library_structured
@@ -27,12 +47,21 @@ from server.question_sets import (
 
 DIST_DIR = (Path(__file__).parent.parent / "web" / "dist")
 
+load_dotenv(Path(__file__).resolve().parents[1] / ".env", override=False)
+
 
 def _read_first(globs: list[str]) -> str:
     for pat in globs:
         for p in DIST_DIR.glob(pat):
             return p.read_text(encoding="utf-8")
     return ""
+
+
+def _find_first(globs: list[str]) -> Path | None:
+    for pat in globs:
+        for p in DIST_DIR.glob(pat):
+            return p
+    return None
 
 
 fixed = DIST_DIR / "widget.js"
@@ -48,6 +77,8 @@ else:
             print("[WARN] No web/dist/widget.js found. Run: cd web && npm i && npm run build")
 
 WIDGET_CSS = _read_first(["*.css", "assets/*.css"])
+WIDGET_JS_PATH = fixed if fixed.exists() else _find_first(["*.js", "assets/*.js"])
+WIDGET_CSS_PATH = _find_first(["assets/*.css", "*.css"])
 
 
 init_db()
@@ -58,25 +89,247 @@ mcp = FastMCP(name="research-notes-py")
 TEMPLATE_URI = "ui://widget/research-notes.html"
 
 
+def _static_headers() -> dict[str, str]:
+    return {
+        "Cache-Control": "no-store",
+        "Access-Control-Allow-Origin": "*",
+    }
+
+
+def _widget_csp() -> str:
+    override = os.getenv("WIDGET_CSP", "").strip()
+    if override:
+        return override
+    return (
+        "default-src 'self'; "
+        "script-src 'self' https: resource: 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' https: resource: 'unsafe-inline'; "
+        "img-src 'self' https: data: blob:; "
+        "font-src 'self' https: data:; "
+        "connect-src 'self' https:; "
+    )
+
+
+def _widget_csp_meta() -> dict[str, object]:
+    return {
+        "openai/widgetCsp": _widget_csp(),
+        "openai/widgetCSP": {"connect_domains": [], "resource_domains": []},
+    }
+
+
+def _wrap_widget_js(js: str) -> str:
+    polyfill = (
+        "(function(){"
+        "if (typeof globalThis.TextEncoder === 'undefined') {"
+        "function TE(){};"
+        "TE.prototype.encode = function(str){"
+        "str = String(str || '');"
+        "var out = [], i = 0;"
+        "for (; i < str.length; i++) {"
+        "var c = str.charCodeAt(i);"
+        "if (c < 0x80) { out.push(c); continue; }"
+        "if (c < 0x800) { out.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f)); continue; }"
+        "if (c < 0xd800 || c >= 0xe000) {"
+        "out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f));"
+        "continue; }"
+        "i++;"
+        "var c2 = str.charCodeAt(i);"
+        "var u = 0x10000 + (((c & 0x3ff) << 10) | (c2 & 0x3ff));"
+        "out.push(0xf0 | (u >> 18), 0x80 | ((u >> 12) & 0x3f), 0x80 | ((u >> 6) & 0x3f), 0x80 | (u & 0x3f));"
+        "}"
+        "return new Uint8Array(out);"
+        "};"
+        "globalThis.TextEncoder = TE;"
+        "}"
+        "if (typeof globalThis.TextDecoder === 'undefined') {"
+        "function TD(){};"
+        "TD.prototype.decode = function(bytes){"
+        "if (!bytes) return '';"
+        "var out = '', i = 0;"
+        "var arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);"
+        "while (i < arr.length) {"
+        "var c = arr[i++];"
+        "if (c < 0x80) { out += String.fromCharCode(c); continue; }"
+        "if (c < 0xe0) {"
+        "var c2 = arr[i++] & 0x3f;"
+        "out += String.fromCharCode(((c & 0x1f) << 6) | c2);"
+        "continue; }"
+        "if (c < 0xf0) {"
+        "var c2b = arr[i++] & 0x3f;"
+        "var c3 = arr[i++] & 0x3f;"
+        "out += String.fromCharCode(((c & 0x0f) << 12) | (c2b << 6) | c3);"
+        "continue; }"
+        "var c2c = arr[i++] & 0x3f;"
+        "var c3b = arr[i++] & 0x3f;"
+        "var c4 = arr[i++] & 0x3f;"
+        "var u = ((c & 0x07) << 18) | (c2c << 12) | (c3b << 6) | c4;"
+        "u -= 0x10000;"
+        "out += String.fromCharCode(0xd800 + (u >> 10), 0xdc00 + (u & 0x3ff));"
+        "}"
+        "return out;"
+        "};"
+        "globalThis.TextDecoder = TD;"
+        "}"
+        "})();"
+    )
+    return (
+        "if (!window.__IA_WIDGET_LOADED__) {"
+        "window.__IA_WIDGET_LOADED__ = true;"
+        "var root = document.getElementById('root');"
+        "var showError = function(label, err) {"
+        "  if (!root) { root = document.getElementById('root'); }"
+        "  if (root) {"
+        "    var msg = label + ': ' + (err && err.message ? err.message : String(err));"
+        "    root.textContent = msg;"
+        "  }"
+        "};"
+        "window.addEventListener('error', function(e) { showError('Widget error', e.error || e.message); });"
+        "window.addEventListener('unhandledrejection', function(e) { showError('Widget error', e.reason || e); });"
+        "try {"
+        "  if (root) { root.textContent = 'Booting Instructor Assistant...'; }"
+        f"{polyfill}"
+        f"{js}"
+        "} catch (err) {"
+        "  showError('Widget boot error', err);"
+        "}"
+        "}"
+    )
+
+
+@mcp.custom_route("/widget.js", methods=["GET"], include_in_schema=False)
+async def serve_widget_js(_: Request) -> Response:
+    if WIDGET_JS_PATH and WIDGET_JS_PATH.exists():
+        return Response(
+            _wrap_widget_js(WIDGET_JS_PATH.read_text(encoding="utf-8")),
+            media_type="application/javascript",
+            headers=_static_headers(),
+        )
+    if WIDGET_JS:
+        return Response(
+            _wrap_widget_js(WIDGET_JS),
+            media_type="application/javascript",
+            headers=_static_headers(),
+        )
+    return PlainTextResponse("widget.js not found", status_code=404)
+
+
+@mcp.custom_route("/widget.css", methods=["GET"], include_in_schema=False)
+async def serve_widget_css(_: Request) -> Response:
+    if WIDGET_CSS_PATH and WIDGET_CSS_PATH.exists():
+        return Response(
+            WIDGET_CSS_PATH.read_bytes(),
+            media_type="text/css",
+            headers=_static_headers(),
+        )
+    if WIDGET_CSS:
+        return Response(
+            WIDGET_CSS,
+            media_type="text/css",
+            headers=_static_headers(),
+        )
+    return PlainTextResponse("widget.css not found", status_code=404)
+
+
+@mcp.resource("resource://widget.js", mime_type="application/javascript")
+def widget_js_resource() -> str | bytes:
+    if WIDGET_JS_PATH and WIDGET_JS_PATH.exists():
+        return _wrap_widget_js(WIDGET_JS_PATH.read_text(encoding="utf-8"))
+    return _wrap_widget_js(WIDGET_JS)
+
+
+@mcp.resource("resource://widget.css", mime_type="text/css")
+def widget_css_resource() -> str | bytes:
+    if WIDGET_CSS_PATH and WIDGET_CSS_PATH.exists():
+        return WIDGET_CSS_PATH.read_bytes()
+    return WIDGET_CSS
+
+
 @mcp.resource(
     TEMPLATE_URI,
     mime_type="text/html+skybridge",
     annotations={
         "openai/widgetAccessible": True,
         "openai/widgetPrefersBorder": True,
+        **_widget_csp_meta(),
     },
 )
 def research_notes_widget() -> str:
-    style_block = f"<style>{WIDGET_CSS}</style>\n" if WIDGET_CSS else ""
-    script_body = WIDGET_JS.replace("</script>", "<\\/script>")
+    if not WIDGET_JS:
+        return (
+            "Widget bundle missing. Run: cd web && npm i && npm run build."
+        )
+
+    safe_js = _wrap_widget_js(WIDGET_JS).replace("</script", "<\\/script")
+    inline_css = f"<style>{WIDGET_CSS}</style>\n" if WIDGET_CSS else ""
+
     return (
-        '<div id="root"></div>\n'
-        f"{style_block}"
-        f"<script>\n{script_body}\n</script>"
+        '<div id="root">Loading Instructor Assistant...</div>\n'
+        f"{inline_css}"
+        f'<script type="module">\n{safe_js}\n</script>\n'
     )
 
 
-META_UI = {"openai/outputTemplate": TEMPLATE_URI, "openai/widgetAccessible": True}
+async def _list_resources_with_meta() -> list[Resource]:
+    items: list[Resource] = []
+    for res in mcp._resource_manager.list_resources():  # type: ignore[attr-defined]
+        meta = _widget_csp_meta() if str(res.uri) == TEMPLATE_URI else None
+        items.append(
+            Resource(
+                uri=res.uri,
+                name=res.name or "",
+                title=res.title,
+                description=res.description,
+                mimeType=res.mime_type,
+                icons=res.icons,
+                annotations=res.annotations,
+                _meta=meta,
+            )
+        )
+    return items
+
+
+# Re-register list_resources on the low-level server so _meta is preserved.
+mcp._mcp_server.list_resources()(_list_resources_with_meta)  # type: ignore[attr-defined]
+
+
+async def _read_resource_request(req: ReadResourceRequest) -> ServerResult:
+    uri = req.params.uri
+    context = mcp.get_context()
+    resource = await mcp._resource_manager.get_resource(uri, context=context)  # type: ignore[attr-defined]
+    content = await resource.read()
+    meta = _widget_csp_meta() if str(uri) == TEMPLATE_URI else None
+
+    if isinstance(content, bytes):
+        blob = base64.b64encode(content).decode("ascii")
+        contents = [
+            BlobResourceContents(
+                uri=uri,
+                blob=blob,
+                mimeType=resource.mime_type,
+                _meta=meta,
+            )
+        ]
+    else:
+        contents = [
+            TextResourceContents(
+                uri=uri,
+                text=content,
+                mimeType=resource.mime_type,
+                _meta=meta,
+            )
+        ]
+
+    return ServerResult(ReadResourceResult(contents=contents, _meta=meta))
+
+
+mcp._mcp_server.request_handlers[ReadResourceRequest] = _read_resource_request  # type: ignore[attr-defined]
+
+
+META_UI = {
+    "openai/outputTemplate": TEMPLATE_URI,
+    "openai/widgetAccessible": True,
+    **_widget_csp_meta(),
+}
 META_SILENT = {"openai/widgetAccessible": False}
 
 

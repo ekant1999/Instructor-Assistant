@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@source "./**/*.{ts,tsx,js,jsx}";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -30,7 +31,8 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
-:root {
+:root,
+:host {
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
   --card: 0 0% 100%;
@@ -52,7 +54,8 @@
   --ring: 240 5.9% 10%;
 }
 
-.dark {
+.dark,
+:host(.dark) {
   --background: 240 10% 3.9%;
   --foreground: 0 0% 98%;
   --card: 240 10% 3.9%;
@@ -85,5 +88,10 @@
     @apply font-sans antialiased bg-background text-foreground;
     font-size: 1.125rem; /* 18px base instead of 16px */
     line-height: 1.6;
+    background-color: hsl(var(--background, 0 0% 100%));
+    color: hsl(var(--foreground, 240 10% 3.9%));
+  }
+  #root {
+    min-height: 100vh;
   }
 }

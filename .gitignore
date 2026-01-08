@@ -17,3 +17,5 @@ chatgpt-sdk-app/web/dist/
 chatgpt-sdk-app/server/data/
 chatgpt-sdk-app/server/exports/canvas/*
 !chatgpt-sdk-app/server/exports/canvas/example_question_set.md
+ngrok-mcp.yml
+ngrok-fastapi.yml

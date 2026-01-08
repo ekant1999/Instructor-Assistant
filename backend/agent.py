@@ -263,6 +263,7 @@ IMPORTANT TOOL USAGE RULES:
 Pick and call tools when they help answer the user's request. Prefer accurate retrieval over guessing.
 If a task references the app's pages, you can mention the right section (Research Library, Notes, Question Sets) but tools are your primary way to fetch fresh info.
 Never fabricate tool results—if a tool fails, explain briefly.
+When confirming downloads, say the paper was saved to the Research Library. Avoid local file paths unless the user explicitly asks for a file location.
 When the user asks for a paper summary:
 - If no paper_id is provided and no recent download is known, ask which paper (by id/title) to summarize.
 - If summarization fails, report the error instead of guessing.
@@ -291,7 +292,12 @@ def _chat_with_ollama(messages: List[Dict[str, Any]]) -> Dict[str, Any]:
     return ollama.chat(**kwargs)
 
 
-def _save_note_direct(paper_id: int, title: str | None, body: str) -> Dict[str, Any]:
+def _save_note_direct(
+    paper_id: int,
+    title: str | None,
+    body: str,
+    tags: List[str] | None = None,
+) -> Dict[str, Any]:
     with get_conn() as conn:
         paper_row = conn.execute(
             "SELECT title FROM papers WHERE id=?",
@@ -299,18 +305,19 @@ def _save_note_direct(paper_id: int, title: str | None, body: str) -> Dict[str, 
         ).fetchone()
     paper_title = (paper_row["title"] if paper_row else None) or "Untitled paper"
     note_title = (title or paper_title or "Summary").strip() or paper_title
+    tags_json = json.dumps(tags or [], ensure_ascii=False) if tags is not None else None
     with get_conn() as conn:
         conn.execute(
             """
-            INSERT INTO notes (paper_id, title, body, created_at)
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+            INSERT INTO notes (paper_id, title, body, tags_json, created_at)
+            VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
             """,
-            (paper_id, note_title, body),
+            (paper_id, note_title, body, tags_json),
         )
         nid = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
         row = conn.execute(
             """
-            SELECT n.id, n.paper_id, n.title, n.body, n.created_at,
+            SELECT n.id, n.paper_id, n.title, n.body, n.tags_json, n.created_at,
                    p.title AS paper_title
             FROM notes n
             LEFT JOIN papers p ON p.id = n.paper_id
@@ -318,7 +325,10 @@ def _save_note_direct(paper_id: int, title: str | None, body: str) -> Dict[str, 
             """,
             (nid,),
         ).fetchone()
-    return {"note_id": nid, "note": dict(row) if row else None, "paper_title": paper_title}
+    note = dict(row) if row else None
+    if note is not None:
+        note["tags"] = json.loads(note.pop("tags_json") or "[]")
+    return {"note_id": nid, "note": note, "paper_title": paper_title}
 
 
 def _save_last_summary() -> Dict[str, Any]:
@@ -331,6 +341,7 @@ def _save_last_summary() -> Dict[str, Any]:
         int(pid),
         _LAST_SUMMARY.get("suggested_title") or _LAST_SUMMARY.get("paper_title"),
         _LAST_SUMMARY.get("summary") or "",
+        tags=["summary"],
     )
 
 
@@ -491,6 +502,24 @@ def run_agent(messages: List[Dict[str, str]]) -> List[Dict[str, str]]:
             last_user_text = m.get("content") or ""
     global _LAST_DOWNLOADED_PAPER_ID
     convo: List[Dict[str, Any]] = [{"role": "system", "content": SYSTEM_PROMPT}]
+
+    def _user_wants_file_path(text: str) -> bool:
+        if not text:
+            return False
+        lowered = text.lower()
+        return any(
+            phrase in lowered
+            for phrase in [
+                "file path",
+                "filepath",
+                "path",
+                "location",
+                "where is",
+                "where was",
+                "folder",
+                "directory",
+            ]
+        )
     for m in messages:
         entry: Dict[str, Any] = {"role": m["role"], "content": m.get("content", "")}
         if m["role"] == "tool" and m.get("name"):
@@ -585,8 +614,13 @@ def run_agent(messages: List[Dict[str, str]]) -> List[Dict[str, str]]:
                         )
                         result["paper_id"] = ingest["paper_id"]
                         _LAST_DOWNLOADED_PAPER_ID = ingest["paper_id"]
+                        result["saved_to_library"] = True
+                        result["library_title"] = ingest.get("title")
+                        result["user_message"] = "Saved the paper to your Research Library."
                     except Exception as ingest_exc:
                         result["ingest_error"] = f"Failed to add to library: {ingest_exc}"
+                    if not _user_wants_file_path(last_user_text):
+                        result.pop("file_path", None)
                 result_text = json.dumps(result, ensure_ascii=False, indent=2)
             except Exception as exc:  # pragma: no cover - best-effort guard
                 logger.exception("Tool '%s' failed", name)

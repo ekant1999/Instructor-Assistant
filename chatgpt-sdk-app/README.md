@@ -71,13 +71,24 @@ This serves all REST endpoints under `http://localhost:8010/api`.
 
 ## Frontend Setup
 
+The main web app lives under `client/`:
 ```bash
 cd client
 npm install
 npm run dev
 ```
-
 The Vite dev server runs at `http://localhost:5173`
+
+### ChatGPT App Widget UI
+
+The ChatGPT widget now builds from the same UI as the main app. Set the API base to your public FastAPI URL (ngrok) and build the widget:
+```bash
+cd chatgpt-sdk-app/web
+echo "VITE_API_BASE=https://<your-ngrok-domain>/api" > .env
+npm install
+npm run build
+```
+This outputs `chatgpt-sdk-app/web/dist/widget.js`, which the MCP server serves inline.
 
 ## Local LLM Workflow
 
@@ -98,6 +109,28 @@ python -m backend.mcp_server.app
 ```
 
 Set `LOCAL_MCP_SERVER_URL` in the `.env` to the exposed `/mcp` endpoint (for example `http://127.0.0.1:8020/mcp`).
+
+### Running the ChatGPT MCP Server
+
+```bash
+source backend/.webenv/bin/activate
+cd chatgpt-sdk-app
+python -m server.app
+```
+
+If running through ngrok, point ChatGPT to the MCP server URL (e.g. `https://<your-mcp-ngrok-domain>/mcp`).
+For the widget assets, also set `MCP_PUBLIC_BASE` so the HTML can resolve `/widget.js` and `/widget.css`:
+```bash
+export MCP_PUBLIC_BASE=https://<your-mcp-ngrok-domain>
+python -m server.app
+```
+You can also place `MCP_PUBLIC_BASE=https://<your-mcp-ngrok-domain>` in `chatgpt-sdk-app/.env` and run `python -m server.app`.
+
+If the widget shows only "Loading Instructor Assistant...", set a CSP allowlist so ChatGPT can load your JS/CSS and call the API:
+```bash
+export WIDGET_CSP="default-src 'self'; script-src 'self' https:; style-src 'self' https: 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self' https: data:; connect-src 'self' https:;"
+```
+You can also add `WIDGET_CSP=...` to `chatgpt-sdk-app/.env`.
 
 The server exposes these tools:
 
