@@ -95,3 +95,30 @@
     min-height: 100vh;
   }
 }
+
+:root[data-ia-widget="true"] .ia-library-panel {
+  overflow-y: auto;
+}
+
+:root[data-ia-widget="true"] .ia-library-panel-body {
+  overflow: visible;
+}
+
+:root[data-ia-widget="true"] .ia-paper-list-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 280px;
+  min-height: 12rem;
+  scrollbar-gutter: stable;
+}
+
+:root[data-ia-widget="true"] body,
+:root[data-ia-widget="true"] #root {
+  height: 100vh;
+  overflow: auto;
+}
+
+:root[data-ia-widget="true"] .ia-app-shell,
+:root[data-ia-widget="true"] .ia-app-main {
+  overflow: visible;
+}

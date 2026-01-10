@@ -696,11 +696,11 @@ export default function EnhancedLibraryPage() {
   };
 
   return (
-    <div className="flex h-full w-full flex-col bg-background">
+    <div className="flex h-full w-full flex-col bg-background min-h-0">
       <UploadPanel onUpload={handleAddPapers} onDownload={downloadPaper} />
 
-      <div className="flex flex-1 overflow-hidden">
-        <div className="w-[360px] border-r bg-muted/5 flex flex-col h-full overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-h-0">
+        <div className="w-[360px] border-r bg-muted/5 flex flex-col h-full overflow-hidden min-h-0 ia-library-panel">
           <div className="p-4 border-b sticky top-0 bg-background z-10">
             <h2 className="font-semibold text-sm flex items-center gap-2">
               <FileText className="h-4 w-4" />
@@ -709,7 +709,7 @@ export default function EnhancedLibraryPage() {
             <p className="text-xs text-muted-foreground mt-1">{papers.length} papers in library</p>
           </div>
 
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto min-h-0 ia-library-panel-body">
             <EnhancedPaperList
               papers={papers}
               selectedId={selectedId}
@@ -731,7 +731,7 @@ export default function EnhancedLibraryPage() {
           </div>
         </div>
 
-        <div className="flex-1 h-full overflow-hidden">
+        <div className="flex-1 h-full overflow-hidden min-h-0">
           {isLoading && (
             <div className="h-full flex items-center justify-center text-muted-foreground">
               Loading library...

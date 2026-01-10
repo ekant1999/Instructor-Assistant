@@ -24,7 +24,7 @@ export default function AppShell({ children }: AppShellProps) {
   const isChatPage = location === '/';
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
+    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden ia-app-shell">
       {/* Top Bar */}
       <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-background/80 backdrop-blur-sm z-50 sticky top-0">
         <div className="flex items-center gap-3">
@@ -69,7 +69,7 @@ export default function AppShell({ children }: AppShellProps) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 relative overflow-hidden flex flex-col">
+      <main className="flex-1 relative overflow-hidden flex flex-col ia-app-main">
         {children}
         
         {/* Persistent Chat Input Layer - always sits above content at bottom */}

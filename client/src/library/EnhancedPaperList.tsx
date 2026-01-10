@@ -109,7 +109,7 @@ export function EnhancedPaperList({
   const hasActiveFilters = searchQuery || yearFilter !== 'all' || authorFilter !== 'all';
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0 ia-paper-list">
       {/* Search and Filters */}
       <div className="p-4 border-b space-y-3 bg-background">
         <div className="relative">
@@ -214,7 +214,7 @@ export function EnhancedPaperList({
       </div>
 
       {/* Papers List */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto min-h-0 ia-paper-list-scroll">
         <div className="space-y-3 p-4">
           {filteredPapers.map((paper) => {
             const isSelected = selectedIds.has(paper.id);
