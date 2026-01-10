@@ -26,6 +26,7 @@ const DEFAULT_BASE = (import.meta.env.VITE_API_BASE as string | undefined) || "h
 export const API_BASE = DEFAULT_BASE.replace(/\/$/, "");
 const NGROK_SKIP_HEADER = "ngrok-skip-browser-warning";
 const SHOULD_SKIP_NGROK_WARNING = /ngrok-free\.dev|ngrok\.io|ngrok\.app/i.test(API_BASE);
+const NGROK_WARNING_PARAM = "ngrok-skip-browser-warning";
 
 function addHeader(headers: HeadersInit, key: string, value: string): HeadersInit {
   if (headers instanceof Headers) {
@@ -41,6 +42,24 @@ function addHeader(headers: HeadersInit, key: string, value: string): HeadersIni
 function applyNgrokSkipHeader(headers: HeadersInit): HeadersInit {
   if (!SHOULD_SKIP_NGROK_WARNING) return headers;
   return addHeader(headers, NGROK_SKIP_HEADER, "true");
+}
+
+export function getNgrokSkipHeaders(): HeadersInit {
+  if (!SHOULD_SKIP_NGROK_WARNING) return {};
+  return { [NGROK_SKIP_HEADER]: "true" };
+}
+
+export function withNgrokSkipParam(url: string): string {
+  if (!SHOULD_SKIP_NGROK_WARNING) return url;
+  try {
+    const parsed = new URL(url);
+    if (!parsed.searchParams.has(NGROK_WARNING_PARAM)) {
+      parsed.searchParams.set(NGROK_WARNING_PARAM, "true");
+    }
+    return parsed.toString();
+  } catch {
+    return url;
+  }
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {

@@ -124,6 +124,12 @@ def _get_paper(paper_id: int) -> Optional[Dict[str, Any]]:
 app = FastAPI(title="Instructor Assistant Web API")
 
 
+def _pdf_frame_ancestors() -> str:
+    extras = [o.strip() for o in os.getenv("PDF_FRAME_ANCESTORS", "").split(",") if o.strip()]
+    allowed = ["'self'", "https://chatgpt.com", "https://chat.openai.com", *extras]
+    return "frame-ancestors " + " ".join(allowed)
+
+
 @app.on_event("startup")
 def _startup() -> None:
     init_db()
@@ -170,7 +176,12 @@ def download_paper_file(paper_id: int):
     pdf_path = Path(row["pdf_path"])
     if not pdf_path.exists():
         raise HTTPException(status_code=404, detail="PDF not available on server.")
-    headers = {"Content-Disposition": f"inline; filename=\"{pdf_path.name}\""}
+    headers = {
+        "Content-Disposition": f"inline; filename=\"{pdf_path.name}\"",
+        "Content-Security-Policy": _pdf_frame_ancestors(),
+        "X-Frame-Options": "ALLOWALL",
+        "Cross-Origin-Resource-Policy": "cross-origin",
+    }
     return FileResponse(pdf_path, media_type="application/pdf", headers=headers)
 
 
