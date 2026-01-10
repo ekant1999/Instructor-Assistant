@@ -24,14 +24,33 @@ import {
 
 const DEFAULT_BASE = (import.meta.env.VITE_API_BASE as string | undefined) || "http://localhost:8010/api";
 export const API_BASE = DEFAULT_BASE.replace(/\/$/, "");
+const NGROK_SKIP_HEADER = "ngrok-skip-browser-warning";
+const SHOULD_SKIP_NGROK_WARNING = /ngrok-free\.dev|ngrok\.io|ngrok\.app/i.test(API_BASE);
+
+function addHeader(headers: HeadersInit, key: string, value: string): HeadersInit {
+  if (headers instanceof Headers) {
+    headers.set(key, value);
+    return headers;
+  }
+  if (Array.isArray(headers)) {
+    return [...headers, [key, value]];
+  }
+  return { ...(headers as Record<string, string>), [key]: value };
+}
+
+function applyNgrokSkipHeader(headers: HeadersInit): HeadersInit {
+  if (!SHOULD_SKIP_NGROK_WARNING) return headers;
+  return addHeader(headers, NGROK_SKIP_HEADER, "true");
+}
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const headers: HeadersInit = {
+  let headers: HeadersInit = {
     ...(options.headers || {})
   };
   if (!(options.body instanceof FormData)) {
-    headers["Content-Type"] = "application/json";
+    headers = addHeader(headers, "Content-Type", "application/json");
   }
+  headers = applyNgrokSkipHeader(headers);
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   if (!res.ok) {
     let detail = res.statusText;
@@ -248,9 +267,9 @@ export async function streamQuestionGeneration(
 ): Promise<void> {
   const res = await fetch(`${API_BASE}/question-sets/generate/stream`, {
     method: "POST",
-    headers: {
+    headers: applyNgrokSkipHeader({
       "Content-Type": "application/json"
-    },
+    }),
     body: JSON.stringify(input),
     signal
   });
@@ -297,6 +316,7 @@ export async function uploadQuestionContext(file: File): Promise<ApiQuestionCont
   formData.append("file", file);
   const res = await fetch(`${API_BASE}/question-sets/context`, {
     method: "POST",
+    headers: applyNgrokSkipHeader({}),
     body: formData
   });
   if (!res.ok) {
@@ -327,9 +347,9 @@ export async function ragIngest(input: ApiRagIngestRequest): Promise<ApiRagInges
   try {
     const res = await fetch(`${API_BASE}/rag/ingest`, {
       method: "POST",
-      headers: {
+      headers: applyNgrokSkipHeader({
         "Content-Type": "application/json"
-      },
+      }),
       body: JSON.stringify(input),
       signal: controller.signal
     });

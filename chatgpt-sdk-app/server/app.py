@@ -13,6 +13,7 @@ import json
 import re
 import secrets
 from typing import Any, Dict, Optional, Tuple, List
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
@@ -111,9 +112,23 @@ def _widget_csp() -> str:
 
 
 def _widget_csp_meta() -> dict[str, object]:
+    def _extract_origin(value: str) -> str | None:
+        val = (value or "").strip()
+        if not val:
+            return None
+        parsed = urlparse(val if "://" in val else f"https://{val}")
+        if not parsed.netloc:
+            return None
+        return f"{parsed.scheme or 'https'}://{parsed.netloc}"
+
+    connect_domains: list[str] = []
+    for raw in (os.getenv("FASTAPI_PUBLIC_BASE", ""), os.getenv("VITE_API_BASE", "")):
+        origin = _extract_origin(raw)
+        if origin and origin not in connect_domains:
+            connect_domains.append(origin)
     return {
         "openai/widgetCsp": _widget_csp(),
-        "openai/widgetCSP": {"connect_domains": [], "resource_domains": []},
+        "openai/widgetCSP": {"connect_domains": connect_domains, "resource_domains": []},
     }
 
 

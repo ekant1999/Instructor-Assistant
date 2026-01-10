@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -127,16 +128,22 @@ app = FastAPI(title="Instructor Assistant Web API")
 def _startup() -> None:
     init_db()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins = [
+cors_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5174",
     "https://chat.openai.com",
     "https://chatgpt.com",
-    ],
+    "null",
+]
+extra_origins = [o.strip() for o in os.getenv("CORS_EXTRA_ORIGINS", "").split(",") if o.strip()]
+cors_origin_regex = os.getenv("CORS_ALLOW_ORIGIN_REGEX", r".*")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins + extra_origins,
+    allow_origin_regex=cors_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
