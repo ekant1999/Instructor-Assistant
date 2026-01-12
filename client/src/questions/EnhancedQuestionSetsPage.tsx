@@ -685,7 +685,7 @@ export default function EnhancedQuestionSetsPage() {
   };
 
   return (
-    <div className="h-full p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 flex flex-col overflow-hidden">
+    <div className="h-full p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 flex flex-col overflow-hidden min-h-0 ia-page-root">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Question Sets</h1>
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">

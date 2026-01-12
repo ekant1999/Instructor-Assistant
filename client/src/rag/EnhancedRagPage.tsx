@@ -247,7 +247,7 @@ export default function EnhancedRagPage() {
   };
 
   return (
-    <div className="flex flex-col h-full max-w-7xl mx-auto w-full p-4 space-y-4">
+    <div className="flex flex-col h-full max-w-7xl mx-auto w-full p-4 space-y-4 min-h-0 ia-page-root">
       <div className="text-center mb-4">
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 mb-3">
           <Network className="h-6 w-6 text-primary" />

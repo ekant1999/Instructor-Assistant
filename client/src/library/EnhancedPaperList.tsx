@@ -111,7 +111,7 @@ export function EnhancedPaperList({
   return (
     <div className="flex flex-col h-full min-h-0 ia-paper-list">
       {/* Search and Filters */}
-      <div className="p-4 border-b space-y-3 bg-background">
+      <div className="p-4 border-b space-y-3 bg-background ia-paper-list-header">
         <div className="relative">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -215,7 +215,7 @@ export function EnhancedPaperList({
 
       {/* Papers List */}
       <div className="flex-1 overflow-auto min-h-0 ia-paper-list-scroll">
-        <div className="space-y-3 p-4">
+        <div className="space-y-3 p-4 ia-paper-list-cards">
           {filteredPapers.map((paper) => {
             const isSelected = selectedIds.has(paper.id);
             const isActive = selectedId === paper.id;
@@ -224,7 +224,7 @@ export function EnhancedPaperList({
             return (
               <Card
                 key={paper.id}
-                className={`p-4 cursor-pointer transition-all hover:shadow-md ${
+                className={`p-4 cursor-pointer transition-all hover:shadow-md ia-paper-card ${
                   isActive ? 'border-primary ring-1 ring-primary' : 'hover:border-primary/50'
                 } ${isSelected ? 'bg-primary/5' : ''}`}
                 onClick={() => onSelect(paper)}

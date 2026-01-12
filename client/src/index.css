@@ -112,13 +112,112 @@
   scrollbar-gutter: stable;
 }
 
-:root[data-ia-widget="true"] body,
-:root[data-ia-widget="true"] #root {
-  height: 100vh;
-  overflow: auto;
+:root[data-ia-widget="true"] .ia-tabs-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-gutter: stable;
+  column-gap: 0.25rem;
 }
 
-:root[data-ia-widget="true"] .ia-app-shell,
+:root[data-ia-widget="true"] .ia-tabs-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+:root[data-ia-widget="true"] .ia-tabs-scroll [data-state] {
+  flex-shrink: 0;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+  font-size: 0.7rem;
+}
+
+:root[data-ia-widget="true"] .ia-tabs-scroll svg {
+  display: none;
+}
+
+:root[data-ia-widget="true"] .ia-library-panel {
+  width: 300px !important;
+}
+
+:root[data-ia-widget="true"] .ia-upload-bar {
+  padding: 0.5rem 0.75rem;
+}
+
+:root[data-ia-widget="true"] .ia-paper-list-header {
+  padding: 0.5rem 0.75rem;
+  gap: 0.5rem;
+}
+
+:root[data-ia-widget="true"] .ia-paper-list-header .grid {
+  gap: 0.25rem;
+}
+
+:root[data-ia-widget="true"] .ia-paper-list-header input,
+:root[data-ia-widget="true"] .ia-paper-list-header button {
+  font-size: 0.7rem;
+}
+
+:root[data-ia-widget="true"] .ia-paper-list-header [data-radix-select-trigger] {
+  height: 1.75rem;
+}
+
+:root[data-ia-widget="true"] .ia-paper-list-cards {
+  padding: 0.5rem 0.75rem;
+  gap: 0.5rem;
+}
+
+:root[data-ia-widget="true"] .ia-paper-card {
+  padding: 0.5rem;
+}
+
+:root[data-ia-widget="true"] .ia-paper-card h3 {
+  font-size: 0.75rem;
+}
+
+:root[data-ia-widget="true"] .ia-paper-card p {
+  font-size: 0.65rem;
+}
+
+:root[data-ia-widget="true"] {
+  height: var(--ia-widget-height, 100vh);
+  max-height: var(--ia-widget-height, 100vh);
+  overflow: hidden;
+}
+
+:root[data-ia-widget="true"] body,
+:root[data-ia-widget="true"] #root {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:root[data-ia-widget="true"] #root {
+  min-height: 0;
+  position: fixed;
+  inset: 0;
+  padding: var(--ia-widget-gutter, 0);
+  box-sizing: border-box;
+}
+
+:root[data-ia-widget="true"] .ia-app-shell {
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
 :root[data-ia-widget="true"] .ia-app-main {
-  overflow: visible;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:root[data-ia-widget="true"] .ia-page-root {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:root[data-ia-widget="true"] .ia-page-scroll {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
 }

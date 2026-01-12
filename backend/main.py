@@ -126,7 +126,18 @@ app = FastAPI(title="Instructor Assistant Web API")
 
 def _pdf_frame_ancestors() -> str:
     extras = [o.strip() for o in os.getenv("PDF_FRAME_ANCESTORS", "").split(",") if o.strip()]
-    allowed = ["'self'", "https://chatgpt.com", "https://chat.openai.com", *extras]
+    allowed = [
+        "'self'",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
+        "https://chatgpt.com",
+        "https://chat.openai.com",
+        *extras,
+    ]
     return "frame-ancestors " + " ".join(allowed)
 
 
@@ -173,13 +184,18 @@ def download_paper_file(paper_id: int):
         row = conn.execute("SELECT title, pdf_path FROM papers WHERE id=?", (paper_id,)).fetchone()
     if not row:
         raise HTTPException(status_code=404, detail="Paper not found.")
-    pdf_path = Path(row["pdf_path"])
+    pdf_path = Path(row["pdf_path"]).expanduser()
     if not pdf_path.exists():
-        raise HTTPException(status_code=404, detail="PDF not available on server.")
+        fallback = DATA_DIR / "pdfs" / pdf_path.name
+        if fallback.exists():
+            pdf_path = fallback
+            with get_conn() as conn:
+                conn.execute("UPDATE papers SET pdf_path=? WHERE id=?", (str(pdf_path), paper_id))
+        else:
+            raise HTTPException(status_code=404, detail="PDF not available on server.")
     headers = {
         "Content-Disposition": f"inline; filename=\"{pdf_path.name}\"",
         "Content-Security-Policy": _pdf_frame_ancestors(),
-        "X-Frame-Options": "ALLOWALL",
         "Cross-Origin-Resource-Policy": "cross-origin",
     }
     return FileResponse(pdf_path, media_type="application/pdf", headers=headers)

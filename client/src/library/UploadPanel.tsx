@@ -74,7 +74,7 @@ export function UploadPanel({ onUpload, onDownload }: UploadPanelProps) {
 
   if (!isOpen) {
     return (
-      <div className="border-b px-6 py-3 flex justify-between items-center bg-muted/5">
+      <div className="border-b px-6 py-3 flex justify-between items-center bg-muted/5 ia-upload-bar">
         <span className="text-sm text-muted-foreground">Bulk upload papers</span>
         <Button
           variant="outline"

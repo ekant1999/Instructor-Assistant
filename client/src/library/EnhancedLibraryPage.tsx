@@ -696,7 +696,7 @@ export default function EnhancedLibraryPage() {
   };
 
   return (
-    <div className="flex h-full w-full flex-col bg-background min-h-0">
+    <div className="flex h-full w-full flex-col bg-background min-h-0 ia-page-root">
       <UploadPanel onUpload={handleAddPapers} onDownload={downloadPaper} />
 
       <div className="flex flex-1 overflow-hidden min-h-0">
@@ -740,7 +740,7 @@ export default function EnhancedLibraryPage() {
 
           {!isLoading && selectedPaper ? (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-              <TabsList className="w-full justify-start rounded-none border-b h-auto p-0 bg-transparent">
+              <TabsList className="w-full justify-start rounded-none border-b h-auto p-0 bg-transparent ia-tabs-scroll">
                 <TabsTrigger value="preview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
                   <FileText className="h-4 w-4 mr-2" />
                   Preview

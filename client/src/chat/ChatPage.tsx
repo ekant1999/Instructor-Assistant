@@ -13,7 +13,7 @@ export default function ChatPage() {
   }, [messages, status]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-background relative">
+    <div className="flex flex-col h-full w-full bg-background relative min-h-0 ia-page-root">
       <ScrollArea className="flex-1 w-full">
         <div className="flex flex-col min-h-full pb-40"> {/* Padding for fixed input */}
           {messages.length === 0 && (

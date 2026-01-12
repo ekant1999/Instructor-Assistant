@@ -189,7 +189,7 @@ export default function EnhancedNotesPage() {
   };
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-full w-full min-h-0 ia-page-root">
       {/* Sidebar */}
       <div className="w-[320px] border-r bg-muted/10 flex flex-col h-full">
         <div className="p-4 border-b space-y-3">
