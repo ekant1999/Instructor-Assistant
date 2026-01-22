@@ -22,7 +22,14 @@ import {
   ApiSummary
 } from "./api-types";
 
-const DEFAULT_BASE = (import.meta.env.VITE_API_BASE as string | undefined) || "http://localhost:8010/api";
+const runtimeBase =
+  typeof globalThis !== "undefined" && (globalThis as any).__IA_API_BASE__
+    ? String((globalThis as any).__IA_API_BASE__)
+    : undefined;
+const DEFAULT_BASE =
+  runtimeBase ||
+  (import.meta.env.VITE_API_BASE as string | undefined) ||
+  "http://localhost:8010/api";
 export const API_BASE = DEFAULT_BASE.replace(/\/$/, "");
 const NGROK_SKIP_HEADER = "ngrok-skip-browser-warning";
 const SHOULD_SKIP_NGROK_WARNING = /ngrok-free\.dev|ngrok\.io|ngrok\.app/i.test(API_BASE);

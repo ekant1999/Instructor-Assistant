@@ -118,6 +118,15 @@ def _widget_csp_meta() -> dict[str, object]:
     }
 
 
+def _widget_api_base() -> str | None:
+    base = os.getenv("FASTAPI_PUBLIC_BASE", "").strip()
+    if not base:
+        return None
+    if base.endswith("/api"):
+        return base
+    return base.rstrip("/") + "/api"
+
+
 def _wrap_widget_js(js: str) -> str:
     polyfill = (
         "(function(){"
@@ -262,10 +271,17 @@ def research_notes_widget() -> str:
 
     safe_js = _wrap_widget_js(WIDGET_JS).replace("</script", "<\\/script")
     inline_css = f"<style>{WIDGET_CSS}</style>\n" if WIDGET_CSS else ""
+    api_base = _widget_api_base()
+    api_bootstrap = (
+        f"<script>window.__IA_API_BASE__ = {json.dumps(api_base)};</script>\n"
+        if api_base
+        else ""
+    )
 
     return (
         '<div id="root">Loading Instructor Assistant...</div>\n'
         f"{inline_css}"
+        f"{api_bootstrap}"
         f'<script type="module">\n{safe_js}\n</script>\n'
     )
 

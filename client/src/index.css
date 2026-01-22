@@ -221,3 +221,35 @@
   min-height: 0;
   overflow: auto;
 }
+
+:root[data-ia-widget="true"] .ia-questions-page {
+  overflow: auto !important;
+}
+
+:root[data-ia-widget="true"] .ia-questions-content {
+  min-height: 0;
+  overflow: visible !important;
+}
+
+:root[data-ia-widget="true"] .ia-questions-panel {
+  min-height: 0;
+  overflow: visible;
+}
+
+:root[data-ia-widget="true"] .ia-questions-scroll {
+  min-height: clamp(220px, 35vh, 420px);
+  max-height: clamp(260px, 42vh, 520px);
+  overflow-y: auto;
+  pointer-events: auto;
+}
+
+:root[data-ia-widget="true"] .ia-questions-scroll-root {
+  height: 100%;
+  min-height: 0;
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+:root[data-ia-widget="true"] .ia-questions-tabs {
+  min-height: 100%;
+}

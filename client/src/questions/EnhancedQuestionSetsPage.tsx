@@ -685,7 +685,7 @@ export default function EnhancedQuestionSetsPage() {
   };
 
   return (
-    <div className="h-full p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 flex flex-col overflow-hidden min-h-0 ia-page-root">
+    <div className="h-full p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 flex flex-col overflow-hidden min-h-0 ia-page-root ia-questions-page">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Question Sets</h1>
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
@@ -702,149 +702,151 @@ export default function EnhancedQuestionSetsPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="generate" className="flex-1 flex flex-col min-h-0 overflow-hidden">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="generate" className="flex-1 sm:flex-initial">Generate</TabsTrigger>
-          <TabsTrigger value="edit" className="flex-1 sm:flex-initial">Edit Questions</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="generate" className="flex-1 mt-4 sm:mt-6 border rounded-xl overflow-hidden bg-background shadow-sm flex flex-col lg:flex-row min-h-0">
-          {/* Left Panel - Controls */}
-          <div className="w-full lg:w-[380px] xl:w-[420px] border-r bg-muted/10 p-5 flex flex-col gap-4 overflow-hidden min-h-0">
-            {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 space-y-4 pr-2">
-              {/* Document Selection */}
-              <div className="flex-shrink-0">
-                <DocumentSelector
-                  papers={papers}
-                  notes={notes}
-                  uploads={uploads}
-                  selectedPaperIds={selectedPaperIds}
-                  selectedNoteIds={selectedNoteIds}
-                  selectedUploadIds={selectedUploadIds}
-                  onPaperToggle={togglePaper}
-                  onNoteToggle={toggleNote}
-                  onUploadToggle={toggleUpload}
-                  onUpload={handleUploadFiles}
-                  onClearSelection={clearSelection}
-                  isUploading={isUploading}
-                />
+      <div className="flex-1 min-h-0 overflow-hidden ia-questions-scroll-root">
+        <Tabs defaultValue="generate" className="flex-1 flex flex-col min-h-0 overflow-hidden ia-questions-tabs">
+          <TabsList className="w-full sm:w-auto">
+            <TabsTrigger value="generate" className="flex-1 sm:flex-initial">Generate</TabsTrigger>
+            <TabsTrigger value="edit" className="flex-1 sm:flex-initial">Edit Questions</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="generate" className="flex-1 mt-4 sm:mt-6 border rounded-xl overflow-hidden bg-background shadow-sm flex flex-col lg:flex-row min-h-0 ia-questions-content">
+            {/* Left Panel - Controls */}
+            <div className="w-full lg:w-[380px] xl:w-[420px] border-r bg-muted/10 p-5 flex flex-col gap-4 overflow-hidden min-h-0 ia-questions-panel">
+              {/* Scrollable Content Area */}
+              <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 space-y-4 pr-2 ia-questions-scroll">
+                {/* Document Selection */}
+                <div className="flex-shrink-0">
+                  <DocumentSelector
+                    papers={papers}
+                    notes={notes}
+                    uploads={uploads}
+                    selectedPaperIds={selectedPaperIds}
+                    selectedNoteIds={selectedNoteIds}
+                    selectedUploadIds={selectedUploadIds}
+                    onPaperToggle={togglePaper}
+                    onNoteToggle={toggleNote}
+                    onUploadToggle={toggleUpload}
+                    onUpload={handleUploadFiles}
+                    onClearSelection={clearSelection}
+                    isUploading={isUploading}
+                  />
+                </div>
+
+                {/* Question Configuration */}
+                <div className="flex-shrink-0">
+                  <QuestionConfigPanel
+                    configs={questionConfigs}
+                    onChange={setQuestionConfigs}
+                  />
+                </div>
               </div>
 
-              {/* Question Configuration */}
-              <div className="flex-shrink-0">
-                <QuestionConfigPanel
-                  configs={questionConfigs}
-                  onChange={setQuestionConfigs}
-                />
+              {/* Fixed Bottom Section - Always Visible */}
+              <div className="flex-shrink-0 space-y-3 pt-2 border-t bg-muted/10 -mx-5 px-5 pb-0">
+                {/* Model Selection */}
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-sm">Model</h3>
+                  <Button variant="outline" size="sm" className="w-full h-9 text-xs justify-start">
+                    ⚡ Qwen (Local) - Recommended
+                  </Button>
+                </div>
+                
+                {/* Generate Button */}
+                <div className="space-y-2">
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={
+                      isGenerating ||
+                      (selectedPaperIds.size === 0 &&
+                        selectedNoteIds.size === 0 &&
+                        selectedUploadIds.size === 0)
+                    }
+                    className="w-full"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Generate Questions
+                      </>
+                    )}
+                  </Button>
+
+                  {questions.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="text-xs text-muted-foreground text-center">
+                        Current Set: {questions.length} questions
+                      </div>
+                      <Button
+                        variant="outline"
+                        onClick={handleAddMore}
+                        disabled={isGenerating}
+                        className="w-full"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add More Questions
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Fixed Bottom Section - Always Visible */}
-            <div className="flex-shrink-0 space-y-3 pt-2 border-t bg-muted/10 -mx-5 px-5 pb-0">
-              {/* Model Selection */}
-              <div className="space-y-2">
-                <h3 className="font-semibold text-sm">Model</h3>
-                <Button variant="outline" size="sm" className="w-full h-9 text-xs justify-start">
-                  ⚡ Qwen (Local) - Recommended
-                </Button>
+            {/* Right Panel - Preview */}
+            <div className="flex-1 bg-background flex flex-col min-h-0">
+              <div className="p-3 border-b bg-muted/5 flex justify-between items-center text-xs text-muted-foreground">
+                <span>Preview</span>
+                <span className="hidden sm:inline">Markdown</span>
               </div>
-              
-              {/* Generate Button */}
-              <div className="space-y-2">
-                <Button
-                  onClick={handleGenerate}
-                  disabled={
-                    isGenerating ||
-                    (selectedPaperIds.size === 0 &&
-                      selectedNoteIds.size === 0 &&
-                      selectedUploadIds.size === 0)
-                  }
-                  className="w-full"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Generate Questions
-                    </>
-                  )}
-                </Button>
-
-                {questions.length > 0 && (
-                  <div className="space-y-2">
-                    <div className="text-xs text-muted-foreground text-center">
-                      Current Set: {questions.length} questions
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={handleAddMore}
-                      disabled={isGenerating}
-                      className="w-full"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add More Questions
-                    </Button>
+              <ScrollArea className="flex-1 p-4 sm:p-8">
+                {questions.length > 0 ? (
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    {questions.map((q, idx) => (
+                      <div key={q.id} className="mb-6">
+                        <h3>Question {idx + 1}</h3>
+                        <p>{q.question}</p>
+                        {q.options && (
+                          <ul>
+                            {q.options.map((opt, optIdx) => (
+                              <li key={optIdx}>
+                                {String.fromCharCode(65 + optIdx)}) {opt}
+                                {optIdx === q.correctAnswer && ' ✓'}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {q.explanation && (
+                          <div className="bg-muted/50 p-2 rounded text-sm">
+                            <strong>Explanation:</strong> {q.explanation}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-50">
+                    <p>Select source materials and configure questions, then click generate</p>
                   </div>
                 )}
-              </div>
+              </ScrollArea>
             </div>
-          </div>
+          </TabsContent>
 
-          {/* Right Panel - Preview */}
-          <div className="flex-1 bg-background flex flex-col min-h-0">
-            <div className="p-3 border-b bg-muted/5 flex justify-between items-center text-xs text-muted-foreground">
-              <span>Preview</span>
-              <span className="hidden sm:inline">Markdown</span>
-            </div>
-            <ScrollArea className="flex-1 p-4 sm:p-8">
-              {questions.length > 0 ? (
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                  {questions.map((q, idx) => (
-                    <div key={q.id} className="mb-6">
-                      <h3>Question {idx + 1}</h3>
-                      <p>{q.question}</p>
-                      {q.options && (
-                        <ul>
-                          {q.options.map((opt, optIdx) => (
-                            <li key={optIdx}>
-                              {String.fromCharCode(65 + optIdx)}) {opt}
-                              {optIdx === q.correctAnswer && ' ✓'}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                      {q.explanation && (
-                        <div className="bg-muted/50 p-2 rounded text-sm">
-                          <strong>Explanation:</strong> {q.explanation}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-50">
-                  <p>Select source materials and configure questions, then click generate</p>
-                </div>
-              )}
-            </ScrollArea>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="edit" className="flex-1 mt-4 sm:mt-6 min-h-0 overflow-auto">
-          {questions.length > 0 ? (
-            <QuestionEditor questions={questions} onUpdate={handleUpdateQuestions} />
-          ) : (
-            <Card className="h-full flex items-center justify-center min-h-[400px]">
-              <p className="text-muted-foreground text-sm sm:text-base">Generate questions first to edit them</p>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="edit" className="flex-1 mt-4 sm:mt-6 min-h-0 overflow-auto">
+            {questions.length > 0 ? (
+              <QuestionEditor questions={questions} onUpdate={handleUpdateQuestions} />
+            ) : (
+              <Card className="h-full flex items-center justify-center min-h-[400px]">
+                <p className="text-muted-foreground text-sm sm:text-base">Generate questions first to edit them</p>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
 
       <ExportQuestionSetDialog
         open={exportDialogOpen}
