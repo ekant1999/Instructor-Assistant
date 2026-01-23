@@ -29,7 +29,7 @@ export function MiniChatWidget({ onClose }: { onClose?: () => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const visibleMessages = messages.slice(-8);
+  const visibleMessages = messages;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
