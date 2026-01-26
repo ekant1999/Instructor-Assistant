@@ -55,6 +55,8 @@ from .schemas import (
     RAGQueryRequest,
     RAGQueryResponse,
     RAGIndexStatusResponse,
+    RAGQnaCreateRequest,
+    RAGQnaRecord,
 )
 from .services import (
     QuestionGenerationError,
@@ -143,6 +145,18 @@ def _pdf_frame_ancestors() -> str:
         *extras,
     ]
     return "frame-ancestors " + " ".join(allowed)
+
+
+def _parse_rag_sources(raw: Optional[str]) -> List[Dict[str, Any]]:
+    if not raw:
+        return []
+    try:
+        data = json.loads(raw)
+    except (TypeError, json.JSONDecodeError):
+        return []
+    if isinstance(data, list):
+        return data
+    return []
 
 
 def _set_rag_status(paper_ids: List[int], status: str, error: Optional[str] = None) -> None:
@@ -981,6 +995,103 @@ async def rag_query(payload: RAGQueryRequest) -> RAGQueryResponse:
     except Exception as exc:
         logger.exception("RAG query failed")
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/api/papers/{paper_id}/rag-qa", response_model=List[RAGQnaRecord])
+def list_rag_qna(paper_id: int) -> List[RAGQnaRecord]:
+    with get_conn() as conn:
+        exists = conn.execute("SELECT 1 FROM papers WHERE id=?", (paper_id,)).fetchone()
+        if not exists:
+            raise HTTPException(status_code=404, detail="Paper not found")
+        rows = conn.execute(
+            """
+            SELECT id, paper_id, question, answer, sources_json, scope, provider, created_at
+            FROM rag_qna
+            WHERE paper_id=?
+            ORDER BY datetime(created_at) DESC, id DESC
+            """,
+            (paper_id,),
+        ).fetchall()
+    return [
+        RAGQnaRecord(
+            id=row["id"],
+            paper_id=row["paper_id"],
+            question=row["question"],
+            answer=row["answer"],
+            sources=_parse_rag_sources(row["sources_json"]),
+            scope=row["scope"],
+            provider=row["provider"],
+            created_at=row["created_at"],
+        )
+        for row in rows
+    ]
+
+
+@app.post("/api/papers/{paper_id}/rag-qa", response_model=RAGQnaRecord)
+def create_rag_qna(paper_id: int, payload: RAGQnaCreateRequest) -> RAGQnaRecord:
+    with get_conn() as conn:
+        exists = conn.execute("SELECT 1 FROM papers WHERE id=?", (paper_id,)).fetchone()
+        if not exists:
+            raise HTTPException(status_code=404, detail="Paper not found")
+        sources_json = json.dumps([s.model_dump() for s in payload.sources])
+        cur = conn.execute(
+            """
+            INSERT INTO rag_qna(paper_id, question, answer, sources_json, scope, provider)
+            VALUES(?,?,?,?,?,?)
+            """,
+            (
+                paper_id,
+                payload.question,
+                payload.answer,
+                sources_json,
+                payload.scope,
+                payload.provider,
+            ),
+        )
+        conn.commit()
+        row_id = cur.lastrowid
+        row = conn.execute(
+            """
+            SELECT id, paper_id, question, answer, sources_json, scope, provider, created_at
+            FROM rag_qna
+            WHERE id=?
+            """,
+            (row_id,),
+        ).fetchone()
+    return RAGQnaRecord(
+        id=row["id"],
+        paper_id=row["paper_id"],
+        question=row["question"],
+        answer=row["answer"],
+        sources=_parse_rag_sources(row["sources_json"]),
+        scope=row["scope"],
+        provider=row["provider"],
+        created_at=row["created_at"],
+    )
+
+
+@app.delete("/api/papers/{paper_id}/rag-qa/{qa_id}")
+def delete_rag_qna(paper_id: int, qa_id: int) -> Dict[str, Any]:
+    with get_conn() as conn:
+        cur = conn.execute(
+            "DELETE FROM rag_qna WHERE id=? AND paper_id=?",
+            (qa_id, paper_id),
+        )
+        conn.commit()
+        if cur.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Q&A entry not found")
+    return {"deleted": True}
+
+
+@app.delete("/api/papers/{paper_id}/rag-qa")
+def clear_rag_qna(paper_id: int) -> Dict[str, Any]:
+    with get_conn() as conn:
+        exists = conn.execute("SELECT 1 FROM papers WHERE id=?", (paper_id,)).fetchone()
+        if not exists:
+            raise HTTPException(status_code=404, detail="Paper not found")
+        conn.execute("DELETE FROM rag_qna WHERE paper_id=?", (paper_id,))
+        conn.commit()
+    return {"cleared": True}
 
 
 if __name__ == "__main__":

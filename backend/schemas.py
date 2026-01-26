@@ -272,6 +272,25 @@ class RAGQueryResponse(BaseModel):
     num_sources: int
 
 
+class RAGQnaCreateRequest(BaseModel):
+    question: str = Field(..., min_length=1)
+    answer: str = Field(..., min_length=1)
+    sources: List[RAGContextInfo] = Field(default_factory=list)
+    scope: Optional[str] = Field(default="selected")
+    provider: Optional[str] = Field(default=None)
+
+
+class RAGQnaRecord(BaseModel):
+    id: int
+    paper_id: int
+    question: str
+    answer: str
+    sources: List[RAGContextInfo] = Field(default_factory=list)
+    scope: Optional[str] = None
+    provider: Optional[str] = None
+    created_at: Optional[str] = None
+
+
 class RAGIndexStatusResponse(BaseModel):
     exists: bool
     message: str

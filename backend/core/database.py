@@ -87,6 +87,21 @@ def _init_core_tables(conn: sqlite3.Connection) -> None:
         );
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS rag_qna(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          paper_id INTEGER NOT NULL,
+          question TEXT NOT NULL,
+          answer TEXT NOT NULL,
+          sources_json TEXT,
+          scope TEXT,
+          provider TEXT,
+          created_at TEXT DEFAULT (datetime('now')),
+          FOREIGN KEY(paper_id) REFERENCES papers(id) ON DELETE CASCADE
+        );
+        """
+    )
     conn.commit()
 
 

@@ -7,9 +7,9 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, MessageSquare } from 'lucide-react';
-import { ragQuery } from '@/lib/api';
-import { ApiRagContextInfo } from '@/lib/api-types';
+import { Loader2, MessageSquare, Trash2 } from 'lucide-react';
+import { clearPaperRagQna, createPaperRagQna, deletePaperRagQna, listPaperRagQna, ragQuery } from '@/lib/api';
+import { ApiRagContextInfo, ApiRagQnaItem } from '@/lib/api-types';
 import { Paper } from '@/shared/types';
 import { toast } from 'sonner';
 
@@ -23,6 +23,8 @@ interface AskEntry {
   question: string;
   answer: string;
   sources: ApiRagContextInfo[];
+  scope?: string;
+  provider?: string;
   createdAt: number;
 }
 
@@ -48,10 +50,39 @@ export function AskQuestionsPanel({ selectedPaper, papers }: AskQuestionsPanelPr
   const hasIndexed = useAllPapers ? indexedPapers.length > 0 : selectedPaper.ragStatus === 'done';
   const showPartialWarning = useAllPapers && indexedPapers.length > 0 && indexedPapers.length < papers.length;
 
+  const mapRagQnaEntry = (item: ApiRagQnaItem): AskEntry => {
+    const createdAt = item.created_at ? Date.parse(item.created_at) : Date.now();
+    return {
+      id: String(item.id),
+      question: item.question,
+      answer: item.answer,
+      sources: item.sources || [],
+      scope: item.scope || 'selected',
+      provider: item.provider || 'local',
+      createdAt: Number.isNaN(createdAt) ? Date.now() : createdAt,
+    };
+  };
+
   useEffect(() => {
+    let cancelled = false;
+    async function loadHistory() {
+      try {
+        const entries = await listPaperRagQna(Number(selectedPaper.id));
+        if (!cancelled) {
+          setHistory(entries.map(mapRagQnaEntry));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          toast.error(error instanceof Error ? error.message : 'Failed to load Q&A history');
+        }
+      }
+    }
     setQuestion('');
-    setHistory([]);
     setUseAllPapers(false);
+    loadHistory();
+    return () => {
+      cancelled = true;
+    };
   }, [selectedPaper.id]);
 
   const handleAsk = async () => {
@@ -72,19 +103,56 @@ export function AskQuestionsPanel({ selectedPaper, papers }: AskQuestionsPanelPr
         paper_ids: useAllPapers ? undefined : [Number(selectedPaper.id)],
       };
       const result = await ragQuery(payload);
-      const entry: AskEntry = {
-        id: `${Date.now()}`,
-        question,
-        answer: result.answer,
-        sources: result.context || [],
-        createdAt: Date.now(),
-      };
-      setHistory((prev) => [entry, ...prev]);
-      setQuestion('');
+      const scope = useAllPapers ? 'all' : 'selected';
+      try {
+        const stored = await createPaperRagQna(Number(selectedPaper.id), {
+          question,
+          answer: result.answer,
+          sources: result.context || [],
+          scope,
+          provider: 'local',
+        });
+        setHistory((prev) => [mapRagQnaEntry(stored), ...prev]);
+      } catch (error) {
+        const entry: AskEntry = {
+          id: `${Date.now()}`,
+          question,
+          answer: result.answer,
+          sources: result.context || [],
+          scope,
+          provider: 'local',
+          createdAt: Date.now(),
+        };
+        setHistory((prev) => [entry, ...prev]);
+        toast.error(error instanceof Error ? error.message : 'Failed to save Q&A history');
+      } finally {
+        setQuestion('');
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to answer question');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteEntry = async (entryId: string) => {
+    try {
+      await deletePaperRagQna(Number(selectedPaper.id), Number(entryId));
+      setHistory((prev) => prev.filter((item) => item.id !== entryId));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete Q&A entry');
+    }
+  };
+
+  const handleClearHistory = async () => {
+    if (history.length === 0) return;
+    const confirmed = window.confirm('Clear all Q&A history for this paper?');
+    if (!confirmed) return;
+    try {
+      await clearPaperRagQna(Number(selectedPaper.id));
+      setHistory([]);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to clear Q&A history');
     }
   };
 
@@ -144,6 +212,13 @@ export function AskQuestionsPanel({ selectedPaper, papers }: AskQuestionsPanelPr
           </Button>
         </Card>
 
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium">Q&A History</div>
+          <Button variant="ghost" size="sm" onClick={handleClearHistory} disabled={history.length === 0}>
+            Clear history
+          </Button>
+        </div>
+
         {history.length === 0 && (
           <Card className="p-4 text-sm text-muted-foreground">
             Ask a question to see an answer grounded in the indexed paper chunks.
@@ -152,7 +227,16 @@ export function AskQuestionsPanel({ selectedPaper, papers }: AskQuestionsPanelPr
 
         {history.map((entry) => (
           <Card key={entry.id} className="p-4 space-y-3">
-            <div className="text-sm font-medium">Q: {entry.question}</div>
+            <div className="flex items-start justify-between gap-3">
+              <div className="text-sm font-medium">Q: {entry.question}</div>
+              <Button variant="ghost" size="icon" onClick={() => handleDeleteEntry(entry.id)}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              {entry.scope === 'all' && <Badge variant="outline">All papers</Badge>}
+              {entry.provider && <Badge variant="secondary">{entry.provider}</Badge>}
+            </div>
             <div className="prose prose-sm max-w-none dark:prose-invert">
               <ReactMarkdown>{entry.answer}</ReactMarkdown>
             </div>

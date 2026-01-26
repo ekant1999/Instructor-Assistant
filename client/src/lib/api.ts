@@ -17,6 +17,8 @@ import {
   ApiRagIndexStatusResponse,
   ApiRagIngestRequest,
   ApiRagIngestResponse,
+  ApiRagQnaCreateRequest,
+  ApiRagQnaItem,
   ApiRagQueryRequest,
   ApiRagQueryResponse,
   ApiSummary
@@ -409,5 +411,31 @@ export async function ragQuery(input: ApiRagQueryRequest): Promise<ApiRagQueryRe
   return request<ApiRagQueryResponse>("/rag/query", {
     method: "POST",
     body: JSON.stringify(input)
+  });
+}
+
+export async function listPaperRagQna(paperId: number): Promise<ApiRagQnaItem[]> {
+  return request<ApiRagQnaItem[]>(`/papers/${paperId}/rag-qa`);
+}
+
+export async function createPaperRagQna(
+  paperId: number,
+  input: ApiRagQnaCreateRequest
+): Promise<ApiRagQnaItem> {
+  return request<ApiRagQnaItem>(`/papers/${paperId}/rag-qa`, {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export async function deletePaperRagQna(paperId: number, qaId: number): Promise<void> {
+  await request(`/papers/${paperId}/rag-qa/${qaId}`, {
+    method: "DELETE"
+  });
+}
+
+export async function clearPaperRagQna(paperId: number): Promise<void> {
+  await request(`/papers/${paperId}/rag-qa`, {
+    method: "DELETE"
   });
 }

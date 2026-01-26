@@ -176,3 +176,22 @@ export interface ApiRagQueryResponse {
   context: ApiRagContextInfo[];
   num_sources: number;
 }
+
+export interface ApiRagQnaCreateRequest {
+  question: string;
+  answer: string;
+  sources: ApiRagContextInfo[];
+  scope?: string;
+  provider?: string;
+}
+
+export interface ApiRagQnaItem {
+  id: number;
+  paper_id: number;
+  question: string;
+  answer: string;
+  sources: ApiRagContextInfo[];
+  scope?: string | null;
+  provider?: string | null;
+  created_at?: string | null;
+}
