@@ -36,6 +36,7 @@ function yearFromTimestamp(ts?: number): string | undefined {
 
 export function mapApiPaper(api: ApiPaper): Paper {
   const createdAt = parseTimestamp(api.created_at);
+  const ragUpdatedAt = parseTimestamp(api.rag_updated_at);
   return {
     id: String(api.id),
     title: api.title || "Untitled Paper",
@@ -46,6 +47,9 @@ export function mapApiPaper(api: ApiPaper): Paper {
     createdAt,
     updatedAt: createdAt,
     noteCount: api.note_count,
+    ragStatus: (api.rag_status || undefined) as Paper["ragStatus"],
+    ragError: api.rag_error || undefined,
+    ragUpdatedAt,
   };
 }
 

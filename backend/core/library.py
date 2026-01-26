@@ -109,7 +109,11 @@ def render_library_structured() -> Dict[str, Any]:
     """Return the full library structure (papers + notes)."""
     with get_conn() as conn:
         paper_rows = conn.execute(
-            "SELECT id, title, source_url, pdf_path, created_at FROM papers ORDER BY datetime(created_at) DESC, id DESC"
+            """
+            SELECT id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at
+            FROM papers
+            ORDER BY datetime(created_at) DESC, id DESC
+        """
         ).fetchall()
         papers: List[Dict[str, Any]] = [dict(row) for row in paper_rows]
 

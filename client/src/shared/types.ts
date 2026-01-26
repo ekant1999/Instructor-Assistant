@@ -33,6 +33,9 @@ export interface Paper {
   noteCount?: number;
   createdAt?: number;
   updatedAt?: number;
+  ragStatus?: 'queued' | 'processing' | 'done' | 'error';
+  ragError?: string;
+  ragUpdatedAt?: number;
 }
 
 export interface Summary {

@@ -125,6 +125,9 @@ class PaperRecord(BaseModel):
     source_url: Optional[str] = None
     pdf_path: Optional[str] = None
     pdf_url: Optional[str] = None
+    rag_status: Optional[str] = None
+    rag_error: Optional[str] = None
+    rag_updated_at: Optional[str] = None
     created_at: Optional[str] = None
     note_count: Optional[int] = None
 

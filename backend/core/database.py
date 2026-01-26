@@ -22,6 +22,7 @@ def init_db() -> None:
     """
     with get_conn() as conn:
         _init_core_tables(conn)
+        _ensure_papers_rag_columns(conn)
         _ensure_notes_title_column(conn)
         _ensure_notes_tags_column(conn)
     _ensure_notes_fk_set_null()
@@ -36,6 +37,9 @@ def _init_core_tables(conn: sqlite3.Connection) -> None:
           title TEXT,
           source_url TEXT,
           pdf_path TEXT NOT NULL,
+          rag_status TEXT,
+          rag_error TEXT,
+          rag_updated_at TEXT,
           created_at TEXT DEFAULT (datetime('now'))
         );
         """
@@ -83,6 +87,17 @@ def _init_core_tables(conn: sqlite3.Connection) -> None:
         );
         """
     )
+    conn.commit()
+
+
+def _ensure_papers_rag_columns(conn: sqlite3.Connection) -> None:
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(papers)")}
+    if "rag_status" not in columns:
+        conn.execute("ALTER TABLE papers ADD COLUMN rag_status TEXT")
+    if "rag_error" not in columns:
+        conn.execute("ALTER TABLE papers ADD COLUMN rag_error TEXT")
+    if "rag_updated_at" not in columns:
+        conn.execute("ALTER TABLE papers ADD COLUMN rag_updated_at TEXT")
     conn.commit()
 
 

@@ -6,6 +6,9 @@ export interface ApiPaper {
   note_count?: number;
   pdf_path?: string | null;
   pdf_url?: string | null;
+  rag_status?: string | null;
+  rag_error?: string | null;
+  rag_updated_at?: string | null;
 }
 
 export interface ApiPaperSection {

@@ -4,6 +4,7 @@ import base64
 import json
 import logging
 import os
+import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -111,7 +112,7 @@ def _parse_metadata(raw: Optional[str]) -> Dict[str, Any]:
 def _get_paper(paper_id: int) -> Optional[Dict[str, Any]]:
     with get_conn() as conn:
         row = conn.execute(
-            "SELECT id, title, source_url, pdf_path, created_at FROM papers WHERE id=?",
+            "SELECT id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at FROM papers WHERE id=?",
             (paper_id,)
         ).fetchone()
     if not row:
@@ -122,6 +123,9 @@ def _get_paper(paper_id: int) -> Optional[Dict[str, Any]]:
     return data
 
 app = FastAPI(title="Instructor Assistant Web API")
+
+RAG_INGEST_THREAD: Optional[threading.Thread] = None
+RAG_INGEST_PENDING = False
 
 
 def _pdf_frame_ancestors() -> str:
@@ -139,6 +143,86 @@ def _pdf_frame_ancestors() -> str:
         *extras,
     ]
     return "frame-ancestors " + " ".join(allowed)
+
+
+def _set_rag_status(paper_ids: List[int], status: str, error: Optional[str] = None) -> None:
+    if not paper_ids:
+        return
+    with get_conn() as conn:
+        placeholders = ",".join("?" for _ in paper_ids)
+        params = [status, error, *paper_ids]
+        conn.execute(
+            f"UPDATE papers SET rag_status=?, rag_error=?, rag_updated_at=datetime('now') WHERE id IN ({placeholders})",
+            params,
+        )
+        conn.commit()
+
+
+def _set_all_rag_status(status: str, error: Optional[str] = None) -> None:
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE papers SET rag_status=?, rag_error=?, rag_updated_at=datetime('now')",
+            (status, error),
+        )
+        conn.commit()
+
+
+def _collect_rag_papers() -> List[Dict[str, Any]]:
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT id, pdf_path FROM papers WHERE pdf_path IS NOT NULL"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _run_full_rag_ingestion() -> None:
+    papers = _collect_rag_papers()
+    if not papers:
+        return
+
+    paper_ids = [p["id"] for p in papers]
+    pdf_paths = [p["pdf_path"] for p in papers if p.get("pdf_path")]
+    _set_rag_status(paper_ids, "processing", None)
+
+    try:
+        documents = ingest.load_pdfs_from_paths(pdf_paths)
+        if not documents:
+            raise ValueError("No valid PDFs were loaded for ingestion.")
+        chunks = ingest.split_documents(documents, chunk_size=1200, chunk_overlap=200)
+        if not chunks:
+            raise ValueError("No chunks were created from the PDFs.")
+        index_dir = str(BACKEND_ROOT / "index")
+        ingest.create_faiss_index(chunks, index_dir=index_dir)
+        _set_rag_status(paper_ids, "done", None)
+        logger.info("RAG ingestion complete for %s papers", len(paper_ids))
+    except Exception as exc:
+        logger.exception("RAG ingestion failed")
+        _set_rag_status(paper_ids, "error", str(exc))
+
+
+def _rag_ingest_worker() -> None:
+    global RAG_INGEST_PENDING
+    while True:
+        _run_full_rag_ingestion()
+        if RAG_INGEST_PENDING:
+            RAG_INGEST_PENDING = False
+            continue
+        break
+
+
+def schedule_rag_rebuild() -> None:
+    global RAG_INGEST_THREAD, RAG_INGEST_PENDING
+    papers = _collect_rag_papers()
+    if not papers:
+        return
+    _set_all_rag_status("queued", None)
+    if RAG_INGEST_THREAD and RAG_INGEST_THREAD.is_alive():
+        RAG_INGEST_PENDING = True
+        return
+    RAG_INGEST_PENDING = False
+    RAG_INGEST_THREAD = threading.Thread(target=_rag_ingest_worker, daemon=True)
+    RAG_INGEST_THREAD.start()
+
 
 
 @app.on_event("startup")
@@ -632,6 +716,13 @@ async def download_paper(payload: PaperDownloadRequest) -> Dict[str, PaperRecord
         raise HTTPException(status_code=400, detail=str(exc))
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE papers SET rag_status=?, rag_error=NULL, rag_updated_at=datetime('now') WHERE id=?",
+            ("queued", result["paper_id"]),
+        )
+        conn.commit()
+    schedule_rag_rebuild()
     paper = _get_paper(result["paper_id"])
     if not paper:
         raise HTTPException(status_code=500, detail="Downloaded paper could not be loaded.")
@@ -651,6 +742,7 @@ def delete_paper_handler(paper_id: int) -> Response:
     if path:
         pdf_path = Path(path)
         pdf_path.unlink(missing_ok=True)
+    schedule_rag_rebuild()
     return Response(status_code=204)
 
 

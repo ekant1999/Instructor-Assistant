@@ -109,6 +109,28 @@ export default function EnhancedLibraryPage() {
   }, []);
 
   useEffect(() => {
+    const hasPending = papers.some(
+      (paper) => paper.ragStatus === 'queued' || paper.ragStatus === 'processing'
+    );
+    if (!hasPending) return;
+    let cancelled = false;
+    const timer = window.setInterval(async () => {
+      try {
+        const paperRows = await listPapers();
+        if (!cancelled) {
+          setPapers(paperRows.map(mapApiPaper));
+        }
+      } catch {
+        // ignore polling errors
+      }
+    }, 6000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [papers]);
+
+  useEffect(() => {
     if (!selectedId || sectionsByPaperId[selectedId]) return;
     void ensureSections(selectedId);
   }, [selectedId, sectionsByPaperId]);
@@ -669,10 +691,16 @@ export default function EnhancedLibraryPage() {
   const handleDeletePaper = async (id: string) => {
     try {
       await deletePaper(Number(id));
-      setPapers((prev) => prev.filter((p) => p.id !== id));
+      const paperRows = await listPapers();
+      const mappedPapers = paperRows.map(mapApiPaper);
+      setPapers(mappedPapers);
       setSelectedPaperIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
+        const next = new Set<string>();
+        mappedPapers.forEach((paper) => {
+          if (prev.has(paper.id)) {
+            next.add(paper.id);
+          }
+        });
         return next;
       });
       setSectionsByPaperId((prev) => {
@@ -684,10 +712,11 @@ export default function EnhancedLibraryPage() {
         next.delete(id);
         return next;
       });
-      if (selectedId === id) {
-        const nextPaper = papers.find((p) => p.id !== id);
-        setSelectedId(nextPaper?.id);
+      if (selectedId === id || (selectedId && !mappedPapers.find((p) => p.id === selectedId))) {
+        setSelectedId(mappedPapers[0]?.id);
         setSelectedSections(new Set());
+        setCurrentSummary(null);
+        setActiveTab('preview');
       }
       toast.success('Paper deleted');
     } catch (error) {

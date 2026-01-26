@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, Trash2, Eye, Sparkles, Search, X, Filter } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface EnhancedPaperListProps {
   papers: Paper[];
@@ -220,6 +221,26 @@ export function EnhancedPaperList({
             const isSelected = selectedIds.has(paper.id);
             const isActive = selectedId === paper.id;
             const meta = [paper.source, paper.year, paper.authors?.split(',')[0]].filter(Boolean).join(' • ');
+            const statusLabel =
+              paper.ragStatus === 'queued'
+                ? 'Indexing queued'
+                : paper.ragStatus === 'processing'
+                  ? 'Indexing…'
+                  : paper.ragStatus === 'done'
+                    ? 'Indexed'
+                    : paper.ragStatus === 'error'
+                      ? 'Index error'
+                      : null;
+            const statusClasses =
+              paper.ragStatus === 'queued'
+                ? 'border-amber-500/40 text-amber-600'
+                : paper.ragStatus === 'processing'
+                  ? 'border-blue-500/40 text-blue-600'
+                  : paper.ragStatus === 'done'
+                    ? 'border-emerald-500/40 text-emerald-600'
+                    : paper.ragStatus === 'error'
+                      ? 'border-red-500/40 text-red-600'
+                      : '';
             
             return (
               <Card
@@ -254,9 +275,21 @@ export function EnhancedPaperList({
                           : paper.title
                       }}
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {meta || 'Metadata pending'}
-                    </p>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <span>{meta || 'Metadata pending'}</span>
+                      {statusLabel && (
+                        <span
+                          title={paper.ragError || statusLabel}
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px]",
+                            statusClasses
+                          )}
+                        >
+                          <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                          {statusLabel}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
