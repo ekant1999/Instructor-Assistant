@@ -159,6 +159,11 @@ export interface ApiRagContextInfo {
   index: number;
   paper_id?: number | null;
   paper_title?: string | null;
+  kind?: string | null;
+  figure_number?: number | null;
+  caption?: string | null;
+  image_path?: string | null;
+  page_number?: number | null;
 }
 
 export interface ApiRagQueryRequest {

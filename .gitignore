@@ -9,6 +9,7 @@ backend/.env
 backend/.webenv/
 backend/data/
 backend/index/
+backend/index_images/
 backend/exports/
 **/__pycache__/
 backend/config/ngrok-mcp.yml

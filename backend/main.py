@@ -75,7 +75,7 @@ from .mcp_client import (
 )
 from .canvas_service import CanvasPushError, push_question_set_to_canvas
 from . import qwen_tools
-from .rag import ingest, query
+from .rag import ingest, query, image_index
 from . import context_store
 
 BACKEND_ROOT = Path(__file__).resolve().parent
@@ -215,6 +215,13 @@ def _run_full_rag_ingestion() -> None:
             raise ValueError("No chunks were created from the PDFs.")
         index_dir = str(BACKEND_ROOT / "index")
         ingest.create_faiss_index(chunks, index_dir=index_dir)
+        if os.getenv("ENABLE_IMAGE_INDEX", "true").lower() in {"1", "true", "yes"}:
+            image_index_dir = os.getenv("IMAGE_INDEX_DIR", str(BACKEND_ROOT / "index_images"))
+            figure_dir = os.getenv("FIGURE_OUTPUT_DIR", str(DATA_DIR / "figures"))
+            try:
+                image_index.build_image_index(pdf_paths, metadata_by_path, figure_dir, image_index_dir)
+            except Exception as exc:
+                logger.exception("Image indexing failed: %s", exc)
         _set_rag_status(paper_ids, "done", None)
         logger.info("RAG ingestion complete for %s papers", len(paper_ids))
     except Exception as exc:
@@ -882,6 +889,8 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
             # Load PDFs
             paper_ids = payload.paper_ids or []
             documents = []
+            pdf_paths: List[str] = []
+            metadata_by_path: Dict[str, Dict[str, Any]] = {}
             if paper_ids:
                 with get_conn() as conn:
                     placeholders = ",".join("?" for _ in paper_ids)
@@ -907,6 +916,7 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
                 documents = ingest.load_pdfs_from_paths(pdf_paths, metadata_by_path=metadata_by_path)
             else:
                 documents = ingest.load_pdfs(papers_dir)
+                pdf_paths = list({doc.metadata.get("source") for doc in documents if doc.metadata.get("source")})
             if not documents:
                 return RAGIngestResponse(
                     success=False,
@@ -923,6 +933,13 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
             # Create index
             ingest.create_faiss_index(chunks, index_dir=index_dir)
             logger.info("FAISS index created successfully")
+            if metadata_by_path and os.getenv("ENABLE_IMAGE_INDEX", "true").lower() in {"1", "true", "yes"}:
+                image_index_dir = os.getenv("IMAGE_INDEX_DIR", str(BACKEND_ROOT / "index_images"))
+                figure_dir = os.getenv("FIGURE_OUTPUT_DIR", str(DATA_DIR / "figures"))
+                try:
+                    image_index.build_image_index(pdf_paths, metadata_by_path, figure_dir, image_index_dir)
+                except Exception as exc:
+                    logger.exception("Image indexing failed: %s", exc)
 
             return RAGIngestResponse(
                 success=True,

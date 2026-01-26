@@ -263,6 +263,11 @@ class RAGContextInfo(BaseModel):
     index: int
     paper_id: int | None = None
     paper_title: str | None = None
+    kind: str | None = None
+    figure_number: int | None = None
+    caption: str | None = None
+    image_path: str | None = None
+    page_number: int | None = None
 
 
 class RAGQueryResponse(BaseModel):

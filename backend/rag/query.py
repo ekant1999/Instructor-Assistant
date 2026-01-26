@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from typing import Dict, Any, Optional, List, Set
 from .graph import create_graph, get_llm, load_vectorstore, retrieve_node
+from .image_index import query_image_index
 from ..services import call_local_llm
 
 
@@ -27,18 +28,44 @@ def query_rag(
 
     vectorstore = load_vectorstore(str(index_path))
 
+    total_docs = None
+    try:
+        total_docs = int(getattr(vectorstore.index, "ntotal", 0))
+    except Exception:
+        total_docs = None
+
     selected_ids: Optional[Set[int]] = None
     if paper_ids:
         selected_ids = {int(pid) for pid in paper_ids}
-    retrieve_k = max(k * 4, k) if selected_ids else k
+    if selected_ids and total_docs:
+        # When filtering by paper_id, search the whole index so the selected paper
+        # is guaranteed to be present before filtering.
+        retrieve_k = total_docs
+    else:
+        retrieve_k = max(k * 4, k) if selected_ids else k
     resolved_provider = (provider or "openai").strip().lower()
     if resolved_provider not in {"openai", "local"}:
         resolved_provider = "openai"
+
+    image_index_dir = os.getenv(
+        "IMAGE_INDEX_DIR",
+        str(Path(__file__).resolve().parents[1] / "index_images"),
+    )
+    image_k = int(os.getenv("IMAGE_QUERY_K", "4"))
+    image_results: List[Dict[str, Any]] = []
 
     if resolved_provider == "local":
         initial_state = {"question": question, "context": [], "answer": ""}
         retrieved = retrieve_node(initial_state, vectorstore, k=retrieve_k, paper_ids=selected_ids)
         context = retrieved.get("context", [])
+        if os.getenv("ENABLE_IMAGE_INDEX", "true").lower() in {"1", "true", "yes"}:
+            image_results = query_image_index(question, image_index_dir, k=image_k, paper_ids=selected_ids)
+            if image_results:
+                base_index = len(context) + 1
+                for offset, item in enumerate(image_results):
+                    item["index"] = base_index + offset
+                context = context + image_results
+                image_results = []
         if not context:
             reason = "No indexed chunks found. Please run ingestion to build the index."
             if selected_ids:
@@ -70,6 +97,8 @@ def query_rag(
         graph = create_graph(vectorstore, llm, k=retrieve_k, paper_ids=selected_ids)
         initial_state = {"question": question, "context": [], "answer": ""}
         result = graph.invoke(initial_state)
+        if os.getenv("ENABLE_IMAGE_INDEX", "true").lower() in {"1", "true", "yes"}:
+            image_results = query_image_index(question, image_index_dir, k=image_k, paper_ids=selected_ids)
         if not result.get("context"):
             reason = "No indexed chunks found. Please run ingestion to build the index."
             if selected_ids:
@@ -78,7 +107,14 @@ def query_rag(
 
     # Format response
     context_info = []
-    for item in result.get("context", []):
+    combined_context = list(result.get("context", []))
+    if image_results:
+        base_index = len(combined_context) + 1
+        for offset, item in enumerate(image_results):
+            item["index"] = base_index + offset
+        combined_context.extend(image_results)
+
+    for item in combined_context:
         meta = item.get("meta", {}) or {}
         context_info.append({
             "paper": meta.get("paper_title") or meta.get("paper", "Unknown"),
@@ -87,6 +123,11 @@ def query_rag(
             "index": item.get("index", 0),
             "paper_id": meta.get("paper_id"),
             "paper_title": meta.get("paper_title"),
+            "kind": meta.get("kind") or "text",
+            "figure_number": meta.get("figure_number"),
+            "caption": meta.get("caption"),
+            "image_path": meta.get("image_path"),
+            "page_number": meta.get("page_number"),
         })
 
     return {

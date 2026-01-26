@@ -246,9 +246,17 @@ export function AskQuestionsPanel({ selectedPaper, papers }: AskQuestionsPanelPr
                 {entry.sources.map((source) => (
                   <div key={`${entry.id}-${source.index}`} className="flex flex-col">
                     <span>
-                      [{source.index}] {source.paper_title || source.paper || 'Unknown paper'}
+                      [{source.index}]{' '}
+                      {source.kind === 'figure'
+                        ? `${source.figure_number ? `Figure ${source.figure_number}` : 'Figure'} — ${source.paper_title || source.paper || 'Unknown paper'}`
+                        : source.paper_title || source.paper || 'Unknown paper'}
                     </span>
-                    {source.source && <span className="truncate">{source.source}</span>}
+                    {source.caption && source.kind === 'figure' && (
+                      <span className="truncate">{source.caption}</span>
+                    )}
+                    {source.source && source.kind !== 'figure' && (
+                      <span className="truncate">{source.source}</span>
+                    )}
                   </div>
                 ))}
               </div>
