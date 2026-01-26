@@ -246,6 +246,14 @@ class RAGQueryRequest(BaseModel):
     index_dir: str | None = Field(default=None, description="Directory containing the FAISS index")
     k: int | None = Field(default=6, ge=1, le=20, description="Number of chunks to retrieve")
     headless: bool | None = Field(default=False, description="Run browser in headless mode (False = show browser window for login)")
+    paper_ids: List[int] | None = Field(
+        default=None,
+        description="Optional list of paper IDs to constrain retrieval to.",
+    )
+    provider: str | None = Field(
+        default=None,
+        description="LLM provider identifier, e.g., 'openai' or 'local'.",
+    )
 
 
 class RAGContextInfo(BaseModel):
@@ -253,6 +261,8 @@ class RAGContextInfo(BaseModel):
     source: str
     chunk_count: int
     index: int
+    paper_id: int | None = None
+    paper_title: str | None = None
 
 
 class RAGQueryResponse(BaseModel):

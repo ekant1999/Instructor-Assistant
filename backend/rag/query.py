@@ -1,10 +1,18 @@
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional
-from .graph import create_graph, get_llm, load_vectorstore
+from typing import Dict, Any, Optional, List, Set
+from .graph import create_graph, get_llm, load_vectorstore, retrieve_node
+from ..services import call_local_llm
 
 
-def query_rag(question: str, index_dir: str = "index/", k: int = 6, headless: bool = False) -> Dict[str, Any]:
+def query_rag(
+    question: str,
+    index_dir: str = "index/",
+    k: int = 6,
+    headless: bool = False,
+    paper_ids: Optional[List[int]] = None,
+    provider: Optional[str] = None,
+) -> Dict[str, Any]:
     """Query the RAG system with a question. Returns answer with context information."""
     # Resolve index directory relative to project root if not absolute
     index_path = Path(index_dir)
@@ -19,29 +27,66 @@ def query_rag(question: str, index_dir: str = "index/", k: int = 6, headless: bo
 
     vectorstore = load_vectorstore(str(index_path))
 
-    # Get LLM
-    llm = get_llm(headless=headless)
+    selected_ids: Optional[Set[int]] = None
+    if paper_ids:
+        selected_ids = {int(pid) for pid in paper_ids}
+    retrieve_k = max(k * 4, k) if selected_ids else k
+    resolved_provider = (provider or "openai").strip().lower()
+    if resolved_provider not in {"openai", "local"}:
+        resolved_provider = "openai"
 
-    # Create graph
-    graph = create_graph(vectorstore, llm, k=k)
-
-    # Execute query
-    initial_state = {
-        "question": question,
-        "context": [],
-        "answer": ""
-    }
-
-    result = graph.invoke(initial_state)
+    if resolved_provider == "local":
+        initial_state = {"question": question, "context": [], "answer": ""}
+        retrieved = retrieve_node(initial_state, vectorstore, k=retrieve_k, paper_ids=selected_ids)
+        context = retrieved.get("context", [])
+        if not context:
+            reason = "No indexed chunks found. Please run ingestion to build the index."
+            if selected_ids:
+                reason = "No indexed chunks found for the selected paper(s). Re-ingest the library to include metadata."
+            return {
+                "question": question,
+                "answer": reason,
+                "context": [],
+                "num_sources": 0,
+            }
+        context_text = "\n\n".join([f"[{item['index']}] {item['text']}" for item in context])
+        system_prompt = (
+            "You are a helpful research assistant. Answer the question based ONLY on the provided context. "
+            "Always include numbered citations [1], [2], etc. that correspond to the source numbers in the context. "
+            "If information is not in the context, say so explicitly. "
+            "Format your answer clearly with proper citations."
+        )
+        user_prompt = f"Context:\n\n{context_text}\n\nQuestion: {question}\n\nAnswer:"
+        answer = call_local_llm(
+            [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+        )
+        result = {"context": context, "answer": answer}
+    else:
+        # Get LLM
+        llm = get_llm(headless=headless)
+        graph = create_graph(vectorstore, llm, k=retrieve_k, paper_ids=selected_ids)
+        initial_state = {"question": question, "context": [], "answer": ""}
+        result = graph.invoke(initial_state)
+        if not result.get("context"):
+            reason = "No indexed chunks found. Please run ingestion to build the index."
+            if selected_ids:
+                reason = "No indexed chunks found for the selected paper(s). Re-ingest the library to include metadata."
+            result["answer"] = reason
 
     # Format response
     context_info = []
     for item in result.get("context", []):
+        meta = item.get("meta", {}) or {}
         context_info.append({
-            "paper": item.get("meta", {}).get("paper", "Unknown"),
-            "source": item.get("meta", {}).get("source", ""),
+            "paper": meta.get("paper_title") or meta.get("paper", "Unknown"),
+            "source": meta.get("source", ""),
             "chunk_count": item.get("chunk_count", 0),
-            "index": item.get("index", 0)
+            "index": item.get("index", 0),
+            "paper_id": meta.get("paper_id"),
+            "paper_title": meta.get("paper_title"),
         })
 
     return {

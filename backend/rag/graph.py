@@ -1,4 +1,4 @@
-from typing import List, Dict, TypedDict
+from typing import List, Dict, TypedDict, Optional, Set
 from langchain_community.vectorstores import FAISS
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import StateGraph, END
@@ -12,10 +12,26 @@ class GraphState(TypedDict):
     answer: str
 
 
-def retrieve_node(state: GraphState, vectorstore: FAISS, k: int = 6) -> Dict:
+def retrieve_node(
+    state: GraphState,
+    vectorstore: FAISS,
+    k: int = 6,
+    paper_ids: Optional[Set[int]] = None,
+) -> Dict:
     """Retrieve relevant document chunks from vectorstore based on the question. Groups chunks by paper and deduplicates."""
     question = state["question"]
     docs = vectorstore.similarity_search(question, k=k)
+    if paper_ids:
+        filtered = []
+        for doc in docs:
+            raw_id = doc.metadata.get("paper_id")
+            try:
+                paper_id = int(raw_id) if raw_id is not None else None
+            except (TypeError, ValueError):
+                paper_id = None
+            if paper_id in paper_ids:
+                filtered.append(doc)
+        docs = filtered
 
     paper_to_chunks = {}
     seen_texts = set()
@@ -26,7 +42,7 @@ def retrieve_node(state: GraphState, vectorstore: FAISS, k: int = 6) -> Dict:
             continue
         seen_texts.add(text_key)
 
-        paper_name = doc.metadata.get("paper", "Unknown")
+        paper_name = doc.metadata.get("paper_title") or doc.metadata.get("paper") or "Unknown"
         if paper_name not in paper_to_chunks:
             paper_to_chunks[paper_name] = []
 
@@ -110,12 +126,12 @@ Answer:"""
     return {"answer": answer}
 
 
-def create_graph(vectorstore: FAISS, llm, k: int = 6) -> StateGraph:
+def create_graph(vectorstore: FAISS, llm, k: int = 6, paper_ids: Optional[Set[int]] = None) -> StateGraph:
     """Create LangGraph workflow: retrieve → generate. Returns compiled graph ready for execution."""
     workflow = StateGraph(GraphState)
 
     def retrieve_wrapper(state: GraphState):
-        return retrieve_node(state, vectorstore, k=k)
+        return retrieve_node(state, vectorstore, k=k, paper_ids=paper_ids)
 
     def generate_wrapper(state: GraphState):
         return generate_node(state, llm)
@@ -198,4 +214,3 @@ def load_vectorstore(index_dir: str = "index/") -> FAISS:
 
     vectorstore = FAISS.load_local(index_dir, embeddings, allow_dangerous_deserialization=True)
     return vectorstore
-

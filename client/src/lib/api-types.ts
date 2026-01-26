@@ -157,6 +157,8 @@ export interface ApiRagContextInfo {
   source: string;
   chunk_count: number;
   index: number;
+  paper_id?: number | null;
+  paper_title?: string | null;
 }
 
 export interface ApiRagQueryRequest {
@@ -164,6 +166,8 @@ export interface ApiRagQueryRequest {
   index_dir?: string;
   k?: number;
   headless?: boolean;
+  paper_ids?: number[];
+  provider?: string;
 }
 
 export interface ApiRagQueryResponse {

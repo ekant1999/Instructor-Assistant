@@ -9,11 +9,12 @@ import { SummarizePanel, SummarizeConfig } from './SummarizePanel';
 import { BatchSummarizePanel } from './BatchSummarizePanel';
 import { EnhancedSummaryEditor } from './EnhancedSummaryEditor';
 import { SummaryHistory } from './SummaryHistory';
+import { AskQuestionsPanel } from './AskQuestionsPanel';
 import { SaveSummaryModal } from './SaveSummaryModal';
 import { ExportSummaryDialog } from './ExportSummaryDialog';
 import { Paper, Summary, Document, Section } from '@/shared/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Layers, Sparkles, BookOpen, History } from 'lucide-react';
+import { FileText, Layers, Sparkles, BookOpen, History, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   chatPaper,
@@ -782,6 +783,10 @@ export default function EnhancedLibraryPage() {
                   <Sparkles className="h-4 w-4 mr-2" />
                   Summarize
                 </TabsTrigger>
+                <TabsTrigger value="ask" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Ask questions
+                </TabsTrigger>
                 <TabsTrigger value="history" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
                   <History className="h-4 w-4 mr-2" />
                   History
@@ -823,6 +828,10 @@ export default function EnhancedLibraryPage() {
                     progress={batchProgress}
                   />
                 </div>
+              </TabsContent>
+
+              <TabsContent value="ask" className="flex-1 overflow-hidden">
+                <AskQuestionsPanel selectedPaper={selectedPaper} papers={papers} />
               </TabsContent>
 
               <TabsContent value="history" className="flex-1 overflow-hidden">

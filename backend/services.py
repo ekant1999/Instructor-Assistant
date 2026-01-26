@@ -364,6 +364,11 @@ def _generate_questions_local(payload: QuestionGenerationRequest, messages: List
     )
 
 
+def call_local_llm(messages: List[Dict[str, str]]) -> str:
+    """Call the locally configured LLM with the provided chat messages."""
+    return _call_local_llm(messages)
+
+
 def _call_local_llm(messages: List[Dict[str, str]]) -> str:
     if not LOCAL_LLM_URL:
         raise QuestionGenerationError("Set LOCAL_LLM_URL to use the local LLM provider.")

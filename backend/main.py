@@ -170,7 +170,7 @@ def _set_all_rag_status(status: str, error: Optional[str] = None) -> None:
 def _collect_rag_papers() -> List[Dict[str, Any]]:
     with get_conn() as conn:
         rows = conn.execute(
-            "SELECT id, pdf_path FROM papers WHERE pdf_path IS NOT NULL"
+            "SELECT id, title, pdf_path FROM papers WHERE pdf_path IS NOT NULL"
         ).fetchall()
     return [dict(r) for r in rows]
 
@@ -182,10 +182,18 @@ def _run_full_rag_ingestion() -> None:
 
     paper_ids = [p["id"] for p in papers]
     pdf_paths = [p["pdf_path"] for p in papers if p.get("pdf_path")]
+    metadata_by_path = {
+        str(Path(p["pdf_path"]).expanduser().resolve()): {
+            "paper_id": p["id"],
+            "paper_title": p.get("title") or Path(p["pdf_path"]).stem,
+        }
+        for p in papers
+        if p.get("pdf_path")
+    }
     _set_rag_status(paper_ids, "processing", None)
 
     try:
-        documents = ingest.load_pdfs_from_paths(pdf_paths)
+        documents = ingest.load_pdfs_from_paths(pdf_paths, metadata_by_path=metadata_by_path)
         if not documents:
             raise ValueError("No valid PDFs were loaded for ingestion.")
         chunks = ingest.split_documents(documents, chunk_size=1200, chunk_overlap=200)
@@ -864,7 +872,7 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
                 with get_conn() as conn:
                     placeholders = ",".join("?" for _ in paper_ids)
                     rows = conn.execute(
-                        f"SELECT id, pdf_path FROM papers WHERE id IN ({placeholders})",
+                        f"SELECT id, title, pdf_path FROM papers WHERE id IN ({placeholders})",
                         tuple(paper_ids),
                     ).fetchall()
                 pdf_paths = [row["pdf_path"] for row in rows if row["pdf_path"]]
@@ -874,7 +882,15 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
                         message="No PDFs found for the selected papers.",
                         num_documents=0,
                     )
-                documents = ingest.load_pdfs_from_paths(pdf_paths)
+                metadata_by_path = {
+                    str(Path(row["pdf_path"]).expanduser().resolve()): {
+                        "paper_id": row["id"],
+                        "paper_title": row["title"] or Path(row["pdf_path"]).stem,
+                    }
+                    for row in rows
+                    if row["pdf_path"]
+                }
+                documents = ingest.load_pdfs_from_paths(pdf_paths, metadata_by_path=metadata_by_path)
             else:
                 documents = ingest.load_pdfs(papers_dir)
             if not documents:
@@ -943,7 +959,9 @@ async def rag_query(payload: RAGQueryRequest) -> RAGQueryResponse:
             payload.question,
             index_dir=index_dir,
             k=k,
-            headless=headless
+            headless=headless,
+            paper_ids=payload.paper_ids,
+            provider=payload.provider,
         )
 
         # Convert context info to proper format

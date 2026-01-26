@@ -1,7 +1,7 @@
 import os
 import logging
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Any, Optional
 import pickle
 
 try:
@@ -69,7 +69,10 @@ def load_pdfs(papers_dir: str) -> List:
     return documents
 
 
-def load_pdfs_from_paths(pdf_paths: List[str]) -> List:
+def load_pdfs_from_paths(
+    pdf_paths: List[str],
+    metadata_by_path: Optional[Dict[str, Dict[str, Any]]] = None,
+) -> List:
     """Load PDF files from explicit file paths."""
     documents = []
     if not pdf_paths:
@@ -80,14 +83,21 @@ def load_pdfs_from_paths(pdf_paths: List[str]) -> List:
         if not path.exists():
             logger.warning(f"PDF not found: {path}")
             continue
+        meta = metadata_by_path.get(str(path)) if metadata_by_path else None
+        paper_title = meta.get("paper_title") if meta else None
+        paper_id = meta.get("paper_id") if meta else None
         try:
             logger.info(f"Loading: {path.name}")
             loader = PyPDFLoader(str(path))
             pages = loader.load()
 
             for page in pages:
-                page.metadata["paper"] = path.stem
+                page.metadata["paper"] = paper_title or path.stem
                 page.metadata["source"] = str(path)
+                if paper_id is not None:
+                    page.metadata["paper_id"] = paper_id
+                if paper_title:
+                    page.metadata["paper_title"] = paper_title
 
             documents.extend(pages)
             logger.info(f"  Loaded {len(pages)} pages")
