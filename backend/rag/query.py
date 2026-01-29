@@ -1,9 +1,10 @@
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional, List, Set
+from typing import Dict, Any, Optional, List, Set, Literal
 from .graph import create_graph, get_llm, load_vectorstore, retrieve_node
 from .image_index import query_image_index
 from ..services import call_local_llm
+from ..core.search import search_sections
 
 
 def query_rag(
@@ -13,8 +14,23 @@ def query_rag(
     headless: bool = False,
     paper_ids: Optional[List[int]] = None,
     provider: Optional[str] = None,
+    search_type: Literal["keyword", "embedding", "hybrid"] = "embedding",
 ) -> Dict[str, Any]:
-    """Query the RAG system with a question. Returns answer with context information."""
+    """
+    Query the RAG system with a question. Returns answer with context information.
+    
+    Args:
+        question: The question to answer
+        index_dir: Path to the FAISS index directory
+        k: Number of results to retrieve
+        headless: Whether to run browser in headless mode
+        paper_ids: Optional list of paper IDs to filter by
+        provider: LLM provider ("openai" or "local")
+        search_type: Search type - "keyword" (FTS5), "embedding" (FAISS), or "hybrid" (both)
+    
+    Returns:
+        Dictionary with question, answer, context, and num_sources
+    """
     # Resolve index directory relative to project root if not absolute
     index_path = Path(index_dir)
     if not index_path.is_absolute():
@@ -22,27 +38,40 @@ def query_rag(
         index_path = backend_root / index_dir
     index_dir = str(index_path)
 
-    # Load vectorstore
-    if not index_path.exists():
-        raise ValueError(f"Index directory not found: {index_dir}. Please run ingestion first.")
-
-    vectorstore = load_vectorstore(str(index_path))
+    # Load vectorstore for embedding search
+    vectorstore = None
+    if search_type in ["embedding", "hybrid"]:
+        if not index_path.exists():
+            if search_type == "embedding":
+                raise ValueError(f"Index directory not found: {index_dir}. Please run ingestion first.")
+            # For hybrid, continue with keyword-only search
+            search_type = "keyword"
+        else:
+            vectorstore = load_vectorstore(str(index_path))
 
     total_docs = None
-    try:
-        total_docs = int(getattr(vectorstore.index, "ntotal", 0))
-    except Exception:
-        total_docs = None
+    if vectorstore:
+        try:
+            total_docs = int(getattr(vectorstore.index, "ntotal", 0))
+        except Exception:
+            total_docs = None
 
     selected_ids: Optional[Set[int]] = None
     if paper_ids:
         selected_ids = {int(pid) for pid in paper_ids}
+    
+    # Determine retrieve_k based on search type
     if selected_ids and total_docs:
         # When filtering by paper_id, search the whole index so the selected paper
         # is guaranteed to be present before filtering.
         retrieve_k = total_docs
     else:
         retrieve_k = max(k * 4, k) if selected_ids else k
+    
+    # For hybrid search, retrieve from both sources
+    if search_type == "hybrid":
+        retrieve_k = k // 2  # Split between keyword and embedding
+    
     resolved_provider = (provider or "openai").strip().lower()
     if resolved_provider not in {"openai", "local"}:
         resolved_provider = "openai"
@@ -56,8 +85,46 @@ def query_rag(
 
     if resolved_provider == "local":
         initial_state = {"question": question, "context": [], "answer": ""}
-        retrieved = retrieve_node(initial_state, vectorstore, k=retrieve_k, paper_ids=selected_ids)
-        context = retrieved.get("context", [])
+        context = []
+        
+        # Retrieve from keyword search (FTS5)
+        if search_type in ["keyword", "hybrid"]:
+            keyword_limit = retrieve_k if search_type == "keyword" else retrieve_k
+            keyword_results = search_sections(
+                question, 
+                search_type="keyword", 
+                paper_ids=list(selected_ids) if selected_ids else None,
+                limit=keyword_limit
+            )
+            
+            # Convert keyword results to context format
+            for idx, result in enumerate(keyword_results, start=1):
+                context.append({
+                    "text": result["text"],
+                    "meta": {
+                        "paper_id": result["paper_id"],
+                        "paper_title": result["paper_title"],
+                        "source": result.get("source_url", ""),
+                        "page_number": result["page_no"],
+                        "kind": "text",
+                    },
+                    "index": idx,
+                    "chunk_count": 1,
+                })
+        
+        # Retrieve from embedding search (FAISS)
+        if search_type in ["embedding", "hybrid"] and vectorstore:
+            embedding_start_index = len(context) + 1
+            embedding_k = retrieve_k if search_type == "embedding" else retrieve_k
+            retrieved = retrieve_node(initial_state, vectorstore, k=embedding_k, paper_ids=selected_ids)
+            embedding_context = retrieved.get("context", [])
+            
+            # Update indices for embedding results
+            for item in embedding_context:
+                item["index"] = embedding_start_index
+                embedding_start_index += 1
+            
+            context.extend(embedding_context)
         if os.getenv("ENABLE_IMAGE_INDEX", "true").lower() in {"1", "true", "yes"}:
             image_results = query_image_index(question, image_index_dir, k=image_k, paper_ids=selected_ids)
             if image_results:
@@ -94,9 +161,55 @@ def query_rag(
     else:
         # Get LLM
         llm = get_llm(headless=headless)
-        graph = create_graph(vectorstore, llm, k=retrieve_k, paper_ids=selected_ids)
-        initial_state = {"question": question, "context": [], "answer": ""}
-        result = graph.invoke(initial_state)
+        
+        context = []
+        
+        # Retrieve from keyword search (FTS5)
+        if search_type in ["keyword", "hybrid"]:
+            keyword_limit = retrieve_k if search_type == "keyword" else retrieve_k
+            keyword_results = search_sections(
+                question, 
+                search_type="keyword", 
+                paper_ids=list(selected_ids) if selected_ids else None,
+                limit=keyword_limit
+            )
+            
+            # Convert keyword results to context format
+            for idx, result in enumerate(keyword_results, start=1):
+                context.append({
+                    "text": result["text"],
+                    "meta": {
+                        "paper_id": result["paper_id"],
+                        "paper_title": result["paper_title"],
+                        "source": result.get("source_url", ""),
+                        "page_number": result["page_no"],
+                        "kind": "text",
+                    },
+                    "index": idx,
+                    "chunk_count": 1,
+                })
+        
+        # Retrieve from embedding search (FAISS)
+        if search_type in ["embedding", "hybrid"] and vectorstore:
+            graph = create_graph(vectorstore, llm, k=retrieve_k, paper_ids=selected_ids)
+            initial_state = {"question": question, "context": [], "answer": ""}
+            result = graph.invoke(initial_state)
+            
+            # Update indices for embedding results
+            embedding_start_index = len(context) + 1
+            embedding_context = result.get("context", [])
+            for item in embedding_context:
+                item["index"] = embedding_start_index
+                embedding_start_index += 1
+            
+            context.extend(embedding_context)
+        else:
+            # Keyword-only search with OpenAI provider
+            initial_state = {"question": question, "context": context, "answer": ""}
+            from .graph import generate_node
+            result = {"context": context}
+            gen_result = generate_node(initial_state, llm)
+            result["answer"] = gen_result.get("answer", "")
         if os.getenv("ENABLE_IMAGE_INDEX", "true").lower() in {"1", "true", "yes"}:
             image_results = query_image_index(question, image_index_dir, k=image_k, paper_ids=selected_ids)
         if not result.get("context"):

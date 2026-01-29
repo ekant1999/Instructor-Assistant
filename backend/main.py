@@ -23,6 +23,13 @@ from backend.core.questions import (
     list_question_sets,
     update_question_set,
 )
+from backend.core.search import (
+    search_papers,
+    search_sections,
+    search_notes,
+    search_summaries,
+    search_all,
+)
 
 from .schemas import (
     CanvasPushRequest,
@@ -57,6 +64,9 @@ from .schemas import (
     RAGIndexStatusResponse,
     RAGQnaCreateRequest,
     RAGQnaRecord,
+    SearchRequest,
+    SearchResponse,
+    SearchResult,
 )
 from .services import (
     QuestionGenerationError,
@@ -285,10 +295,140 @@ def health() -> Dict[str, str]:
     return {"status": "ok"}
 
 
+@app.post("/api/search", response_model=SearchResponse)
+def search_endpoint(payload: SearchRequest) -> SearchResponse:
+    """
+    Unified search endpoint that searches across papers, sections, notes, and summaries.
+    
+    Supports keyword-based (FTS5), embedding-based (FAISS), or hybrid search.
+    """
+    search_type = payload.search_type or "keyword"
+    if search_type not in ["keyword", "embedding", "hybrid"]:
+        search_type = "keyword"
+    
+    # Search all categories
+    all_results = search_all(
+        payload.query,
+        search_type=search_type,
+        paper_ids=payload.paper_ids,
+        limit_per_category=payload.limit,
+    )
+    
+    # Combine and format results
+    combined_results: List[SearchResult] = []
+    
+    for paper in all_results.get("papers", []):
+        combined_results.append(
+            SearchResult(
+                id=paper["id"],
+                relevance_score=paper.get("rank"),
+                result_type="paper",
+                data=paper,
+            )
+        )
+    
+    for section in all_results.get("sections", []):
+        combined_results.append(
+            SearchResult(
+                id=section["id"],
+                relevance_score=section.get("rank"),
+                result_type="section",
+                data=section,
+            )
+        )
+    
+    for note in all_results.get("notes", []):
+        note_data = dict(note)
+        note_data["tags"] = _parse_tags(note_data.pop("tags_json", None))
+        combined_results.append(
+            SearchResult(
+                id=note["id"],
+                relevance_score=note.get("rank"),
+                result_type="note",
+                data=note_data,
+            )
+        )
+    
+    for summary in all_results.get("summaries", []):
+        summary_data = dict(summary)
+        summary_data["metadata"] = _parse_metadata(summary_data.pop("metadata_json", None))
+        summary_data["is_edited"] = bool(summary_data.get("is_edited"))
+        combined_results.append(
+            SearchResult(
+                id=summary["id"],
+                relevance_score=summary.get("rank"),
+                result_type="summary",
+                data=summary_data,
+            )
+        )
+    
+    return SearchResponse(
+        query=payload.query,
+        search_type=search_type,
+        results=combined_results,
+        total_results=len(combined_results),
+    )
+
+
 @app.get("/api/papers")
-def list_papers() -> Dict[str, List[Dict]]:
-    data = render_library_structured()
-    return {"papers": data.get("papers", [])}
+def list_papers(
+    q: Optional[str] = None,
+    search_type: Optional[str] = None,
+) -> Dict[str, List[Dict]]:
+    """
+    List all papers or search papers with query parameter.
+    
+    Query params:
+        q: Optional search query
+        search_type: "keyword", "embedding", or "hybrid" (defaults to "keyword")
+    
+    When searching, returns papers that match in either:
+    - Paper title/source
+    - PDF content (sections)
+    """
+    if q:
+        # Search papers by title AND sections
+        st = search_type or "keyword"
+        if st not in ["keyword", "embedding", "hybrid"]:
+            st = "keyword"
+        
+        # Search both paper titles and sections
+        paper_results = search_papers(q, search_type=st, limit=100)
+        section_results = search_sections(q, search_type=st, limit=500)
+        
+        # Collect unique paper IDs from both results
+        paper_ids_from_titles = {p['id'] for p in paper_results}
+        paper_ids_from_sections = {s['paper_id'] for s in section_results}
+        matching_paper_ids = paper_ids_from_titles | paper_ids_from_sections
+        
+        # Fetch full paper details for all matching papers
+        if matching_paper_ids:
+            with get_conn() as conn:
+                placeholders = ','.join('?' for _ in matching_paper_ids)
+                rows = conn.execute(
+                    f"""
+                    SELECT id, title, source_url, pdf_path, rag_status, rag_error, 
+                           rag_updated_at, created_at
+                    FROM papers
+                    WHERE id IN ({placeholders})
+                    ORDER BY datetime(created_at) DESC
+                    """,
+                    tuple(matching_paper_ids)
+                ).fetchall()
+                papers = [dict(row) for row in rows]
+                
+                # Add pdf_url field for frontend compatibility
+                for p in papers:
+                    pdf_path = p.get("pdf_path")
+                    p["pdf_url"] = f"/papers/{p['id']}/file" if pdf_path else None
+        else:
+            papers = []
+        
+        return {"papers": papers}
+    else:
+        # Return all papers
+        data = render_library_structured()
+        return {"papers": data.get("papers", [])}
 
 
 @app.get("/api/papers/{paper_id}/file")
@@ -319,33 +459,64 @@ def list_paper_sections(
     paper_id: int,
     include_text: bool = True,
     max_chars: Optional[int] = None,
+    q: Optional[str] = None,
+    search_type: Optional[str] = None,
 ) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    List all sections for a paper or search sections with query parameter.
+    
+    Query params:
+        include_text: Include full text content
+        max_chars: Truncate text to this many characters
+        q: Optional search query
+        search_type: "keyword", "embedding", or "hybrid" (defaults to "keyword")
+    """
     with get_conn() as conn:
         row = conn.execute("SELECT id FROM papers WHERE id=?", (paper_id,)).fetchone()
         if not row:
             raise HTTPException(status_code=404, detail="Paper not found.")
 
-        if include_text:
-            rows = conn.execute(
-                "SELECT id, page_no, text FROM sections WHERE paper_id=? ORDER BY page_no ASC",
-                (paper_id,),
-            ).fetchall()
-        else:
-            rows = conn.execute(
-                "SELECT id, page_no FROM sections WHERE paper_id=? ORDER BY page_no ASC",
-                (paper_id,),
-            ).fetchall()
+    if q:
+        # Search sections
+        st = search_type or "keyword"
+        if st not in ["keyword", "embedding", "hybrid"]:
+            st = "keyword"
+        
+        results = search_sections(q, search_type=st, paper_ids=[paper_id], limit=100)
+        sections: List[Dict[str, Any]] = []
+        for r in results:
+            entry = {"id": r["id"], "page_no": r["page_no"], "paper_id": r["paper_id"]}
+            if include_text:
+                text = r["text"] or ""
+                if max_chars is not None and max_chars > 0:
+                    text = text[:max_chars]
+                entry["text"] = text
+            sections.append(entry)
+        return {"sections": sections}
+    else:
+        # Return all sections
+        with get_conn() as conn:
+            if include_text:
+                rows = conn.execute(
+                    "SELECT id, page_no, text FROM sections WHERE paper_id=? ORDER BY page_no ASC",
+                    (paper_id,),
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT id, page_no FROM sections WHERE paper_id=? ORDER BY page_no ASC",
+                    (paper_id,),
+                ).fetchall()
 
-    sections: List[Dict[str, Any]] = []
-    for r in rows:
-        entry = {"id": r["id"], "page_no": r["page_no"]}
-        if include_text:
-            text = r["text"] or ""
-            if max_chars is not None and max_chars > 0:
-                text = text[:max_chars]
-            entry["text"] = text
-        sections.append(entry)
-    return {"sections": sections}
+        sections: List[Dict[str, Any]] = []
+        for r in rows:
+            entry = {"id": r["id"], "page_no": r["page_no"]}
+            if include_text:
+                text = r["text"] or ""
+                if max_chars is not None and max_chars > 0:
+                    text = text[:max_chars]
+                entry["text"] = text
+            sections.append(entry)
+        return {"sections": sections}
 
 
 @app.get("/api/papers/{paper_id}/context")
@@ -387,23 +558,57 @@ def get_paper_context(
 
 
 @app.get("/api/notes")
-def list_notes() -> Dict[str, List[Dict]]:
-    with get_conn() as conn:
-        rows = conn.execute(
-            """
-            SELECT n.id, n.paper_id, n.title, n.body, n.tags_json, n.created_at,
-                   p.title AS paper_title
-            FROM notes n
-            LEFT JOIN papers p ON p.id = n.paper_id
-            ORDER BY datetime(n.created_at) DESC, n.id DESC
-            """
-        ).fetchall()
-    notes: List[Dict[str, Any]] = []
-    for row in rows:
-        note = dict(row)
-        note["tags"] = _parse_tags(note.pop("tags_json", None))
-        notes.append(note)
-    return {"notes": notes}
+def list_notes(
+    q: Optional[str] = None,
+    search_type: Optional[str] = None,
+    paper_ids: Optional[str] = None,
+) -> Dict[str, List[Dict]]:
+    """
+    List all notes or search notes with query parameter.
+    
+    Query params:
+        q: Optional search query
+        search_type: "keyword", "embedding", or "hybrid" (defaults to "keyword")
+        paper_ids: Comma-separated list of paper IDs to filter by
+    """
+    if q:
+        # Search notes
+        st = search_type or "keyword"
+        if st not in ["keyword", "embedding", "hybrid"]:
+            st = "keyword"
+        
+        paper_id_list = None
+        if paper_ids:
+            try:
+                paper_id_list = [int(pid.strip()) for pid in paper_ids.split(",") if pid.strip()]
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid paper_ids format")
+        
+        results = search_notes(q, search_type=st, paper_ids=paper_id_list, limit=100)
+        notes: List[Dict[str, Any]] = []
+        for row in results:
+            note = dict(row)
+            note["tags"] = _parse_tags(note.pop("tags_json", None))
+            notes.append(note)
+        return {"notes": notes}
+    else:
+        # Return all notes
+        with get_conn() as conn:
+            rows = conn.execute(
+                """
+                SELECT n.id, n.paper_id, n.title, n.body, n.tags_json, n.created_at,
+                       p.title AS paper_title
+                FROM notes n
+                LEFT JOIN papers p ON p.id = n.paper_id
+                ORDER BY datetime(n.created_at) DESC, n.id DESC
+                """
+            ).fetchall()
+        notes: List[Dict[str, Any]] = []
+        for row in rows:
+            note = dict(row)
+            note["tags"] = _parse_tags(note.pop("tags_json", None))
+            notes.append(note)
+        return {"notes": notes}
 
 
 @app.post("/api/notes", status_code=201)
@@ -480,25 +685,52 @@ def remove_note(note_id: int) -> Response:
 
 
 @app.get("/api/papers/{paper_id}/summaries")
-def list_summaries(paper_id: int) -> Dict[str, List[Dict]]:
-    with get_conn() as conn:
-        rows = conn.execute(
-            """
-            SELECT id, paper_id, title, content, agent, style, word_count, is_edited,
-                   metadata_json, created_at, updated_at
-            FROM summaries
-            WHERE paper_id=?
-            ORDER BY datetime(created_at) DESC, id DESC
-            """,
-            (paper_id,),
-        ).fetchall()
-    summaries: List[Dict[str, Any]] = []
-    for row in rows:
-        summary = dict(row)
-        summary["metadata"] = _parse_metadata(summary.pop("metadata_json", None))
-        summary["is_edited"] = bool(summary.get("is_edited"))
-        summaries.append(summary)
-    return {"summaries": summaries}
+def list_summaries(
+    paper_id: int,
+    q: Optional[str] = None,
+    search_type: Optional[str] = None,
+) -> Dict[str, List[Dict]]:
+    """
+    List all summaries for a paper or search summaries with query parameter.
+    
+    Query params:
+        q: Optional search query
+        search_type: "keyword", "embedding", or "hybrid" (defaults to "keyword")
+    """
+    if q:
+        # Search summaries
+        st = search_type or "keyword"
+        if st not in ["keyword", "embedding", "hybrid"]:
+            st = "keyword"
+        
+        results = search_summaries(q, search_type=st, paper_ids=[paper_id], limit=100)
+        summaries: List[Dict[str, Any]] = []
+        for row in results:
+            summary = dict(row)
+            summary["metadata"] = _parse_metadata(summary.pop("metadata_json", None))
+            summary["is_edited"] = bool(summary.get("is_edited"))
+            summaries.append(summary)
+        return {"summaries": summaries}
+    else:
+        # Return all summaries for the paper
+        with get_conn() as conn:
+            rows = conn.execute(
+                """
+                SELECT id, paper_id, title, content, agent, style, word_count, is_edited,
+                       metadata_json, created_at, updated_at
+                FROM summaries
+                WHERE paper_id=?
+                ORDER BY datetime(created_at) DESC, id DESC
+                """,
+                (paper_id,),
+            ).fetchall()
+        summaries: List[Dict[str, Any]] = []
+        for row in rows:
+            summary = dict(row)
+            summary["metadata"] = _parse_metadata(summary.pop("metadata_json", None))
+            summary["is_edited"] = bool(summary.get("is_edited"))
+            summaries.append(summary)
+        return {"summaries": summaries}
 
 
 @app.post("/api/papers/{paper_id}/summaries", status_code=201)
@@ -984,6 +1216,11 @@ async def rag_query(payload: RAGQueryRequest) -> RAGQueryResponse:
         index_dir = payload.index_dir or default_index_dir
         k = payload.k or 6
         headless = payload.headless if payload.headless is not None else False  # Default to False to show browser
+        search_type = payload.search_type or "embedding"
+        
+        # Validate search_type
+        if search_type not in ["keyword", "embedding", "hybrid"]:
+            search_type = "embedding"
 
         result = await run_in_threadpool(
             query.query_rag,
@@ -993,6 +1230,7 @@ async def rag_query(payload: RAGQueryRequest) -> RAGQueryResponse:
             headless=headless,
             paper_ids=payload.paper_ids,
             provider=payload.provider,
+            search_type=search_type,
         )
 
         # Convert context info to proper format

@@ -6,6 +6,34 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 
+# Search Schemas
+class SearchRequest(BaseModel):
+    query: str = Field(..., min_length=1, description="Search query")
+    search_type: Literal["keyword", "embedding", "hybrid"] = Field(
+        default="keyword",
+        description="Search type: 'keyword' (FTS5), 'embedding' (FAISS), or 'hybrid' (both)",
+    )
+    paper_ids: Optional[List[int]] = Field(
+        default=None,
+        description="Optional list of paper IDs to filter by",
+    )
+    limit: int = Field(default=20, ge=1, le=100, description="Maximum results to return")
+
+
+class SearchResult(BaseModel):
+    id: int
+    relevance_score: Optional[float] = None
+    result_type: str  # "paper", "section", "note", "summary"
+    data: Dict[str, Any]
+
+
+class SearchResponse(BaseModel):
+    query: str
+    search_type: str
+    results: List[SearchResult]
+    total_results: int
+
+
 class NoteCreate(BaseModel):
     title: Optional[str] = Field(default=None, max_length=255)
     body: str = Field(...)
@@ -253,6 +281,10 @@ class RAGQueryRequest(BaseModel):
     provider: str | None = Field(
         default=None,
         description="LLM provider identifier, e.g., 'openai' or 'local'.",
+    )
+    search_type: str | None = Field(
+        default="embedding",
+        description="Search type: 'keyword' (FTS5), 'embedding' (FAISS), or 'hybrid' (both)",
     )
 
 
