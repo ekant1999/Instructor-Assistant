@@ -4,6 +4,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
+    "dev:backend": "backend/.webenv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8010 --reload",
     "dev:client": "vite dev --port 5173",
     "dev": "vite dev --port 5173",
     "build": "vite build",

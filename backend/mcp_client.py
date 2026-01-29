@@ -3,10 +3,20 @@ from __future__ import annotations
 import os
 from typing import Any, Dict
 
-import anyio
-from mcp import ClientSession
-from mcp.client.streamable_http import StreamableHTTPError, streamablehttp_client
-from mcp.types import CallToolResult, ContentBlock
+try:
+    import anyio
+    from mcp import ClientSession
+    from mcp.client.streamable_http import StreamableHTTPError, streamablehttp_client
+    from mcp.types import CallToolResult, ContentBlock
+    _MCP_AVAILABLE = True
+except ImportError:
+    _MCP_AVAILABLE = False
+    anyio = None
+    ClientSession = None
+    StreamableHTTPError = Exception
+    streamablehttp_client = None
+    CallToolResult = None
+    ContentBlock = None
 
 
 LOCAL_MCP_SERVER_URL = os.getenv("LOCAL_MCP_SERVER_URL")
@@ -16,7 +26,9 @@ class MCPClientError(RuntimeError):
     """Raised when the MCP server call fails or returns an error."""
 
 
-def _extract_text(blocks: list[ContentBlock]) -> str:
+def _extract_text(blocks: list) -> str:
+    if not _MCP_AVAILABLE or not blocks:
+        return ""
     parts = []
     for block in blocks or []:
         text = getattr(block, "text", None)
@@ -26,10 +38,12 @@ def _extract_text(blocks: list[ContentBlock]) -> str:
 
 
 def is_configured() -> bool:
-    return bool(LOCAL_MCP_SERVER_URL)
+    return bool(LOCAL_MCP_SERVER_URL and _MCP_AVAILABLE)
 
 
-def _format_result(name: str, result: CallToolResult) -> Dict[str, Any]:
+def _format_result(name: str, result: Any) -> Dict[str, Any]:
+    if not _MCP_AVAILABLE:
+        return {}
     if result.isError:
         message = _extract_text(result.content)
         structured = result.structuredContent or {}
@@ -42,6 +56,8 @@ def _format_result(name: str, result: CallToolResult) -> Dict[str, Any]:
 
 
 async def _call_tool_async(name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+    if not _MCP_AVAILABLE:
+        raise MCPClientError("MCP support is not installed. Run: pip install mcp")
     if not LOCAL_MCP_SERVER_URL:
         raise MCPClientError("LOCAL_MCP_SERVER_URL is not configured.")
     try:
@@ -60,4 +76,6 @@ async def call_tool_async(name: str, arguments: Dict[str, Any] | None = None) ->
 
 def call_tool(name: str, arguments: Dict[str, Any] | None = None) -> Dict[str, Any]:
     """Call a tool on the local MCP server from synchronous code."""
+    if not _MCP_AVAILABLE:
+        raise MCPClientError("MCP support is not installed. Run: pip install mcp")
     return anyio.run(_call_tool_async, name, arguments or {})

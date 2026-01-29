@@ -1,6 +1,7 @@
 fastapi==0.110.0
 uvicorn[standard]==0.32.0
 pydantic==2.11.4
+python-multipart>=0.0.6
 litellm==1.40.12
 pypdf==4.2.0
 python-pptx==0.6.23
@@ -11,7 +12,16 @@ feedparser==6.0.11
 arxiv==2.1.3
 yt-dlp==2024.10.22
 ollama==0.6.0
+mcp>=1.0.0  # optional: for MCP server integration (pip install mcp)
 pymupdf==1.24.9
 pillow==10.4.0
 open-clip-torch==2.26.1
 torch==2.5.1
+langchain>=0.1.0
+langchain-community>=0.0.20
+langchain-core>=0.1.0
+langchain-text-splitters>=0.0.1
+langgraph>=0.0.20
+faiss-cpu>=1.7.4
+playwright>=1.40.0
+sentence-transformers>=2.2.0
