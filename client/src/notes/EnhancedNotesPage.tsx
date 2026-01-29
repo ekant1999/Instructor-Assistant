@@ -29,11 +29,11 @@ export default function EnhancedNotesPage() {
     async function loadNotes() {
       setIsLoading(true);
       try {
-        const rows = await listNotes();
+        const rows = await listNotes(search || undefined, 'keyword');
         if (!isMounted) return;
         const mapped = rows.map(mapApiNote);
         setDocuments(mapped);
-        if (mapped.length > 0) {
+        if (mapped.length > 0 && !selectedId) {
           setSelectedId(mapped[0].id);
         }
       } catch (error) {
@@ -42,11 +42,17 @@ export default function EnhancedNotesPage() {
         if (isMounted) setIsLoading(false);
       }
     }
-    loadNotes();
+    
+    // Debounce search
+    const timer = setTimeout(() => {
+      loadNotes();
+    }, 300);
+    
     return () => {
       isMounted = false;
+      clearTimeout(timer);
     };
-  }, []);
+  }, [search]); // Re-fetch when search changes
 
   // Extract unique tags
   const allTags = useMemo(() => {
@@ -55,20 +61,15 @@ export default function EnhancedNotesPage() {
     return Array.from(tagSet).sort();
   }, [documents]);
 
-  // Filter documents
+  // Filter documents (search now handled by backend, only filter by type and tag on frontend)
   const filteredDocuments = useMemo(() => {
     return documents.filter(doc => {
-      const matchesSearch = !search || 
-        doc.title.toLowerCase().includes(search.toLowerCase()) ||
-        doc.content.toLowerCase().includes(search.toLowerCase()) ||
-        doc.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()));
-      
       const matchesType = typeFilter === 'all' || doc.type === typeFilter;
       const matchesTag = tagFilter === 'all' || doc.tags.includes(tagFilter);
       
-      return matchesSearch && matchesType && matchesTag;
+      return matchesType && matchesTag;
     });
-  }, [documents, search, typeFilter, tagFilter]);
+  }, [documents, typeFilter, tagFilter]);
 
   // Group by type
   const documentsByType = useMemo(() => {

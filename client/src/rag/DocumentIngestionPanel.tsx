@@ -23,6 +23,7 @@ interface DocumentIngestionPanelProps {
   onNoteToggle: (id: string) => void;
   onSelectAll: (type: 'papers' | 'notes') => void;
   onClearSelection: () => void;
+  onPaperSearchChange?: (query: string) => void;
   indexDirectory?: string;
   onIndexDirectoryChange?: (value: string) => void;
   contextTemplates?: ContextTemplate[];
@@ -41,6 +42,7 @@ export function DocumentIngestionPanel({
   onNoteToggle,
   onSelectAll,
   onClearSelection,
+  onPaperSearchChange,
   indexDirectory: controlledIndexDirectory,
   onIndexDirectoryChange,
   contextTemplates = [],
@@ -72,6 +74,16 @@ export function DocumentIngestionPanel({
       setLocalIndexDirectory(value);
     }
   };
+
+  // Notify parent when paper search changes (debounced)
+  useEffect(() => {
+    if (onPaperSearchChange) {
+      const timer = setTimeout(() => {
+        onPaperSearchChange(paperSearch);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [paperSearch, onPaperSearchChange]);
 
   // Check index status on mount
   useEffect(() => {
@@ -123,10 +135,8 @@ export function DocumentIngestionPanel({
     }
   };
 
-  const filteredPapers = papers.filter(p =>
-    p.title.toLowerCase().includes(paperSearch.toLowerCase()) ||
-    p.authors?.toLowerCase().includes(paperSearch.toLowerCase())
-  );
+  // Backend now handles paper search, so no client-side filtering
+  const filteredPapers = papers;
 
   const filteredNotes = notes.filter(n => {
     const matchesSearch = !noteSearch ||

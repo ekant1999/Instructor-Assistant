@@ -40,13 +40,17 @@ export default function EnhancedRagPage() {
   const [selectedPaperIds, setSelectedPaperIds] = useState<Set<string>>(new Set());
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(new Set());
   const [contextTemplates, setContextTemplates] = useState<ContextTemplate[]>([]);
+  const [paperSearchQuery, setPaperSearchQuery] = useState<string>('');
 
   useEffect(() => {
     let isMounted = true;
     async function loadDocs() {
       setIsLoadingDocs(true);
       try {
-        const [paperRows, noteRows] = await Promise.all([listPapers(), listNotes()]);
+        const [paperRows, noteRows] = await Promise.all([
+          listPapers(paperSearchQuery || undefined, 'keyword'),
+          listNotes()
+        ]);
         if (!isMounted) return;
         setPapers(paperRows.map(mapApiPaper));
         setNotes(noteRows.map(mapApiNote));
@@ -60,7 +64,7 @@ export default function EnhancedRagPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [paperSearchQuery]); // Re-fetch when search query changes
 
   const handleQuery = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -268,6 +272,7 @@ export default function EnhancedRagPage() {
             onNoteToggle={handleSelectNote}
             onSelectAll={handleSelectAll}
             onClearSelection={handleClearSelection}
+            onPaperSearchChange={setPaperSearchQuery}
             indexDirectory={indexDirectory}
             onIndexDirectoryChange={setIndexDirectory}
             contextTemplates={contextTemplates}
