@@ -16,6 +16,7 @@ interface EnhancedPaperListProps {
   selectedId?: string;
   selectedIds?: Set<string>;
   onSelectionChange?: (selectedIds: Set<string>) => void;
+  onSearchChange?: (query: string) => void;
 }
 
 export function EnhancedPaperList({ 
@@ -25,12 +26,23 @@ export function EnhancedPaperList({
   onSummarize, 
   selectedId,
   selectedIds = new Set(),
-  onSelectionChange
+  onSelectionChange,
+  onSearchChange
 }: EnhancedPaperListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [yearFilter, setYearFilter] = useState<string>('all');
   const [authorFilter, setAuthorFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'recent' | 'title' | 'cited'>('recent');
+  
+  // Notify parent when search query changes
+  React.useEffect(() => {
+    if (onSearchChange) {
+      const timer = setTimeout(() => {
+        onSearchChange(searchQuery);
+      }, 300); // Debounce
+      return () => clearTimeout(timer);
+    }
+  }, [searchQuery, onSearchChange]);
 
   // Extract unique years and authors
   const years = useMemo(() => {
@@ -49,18 +61,14 @@ export function EnhancedPaperList({
   }, [papers]);
 
   // Filter and sort papers
+  // Note: Search is now handled by backend API via onSearchChange
   const filteredPapers = useMemo(() => {
     let filtered = papers.filter(paper => {
-      const matchesSearch = !searchQuery || 
-        paper.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        paper.authors?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        paper.keywords?.toLowerCase().includes(searchQuery.toLowerCase());
-      
       const matchesYear = yearFilter === 'all' || paper.year === yearFilter;
       const matchesAuthor = authorFilter === 'all' || 
         paper.authors?.split(',').some(a => a.trim() === authorFilter);
       
-      return matchesSearch && matchesYear && matchesAuthor;
+      return matchesYear && matchesAuthor;
     });
 
     // Sort
@@ -79,7 +87,7 @@ export function EnhancedPaperList({
     });
 
     return filtered;
-  }, [papers, searchQuery, yearFilter, authorFilter, sortBy]);
+  }, [papers, yearFilter, authorFilter, sortBy]);
 
   const handleToggleSelect = (paperId: string) => {
     if (!onSelectionChange) return;

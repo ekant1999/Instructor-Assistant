@@ -57,6 +57,7 @@ export default function EnhancedLibraryPage() {
   const [existingNotes, setExistingNotes] = useState<Document[]>([]);
   const [activeTab, setActiveTab] = useState<string>('preview');
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const selectedPaper = useMemo(() => {
     if (!selectedId) return null;
@@ -87,7 +88,10 @@ export default function EnhancedLibraryPage() {
     async function loadData() {
       setIsLoading(true);
       try {
-        const [paperRows, noteRows] = await Promise.all([listPapers(), listNotes()]);
+        const [paperRows, noteRows] = await Promise.all([
+          listPapers(searchQuery || undefined, 'keyword'), 
+          listNotes()
+        ]);
         if (!isMounted) return;
         const mappedPapers = paperRows.map(mapApiPaper);
         setPapers(mappedPapers);
@@ -107,7 +111,7 @@ export default function EnhancedLibraryPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [searchQuery]); // Re-fetch when search query changes
 
   useEffect(() => {
     const hasPending = papers.some(
@@ -117,7 +121,7 @@ export default function EnhancedLibraryPage() {
     let cancelled = false;
     const timer = window.setInterval(async () => {
       try {
-        const paperRows = await listPapers();
+        const paperRows = await listPapers(searchQuery || undefined, 'keyword');
         if (!cancelled) {
           setPapers(paperRows.map(mapApiPaper));
         }
@@ -692,7 +696,7 @@ export default function EnhancedLibraryPage() {
   const handleDeletePaper = async (id: string) => {
     try {
       await deletePaper(Number(id));
-      const paperRows = await listPapers();
+      const paperRows = await listPapers(searchQuery || undefined, 'keyword');
       const mappedPapers = paperRows.map(mapApiPaper);
       setPapers(mappedPapers);
       setSelectedPaperIds((prev) => {
@@ -745,6 +749,7 @@ export default function EnhancedLibraryPage() {
               selectedId={selectedId}
               selectedIds={selectedPaperIds}
               onSelectionChange={setSelectedPaperIds}
+              onSearchChange={setSearchQuery}
               onSelect={(paper) => {
                 setSelectedId(paper.id);
                 setSelectedSections(new Set());

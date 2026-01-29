@@ -40,6 +40,7 @@ export default function EnhancedQuestionSetsPage() {
   const [notes, setNotes] = useState<Document[]>([]);
   const [uploads, setUploads] = useState<UploadContext[]>([]);
   const [selectedUploadIds, setSelectedUploadIds] = useState<Set<string>>(new Set());
+  const [paperSearchQuery, setPaperSearchQuery] = useState<string>('');
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
   const [selectedPaperIds, setSelectedPaperIds] = useState<Set<string>>(new Set());
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<string>>(new Set());
@@ -51,7 +52,10 @@ export default function EnhancedQuestionSetsPage() {
     async function loadDocs() {
       setIsLoadingDocs(true);
       try {
-        const [paperRows, noteRows] = await Promise.all([listPapers(), listNotes()]);
+        const [paperRows, noteRows] = await Promise.all([
+          listPapers(paperSearchQuery || undefined, 'keyword'),
+          listNotes()
+        ]);
         if (!isMounted) return;
         setPapers(paperRows.map(mapApiPaper));
         setNotes(noteRows.map(mapApiNote));
@@ -65,7 +69,7 @@ export default function EnhancedQuestionSetsPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [paperSearchQuery]); // Re-fetch when search query changes
 
   const [questionConfigs, setQuestionConfigs] = useState<QuestionTypeConfig[]>([
     { type: 'multiple-choice', enabled: true, count: 5, options: { numOptions: 4 } },
@@ -728,6 +732,7 @@ export default function EnhancedQuestionSetsPage() {
                     onUploadToggle={toggleUpload}
                     onUpload={handleUploadFiles}
                     onClearSelection={clearSelection}
+                    onPaperSearchChange={setPaperSearchQuery}
                     isUploading={isUploading}
                   />
                 </div>

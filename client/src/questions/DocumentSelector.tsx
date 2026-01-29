@@ -28,6 +28,7 @@ interface DocumentSelectorProps {
   onUploadToggle: (id: string) => void;
   onUpload: (files: FileList | File[]) => void;
   onClearSelection: () => void;
+  onPaperSearchChange?: (query: string) => void;
   isUploading?: boolean;
 }
 
@@ -43,6 +44,7 @@ export function DocumentSelector({
   onUploadToggle,
   onUpload,
   onClearSelection,
+  onPaperSearchChange,
   isUploading = false
 }: DocumentSelectorProps) {
   const [paperSearch, setPaperSearch] = useState('');
@@ -50,11 +52,19 @@ export function DocumentSelector({
   const [noteTypeFilter, setNoteTypeFilter] = useState<string>('all');
   const [uploadSearch, setUploadSearch] = useState('');
   const uploadInputRef = useRef<HTMLInputElement>(null);
+  
+  // Notify parent when paper search changes (debounced)
+  React.useEffect(() => {
+    if (onPaperSearchChange) {
+      const timer = setTimeout(() => {
+        onPaperSearchChange(paperSearch);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [paperSearch, onPaperSearchChange]);
 
-  const filteredPapers = papers.filter(p =>
-    p.title.toLowerCase().includes(paperSearch.toLowerCase()) ||
-    p.authors?.toLowerCase().includes(paperSearch.toLowerCase())
-  );
+  // Backend now handles paper search, so no client-side filtering needed
+  const filteredPapers = papers;
 
   const filteredNotes = notes.filter(n => {
     const matchesSearch = !noteSearch ||
