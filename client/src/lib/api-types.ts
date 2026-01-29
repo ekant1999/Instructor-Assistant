@@ -173,6 +173,7 @@ export interface ApiRagQueryRequest {
   headless?: boolean;
   paper_ids?: number[];
   provider?: string;
+  search_type?: "keyword" | "embedding" | "hybrid";
 }
 
 export interface ApiRagQueryResponse {
@@ -199,4 +200,27 @@ export interface ApiRagQnaItem {
   scope?: string | null;
   provider?: string | null;
   created_at?: string | null;
+}
+
+export type SearchType = "keyword" | "embedding" | "hybrid";
+
+export interface ApiSearchRequest {
+  query: string;
+  search_type?: SearchType;
+  paper_ids?: number[];
+  limit?: number;
+}
+
+export interface ApiSearchResult {
+  id: number;
+  relevance_score?: number | null;
+  result_type: "paper" | "section" | "note" | "summary";
+  data: any;
+}
+
+export interface ApiSearchResponse {
+  query: string;
+  search_type: string;
+  results: ApiSearchResult[];
+  total_results: number;
 }

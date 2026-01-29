@@ -21,7 +21,10 @@ import {
   ApiRagQnaItem,
   ApiRagQueryRequest,
   ApiRagQueryResponse,
-  ApiSummary
+  ApiSummary,
+  ApiSearchRequest,
+  ApiSearchResponse,
+  SearchType
 } from "./api-types";
 
 const runtimeBase =
@@ -113,20 +116,36 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return (await res.json()) as T;
 }
 
-export async function listPapers(): Promise<ApiPaper[]> {
-  const data = await request<{ papers: ApiPaper[] }>("/papers");
+export async function listPapers(searchQuery?: string, searchType?: "keyword" | "embedding" | "hybrid"): Promise<ApiPaper[]> {
+  const params = new URLSearchParams();
+  if (searchQuery) {
+    params.set("q", searchQuery);
+    if (searchType) {
+      params.set("search_type", searchType);
+    }
+  }
+  const query = params.toString() ? `?${params}` : "";
+  const data = await request<{ papers: ApiPaper[] }>(`/papers${query}`);
   return data.papers;
 }
 
 export async function listPaperSections(
   paperId: number,
   includeText: boolean = true,
-  maxChars?: number
+  maxChars?: number,
+  searchQuery?: string,
+  searchType?: "keyword" | "embedding" | "hybrid"
 ): Promise<ApiPaperSection[]> {
   const params = new URLSearchParams();
   params.set("include_text", String(includeText));
   if (typeof maxChars === "number") {
     params.set("max_chars", String(maxChars));
+  }
+  if (searchQuery) {
+    params.set("q", searchQuery);
+    if (searchType) {
+      params.set("search_type", searchType);
+    }
   }
   const query = params.toString() ? `?${params}` : "";
   const data = await request<{ sections: ApiPaperSection[] }>(`/papers/${paperId}/sections${query}`);
@@ -169,8 +188,23 @@ export async function chatPaper(paperId: number, messages: ApiPaperChatMessage[]
   });
 }
 
-export async function listNotes(): Promise<ApiNote[]> {
-  const data = await request<{ notes: ApiNote[] }>("/notes");
+export async function listNotes(
+  searchQuery?: string,
+  searchType?: "keyword" | "embedding" | "hybrid",
+  paperIds?: number[]
+): Promise<ApiNote[]> {
+  const params = new URLSearchParams();
+  if (searchQuery) {
+    params.set("q", searchQuery);
+    if (searchType) {
+      params.set("search_type", searchType);
+    }
+    if (paperIds && paperIds.length > 0) {
+      params.set("paper_ids", paperIds.join(","));
+    }
+  }
+  const query = params.toString() ? `?${params}` : "";
+  const data = await request<{ notes: ApiNote[] }>(`/notes${query}`);
   return data.notes;
 }
 
@@ -202,8 +236,20 @@ export async function deleteNote(noteId: number): Promise<void> {
   await request<void>(`/notes/${noteId}`, { method: "DELETE" });
 }
 
-export async function listPaperSummaries(paperId: number): Promise<ApiSummary[]> {
-  const data = await request<{ summaries: ApiSummary[] }>(`/papers/${paperId}/summaries`);
+export async function listPaperSummaries(
+  paperId: number,
+  searchQuery?: string,
+  searchType?: "keyword" | "embedding" | "hybrid"
+): Promise<ApiSummary[]> {
+  const params = new URLSearchParams();
+  if (searchQuery) {
+    params.set("q", searchQuery);
+    if (searchType) {
+      params.set("search_type", searchType);
+    }
+  }
+  const query = params.toString() ? `?${params}` : "";
+  const data = await request<{ summaries: ApiSummary[] }>(`/papers/${paperId}/summaries${query}`);
   return data.summaries;
 }
 
@@ -437,5 +483,12 @@ export async function deletePaperRagQna(paperId: number, qaId: number): Promise<
 export async function clearPaperRagQna(paperId: number): Promise<void> {
   await request(`/papers/${paperId}/rag-qa`, {
     method: "DELETE"
+  });
+}
+
+export async function unifiedSearch(input: ApiSearchRequest): Promise<ApiSearchResponse> {
+  return request<ApiSearchResponse>("/search", {
+    method: "POST",
+    body: JSON.stringify(input)
   });
 }
