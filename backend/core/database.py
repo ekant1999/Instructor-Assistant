@@ -27,6 +27,7 @@ def init_db() -> None:
         _ensure_notes_tags_column(conn)
     _ensure_notes_fk_set_null()
     ensure_question_tables()
+    _ensure_fts_tables()
 
 
 def _init_core_tables(conn: sqlite3.Connection) -> None:
@@ -196,4 +197,221 @@ def ensure_question_tables() -> None:
             );
         """
         )
+        conn.commit()
+
+
+def _ensure_fts_tables() -> None:
+    """
+    Create FTS5 virtual tables for full-text keyword search on papers, sections, notes, and summaries.
+    Also create triggers to keep FTS tables in sync with the main tables.
+    """
+    with get_conn() as conn:
+        # Check if FTS tables already exist
+        papers_fts_exists = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='papers_fts'"
+        ).fetchone()
+        
+        if not papers_fts_exists:
+            # Create FTS5 virtual table for papers
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE papers_fts USING fts5(
+                    title,
+                    source_url,
+                    content='papers',
+                    content_rowid='id'
+                );
+            """
+            )
+            
+            # Populate FTS table with existing data
+            conn.execute(
+                """
+                INSERT INTO papers_fts(rowid, title, source_url)
+                SELECT id, title, COALESCE(source_url, '') FROM papers;
+            """
+            )
+            
+            # Create triggers to keep papers_fts in sync
+            conn.execute(
+                """
+                CREATE TRIGGER papers_ai AFTER INSERT ON papers BEGIN
+                    INSERT INTO papers_fts(rowid, title, source_url)
+                    VALUES (new.id, new.title, COALESCE(new.source_url, ''));
+                END;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER papers_au AFTER UPDATE ON papers BEGIN
+                    UPDATE papers_fts SET title=new.title, source_url=COALESCE(new.source_url, '')
+                    WHERE rowid=old.id;
+                END;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER papers_ad AFTER DELETE ON papers BEGIN
+                    DELETE FROM papers_fts WHERE rowid=old.id;
+                END;
+            """
+            )
+        
+        # FTS for sections (PDF content)
+        sections_fts_exists = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='sections_fts'"
+        ).fetchone()
+        
+        if not sections_fts_exists:
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE sections_fts USING fts5(
+                    text,
+                    paper_id UNINDEXED,
+                    page_no UNINDEXED,
+                    content='sections',
+                    content_rowid='id'
+                );
+            """
+            )
+            
+            conn.execute(
+                """
+                INSERT INTO sections_fts(rowid, text, paper_id, page_no)
+                SELECT id, text, paper_id, page_no FROM sections;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER sections_ai AFTER INSERT ON sections BEGIN
+                    INSERT INTO sections_fts(rowid, text, paper_id, page_no)
+                    VALUES (new.id, new.text, new.paper_id, new.page_no);
+                END;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER sections_au AFTER UPDATE ON sections BEGIN
+                    UPDATE sections_fts SET text=new.text, paper_id=new.paper_id, page_no=new.page_no
+                    WHERE rowid=old.id;
+                END;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER sections_ad AFTER DELETE ON sections BEGIN
+                    DELETE FROM sections_fts WHERE rowid=old.id;
+                END;
+            """
+            )
+        
+        # FTS for notes
+        notes_fts_exists = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='notes_fts'"
+        ).fetchone()
+        
+        if not notes_fts_exists:
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE notes_fts USING fts5(
+                    title,
+                    body,
+                    tags_json,
+                    paper_id UNINDEXED,
+                    content='notes',
+                    content_rowid='id'
+                );
+            """
+            )
+            
+            conn.execute(
+                """
+                INSERT INTO notes_fts(rowid, title, body, tags_json, paper_id)
+                SELECT id, COALESCE(title, ''), body, COALESCE(tags_json, ''), paper_id FROM notes;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER notes_ai AFTER INSERT ON notes BEGIN
+                    INSERT INTO notes_fts(rowid, title, body, tags_json, paper_id)
+                    VALUES (new.id, COALESCE(new.title, ''), new.body, COALESCE(new.tags_json, ''), new.paper_id);
+                END;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER notes_au AFTER UPDATE ON notes BEGIN
+                    UPDATE notes_fts SET title=COALESCE(new.title, ''), body=new.body, 
+                           tags_json=COALESCE(new.tags_json, ''), paper_id=new.paper_id
+                    WHERE rowid=old.id;
+                END;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER notes_ad AFTER DELETE ON notes BEGIN
+                    DELETE FROM notes_fts WHERE rowid=old.id;
+                END;
+            """
+            )
+        
+        # FTS for summaries
+        summaries_fts_exists = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='summaries_fts'"
+        ).fetchone()
+        
+        if not summaries_fts_exists:
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE summaries_fts USING fts5(
+                    title,
+                    content,
+                    paper_id UNINDEXED,
+                    content='summaries',
+                    content_rowid='id'
+                );
+            """
+            )
+            
+            conn.execute(
+                """
+                INSERT INTO summaries_fts(rowid, title, content, paper_id)
+                SELECT id, COALESCE(title, ''), content, paper_id FROM summaries;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER summaries_ai AFTER INSERT ON summaries BEGIN
+                    INSERT INTO summaries_fts(rowid, title, content, paper_id)
+                    VALUES (new.id, COALESCE(new.title, ''), new.content, new.paper_id);
+                END;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER summaries_au AFTER UPDATE ON summaries BEGIN
+                    UPDATE summaries_fts SET title=COALESCE(new.title, ''), content=new.content, paper_id=new.paper_id
+                    WHERE rowid=old.id;
+                END;
+            """
+            )
+            
+            conn.execute(
+                """
+                CREATE TRIGGER summaries_ad AFTER DELETE ON summaries BEGIN
+                    DELETE FROM summaries_fts WHERE rowid=old.id;
+                END;
+            """
+            )
+        
         conn.commit()
