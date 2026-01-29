@@ -3,12 +3,16 @@ from __future__ import annotations
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+import logging
+import threading
 
 from .database import get_conn
 from .pdf import resolve_any_to_pdf, extract_pages
 
+logger = logging.getLogger(__name__)
 
-async def add_paper(input_str: str, source_url: str | None = None) -> Dict[str, Any]:
+
+async def add_paper(input_str: str, source_url: str | None = None, auto_index: bool = True) -> Dict[str, Any]:
     title, pdf_path = await resolve_any_to_pdf(input_str)
     with get_conn() as conn:
         c = conn.cursor()
@@ -23,6 +27,11 @@ async def add_paper(input_str: str, source_url: str | None = None) -> Dict[str, 
                 (paper_id, page_no, text),
             )
         conn.commit()
+    
+    # Automatically trigger background reindexing for embedding search
+    if auto_index:
+        _trigger_background_reindex(paper_id, title)
+    
     return {"paper_id": paper_id, "title": title, "pdf_path": str(pdf_path)}
 
 
@@ -30,6 +39,7 @@ def add_local_pdf(
     title: str | None,
     pdf_path: str | Path,
     source_url: str | None = None,
+    auto_index: bool = True,
 ) -> Dict[str, Any]:
     path = Path(pdf_path).expanduser().resolve()
     if not path.exists():
@@ -48,6 +58,11 @@ def add_local_pdf(
                 (paper_id, page_no, text),
             )
         conn.commit()
+    
+    # Automatically trigger background reindexing for embedding search
+    if auto_index:
+        _trigger_background_reindex(paper_id, final_title)
+    
     return {
         "paper_id": paper_id,
         "title": final_title,
@@ -103,6 +118,76 @@ def save_note(paper_id: int, body: str, title: Optional[str] = None) -> Dict[str
         conn.commit()
         note_id = c.lastrowid
     return {"note_id": note_id}
+
+
+def _trigger_background_reindex(paper_id: int, paper_title: str):
+    """
+    Trigger background reindexing of a single paper for embedding search.
+    Runs in a separate thread to avoid blocking the API response.
+    """
+    def reindex_paper():
+        try:
+            logger.info(f"📄 Starting background reindex for paper {paper_id}: {paper_title}")
+            
+            # Import here to avoid circular dependencies
+            from ..rag.ingest import ingest_single_paper
+            
+            # Get paper info
+            with get_conn() as conn:
+                row = conn.execute(
+                    "SELECT id, pdf_path, title FROM papers WHERE id=?", (paper_id,)
+                ).fetchone()
+                if not row:
+                    logger.error(f"Paper {paper_id} not found for reindexing")
+                    return
+                
+                pdf_path = row["pdf_path"]
+                title = row["title"]
+            
+            # Get backend root for index directory
+            backend_root = Path(__file__).resolve().parents[1]
+            index_dir = str(backend_root / "index")
+            
+            # Run incremental indexing (append to existing index)
+            result = ingest_single_paper(
+                pdf_path=pdf_path,
+                paper_id=paper_id,
+                paper_title=title,
+                index_dir=index_dir,
+                incremental=True,  # Append to existing index
+            )
+            
+            # Update paper status
+            with get_conn() as conn:
+                conn.execute(
+                    """UPDATE papers 
+                       SET rag_status='indexed', rag_updated_at=CURRENT_TIMESTAMP 
+                       WHERE id=?""",
+                    (paper_id,)
+                )
+                conn.commit()
+            
+            logger.info(f"✅ Background reindex completed for paper {paper_id}: {result['num_chunks']} chunks added")
+            
+        except Exception as e:
+            logger.error(f"❌ Background reindex failed for paper {paper_id}: {e}")
+            # Update paper status to show error
+            try:
+                with get_conn() as conn:
+                    conn.execute(
+                        """UPDATE papers 
+                           SET rag_status='error', rag_error=?, rag_updated_at=CURRENT_TIMESTAMP 
+                           WHERE id=?""",
+                        (str(e)[:500], paper_id)
+                    )
+                    conn.commit()
+            except:
+                pass
+    
+    # Start reindexing in background thread
+    thread = threading.Thread(target=reindex_paper, daemon=True)
+    thread.start()
+    logger.info(f"⏳ Queued background reindex for paper {paper_id}: {paper_title}")
 
 
 def render_library_structured() -> Dict[str, Any]:

@@ -123,8 +123,8 @@ def split_documents(documents: List, chunk_size: int = 1200, chunk_overlap: int 
     return chunks
 
 
-def create_faiss_index(chunks: List, index_dir: str = "index/"):
-    """Create FAISS vectorstore from chunks. Generates embeddings and saves index to disk with metadata."""
+def create_faiss_index(chunks: List, index_dir: str = "index/", incremental: bool = False):
+    """Create or update FAISS vectorstore from chunks. Generates embeddings and saves index to disk with metadata."""
     if not chunks:
         logger.warning("No chunks to index")
         return
@@ -159,17 +159,34 @@ def create_faiss_index(chunks: List, index_dir: str = "index/"):
         logger.error(error_msg)
         raise ValueError(f"{error_msg}. Please check that the model name is correct and you have the required dependencies installed.") from e
 
-    logger.info("Building FAISS index...")
-    logger.info(f"  This may take a few minutes for {len(chunks)} chunks...")
-    try:
-        vectorstore = FAISS.from_documents(chunks, embeddings)
-    except Exception as e:
-        error_msg = f"Error creating FAISS index: {e}"
-        logger.error(error_msg)
-        raise ValueError(f"{error_msg}. Please check your configuration and try again.") from e
-
     index_path = Path(index_dir)
     index_path.mkdir(parents=True, exist_ok=True)
+
+    # Check if we should append to existing index
+    if incremental and index_path.exists() and (index_path / "index.faiss").exists():
+        logger.info("Incremental indexing: Loading existing FAISS index...")
+        try:
+            # Load existing vectorstore
+            vectorstore = FAISS.load_local(str(index_path), embeddings, allow_dangerous_deserialization=True)
+            logger.info(f"  Existing index has {vectorstore.index.ntotal} vectors")
+            
+            # Add new documents to existing index
+            logger.info(f"  Adding {len(chunks)} new chunks...")
+            vectorstore.add_documents(chunks)
+            logger.info(f"  Index now has {vectorstore.index.ntotal} vectors")
+        except Exception as e:
+            logger.warning(f"Failed to load existing index for incremental update: {e}")
+            logger.info("Creating new index instead...")
+            vectorstore = FAISS.from_documents(chunks, embeddings)
+    else:
+        logger.info("Building FAISS index...")
+        logger.info(f"  This may take a few minutes for {len(chunks)} chunks...")
+        try:
+            vectorstore = FAISS.from_documents(chunks, embeddings)
+        except Exception as e:
+            error_msg = f"Error creating FAISS index: {e}"
+            logger.error(error_msg)
+            raise ValueError(f"{error_msg}. Please check your configuration and try again.") from e
 
     try:
         vectorstore.save_local(str(index_path))
@@ -210,6 +227,65 @@ def main():
     print("=" * 50)
     print("\nYou can now start the server and ask questions!")
     print("Run: python server.py")
+
+
+def ingest_single_paper(
+    pdf_path: str,
+    paper_id: int,
+    paper_title: str,
+    index_dir: str = "index/",
+    chunk_size: int = 1200,
+    chunk_overlap: int = 200,
+    incremental: bool = True,
+) -> Dict[str, Any]:
+    """
+    Ingest a single paper and add it to the FAISS index.
+    Used for background reindexing when new papers are added.
+    
+    Args:
+        pdf_path: Path to the PDF file
+        paper_id: Database ID of the paper
+        paper_title: Title of the paper
+        index_dir: Directory to store the index
+        chunk_size: Size of text chunks
+        chunk_overlap: Overlap between chunks
+        incremental: If True, append to existing index; if False, create new index
+    
+    Returns:
+        Dictionary with ingestion results
+    """
+    try:
+        # Prepare metadata
+        metadata = {
+            pdf_path: {
+                "paper_id": paper_id,
+                "paper_title": paper_title,
+            }
+        }
+        
+        # Load the PDF
+        documents = load_pdfs_from_paths([pdf_path], metadata_by_path=metadata)
+        
+        if not documents:
+            raise ValueError(f"Failed to load PDF: {pdf_path}")
+        
+        # Split into chunks
+        chunks = split_documents(documents, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        
+        # Add to FAISS index
+        create_faiss_index(chunks, index_dir=index_dir, incremental=incremental)
+        
+        return {
+            "success": True,
+            "paper_id": paper_id,
+            "num_documents": len(documents),
+            "num_chunks": len(chunks),
+            "index_dir": index_dir,
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to ingest paper {paper_id}: {e}")
+        raise
 
 
 if __name__ == "__main__":
