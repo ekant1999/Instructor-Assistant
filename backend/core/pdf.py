@@ -4,11 +4,12 @@ import hashlib
 import os
 import re
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 
 import httpx
 from bs4 import BeautifulSoup
 from pypdf import PdfReader
+import pymupdf  # PyMuPDF for block-level extraction
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = BACKEND_ROOT / "data"
@@ -92,9 +93,63 @@ async def resolve_any_to_pdf(input_str: str) -> Tuple[str, Path]:
 
 
 def extract_pages(pdf_path: Path) -> List[Tuple[int, str]]:
+    """
+    Legacy function for page-level extraction (kept for backward compatibility).
+    For new code, use extract_text_blocks() instead.
+    """
     pages: List[Tuple[int, str]] = []
     reader = PdfReader(str(pdf_path))
     for i, page in enumerate(reader.pages):
         txt = page.extract_text() or ""
         pages.append((i + 1, txt))
     return pages
+
+
+def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
+    """
+    Extract text blocks with page, block index, and bounding boxes using PyMuPDF.
+    
+    Returns list of blocks, each containing:
+    - page_no: Page number (1-indexed)
+    - block_index: Block position on page (0-indexed)
+    - text: Block text content
+    - bbox: Bounding box dictionary with x0, y0, x1, y1
+    
+    This provides more granular location tracking than page-level extraction.
+    """
+    doc = pymupdf.open(str(pdf_path))
+    blocks = []
+    
+    for page_num in range(len(doc)):
+        page = doc[page_num]
+        
+        # Get text blocks (preserves layout structure)
+        # Each block is a tuple: (x0, y0, x1, y1, "text", block_no, block_type)
+        text_blocks = page.get_text("blocks")
+        
+        block_idx = 0
+        for block in text_blocks:
+            # block[6] is block_type: 0=text, 1=image
+            if block[6] == 0:  # Text block only
+                text = block[4].strip()
+                
+                # Skip empty blocks
+                if not text:
+                    continue
+                
+                blocks.append({
+                    "page_no": page_num + 1,  # 1-indexed
+                    "block_index": block_idx,
+                    "text": text,
+                    "bbox": {
+                        "x0": block[0],
+                        "y0": block[1],
+                        "x1": block[2],
+                        "y1": block[3]
+                    }
+                })
+                
+                block_idx += 1
+    
+    doc.close()
+    return blocks
