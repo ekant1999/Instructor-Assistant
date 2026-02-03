@@ -485,7 +485,12 @@ def list_paper_sections(
         results = search_sections(q, search_type=st, paper_ids=[paper_id], limit=100)
         sections: List[Dict[str, Any]] = []
         for r in results:
-            entry = {"id": r["id"], "page_no": r["page_no"], "paper_id": r["paper_id"]}
+            entry = {
+                "id": r["id"], 
+                "page_no": r["page_no"], 
+                "paper_id": r["paper_id"],
+                "match_score": r.get("rank", 0)  # Include relevance score for highlighting
+            }
             if include_text:
                 text = r["text"] or ""
                 if max_chars is not None and max_chars > 0:
