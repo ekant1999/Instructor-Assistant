@@ -58,6 +58,11 @@ export default function EnhancedLibraryPage() {
   const [activeTab, setActiveTab] = useState<string>('preview');
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  
+  // Navigation state for exact location
+  const [navigateToPage, setNavigateToPage] = useState<number | undefined>(undefined);
+  const [highlightSectionId, setHighlightSectionId] = useState<string | undefined>(undefined);
+  const [scrollToSectionId, setScrollToSectionId] = useState<string | undefined>(undefined);
 
   const selectedPaper = useMemo(() => {
     if (!selectedId) return null;
@@ -136,22 +141,41 @@ export default function EnhancedLibraryPage() {
   }, [papers]);
 
   useEffect(() => {
-    if (!selectedId || sectionsByPaperId[selectedId]) return;
-    void ensureSections(selectedId);
-  }, [selectedId, sectionsByPaperId]);
+    if (!selectedId) return;
+    // Load sections with search query when paper is selected
+    void ensureSections(selectedId, searchQuery);
+  }, [selectedId, searchQuery]);
 
   useEffect(() => {
     if (!selectedId || summaries.get(selectedId)) return;
     void ensureSummaries(selectedId);
   }, [selectedId, summaries]);
 
-  async function ensureSections(paperId: string): Promise<Section[]> {
-    const cached = sectionsByPaperId[paperId];
+  async function ensureSections(paperId: string, searchQuery?: string): Promise<Section[]> {
+    // If searching, always fetch fresh; otherwise use cache
+    const cached = !searchQuery ? sectionsByPaperId[paperId] : undefined;
     if (cached) return cached;
     try {
-      const apiSections = await listPaperSections(Number(paperId), true, 2000);
+      const apiSections = await listPaperSections(
+        Number(paperId), 
+        true, 
+        2000,
+        searchQuery,  // Pass search query to get matching sections
+        searchQuery ? 'keyword' : undefined
+      );
       const mapped = apiSections.map(mapApiSection);
       setSectionsByPaperId((prev) => ({ ...prev, [paperId]: mapped }));
+      
+      // If search found matches, navigate to first match
+      if (searchQuery && mapped.length > 0 && mapped[0].matchScore) {
+        const firstMatch = mapped[0];
+        if (firstMatch.pageNo) {
+          setNavigateToPage(firstMatch.pageNo);
+        }
+        setHighlightSectionId(firstMatch.id);
+        setScrollToSectionId(firstMatch.id);
+      }
+      
       return mapped;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to load paper sections');
@@ -754,6 +778,10 @@ export default function EnhancedLibraryPage() {
                 setSelectedId(paper.id);
                 setSelectedSections(new Set());
                 setCurrentSummary(null);
+                // Reset navigation state when manually selecting a paper
+                setNavigateToPage(undefined);
+                setHighlightSectionId(undefined);
+                setScrollToSectionId(undefined);
                 setActiveTab('preview');
               }}
               onDelete={handleDeletePaper}
@@ -805,7 +833,16 @@ export default function EnhancedLibraryPage() {
               </TabsList>
 
               <TabsContent value="preview" className="flex-1 overflow-hidden">
-                <PdfPreview paper={selectedPaper} />
+                <PdfPreview 
+                  paper={selectedPaper} 
+                  initialPage={navigateToPage}
+                  onPageChange={(page) => {
+                    // Clear navigation state after first page load
+                    if (navigateToPage && page === navigateToPage) {
+                      setNavigateToPage(undefined);
+                    }
+                  }}
+                />
               </TabsContent>
 
               <TabsContent value="sections" className="flex-1 overflow-hidden">
@@ -815,6 +852,8 @@ export default function EnhancedLibraryPage() {
                   onSelectSection={handleSelectSection}
                   onSelectAll={handleSelectAll}
                   onCopy={(text) => navigator.clipboard.writeText(text)}
+                  highlightSectionId={highlightSectionId}
+                  scrollToSectionId={scrollToSectionId}
                 />
               </TabsContent>
 
@@ -826,11 +865,12 @@ export default function EnhancedLibraryPage() {
                     isLoading={isSummarizing}
                   />
                   <BatchSummarizePanel
-                    selectedPaperIds={selectedPaperIds}
-                    papers={papers}
+                    selectedCount={selectedPaperIds.size}
                     onSummarize={handleBatchSummarize}
                     isLoading={isSummarizing}
-                    progress={batchProgress}
+                    currentPaper={batchProgress.current}
+                    progress={batchProgress.progress}
+                    total={batchProgress.total}
                   />
                 </div>
               </TabsContent>
