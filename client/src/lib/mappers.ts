@@ -58,6 +58,8 @@ export function mapApiSection(section: ApiPaperSection): Section {
     id: String(section.id),
     title: `Page ${section.page_no}`,
     content: section.text || "",
+    pageNo: section.page_no,
+    matchScore: section.match_score,
   };
 }
 

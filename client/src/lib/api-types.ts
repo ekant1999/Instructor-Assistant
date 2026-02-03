@@ -15,6 +15,7 @@ export interface ApiPaperSection {
   id: number;
   page_no: number;
   text?: string;
+  match_score?: number;  // Relevance score from search
 }
 
 export interface ApiNote {

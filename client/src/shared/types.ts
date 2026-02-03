@@ -15,6 +15,8 @@ export interface Section {
   id: string;
   title: string;
   content: string;
+  pageNo?: number;  // Page number for navigation
+  matchScore?: number;  // Search relevance score for highlighting
   selected?: boolean;
 }
 
