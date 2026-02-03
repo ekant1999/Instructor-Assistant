@@ -24,7 +24,7 @@ if [ ! -d "node_modules" ]; then
 fi
 
 echo "✅ Starting backend on http://127.0.0.1:8010"
-backend/.webenv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8010 --reload &
+OMP_NUM_THREADS=1 backend/.webenv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8010 --reload &
 BACKEND_PID=$!
 
 echo "✅ Starting frontend on http://localhost:5173"

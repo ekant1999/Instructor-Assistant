@@ -22,6 +22,11 @@ langchain-community>=0.0.20
 langchain-core>=0.1.0
 langchain-text-splitters>=0.0.1
 langgraph>=0.0.20
-faiss-cpu>=1.7.4
+faiss-cpu>=1.7.4  # Legacy RAG; pgvector optional (see MIGRATION_GUIDE.md)
 playwright>=1.40.0
-sentence-transformers>=2.2.0
+sentence-transformers>=2.3.0  # Upgraded for better embedding support
+
+# PostgreSQL + pgvector
+psycopg2-binary==2.9.9
+asyncpg==0.29.0
+pgvector==0.2.5
