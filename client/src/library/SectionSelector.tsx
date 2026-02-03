@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Paper, Section } from '@/shared/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,6 +13,8 @@ interface SectionSelectorProps {
   onSelectSection: (sectionId: string) => void;
   onSelectAll: () => void;
   onCopy: (text: string) => void;
+  highlightSectionId?: string;  // Section to highlight
+  scrollToSectionId?: string;  // Section to scroll to
 }
 
 export function SectionSelector({
@@ -20,9 +22,22 @@ export function SectionSelector({
   selectedSections,
   onSelectSection,
   onSelectAll,
-  onCopy
+  onCopy,
+  highlightSectionId,
+  scrollToSectionId
 }: SectionSelectorProps) {
   const [copied, setCopied] = useState(false);
+  const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  
+  // Scroll to section when scrollToSectionId changes
+  useEffect(() => {
+    if (scrollToSectionId) {
+      const element = sectionRefs.current.get(scrollToSectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [scrollToSectionId]);
   
   if (!paper.sections || paper.sections.length === 0) {
     return (
@@ -62,12 +77,27 @@ export function SectionSelector({
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-3">
-          {paper.sections.map((section) => (
+          {paper.sections.map((section) => {
+            const isHighlighted = highlightSectionId === section.id;
+            const isMatch = section.matchScore !== undefined && section.matchScore !== 0;
+            
+            return (
             <Card
               key={section.id}
+              ref={(el) => {
+                if (el) {
+                  sectionRefs.current.set(section.id, el);
+                } else {
+                  sectionRefs.current.delete(section.id);
+                }
+              }}
               className={`p-4 cursor-pointer transition-all ${
-                selectedSections.has(section.id)
+                isHighlighted
+                  ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20 ring-2 ring-yellow-500'
+                  : selectedSections.has(section.id)
                   ? 'border-primary bg-primary/5'
+                  : isMatch
+                  ? 'border-blue-400 bg-blue-50 dark:bg-blue-950/20'
                   : 'hover:border-primary/50'
               }`}
             >
@@ -78,7 +108,14 @@ export function SectionSelector({
                   className="mt-1"
                 />
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-sm">{section.title}</h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-medium text-sm">{section.title}</h4>
+                    {isMatch && (
+                      <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
+                        Match
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
                     {section.content}
                   </p>
@@ -98,7 +135,8 @@ export function SectionSelector({
                 </Button>
               </div>
             </Card>
-          ))}
+          );
+          })}
         </div>
       </ScrollArea>
 
