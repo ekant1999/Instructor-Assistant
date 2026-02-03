@@ -4,7 +4,13 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ExternalLink, Download, ZoomIn, ZoomOut } from 'lucide-react';
 import { API_BASE, getNgrokSkipHeaders, withNgrokSkipParam } from '@/lib/api';
 
-export function PdfPreview({ paper }: { paper: Paper | null }) {
+interface PdfPreviewProps {
+  paper: Paper | null;
+  initialPage?: number;  // Navigate to specific page
+  onPageChange?: (page: number) => void;  // Callback when page changes
+}
+
+export function PdfPreview({ paper, initialPage, onPageChange }: PdfPreviewProps) {
   const isWidget = useMemo(
     () => typeof document !== 'undefined' && document.documentElement.dataset.iaWidget === 'true',
     []
@@ -39,12 +45,19 @@ export function PdfPreview({ paper }: { paper: Paper | null }) {
   useEffect(() => {
     if (!isWidget) return;
     activeSrcRef.current = pdfSrc;
-    setPageNum(1);
+    setPageNum(initialPage || 1);  // Use initialPage if provided
     setZoom(1);
     setPageCount(null);
     setRenderError(null);
     pdfDocRef.current = null;
-  }, [isWidget, pdfSrc]);
+  }, [isWidget, pdfSrc, initialPage]);
+  
+  // Notify parent when page changes
+  useEffect(() => {
+    if (onPageChange) {
+      onPageChange(pageNum);
+    }
+  }, [pageNum, onPageChange]);
 
   useEffect(() => {
     if (!isWidget || !pdfSrc) return;
