@@ -41,7 +41,7 @@ else:
     TEMPERATURE = 0.2
 MAX_TOKENS = int(os.getenv("LITELLM_MAX_TOKENS", "4000"))
 MAX_CONTEXT_CHARS = int(os.getenv("QUESTION_CONTEXT_CHAR_LIMIT", "60000"))
-DEFAULT_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()
+DEFAULT_PROVIDER = (os.getenv("LLM_PROVIDER") or os.getenv("SUMMARY_PROVIDER") or "openai").strip().lower()
 SUMMARY_PROVIDER = (os.getenv("SUMMARY_PROVIDER") or os.getenv("LLM_PROVIDER") or "openai").strip().lower()
 LOCAL_CONTEXT_CHARS = int(os.getenv("LOCAL_CONTEXT_CHAR_LIMIT", "12000"))
 LOCAL_LLM_URL = (os.getenv("LOCAL_LLM_URL") or "http://localhost:11434").rstrip("/")
@@ -70,9 +70,9 @@ def _completion_limit_args(model_name: str) -> Dict[str, Any]:
 
 def generate_questions(payload: QuestionGenerationRequest) -> QuestionGenerationResponse:
     provider = _resolve_provider(payload)
-    messages = _build_messages(payload, provider)
+    messages, use_tools = _build_messages(payload, provider)
     if provider == "local":
-        return _generate_questions_local(payload, messages)
+        return _generate_questions_local(payload, messages, use_tools=use_tools)
     return _generate_questions_openai(payload, messages)
 
 
@@ -105,7 +105,8 @@ def _generate_questions_openai(payload: QuestionGenerationRequest, messages: Lis
 async def stream_generate_questions(payload: QuestionGenerationRequest) -> AsyncGenerator[Dict[str, Any], None]:
     provider = _resolve_provider(payload)
     if provider == "local":
-        result = _generate_questions_local(payload, _build_messages(payload, provider))
+        messages, use_tools = _build_messages(payload, provider)
+        result = _generate_questions_local(payload, messages, use_tools=use_tools)
         yield {
             "type": "complete",
             "questions": [q.model_dump() for q in result.questions],
@@ -117,7 +118,7 @@ async def stream_generate_questions(payload: QuestionGenerationRequest) -> Async
     if not os.getenv("OPENAI_API_KEY") and not os.getenv("LITELLM_API_KEY"):
         raise QuestionGenerationError("OPENAI_API_KEY (or LITELLM_API_KEY) must be set to use the question generator.")
 
-    messages = _build_messages(payload)
+    messages, _ = _build_messages(payload)
     comp_kwargs = _completion_limit_args(DEFAULT_MODEL)
     try:
         stream = await acompletion(
@@ -150,20 +151,23 @@ async def stream_generate_questions(payload: QuestionGenerationRequest) -> Async
     }
 
 
-def _list_available_contexts() -> List[Dict[str, Any]]:
+def _list_available_contexts() -> Tuple[List[Dict[str, Any]], bool]:
     if not mcp_configured():
-        raise QuestionGenerationError("LOCAL_MCP_SERVER_URL must be configured to list contexts.")
+        return [], False
     try:
         payload = call_mcp_tool("list_contexts", {})
-    except MCPClientError as exc:
-        raise QuestionGenerationError(f"Failed to list contexts via MCP: {exc}") from exc
+    except Exception as exc:
+        logger.warning("MCP list_contexts failed; proceeding without tool access: %s", exc)
+        return [], False
     contexts = payload.get("contexts") if isinstance(payload, dict) else None
     if isinstance(contexts, list):
-        return contexts
-    return []
+        return contexts, True
+    return [], True
 
 
-def _build_messages(payload: QuestionGenerationRequest, provider: str = "openai") -> List[Dict[str, str]]:
+def _build_messages(
+    payload: QuestionGenerationRequest, provider: str = "openai"
+) -> Tuple[List[Dict[str, str]], bool]:
     derived_type_counts, derived_total = _derive_type_counts(payload.instructions)
     type_instruction = "Feel free to use MCQ, short_answer, true_false, or essay question types."
     if payload.question_types:
@@ -229,15 +233,20 @@ Return JSON with this shape:
     if provider == "local":
         return _build_local_messages(payload, user_prompt)
 
-    return [
+    return (
+        [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
-    ]
+        ],
+        False,
+    )
 
 
-def _build_local_messages(payload: QuestionGenerationRequest, base_prompt: str) -> List[Dict[str, str]]:
-    contexts = _list_available_contexts()
-    if contexts:
+def _build_local_messages(
+    payload: QuestionGenerationRequest, base_prompt: str
+) -> Tuple[List[Dict[str, str]], bool]:
+    contexts, tools_available = _list_available_contexts()
+    if tools_available and contexts:
         context_lines = "\n".join(
             f"- {ctx.get('context_id')}: {ctx.get('filename')} ({ctx.get('characters')} chars, preview: {(ctx.get('preview') or '')[:120]}...)"
             for ctx in contexts
@@ -246,10 +255,12 @@ def _build_local_messages(payload: QuestionGenerationRequest, base_prompt: str) 
             "Uploaded files are available through tools. Call 'list_contexts' to see all IDs, then 'read_context' to fetch excerpts.\n"
             f"Known files:\n{context_lines}\n"
         )
-    else:
+    elif tools_available:
         context_note = (
             "No uploaded documents are currently available. If you still need context, ask the instructor for more details."
         )
+    else:
+        context_note = "Tool access is currently unavailable. Use the provided context only."
 
     tool_instructions = """
 You must respond ONLY with JSON objects. Valid patterns:
@@ -277,11 +288,31 @@ Important rules (violating any of these requires you to immediately stop and out
         "Follow the JSON-only protocol strictly."
     )
 
-    user_prompt = f"{base_prompt}\n\n{context_note}\n{tool_instructions}"
-    return [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt},
-    ]
+    if tools_available:
+        user_prompt = f"{base_prompt}\n\n{context_note}\n{tool_instructions}"
+        return (
+            [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            True,
+        )
+
+    direct_system_prompt = (
+        "You are an experienced instructor who writes exam-ready questions. "
+        "Return only valid JSON. Do not reference tools."
+    )
+    direct_user_prompt = (
+        f"{base_prompt}\n\n{context_note}\n"
+        "Return a JSON object with a 'questions' list matching the schema above."
+    )
+    return (
+        [
+            {"role": "system", "content": direct_system_prompt},
+            {"role": "user", "content": direct_user_prompt},
+        ],
+        False,
+    )
 
 
 def _parse_questions(content: str) -> List[Question]:
@@ -354,8 +385,22 @@ def _derive_type_counts(instructions: str) -> Tuple[Dict[str, int], Optional[int
     return counts, total
 
 
-def _generate_questions_local(payload: QuestionGenerationRequest, messages: List[Dict[str, str]]) -> QuestionGenerationResponse:
-    raw = _run_local_tool_session(messages)
+def _generate_questions_local(
+    payload: QuestionGenerationRequest,
+    messages: List[Dict[str, str]],
+    use_tools: bool = True,
+) -> QuestionGenerationResponse:
+    if use_tools:
+        raw = _run_local_tool_session(messages)
+    else:
+        raw = _call_local_llm(messages)
+        parsed = _try_parse_json(raw)
+        if isinstance(parsed, dict) and parsed.get("action") == "final":
+            final_content = parsed.get("content")
+            if isinstance(final_content, (dict, list)):
+                raw = json.dumps(final_content)
+            elif final_content is not None:
+                raw = str(final_content)
     questions = _parse_questions(raw)
     markdown = render_canvas_markdown(payload.instructions, [q.model_dump() for q in questions], {})
     return QuestionGenerationResponse(
@@ -468,6 +513,13 @@ def _resolve_provider(payload: QuestionGenerationRequest) -> str:
     provider = (payload.provider or DEFAULT_PROVIDER or "openai").strip().lower()
     if provider not in {"openai", "local"}:
         provider = DEFAULT_PROVIDER or "openai"
+    if provider == "openai" and payload.provider is None:
+        if not os.getenv("OPENAI_API_KEY") and not os.getenv("LITELLM_API_KEY"):
+            local_pref = (os.getenv("LLM_PROVIDER") or "").strip().lower() == "local"
+            local_pref = local_pref or (os.getenv("SUMMARY_PROVIDER") or "").strip().lower() == "local"
+            local_pref = local_pref or bool(os.getenv("LOCAL_LLM_MODEL") or os.getenv("LOCAL_LLM_URL"))
+            if local_pref:
+                provider = "local"
     return provider
 
 

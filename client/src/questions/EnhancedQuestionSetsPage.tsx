@@ -377,7 +377,8 @@ export default function EnhancedQuestionSetsPage() {
         instructions,
         context: context || undefined,
         question_count: totalQuestions,
-        question_types: questionTypes
+        question_types: questionTypes,
+        provider: "local"
       });
 
       const generatedQuestions = result.questions.map(mapApiQuestion);
@@ -456,7 +457,8 @@ export default function EnhancedQuestionSetsPage() {
         instructions: prompt,
         context: context || undefined,
         question_count: totalNew,
-        question_types: questionTypes
+        question_types: questionTypes,
+        provider: "local"
       });
 
       const newQuestions = result.questions.map(mapApiQuestion);
@@ -689,7 +691,7 @@ export default function EnhancedQuestionSetsPage() {
   };
 
   return (
-    <div className="h-full p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 flex flex-col overflow-hidden min-h-0 ia-page-root ia-questions-page">
+    <div className="h-full p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 flex flex-col overflow-auto min-h-0 ia-page-root ia-questions-page">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Question Sets</h1>
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
@@ -706,7 +708,7 @@ export default function EnhancedQuestionSetsPage() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-hidden ia-questions-scroll-root">
+      <div className="flex-1 min-h-0 overflow-auto ia-questions-scroll-root">
         <Tabs defaultValue="generate" className="flex-1 flex flex-col min-h-0 overflow-hidden ia-questions-tabs">
           <TabsList className="w-full sm:w-auto">
             <TabsTrigger value="generate" className="flex-1 sm:flex-initial">Generate</TabsTrigger>
@@ -744,59 +746,57 @@ export default function EnhancedQuestionSetsPage() {
                     onChange={setQuestionConfigs}
                   />
                 </div>
-              </div>
 
-              {/* Fixed Bottom Section - Always Visible */}
-              <div className="flex-shrink-0 space-y-3 pt-2 border-t bg-muted/10 -mx-5 px-5 pb-0">
-                {/* Model Selection */}
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-sm">Model</h3>
-                  <Button variant="outline" size="sm" className="w-full h-9 text-xs justify-start">
-                    ⚡ Qwen (Local) - Recommended
-                  </Button>
-                </div>
-                
-                {/* Generate Button */}
-                <div className="space-y-2">
-                  <Button
-                    onClick={handleGenerate}
-                    disabled={
-                      isGenerating ||
-                      (selectedPaperIds.size === 0 &&
-                        selectedNoteIds.size === 0 &&
-                        selectedUploadIds.size === 0)
-                    }
-                    className="w-full"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Generate Questions
-                      </>
-                    )}
-                  </Button>
+                {/* Model + Generate (scrolls with panel to avoid clipping) */}
+                <div className="space-y-3 pt-2 border-t bg-muted/10 -mx-5 px-5 pb-1">
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-sm">Model</h3>
+                    <Button variant="outline" size="sm" className="w-full h-9 text-xs justify-start">
+                      ⚡ Qwen (Local) - Recommended
+                    </Button>
+                  </div>
 
-                  {questions.length > 0 && (
-                    <div className="space-y-2">
-                      <div className="text-xs text-muted-foreground text-center">
-                        Current Set: {questions.length} questions
+                  <div className="space-y-2">
+                    <Button
+                      onClick={handleGenerate}
+                      disabled={
+                        isGenerating ||
+                        (selectedPaperIds.size === 0 &&
+                          selectedNoteIds.size === 0 &&
+                          selectedUploadIds.size === 0)
+                      }
+                      className="w-full"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Generate Questions
+                        </>
+                      )}
+                    </Button>
+
+                    {questions.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-xs text-muted-foreground text-center">
+                          Current Set: {questions.length} questions
+                        </div>
+                        <Button
+                          variant="outline"
+                          onClick={handleAddMore}
+                          disabled={isGenerating}
+                          className="w-full"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add More Questions
+                        </Button>
                       </div>
-                      <Button
-                        variant="outline"
-                        onClick={handleAddMore}
-                        disabled={isGenerating}
-                        className="w-full"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add More Questions
-                      </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
