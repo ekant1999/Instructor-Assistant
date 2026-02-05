@@ -11,6 +11,16 @@ import numpy as np
 from .embeddings import get_embedding_service
 
 
+def _sanitize_value(value: Any) -> Any:
+    if isinstance(value, str):
+        return value.replace("\x00", "")
+    if isinstance(value, list):
+        return [_sanitize_value(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _sanitize_value(val) for key, val in value.items()}
+    return value
+
+
 class PgVectorStore:
     """Vector store using PostgreSQL with pgvector extension."""
     
@@ -42,8 +52,19 @@ class PgVectorStore:
         if not blocks:
             return 0
         
-        # Extract texts for embedding
-        texts = [b["text"] for b in blocks]
+        # Extract texts for embedding (sanitize NULL bytes)
+        texts = []
+        for b in blocks:
+            raw_text = b.get("text") or ""
+            clean_text = raw_text.replace("\x00", "")
+            if clean_text != raw_text:
+                b["text"] = clean_text
+            # Sanitize nested metadata/bbox to avoid invalid UTF-8 escapes
+            if "metadata" in b:
+                b["metadata"] = _sanitize_value(b.get("metadata"))
+            if "bbox" in b:
+                b["bbox"] = _sanitize_value(b.get("bbox"))
+            texts.append(clean_text)
         
         # Generate embeddings
         embeddings = self.embedder.embed_texts(texts, show_progress=True)

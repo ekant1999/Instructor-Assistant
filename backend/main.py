@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import asyncio
 import base64
 import json
 import logging
 import os
+import re
 import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -15,6 +17,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.core.database import get_conn, init_db
+from backend.core.postgres import init_db as init_pg_db
 from backend.core.library import render_library_structured, add_paper, delete_paper as delete_paper_record
 from backend.core.questions import (
     create_question_set,
@@ -30,6 +33,8 @@ from backend.core.search import (
     search_summaries,
     search_all,
 )
+from backend.core.hybrid_search import hybrid_search, full_text_search
+from backend.rag.pgvector_store import PgVectorStore
 
 from .schemas import (
     CanvasPushRequest,
@@ -85,7 +90,12 @@ from .mcp_client import (
 )
 from .canvas_service import CanvasPushError, push_question_set_to_canvas
 from . import qwen_tools
-from .rag import ingest, query, image_index
+from .rag import ingest_pgvector, query_pgvector, image_index
+from backend.core.postgres import (
+    get_pool as get_pg_pool,
+    close_pool as close_pg_pool,
+    normalize_timestamp,
+)
 from . import context_store
 
 BACKEND_ROOT = Path(__file__).resolve().parent
@@ -119,6 +129,307 @@ def _parse_metadata(raw: Optional[str]) -> Dict[str, Any]:
     if isinstance(data, dict):
         return data
     return {}
+
+
+def _sqlite_rank_score(raw: Any) -> float:
+    try:
+        if raw is None:
+            return 0.0
+        return -float(raw)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _pgvector_score(row: Dict[str, Any]) -> float:
+    for key in ("hybrid_score", "similarity", "score"):
+        val = row.get(key)
+        if val is None:
+            continue
+        try:
+            return float(val)
+        except (TypeError, ValueError):
+            continue
+    return 0.0
+
+
+_WORD_RE = re.compile(r"[A-Za-z0-9]+")
+
+
+def _query_tokens(query: str) -> List[str]:
+    if not query:
+        return []
+    tokens = [t.lower() for t in _WORD_RE.findall(query) if len(t) > 2]
+    # Deduplicate while preserving order
+    return list(dict.fromkeys(tokens))
+
+
+def _lexical_hits(tokens: List[str], text: str) -> int:
+    if not tokens or not text:
+        return 0
+    text_lower = text.lower()
+    return sum(1 for token in tokens if token in text_lower)
+
+
+def _select_block_for_query(row: Dict[str, Any], tokens: List[str]) -> Dict[str, Any]:
+    metadata = row.get("metadata")
+    blocks = metadata.get("blocks") if isinstance(metadata, dict) else None
+    if not blocks:
+        return {
+            "page_no": row.get("page_no"),
+            "block_index": row.get("block_index"),
+            "bbox": row.get("bbox"),
+            "text": row.get("text") or "",
+            "lex_hits": _lexical_hits(tokens, row.get("text") or ""),
+        }
+
+    best_block: Optional[Dict[str, Any]] = None
+    best_hits = -1
+    best_len = -1
+    for block in blocks:
+        text = block.get("text") or ""
+        hits = _lexical_hits(tokens, text) if tokens else 0
+        if hits > best_hits or (hits == best_hits and len(text) > best_len):
+            best_block = block
+            best_hits = hits
+            best_len = len(text)
+
+    if not best_block:
+        return {
+            "page_no": row.get("page_no"),
+            "block_index": row.get("block_index"),
+            "bbox": row.get("bbox"),
+            "text": row.get("text") or "",
+            "lex_hits": _lexical_hits(tokens, row.get("text") or ""),
+        }
+
+    return {
+        "page_no": best_block.get("page_no") or row.get("page_no"),
+        "block_index": best_block.get("block_index") or row.get("block_index"),
+        "bbox": best_block.get("bbox") or row.get("bbox"),
+        "text": best_block.get("text") or row.get("text") or "",
+        "lex_hits": best_hits,
+    }
+
+
+def _build_match_snippet(query: str, tokens: List[str], text: str, max_len: int = 240) -> str:
+    if not text:
+        return ""
+    clean = " ".join(text.replace("\x00", "").split())
+    if not clean:
+        return ""
+    if not tokens:
+        return clean[:max_len]
+    lower = clean.lower()
+    target_tokens = [t for t in tokens if t in lower]
+    if target_tokens:
+        # Find the smallest window that covers all present query tokens.
+        words = [(m.group(0).lower(), m.start(), m.end()) for m in _WORD_RE.finditer(clean)]
+        target_set = set(target_tokens)
+        needed = len(target_set)
+        counts: Dict[str, int] = {}
+        have = 0
+        best_window: Optional[tuple[int, int]] = None
+        left = 0
+        for right, (token, start, end) in enumerate(words):
+            if token in target_set:
+                counts[token] = counts.get(token, 0) + 1
+                if counts[token] == 1:
+                    have += 1
+            while have == needed and left <= right:
+                window_start = words[left][1]
+                window_end = end
+                if best_window is None or (window_end - window_start) < (best_window[1] - best_window[0]):
+                    best_window = (window_start, window_end)
+                left_token = words[left][0]
+                if left_token in target_set:
+                    counts[left_token] -= 1
+                    if counts[left_token] == 0:
+                        have -= 1
+                left += 1
+        if best_window:
+            pad = 12
+            start = max(0, best_window[0] - pad)
+            end = min(len(clean), best_window[1] + pad)
+            snippet = clean[start:end]
+            if len(snippet) <= max_len:
+                return snippet
+            clean = snippet
+            lower = clean.lower()
+
+    tokens_sorted = sorted(tokens, key=len, reverse=True)
+    anchor = -1
+    for token in tokens_sorted:
+        idx = lower.find(token)
+        if idx != -1:
+            anchor = idx
+            break
+    if anchor == -1:
+        return clean[:max_len]
+    target_len = min(max_len, max(60, len(query) * 2))
+    start = max(0, anchor - target_len // 4)
+    if start > 0:
+        prior_space = clean.rfind(" ", 0, start)
+        if prior_space != -1:
+            start = prior_space + 1
+    end = min(len(clean), start + target_len)
+    if end < len(clean):
+        next_space = clean.find(" ", end)
+        if next_space != -1:
+            end = next_space
+    return clean[start:end]
+
+
+def _pgvector_search_paper_ids(query: str, search_type: str, limit: int = 100) -> Dict[int, float]:
+    async def _run() -> Dict[int, float]:
+        alpha_raw = os.getenv("HYBRID_SEARCH_ALPHA", "0.5")
+        try:
+            alpha = float(alpha_raw)
+        except ValueError:
+            alpha = 0.5
+        pool = await get_pg_pool()
+        store = PgVectorStore(pool)
+        retrieve_k = max(20, min(limit * 5, 300))
+        if search_type == "embedding":
+            results = await store.similarity_search(query, k=retrieve_k)
+        elif search_type == "keyword":
+            results = await full_text_search(query, pool, k=retrieve_k)
+        else:
+            results = await hybrid_search(query, store, pool, k=retrieve_k, alpha=alpha)
+        score_by_id: Dict[int, float] = {}
+        for row in results or []:
+            pid = row.get("paper_id")
+            if pid is None:
+                continue
+            score = _pgvector_score(row)
+            prev = score_by_id.get(pid)
+            if prev is None or score > prev:
+                score_by_id[pid] = score
+        return score_by_id
+
+    try:
+        return asyncio.run(_run())
+    except Exception:
+        logger.exception("pgvector search failed; falling back to SQLite search")
+        return {}
+    finally:
+        try:
+            asyncio.run(close_pg_pool())
+        except Exception:
+            pass
+
+
+def _pgvector_search_sections(
+    paper_id: int,
+    query: str,
+    search_type: str,
+    include_text: bool,
+    max_chars: Optional[int],
+    limit: int = 100,
+) -> List[Dict[str, Any]]:
+    async def _run() -> List[Dict[str, Any]]:
+        alpha_raw = os.getenv("HYBRID_SEARCH_ALPHA", "0.5")
+        try:
+            alpha = float(alpha_raw)
+        except ValueError:
+            alpha = 0.5
+        pool = await get_pg_pool()
+        store = PgVectorStore(pool)
+        retrieve_k = max(20, min(limit * 5, 300))
+        if search_type == "embedding":
+            return await store.similarity_search(query, k=retrieve_k, paper_ids=[paper_id])
+        if search_type == "keyword":
+            return await full_text_search(query, pool, k=retrieve_k, paper_ids=[paper_id])
+        return await hybrid_search(query, store, pool, k=retrieve_k, paper_ids=[paper_id], alpha=alpha)
+
+    try:
+        results = asyncio.run(_run())
+    except Exception:
+        logger.exception("pgvector section search failed; falling back to SQLite search")
+        return []
+    finally:
+        try:
+            asyncio.run(close_pg_pool())
+        except Exception:
+            pass
+
+    if not results:
+        return []
+
+    tokens = _query_tokens(query)
+    page_scores: Dict[int, float] = {}
+    page_best: Dict[int, Dict[str, Any]] = {}
+    page_best_lex: Dict[int, Dict[str, Any]] = {}
+    for row in results:
+        match_block = _select_block_for_query(row, tokens)
+        page_no = match_block.get("page_no") or row.get("page_no")
+        if not page_no:
+            continue
+        score = _pgvector_score(row)
+        page_no_int = int(page_no)
+        prev = page_scores.get(page_no_int)
+        if prev is None or score > prev:
+            page_scores[page_no_int] = score
+            page_best[page_no_int] = {
+                "bbox": match_block.get("bbox") or row.get("bbox"),
+                "block_index": match_block.get("block_index") or row.get("block_index"),
+                "text": match_block.get("text") or row.get("text"),
+                "lex_hits": match_block.get("lex_hits", 0),
+            }
+
+        lex_hits = match_block.get("lex_hits", 0)
+        prev_lex = page_best_lex.get(page_no_int)
+        if prev_lex is None or lex_hits > prev_lex.get("lex_hits", 0):
+            page_best_lex[page_no_int] = {
+                "bbox": match_block.get("bbox") or row.get("bbox"),
+                "block_index": match_block.get("block_index") or row.get("block_index"),
+                "text": match_block.get("text") or row.get("text"),
+                "lex_hits": lex_hits,
+            }
+
+    if not page_scores:
+        return []
+
+    pages = list(page_scores.keys())
+    placeholders = ",".join("?" for _ in pages)
+    with get_conn() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT id, page_no, text
+            FROM sections
+            WHERE paper_id=? AND page_no IN ({placeholders})
+            """,
+            (paper_id, *pages),
+        ).fetchall()
+
+    sections: List[Dict[str, Any]] = []
+    for r in rows:
+        best = page_best.get(r["page_no"]) or {}
+        lex = page_best_lex.get(r["page_no"])
+        if lex and tokens:
+            min_hits = 1 if len(tokens) <= 3 else 2
+            if lex.get("lex_hits", 0) >= min_hits:
+                best = lex
+        entry = {
+            "id": r["id"],
+            "page_no": r["page_no"],
+            "paper_id": paper_id,
+            "match_score": page_scores.get(r["page_no"], 0),
+            "match_bbox": best.get("bbox"),
+            "match_block_index": best.get("block_index"),
+        }
+        best_text = best.get("text") or ""
+        match_text = _build_match_snippet(query, tokens, best_text)
+        if match_text:
+            entry["match_text"] = match_text
+        if include_text:
+            text = r["text"] or ""
+            if max_chars is not None and max_chars > 0:
+                text = text[:max_chars]
+            entry["text"] = text
+        sections.append(entry)
+
+    sections.sort(key=lambda item: item.get("match_score", 0), reverse=True)
+    return sections
 
 
 def _get_paper(paper_id: int) -> Optional[Dict[str, Any]]:
@@ -194,9 +505,48 @@ def _set_all_rag_status(status: str, error: Optional[str] = None) -> None:
 def _collect_rag_papers() -> List[Dict[str, Any]]:
     with get_conn() as conn:
         rows = conn.execute(
-            "SELECT id, title, pdf_path FROM papers WHERE pdf_path IS NOT NULL"
+            """
+            SELECT id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at
+            FROM papers
+            WHERE pdf_path IS NOT NULL
+            """
         ).fetchall()
     return [dict(r) for r in rows]
+
+
+async def _upsert_pg_papers(papers: List[Dict[str, Any]]) -> None:
+    if not papers:
+        return
+    pool = await get_pg_pool()
+    payload = []
+    for p in papers:
+        payload.append(
+            (
+                p.get("id"),
+                p.get("title"),
+                p.get("source_url"),
+                p.get("pdf_path"),
+                p.get("rag_status"),
+                p.get("rag_error"),
+                normalize_timestamp(p.get("rag_updated_at")),
+                normalize_timestamp(p.get("created_at")),
+            )
+        )
+    async with pool.acquire() as conn:
+        await conn.executemany(
+            """
+            INSERT INTO papers (id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            ON CONFLICT (id) DO UPDATE SET
+                title = EXCLUDED.title,
+                source_url = EXCLUDED.source_url,
+                pdf_path = EXCLUDED.pdf_path,
+                rag_status = EXCLUDED.rag_status,
+                rag_error = EXCLUDED.rag_error,
+                rag_updated_at = EXCLUDED.rag_updated_at
+            """,
+            payload,
+        )
 
 
 def _run_full_rag_ingestion() -> None:
@@ -217,14 +567,18 @@ def _run_full_rag_ingestion() -> None:
     _set_rag_status(paper_ids, "processing", None)
 
     try:
-        documents = ingest.load_pdfs_from_paths(pdf_paths, metadata_by_path=metadata_by_path)
-        if not documents:
-            raise ValueError("No valid PDFs were loaded for ingestion.")
-        chunks = ingest.split_documents(documents, chunk_size=1200, chunk_overlap=200)
-        if not chunks:
-            raise ValueError("No chunks were created from the PDFs.")
-        index_dir = str(BACKEND_ROOT / "index")
-        ingest.create_faiss_index(chunks, index_dir=index_dir)
+        async def _ingest() -> Dict[str, Any]:
+            try:
+                await _upsert_pg_papers(papers)
+                return await ingest_pgvector.ingest_papers_from_db(
+                    paper_ids=paper_ids,
+                    chunk_size=1200,
+                    chunk_overlap=200,
+                )
+            finally:
+                await close_pg_pool()
+
+        result = asyncio.run(_ingest())
         if os.getenv("ENABLE_IMAGE_INDEX", "true").lower() in {"1", "true", "yes"}:
             image_index_dir = os.getenv("IMAGE_INDEX_DIR", str(BACKEND_ROOT / "index_images"))
             figure_dir = os.getenv("FIGURE_OUTPUT_DIR", str(DATA_DIR / "figures"))
@@ -233,7 +587,7 @@ def _run_full_rag_ingestion() -> None:
             except Exception as exc:
                 logger.exception("Image indexing failed: %s", exc)
         _set_rag_status(paper_ids, "done", None)
-        logger.info("RAG ingestion complete for %s papers", len(paper_ids))
+        logger.info("RAG ingestion complete for %s papers", result.get("papers_ingested", len(paper_ids)))
     except Exception as exc:
         logger.exception("RAG ingestion failed")
         _set_rag_status(paper_ids, "error", str(exc))
@@ -265,8 +619,12 @@ def schedule_rag_rebuild() -> None:
 
 
 @app.on_event("startup")
-def _startup() -> None:
+async def _startup() -> None:
     init_db()
+    try:
+        await init_pg_db()
+    except Exception:
+        logger.exception("PostgreSQL init failed; pgvector features may be unavailable.")
 
 cors_origins = [
     "http://localhost:5173",
@@ -391,16 +749,39 @@ def list_papers(
         st = search_type or "keyword"
         if st not in ["keyword", "embedding", "hybrid"]:
             st = "keyword"
-        
-        # Search both paper titles and sections
-        paper_results = search_papers(q, search_type=st, limit=100)
-        section_results = search_sections(q, search_type=st, limit=500)
-        
-        # Collect unique paper IDs from both results
-        paper_ids_from_titles = {p['id'] for p in paper_results}
-        paper_ids_from_sections = {s['paper_id'] for s in section_results}
-        matching_paper_ids = paper_ids_from_titles | paper_ids_from_sections
-        
+
+        score_by_id: Dict[int, float] = {}
+        matching_paper_ids: set[int] = set()
+
+        # Keyword search over titles/URLs (SQLite FTS)
+        paper_results = []
+        if st in ["keyword", "hybrid"]:
+            paper_results = search_papers(q, search_type="keyword", limit=100)
+            for p in paper_results:
+                pid = p.get("id")
+                if pid is None:
+                    continue
+                matching_paper_ids.add(pid)
+                score_by_id[pid] = max(score_by_id.get(pid, float("-inf")), _sqlite_rank_score(p.get("rank")))
+
+        # Keyword search over sections (SQLite FTS)
+        section_results = []
+        if st in ["keyword", "hybrid"]:
+            section_results = search_sections(q, search_type="keyword", limit=500)
+            for s in section_results:
+                pid = s.get("paper_id")
+                if pid is None:
+                    continue
+                matching_paper_ids.add(pid)
+                score_by_id[pid] = max(score_by_id.get(pid, float("-inf")), _sqlite_rank_score(s.get("rank")))
+
+        # pgvector semantic/hybrid search over text_blocks (PostgreSQL)
+        if st in ["embedding", "hybrid"]:
+            pg_scores = _pgvector_search_paper_ids(q, st, limit=100)
+            for pid, score in pg_scores.items():
+                matching_paper_ids.add(pid)
+                score_by_id[pid] = max(score_by_id.get(pid, float("-inf")), score)
+
         # Fetch full paper details for all matching papers
         if matching_paper_ids:
             with get_conn() as conn:
@@ -421,6 +802,12 @@ def list_papers(
                 for p in papers:
                     pdf_path = p.get("pdf_path")
                     p["pdf_url"] = f"/papers/{p['id']}/file" if pdf_path else None
+
+                if score_by_id:
+                    papers.sort(
+                        key=lambda p: score_by_id.get(p["id"], float("-inf")),
+                        reverse=True,
+                    )
         else:
             papers = []
         
@@ -481,13 +868,50 @@ def list_paper_sections(
         st = search_type or "keyword"
         if st not in ["keyword", "embedding", "hybrid"]:
             st = "keyword"
-        
-        results = search_sections(q, search_type=st, paper_ids=[paper_id], limit=100)
+
+        # For hybrid searches, prefer exact keyword hits when available.
+        if st == "hybrid":
+            keyword_results = search_sections(q, search_type="keyword", paper_ids=[paper_id], limit=100)
+            if keyword_results:
+                sections: List[Dict[str, Any]] = []
+                for r in keyword_results:
+                    entry = {
+                        "id": r["id"],
+                        "page_no": r["page_no"],
+                        "paper_id": r["paper_id"],
+                        "match_score": r.get("rank", 0),
+                    }
+                    if include_text:
+                        text = r["text"] or ""
+                        if max_chars is not None and max_chars > 0:
+                            text = text[:max_chars]
+                        entry["text"] = text
+                    sections.append(entry)
+                return {"sections": sections}
+
+        # Use pgvector for embedding/hybrid searches when keyword has no hits
+        if st in ["embedding", "hybrid"]:
+            pg_sections = _pgvector_search_sections(
+                paper_id,
+                q,
+                st,
+                include_text=include_text,
+                max_chars=max_chars,
+                limit=100,
+            )
+            if pg_sections:
+                return {"sections": pg_sections}
+            if st == "embedding":
+                return {"sections": []}
+            # fall back to keyword if hybrid found nothing
+            st = "keyword"
+
+        results = search_sections(q, search_type="keyword", paper_ids=[paper_id], limit=100)
         sections: List[Dict[str, Any]] = []
         for r in results:
             entry = {
-                "id": r["id"], 
-                "page_no": r["page_no"], 
+                "id": r["id"],
+                "page_no": r["page_no"],
                 "paper_id": r["paper_id"],
                 "match_score": r.get("rank", 0)  # Include relevance score for highlighting
             }
@@ -988,7 +1412,6 @@ async def download_paper(payload: PaperDownloadRequest) -> Dict[str, PaperRecord
             ("queued", result["paper_id"]),
         )
         conn.commit()
-    schedule_rag_rebuild()
     paper = _get_paper(result["paper_id"])
     if not paper:
         raise HTTPException(status_code=500, detail="Downloaded paper could not be loaded.")
@@ -1008,7 +1431,21 @@ def delete_paper_handler(paper_id: int) -> Response:
     if path:
         pdf_path = Path(path)
         pdf_path.unlink(missing_ok=True)
-    schedule_rag_rebuild()
+    def _delete_pg_blocks() -> None:
+        async def _run():
+            try:
+                from backend.rag.pgvector_store import PgVectorStore
+                pool = await get_pg_pool()
+                store = PgVectorStore(pool)
+                await store.delete_paper_blocks(paper_id)
+            finally:
+                await close_pg_pool()
+        try:
+            asyncio.run(_run())
+        except Exception:
+            logger.exception("Failed to remove pgvector blocks for paper %s", paper_id)
+
+    threading.Thread(target=_delete_pg_blocks, daemon=True).start()
     return Response(status_code=204)
 
 
@@ -1111,103 +1548,94 @@ def agent_chat(payload: AgentChatRequest) -> AgentChatResponse:
 
 @app.post("/api/rag/ingest", response_model=RAGIngestResponse)
 async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
-    """Ingest PDFs from papers directory and create FAISS index."""
-    def _run_ingestion():
-        try:
-            default_papers_dir = str(DATA_DIR / "pdfs")
-            default_index_dir = str(BACKEND_ROOT / "index")
-            papers_dir = payload.papers_dir or default_papers_dir
-            index_dir = payload.index_dir or default_index_dir
-            chunk_size = payload.chunk_size or 1200
-            chunk_overlap = payload.chunk_overlap or 200
+    """Ingest PDFs into PostgreSQL (pgvector)."""
+    chunk_size = payload.chunk_size or 1200
+    chunk_overlap = payload.chunk_overlap or 200
+    requested_ids = payload.paper_ids or []
 
-            logger.info(f"Starting ingestion: papers_dir={papers_dir}, index_dir={index_dir}")
+    with get_conn() as conn:
+        if requested_ids:
+            placeholders = ",".join("?" for _ in requested_ids)
+            rows = conn.execute(
+                f"""
+                SELECT id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at
+                FROM papers
+                WHERE id IN ({placeholders}) AND pdf_path IS NOT NULL
+                """,
+                tuple(requested_ids),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                """
+                SELECT id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at
+                FROM papers
+                WHERE pdf_path IS NOT NULL
+                """
+            ).fetchall()
 
-            # Load PDFs
-            paper_ids = payload.paper_ids or []
-            documents = []
-            pdf_paths: List[str] = []
-            metadata_by_path: Dict[str, Dict[str, Any]] = {}
-            if paper_ids:
-                with get_conn() as conn:
-                    placeholders = ",".join("?" for _ in paper_ids)
-                    rows = conn.execute(
-                        f"SELECT id, title, pdf_path FROM papers WHERE id IN ({placeholders})",
-                        tuple(paper_ids),
-                    ).fetchall()
-                pdf_paths = [row["pdf_path"] for row in rows if row["pdf_path"]]
-                if not pdf_paths:
-                    return RAGIngestResponse(
-                        success=False,
-                        message="No PDFs found for the selected papers.",
-                        num_documents=0,
-                    )
-                metadata_by_path = {
-                    str(Path(row["pdf_path"]).expanduser().resolve()): {
-                        "paper_id": row["id"],
-                        "paper_title": row["title"] or Path(row["pdf_path"]).stem,
-                    }
-                    for row in rows
-                    if row["pdf_path"]
-                }
-                documents = ingest.load_pdfs_from_paths(pdf_paths, metadata_by_path=metadata_by_path)
-            else:
-                documents = ingest.load_pdfs(papers_dir)
-                pdf_paths = list({doc.metadata.get("source") for doc in documents if doc.metadata.get("source")})
-            if not documents:
-                return RAGIngestResponse(
-                    success=False,
-                    message=f"No PDF files found in {papers_dir}",
-                    num_documents=0
-                )
+    papers = [dict(row) for row in rows]
+    if not papers:
+        return RAGIngestResponse(
+            success=False,
+            message="No PDFs found for ingestion.",
+            num_documents=0,
+        )
 
-            logger.info(f"Loaded {len(documents)} documents")
-
-            # Split into chunks
-            chunks = ingest.split_documents(documents, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-            logger.info(f"Created {len(chunks)} chunks")
-
-            # Create index
-            ingest.create_faiss_index(chunks, index_dir=index_dir)
-            logger.info("FAISS index created successfully")
-            if metadata_by_path and os.getenv("ENABLE_IMAGE_INDEX", "true").lower() in {"1", "true", "yes"}:
-                image_index_dir = os.getenv("IMAGE_INDEX_DIR", str(BACKEND_ROOT / "index_images"))
-                figure_dir = os.getenv("FIGURE_OUTPUT_DIR", str(DATA_DIR / "figures"))
-                try:
-                    image_index.build_image_index(pdf_paths, metadata_by_path, figure_dir, image_index_dir)
-                except Exception as exc:
-                    logger.exception("Image indexing failed: %s", exc)
-
-            return RAGIngestResponse(
-                success=True,
-                message=f"Successfully ingested {len(documents)} documents into {len(chunks)} chunks",
-                num_documents=len(documents),
-                num_chunks=len(chunks),
-                index_dir=index_dir
-            )
-        except ValueError as ve:
-            logger.error(f"RAG ingestion validation error: {ve}")
-            raise
-        except Exception as e:
-            logger.exception("RAG ingestion failed with unexpected error")
-            raise ValueError(f"Ingestion failed: {str(e)}") from e
+    paper_ids = [p["id"] for p in papers]
+    pdf_paths = [p["pdf_path"] for p in papers if p.get("pdf_path")]
+    metadata_by_path = {
+        str(Path(p["pdf_path"]).expanduser().resolve()): {
+            "paper_id": p["id"],
+            "paper_title": p.get("title") or Path(p["pdf_path"]).stem,
+        }
+        for p in papers
+        if p.get("pdf_path")
+    }
+    _set_rag_status(paper_ids, "processing", None)
 
     try:
-        return await run_in_threadpool(_run_ingestion)
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
+        await _upsert_pg_papers(papers)
+        result = await ingest_pgvector.ingest_papers_from_db(
+            paper_ids=paper_ids,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+        )
+        if os.getenv("ENABLE_IMAGE_INDEX", "true").lower() in {"1", "true", "yes"}:
+            image_index_dir = os.getenv("IMAGE_INDEX_DIR", str(BACKEND_ROOT / "index_images"))
+            figure_dir = os.getenv("FIGURE_OUTPUT_DIR", str(DATA_DIR / "figures"))
+            try:
+                image_index.build_image_index(pdf_paths, metadata_by_path, figure_dir, image_index_dir)
+            except Exception as exc:
+                logger.exception("Image indexing failed: %s", exc)
+
+        _set_rag_status(paper_ids, "done", None)
+        papers_ingested = result.get("papers_ingested", len(paper_ids))
+        message = f"Successfully ingested {papers_ingested} paper(s) into pgvector."
+        if result.get("failed"):
+            message = f"Ingested {papers_ingested} paper(s); {len(result['failed'])} failed."
+        return RAGIngestResponse(
+            success=bool(result.get("success", True)),
+            message=message,
+            num_documents=papers_ingested,
+            num_chunks=result.get("total_chunks"),
+            index_dir=payload.index_dir or "pgvector",
+        )
     except Exception as exc:
         logger.exception("RAG ingestion failed")
+        _set_rag_status(paper_ids, "error", str(exc))
         raise HTTPException(status_code=500, detail=f"Ingestion failed: {str(exc)}")
 
 
 @app.get("/api/rag/status", response_model=RAGIndexStatusResponse)
-def rag_status(index_dir: Optional[str] = None) -> RAGIndexStatusResponse:
-    """Check the status of the RAG index."""
+async def rag_status(index_dir: Optional[str] = None) -> RAGIndexStatusResponse:
+    """Check the status of the pgvector index."""
     try:
-        default_index_dir = str(BACKEND_ROOT / "index")
-        status = query.check_index_status(index_dir=index_dir or default_index_dir)
-        return RAGIndexStatusResponse(**status)
+        status = await query_pgvector.check_index_status()
+        return RAGIndexStatusResponse(
+            exists=status.get("exists", False),
+            message=status.get("message", ""),
+            index_dir=index_dir or "pgvector",
+        )
     except Exception as exc:
         logger.exception("Failed to check RAG index status")
         raise HTTPException(status_code=500, detail=str(exc))
@@ -1217,8 +1645,6 @@ def rag_status(index_dir: Optional[str] = None) -> RAGIndexStatusResponse:
 async def rag_query(payload: RAGQueryRequest) -> RAGQueryResponse:
     """Query the RAG system with a question."""
     try:
-        default_index_dir = str(BACKEND_ROOT / "index")
-        index_dir = payload.index_dir or default_index_dir
         k = payload.k or 6
         headless = payload.headless if payload.headless is not None else False  # Default to False to show browser
         search_type = payload.search_type or "embedding"
@@ -1227,15 +1653,20 @@ async def rag_query(payload: RAGQueryRequest) -> RAGQueryResponse:
         if search_type not in ["keyword", "embedding", "hybrid"]:
             search_type = "embedding"
 
-        result = await run_in_threadpool(
-            query.query_rag,
+        alpha_raw = os.getenv("HYBRID_SEARCH_ALPHA", "0.5")
+        try:
+            alpha = float(alpha_raw)
+        except ValueError:
+            alpha = 0.5
+
+        result = await query_pgvector.query_rag(
             payload.question,
-            index_dir=index_dir,
             k=k,
-            headless=headless,
             paper_ids=payload.paper_ids,
             provider=payload.provider,
             search_type=search_type,
+            alpha=alpha,
+            headless=headless,
         )
 
         # Convert context info to proper format

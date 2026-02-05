@@ -79,7 +79,7 @@ export function SectionSelector({
         <div className="p-4 space-y-3">
           {paper.sections.map((section) => {
             const isHighlighted = highlightSectionId === section.id;
-            const isMatch = section.matchScore !== undefined && section.matchScore !== 0;
+            const isMatch = section.matchScore !== undefined;
             
             return (
             <Card

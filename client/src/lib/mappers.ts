@@ -37,6 +37,8 @@ function yearFromTimestamp(ts?: number): string | undefined {
 export function mapApiPaper(api: ApiPaper): Paper {
   const createdAt = parseTimestamp(api.created_at);
   const ragUpdatedAt = parseTimestamp(api.rag_updated_at);
+  const rawStatus = (api.rag_status || undefined) as Paper["ragStatus"] | "indexed";
+  const ragStatus = rawStatus === "indexed" ? "done" : rawStatus;
   return {
     id: String(api.id),
     title: api.title || "Untitled Paper",
@@ -47,7 +49,7 @@ export function mapApiPaper(api: ApiPaper): Paper {
     createdAt,
     updatedAt: createdAt,
     noteCount: api.note_count,
-    ragStatus: (api.rag_status || undefined) as Paper["ragStatus"],
+    ragStatus,
     ragError: api.rag_error || undefined,
     ragUpdatedAt,
   };
@@ -60,6 +62,9 @@ export function mapApiSection(section: ApiPaperSection): Section {
     content: section.text || "",
     pageNo: section.page_no,
     matchScore: section.match_score,
+    matchBbox: section.match_bbox,
+    matchBlockIndex: section.match_block_index,
+    matchText: section.match_text,
   };
 }
 

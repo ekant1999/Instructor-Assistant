@@ -10,11 +10,11 @@ import os
 import logging
 from typing import Dict, Any, Optional, List, Literal
 
-from core.postgres import get_pool
-from core.hybrid_search import hybrid_search, full_text_search
-from .pgvector_store import PgVectorStore
-from .graph_pgvector import get_llm, generate_answer
-from services import call_local_llm
+from backend.core.postgres import get_pool
+from backend.core.hybrid_search import hybrid_search, full_text_search
+from backend.rag.pgvector_store import PgVectorStore
+from backend.rag.graph_pgvector import get_llm, generate_answer
+from backend.services import call_local_llm
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,8 @@ async def query_rag(
     paper_ids: Optional[List[int]] = None,
     provider: Optional[str] = None,
     search_type: Literal["keyword", "embedding", "hybrid"] = "hybrid",
-    alpha: float = 0.5
+    alpha: float = 0.5,
+    headless: Optional[bool] = None
 ) -> Dict[str, Any]:
     """
     Query the RAG system with pgvector.
@@ -124,8 +125,8 @@ async def query_rag(
             {"role": "user", "content": user_prompt},
         ])
     else:
-        # Use OpenAI/ChatGPT
-        llm = get_llm()
+        # Use OpenAI/ChatGPT (web)
+        llm = get_llm(headless=headless)
         answer = await generate_answer(question, context, llm)
     
     # Format response

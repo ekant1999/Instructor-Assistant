@@ -17,6 +17,9 @@ export interface Section {
   content: string;
   pageNo?: number;  // Page number for navigation
   matchScore?: number;  // Search relevance score for highlighting
+  matchBbox?: { x0: number; y0: number; x1: number; y1: number };
+  matchBlockIndex?: number;
+  matchText?: string;
   selected?: boolean;
 }
 

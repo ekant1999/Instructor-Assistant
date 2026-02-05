@@ -4,8 +4,10 @@ PostgreSQL database connection and configuration for pgvector migration.
 from __future__ import annotations
 
 import os
+import asyncio
+from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 import asyncpg
 from contextlib import asynccontextmanager
 
@@ -14,36 +16,64 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://instructor:password@local
 DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", "20"))
 DB_MAX_OVERFLOW = int(os.getenv("DB_MAX_OVERFLOW", "10"))
 
-# Global connection pool
-_pool: Optional[asyncpg.Pool] = None
+# Connection pools are tied to the event loop they were created in.
+# Keep a pool per loop to avoid cross-loop usage in background threads.
+_pools: Dict[int, asyncpg.Pool] = {}
+
+
+def normalize_timestamp(value: Any) -> Optional[datetime]:
+    """Convert common SQLite timestamp formats to datetime for asyncpg."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, (int, float)):
+        return datetime.fromtimestamp(value)
+    if isinstance(value, str):
+        for candidate in (value, value.replace(" ", "T")):
+            try:
+                return datetime.fromisoformat(candidate)
+            except ValueError:
+                continue
+    return None
 
 
 async def init_pool() -> asyncpg.Pool:
     """Initialize PostgreSQL connection pool."""
-    global _pool
-    if _pool is None:
-        _pool = await asyncpg.create_pool(
+    loop = asyncio.get_running_loop()
+    key = id(loop)
+    pool = _pools.get(key)
+    if pool is None or getattr(pool, "_closed", False):
+        async def _init_conn(conn: asyncpg.Connection) -> None:
+            try:
+                from pgvector.asyncpg import register_vector
+            except Exception:
+                return
+            await register_vector(conn)
+
+        pool = await asyncpg.create_pool(
             DATABASE_URL,
             min_size=5,
             max_size=DB_POOL_SIZE,
             command_timeout=60,
+            init=_init_conn,
         )
-    return _pool
+        _pools[key] = pool
+    return pool
 
 
 async def close_pool():
     """Close the PostgreSQL connection pool."""
-    global _pool
-    if _pool:
-        await _pool.close()
-        _pool = None
+    loop = asyncio.get_running_loop()
+    key = id(loop)
+    pool = _pools.pop(key, None)
+    if pool:
+        await pool.close()
 
 
 async def get_pool() -> asyncpg.Pool:
     """Get the connection pool, initializing if necessary."""
-    if _pool is None:
-        return await init_pool()
-    return _pool
+    return await init_pool()
 
 
 @asynccontextmanager

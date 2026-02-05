@@ -5,7 +5,7 @@ Uses reciprocal rank fusion (RRF) to combine results from both methods.
 """
 from typing import List, Dict, Any, Optional
 import asyncpg
-from ..rag.pgvector_store import PgVectorStore
+from backend.rag.pgvector_store import PgVectorStore
 
 
 async def full_text_search(

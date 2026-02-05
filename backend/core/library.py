@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -130,12 +131,18 @@ def _trigger_background_reindex(paper_id: int, paper_title: str):
             logger.info(f"📄 Starting background reindex for paper {paper_id}: {paper_title}")
             
             # Import here to avoid circular dependencies
-            from ..rag.ingest import ingest_single_paper
-            
+            from ..rag import ingest_pgvector
+            from ..core.postgres import get_pool, close_pool, normalize_timestamp
+
             # Get paper info
             with get_conn() as conn:
                 row = conn.execute(
-                    "SELECT id, pdf_path, title FROM papers WHERE id=?", (paper_id,)
+                    """
+                    SELECT id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at
+                    FROM papers
+                    WHERE id=?
+                    """,
+                    (paper_id,),
                 ).fetchone()
                 if not row:
                     logger.error(f"Paper {paper_id} not found for reindexing")
@@ -143,25 +150,59 @@ def _trigger_background_reindex(paper_id: int, paper_title: str):
                 
                 pdf_path = row["pdf_path"]
                 title = row["title"]
-            
-            # Get backend root for index directory
-            backend_root = Path(__file__).resolve().parents[1]
-            index_dir = str(backend_root / "index")
-            
-            # Run incremental indexing (append to existing index)
-            result = ingest_single_paper(
-                pdf_path=pdf_path,
-                paper_id=paper_id,
-                paper_title=title,
-                index_dir=index_dir,
-                incremental=True,  # Append to existing index
-            )
+
+            async def _reindex_async():
+                try:
+                    pool = await get_pool()
+                    async with pool.acquire() as pg_conn:
+                        await pg_conn.execute(
+                            """
+                            INSERT INTO papers (id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at)
+                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                            ON CONFLICT (id) DO UPDATE SET
+                                title = EXCLUDED.title,
+                                source_url = EXCLUDED.source_url,
+                                pdf_path = EXCLUDED.pdf_path,
+                                rag_status = EXCLUDED.rag_status,
+                                rag_error = EXCLUDED.rag_error,
+                                rag_updated_at = EXCLUDED.rag_updated_at
+                            """,
+                            row["id"],
+                            row["title"],
+                            row["source_url"],
+                            row["pdf_path"],
+                            row["rag_status"],
+                            row["rag_error"],
+                        normalize_timestamp(row["rag_updated_at"]),
+                        normalize_timestamp(row["created_at"]),
+                    )
+
+                    result = await ingest_pgvector.ingest_single_paper(
+                        pdf_path=pdf_path,
+                        paper_id=paper_id,
+                        paper_title=title,
+                    )
+
+                    async with pool.acquire() as pg_conn:
+                        await pg_conn.execute(
+                            """
+                        UPDATE papers
+                        SET rag_status='done', rag_updated_at=NOW(), rag_error=NULL
+                        WHERE id=$1
+                        """,
+                        paper_id,
+                    )
+                    return result
+                finally:
+                    await close_pool()
+
+            result = asyncio.run(_reindex_async())
             
             # Update paper status
             with get_conn() as conn:
                 conn.execute(
                     """UPDATE papers 
-                       SET rag_status='indexed', rag_updated_at=CURRENT_TIMESTAMP 
+                       SET rag_status='done', rag_updated_at=CURRENT_TIMESTAMP 
                        WHERE id=?""",
                     (paper_id,)
                 )

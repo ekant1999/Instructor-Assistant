@@ -63,6 +63,8 @@ export default function EnhancedLibraryPage() {
   const [navigateToPage, setNavigateToPage] = useState<number | undefined>(undefined);
   const [highlightSectionId, setHighlightSectionId] = useState<string | undefined>(undefined);
   const [scrollToSectionId, setScrollToSectionId] = useState<string | undefined>(undefined);
+  const [highlightBbox, setHighlightBbox] = useState<{ pageNo: number; bbox: { x0: number; y0: number; x1: number; y1: number } } | undefined>(undefined);
+  const [highlightText, setHighlightText] = useState<string | undefined>(undefined);
 
   const selectedPaper = useMemo(() => {
     if (!selectedId) return null;
@@ -94,7 +96,7 @@ export default function EnhancedLibraryPage() {
       setIsLoading(true);
       try {
         const [paperRows, noteRows] = await Promise.all([
-          listPapers(searchQuery || undefined, 'keyword'), 
+          listPapers(searchQuery || undefined, 'hybrid'), 
           listNotes()
         ]);
         if (!isMounted) return;
@@ -126,7 +128,7 @@ export default function EnhancedLibraryPage() {
     let cancelled = false;
     const timer = window.setInterval(async () => {
       try {
-        const paperRows = await listPapers(searchQuery || undefined, 'keyword');
+        const paperRows = await listPapers(searchQuery || undefined, 'hybrid');
         if (!cancelled) {
           setPapers(paperRows.map(mapApiPaper));
         }
@@ -157,23 +159,39 @@ export default function EnhancedLibraryPage() {
     if (cached) return cached;
     try {
       const apiSections = await listPaperSections(
-        Number(paperId), 
-        true, 
+        Number(paperId),
+        true,
         2000,
         searchQuery,  // Pass search query to get matching sections
-        searchQuery ? 'keyword' : undefined
+        searchQuery ? 'hybrid' : undefined
       );
       const mapped = apiSections.map(mapApiSection);
       setSectionsByPaperId((prev) => ({ ...prev, [paperId]: mapped }));
       
       // If search found matches, navigate to first match
-      if (searchQuery && mapped.length > 0 && mapped[0].matchScore) {
+      if (searchQuery && mapped.length > 0 && mapped[0].matchScore !== undefined) {
         const firstMatch = mapped[0];
         if (firstMatch.pageNo) {
           setNavigateToPage(firstMatch.pageNo);
         }
         setHighlightSectionId(firstMatch.id);
         setScrollToSectionId(firstMatch.id);
+        if (firstMatch.pageNo && firstMatch.matchBbox) {
+          setHighlightBbox({ pageNo: firstMatch.pageNo, bbox: firstMatch.matchBbox });
+        } else {
+          setHighlightBbox(undefined);
+        }
+        const matchText = firstMatch.matchText?.trim();
+        if (matchText) {
+          setHighlightText(matchText);
+        } else {
+          setHighlightText(searchQuery);
+        }
+      } else if (!searchQuery) {
+        setHighlightSectionId(undefined);
+        setScrollToSectionId(undefined);
+        setHighlightBbox(undefined);
+        setHighlightText(undefined);
       }
       
       return mapped;
@@ -720,7 +738,7 @@ export default function EnhancedLibraryPage() {
   const handleDeletePaper = async (id: string) => {
     try {
       await deletePaper(Number(id));
-      const paperRows = await listPapers(searchQuery || undefined, 'keyword');
+      const paperRows = await listPapers(searchQuery || undefined, 'hybrid');
       const mappedPapers = paperRows.map(mapApiPaper);
       setPapers(mappedPapers);
       setSelectedPaperIds((prev) => {
@@ -836,6 +854,8 @@ export default function EnhancedLibraryPage() {
                 <PdfPreview 
                   paper={selectedPaper} 
                   initialPage={navigateToPage}
+                  highlight={highlightBbox}
+                  highlightText={highlightText}
                   onPageChange={(page) => {
                     // Clear navigation state after first page load
                     if (navigateToPage && page === navigateToPage) {

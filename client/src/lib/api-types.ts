@@ -16,6 +16,9 @@ export interface ApiPaperSection {
   page_no: number;
   text?: string;
   match_score?: number;  // Relevance score from search
+  match_bbox?: { x0: number; y0: number; x1: number; y1: number };
+  match_block_index?: number;
+  match_text?: string;
 }
 
 export interface ApiNote {

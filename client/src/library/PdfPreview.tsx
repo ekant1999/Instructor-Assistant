@@ -7,10 +7,12 @@ import { API_BASE, getNgrokSkipHeaders, withNgrokSkipParam } from '@/lib/api';
 interface PdfPreviewProps {
   paper: Paper | null;
   initialPage?: number;  // Navigate to specific page
+  highlight?: { pageNo: number; bbox: { x0: number; y0: number; x1: number; y1: number } };
+  highlightText?: string;
   onPageChange?: (page: number) => void;  // Callback when page changes
 }
 
-export function PdfPreview({ paper, initialPage, onPageChange }: PdfPreviewProps) {
+export function PdfPreview({ paper, initialPage, highlight, highlightText, onPageChange }: PdfPreviewProps) {
   const isWidget = useMemo(
     () => typeof document !== 'undefined' && document.documentElement.dataset.iaWidget === 'true',
     []
@@ -41,16 +43,45 @@ export function PdfPreview({ paper, initialPage, onPageChange }: PdfPreviewProps
     : null;
   const pdfSrc = rawPdfSrc ? withNgrokSkipParam(rawPdfSrc) : null;
   const sourceUrl = paper.sourceUrl || undefined;
+  const [usePdfJs, setUsePdfJs] = useState(isWidget);
+  const shouldUsePdfJs = usePdfJs;
+  const iframeSrc = pdfSrc && initialPage ? `${pdfSrc}#page=${initialPage}` : pdfSrc;
 
   useEffect(() => {
-    if (!isWidget) return;
+    if (!pdfSrc) return;
     activeSrcRef.current = pdfSrc;
-    setPageNum(initialPage || 1);  // Use initialPage if provided
     setZoom(1);
     setPageCount(null);
     setRenderError(null);
     pdfDocRef.current = null;
-  }, [isWidget, pdfSrc, initialPage]);
+    if (initialPage) {
+      setPageNum(initialPage);
+    } else {
+      setPageNum(1);
+    }
+    setUsePdfJs(isWidget);
+  }, [pdfSrc, isWidget]);
+
+  useEffect(() => {
+    if (initialPage) {
+      setPageNum(initialPage);
+    }
+    if (initialPage || highlight || (highlightText && highlightText.trim().length > 1)) {
+      setUsePdfJs(true);
+    }
+  }, [initialPage, highlightText, highlight]);
+
+  useEffect(() => {
+    if (highlight) {
+      setUsePdfJs(true);
+    }
+  }, [highlight]);
+
+  useEffect(() => {
+    if (highlightText && highlightText.trim().length > 1) {
+      setUsePdfJs(true);
+    }
+  }, [highlightText]);
   
   // Notify parent when page changes
   useEffect(() => {
@@ -60,7 +91,7 @@ export function PdfPreview({ paper, initialPage, onPageChange }: PdfPreviewProps
   }, [pageNum, onPageChange]);
 
   useEffect(() => {
-    if (!isWidget || !pdfSrc) return;
+    if (!shouldUsePdfJs || !pdfSrc) return;
     let cancelled = false;
     const render = async () => {
       setIsRendering(true);
@@ -117,6 +148,81 @@ export function PdfPreview({ paper, initialPage, onPageChange }: PdfPreviewProps
         canvas.style.height = `${Math.floor(viewport.height)}px`;
         context.setTransform(dpr, 0, 0, dpr, 0, 0);
         await page.render({ canvasContext: context, viewport }).promise;
+
+        let drewExact = false;
+        const query = highlightText ? highlightText.trim() : '';
+        if (query.length > 1) {
+          const normalizedQuery = query.replace(/\s+/g, ' ').toLowerCase();
+          const textContent = await page.getTextContent();
+          const items = (textContent.items || []) as Array<any>;
+          let combined = '';
+          const indexed: Array<{ start: number; end: number; item: any }> = [];
+          for (const item of items) {
+            const raw = (item.str || '').replace(/\s+/g, ' ').trim();
+            if (!raw) continue;
+            if (combined.length > 0) {
+              combined += ' ';
+            }
+            const start = combined.length;
+            combined += raw;
+            const end = combined.length;
+            indexed.push({ start, end, item });
+          }
+
+          const haystack = combined.toLowerCase();
+          const idx = haystack.indexOf(normalizedQuery);
+          if (idx !== -1) {
+            drewExact = true;
+            const matchStart = idx;
+            const matchEnd = idx + normalizedQuery.length;
+            for (const entry of indexed) {
+              if (entry.end <= matchStart || entry.start >= matchEnd) continue;
+              const item = entry.item;
+              if (!item.transform) continue;
+              const pdfjs = pdfjsRef.current;
+              const tx = pdfjs?.Util?.transform ? pdfjs.Util.transform(viewport.transform, item.transform) : item.transform;
+              const x = tx[4];
+              const y = tx[5];
+              const fontHeight = Math.hypot(tx[2], tx[3]) || item.height || 10;
+              const width = (item.width || 0);
+              const height = fontHeight;
+              const drawX = x;
+              const drawY = y - height;
+              context.save();
+              context.globalAlpha = 0.22;
+              context.fillStyle = '#fde68a';
+              context.fillRect(drawX, drawY, width, height);
+              context.globalAlpha = 0.85;
+              context.strokeStyle = '#f59e0b';
+              context.lineWidth = 1.5;
+              context.strokeRect(drawX, drawY, width, height);
+              context.restore();
+            }
+          }
+        }
+
+        if (!drewExact && highlight && highlight.pageNo === pageNum && typeof (viewport as any).convertToViewportRectangle === 'function') {
+          const { x0, y0, x1, y1 } = highlight.bbox;
+          const pdfViewport = page.getViewport({ scale: 1 });
+          const pdfHeight = pdfViewport.height;
+          const fy0 = pdfHeight - y1;
+          const fy1 = pdfHeight - y0;
+          const rect = (viewport as any).convertToViewportRectangle([x0, fy0, x1, fy1]);
+          const [vx0, vy0, vx1, vy1] = rect;
+          const left = Math.min(vx0, vx1);
+          const top = Math.min(vy0, vy1);
+          const width = Math.abs(vx1 - vx0);
+          const height = Math.abs(vy1 - vy0);
+          context.save();
+          context.globalAlpha = 0.25;
+          context.fillStyle = '#facc15';
+          context.fillRect(left, top, width, height);
+          context.globalAlpha = 0.9;
+          context.strokeStyle = '#f59e0b';
+          context.lineWidth = 2;
+          context.strokeRect(left, top, width, height);
+          context.restore();
+        }
       } catch (err) {
         if (!cancelled) {
           setRenderError(err instanceof Error ? err.message : 'Failed to render PDF preview');
@@ -132,7 +238,7 @@ export function PdfPreview({ paper, initialPage, onPageChange }: PdfPreviewProps
     return () => {
       cancelled = true;
     };
-  }, [isWidget, pdfSrc, pageNum, zoom]);
+  }, [shouldUsePdfJs, pdfSrc, pageNum, zoom, highlight, highlightText]);
 
   return (
     <div className="h-full flex flex-col bg-background">
@@ -171,11 +277,11 @@ export function PdfPreview({ paper, initialPage, onPageChange }: PdfPreviewProps
           </div>
         )}
 
-        {pdfSrc && !isWidget && (
-          <iframe title={paper.title} src={pdfSrc} className="h-full w-full" />
+        {pdfSrc && !shouldUsePdfJs && (
+          <iframe title={paper.title} src={iframeSrc || undefined} className="h-full w-full" />
         )}
 
-        {pdfSrc && isWidget && (
+        {pdfSrc && shouldUsePdfJs && (
           <div className="h-full w-full overflow-auto p-4">
             {renderError ? (
               <div className="h-full flex items-center justify-center text-muted-foreground">
@@ -190,7 +296,7 @@ export function PdfPreview({ paper, initialPage, onPageChange }: PdfPreviewProps
           </div>
         )}
 
-        {pdfSrc && isWidget && (
+        {pdfSrc && shouldUsePdfJs && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-background/90 border rounded-full px-3 py-1 shadow-sm">
             <div className="flex items-center gap-1">
               <Button

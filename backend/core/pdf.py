@@ -100,7 +100,7 @@ def extract_pages(pdf_path: Path) -> List[Tuple[int, str]]:
     pages: List[Tuple[int, str]] = []
     reader = PdfReader(str(pdf_path))
     for i, page in enumerate(reader.pages):
-        txt = page.extract_text() or ""
+        txt = (page.extract_text() or "").replace("\x00", "")
         pages.append((i + 1, txt))
     return pages
 
@@ -131,7 +131,7 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
         for block in text_blocks:
             # block[6] is block_type: 0=text, 1=image
             if block[6] == 0:  # Text block only
-                text = block[4].strip()
+                text = block[4].strip().replace("\x00", "")
                 
                 # Skip empty blocks
                 if not text:

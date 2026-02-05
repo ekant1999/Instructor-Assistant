@@ -165,7 +165,7 @@ async def ingest_papers_from_db(
             await conn.execute(
                 """
                 UPDATE papers 
-                SET rag_status = 'indexed', 
+                SET rag_status = 'done', 
                     rag_updated_at = NOW(),
                     rag_error = NULL
                 WHERE id = ANY($1)
