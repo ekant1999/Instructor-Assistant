@@ -549,15 +549,27 @@ def summarize_paper_chat(
     paper_id: int,
     messages: List[PaperChatMessage],
     provider: str | None = None,
+    section_ids: List[int] | None = None,
 ) -> Dict[str, Any]:
     with get_conn() as conn:
         paper = conn.execute("SELECT id, title FROM papers WHERE id=?", (paper_id,)).fetchone()
         if not paper:
             raise QuestionGenerationError("Paper not found.")
-        sections = conn.execute(
-            "SELECT page_no, text FROM sections WHERE paper_id=? ORDER BY page_no ASC",
-            (paper_id,)
-        ).fetchall()
+        if section_ids:
+            placeholders = ",".join("?" for _ in section_ids)
+            sections = conn.execute(
+                f"""
+                SELECT page_no, text FROM sections
+                WHERE paper_id=? AND id IN ({placeholders})
+                ORDER BY page_no ASC
+                """,
+                (paper_id, *section_ids),
+            ).fetchall()
+        else:
+            sections = conn.execute(
+                "SELECT page_no, text FROM sections WHERE paper_id=? ORDER BY page_no ASC",
+                (paper_id,),
+            ).fetchall()
     resolved_provider = _normalize_summary_provider(provider)
     max_chars = LOCAL_CONTEXT_CHARS if resolved_provider == "local" else MAX_CONTEXT_CHARS
     context = "\n\n".join((row["text"] or "" for row in sections))[:max_chars]

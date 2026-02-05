@@ -1556,6 +1556,7 @@ async def paper_summary_chat(paper_id: int, payload: PaperChatRequest) -> Dict[s
             paper_id,
             [m for m in payload.messages],
             payload.provider,
+            payload.section_ids,
         )
     except QuestionGenerationError as exc:
         raise HTTPException(status_code=400, detail=str(exc))

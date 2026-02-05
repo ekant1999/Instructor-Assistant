@@ -292,11 +292,14 @@ export default function EnhancedLibraryPage() {
         'Create a teaching-focused Markdown summary with headings: "## Key Concepts", "## Definitions", and "## Exam Questions". Use numbered questions under "## Exam Questions".'
     };
 
-    const selectedContent = sections
-      .filter((s) => selectedSections.has(s.id))
-      .map((s) => `### ${s.title}\n${s.content}`)
-      .join('\n\n')
-      .slice(0, 12000);
+    const useSelectedOnly = config.scope === 'selected';
+    const selectedContent = useSelectedOnly
+      ? sections
+          .filter((s) => selectedSections.has(s.id))
+          .map((s) => `### ${s.title}\n${s.content}`)
+          .join('\n\n')
+          .slice(0, 12000)
+      : '';
 
     const focusBlock = selectedContent
       ? `Focus on the following excerpts:\n${selectedContent}`
@@ -315,11 +318,19 @@ export default function EnhancedLibraryPage() {
   ): Promise<string> => {
     const sections = await ensureSections(paperId);
     const prompt = buildSummaryPrompt(config, sections);
+    const sectionIds =
+      config.scope === 'selected'
+        ? sections
+            .filter((s) => selectedSections.has(s.id))
+            .map((s) => Number(s.id))
+            .filter((id) => Number.isFinite(id))
+        : undefined;
     const provider = config.method === 'local' ? 'local' : 'openai';
     const response = await chatPaper(
       Number(paperId),
       [{ role: 'user', content: prompt }],
-      provider
+      provider,
+      sectionIds && sectionIds.length > 0 ? sectionIds : undefined
     );
     return response.message || '';
   };

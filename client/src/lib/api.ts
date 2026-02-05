@@ -184,11 +184,12 @@ export async function deletePaper(paperId: number): Promise<void> {
 export async function chatPaper(
   paperId: number,
   messages: ApiPaperChatMessage[],
-  provider?: string
+  provider?: string,
+  sectionIds?: number[]
 ): Promise<ApiPaperChatResponse> {
   return request<ApiPaperChatResponse>(`/papers/${paperId}/chat`, {
     method: "POST",
-    body: JSON.stringify({ messages, provider })
+    body: JSON.stringify({ messages, provider, section_ids: sectionIds })
   });
 }
 
