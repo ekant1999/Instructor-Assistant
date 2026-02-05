@@ -43,6 +43,7 @@ MAX_TOKENS = int(os.getenv("LITELLM_MAX_TOKENS", "4000"))
 MAX_CONTEXT_CHARS = int(os.getenv("QUESTION_CONTEXT_CHAR_LIMIT", "60000"))
 DEFAULT_PROVIDER = (os.getenv("LLM_PROVIDER") or "openai").strip().lower()
 SUMMARY_PROVIDER = (os.getenv("SUMMARY_PROVIDER") or os.getenv("LLM_PROVIDER") or "openai").strip().lower()
+LOCAL_CONTEXT_CHARS = int(os.getenv("LOCAL_CONTEXT_CHAR_LIMIT", "12000"))
 LOCAL_LLM_URL = (os.getenv("LOCAL_LLM_URL") or "http://localhost:11434").rstrip("/")
 LOCAL_LLM_MODEL = os.getenv("LOCAL_LLM_MODEL", "llama3.1:8b")
 LOCAL_LLM_TIMEOUT = int(os.getenv("LOCAL_LLM_TIMEOUT", "60"))
@@ -533,7 +534,22 @@ def _build_anchor_instruction(anchor_phrase: str, position: str) -> str:
     )
 
 
-def summarize_paper_chat(paper_id: int, messages: List[PaperChatMessage]) -> Dict[str, Any]:
+def _normalize_summary_provider(value: str | None) -> str:
+    if not value:
+        return SUMMARY_PROVIDER
+    normalized = value.strip().lower()
+    if normalized in {"local", "qwen", "ollama"}:
+        return "local"
+    if normalized in {"gpt", "openai", "gemini"}:
+        return "openai"
+    return SUMMARY_PROVIDER
+
+
+def summarize_paper_chat(
+    paper_id: int,
+    messages: List[PaperChatMessage],
+    provider: str | None = None,
+) -> Dict[str, Any]:
     with get_conn() as conn:
         paper = conn.execute("SELECT id, title FROM papers WHERE id=?", (paper_id,)).fetchone()
         if not paper:
@@ -542,25 +558,38 @@ def summarize_paper_chat(paper_id: int, messages: List[PaperChatMessage]) -> Dic
             "SELECT page_no, text FROM sections WHERE paper_id=? ORDER BY page_no ASC",
             (paper_id,)
         ).fetchall()
-    context = "\n\n".join((row["text"] or "" for row in sections))[:MAX_CONTEXT_CHARS]
+    resolved_provider = _normalize_summary_provider(provider)
+    max_chars = LOCAL_CONTEXT_CHARS if resolved_provider == "local" else MAX_CONTEXT_CHARS
+    context = "\n\n".join((row["text"] or "" for row in sections))[:max_chars]
     if not context.strip():
         raise QuestionGenerationError("No text available for this paper.")
 
     system_prompt = (
         "You are a research assistant. Summarize the given paper and answer follow-up questions using only the provided context."
     )
-    base_messages: List[Dict[str, str]] = [
-        {"role": "system", "content": f"{system_prompt}\nContext:\n{context}"}
-    ]
-    for msg in messages:
-        base_messages.append({"role": msg.role, "content": msg.content})
-
-    if SUMMARY_PROVIDER == "local":
+    if resolved_provider == "local":
+        base_messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
+        injected = False
+        for msg in messages:
+            if msg.role == "user" and not injected:
+                base_messages.append(
+                    {"role": "user", "content": f"Context:\n{context}\n\n{msg.content}"}
+                )
+                injected = True
+            else:
+                base_messages.append({"role": msg.role, "content": msg.content})
+        if not injected:
+            base_messages.append({"role": "user", "content": f"Context:\n{context}\n\nSummarize the paper."})
         try:
             text = _call_local_llm(base_messages).strip()
         except Exception as exc:
             raise QuestionGenerationError(f"Local LLM request failed: {exc}") from exc
     else:
+        base_messages: List[Dict[str, str]] = [
+            {"role": "system", "content": f"{system_prompt}\nContext:\n{context}"}
+        ]
+        for msg in messages:
+            base_messages.append({"role": msg.role, "content": msg.content})
         try:
             response = completion(
                 model=DEFAULT_MODEL,

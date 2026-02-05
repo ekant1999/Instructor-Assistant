@@ -181,6 +181,7 @@ class PaperChatMessage(BaseModel):
 
 class PaperChatRequest(BaseModel):
     messages: List[PaperChatMessage] = Field(..., min_length=1)
+    provider: str | None = None
 
 
 class CanvasPushRequest(BaseModel):

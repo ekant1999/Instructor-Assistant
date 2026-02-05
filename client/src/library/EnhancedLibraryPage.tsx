@@ -315,7 +315,12 @@ export default function EnhancedLibraryPage() {
   ): Promise<string> => {
     const sections = await ensureSections(paperId);
     const prompt = buildSummaryPrompt(config, sections);
-    const response = await chatPaper(Number(paperId), [{ role: 'user', content: prompt }]);
+    const provider = config.method === 'local' ? 'local' : 'openai';
+    const response = await chatPaper(
+      Number(paperId),
+      [{ role: 'user', content: prompt }],
+      provider
+    );
     return response.message || '';
   };
 

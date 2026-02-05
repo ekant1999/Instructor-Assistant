@@ -1551,7 +1551,12 @@ async def paper_summary_chat(paper_id: int, payload: PaperChatRequest) -> Dict[s
     if not payload.messages:
         raise HTTPException(status_code=400, detail="Provide at least one message.")
     try:
-        data = await run_in_threadpool(summarize_paper_chat, paper_id, [m for m in payload.messages])
+        data = await run_in_threadpool(
+            summarize_paper_chat,
+            paper_id,
+            [m for m in payload.messages],
+            payload.provider,
+        )
     except QuestionGenerationError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     return data

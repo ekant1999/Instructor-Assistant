@@ -181,10 +181,14 @@ export async function deletePaper(paperId: number): Promise<void> {
   await request<void>(`/papers/${paperId}`, { method: "DELETE" });
 }
 
-export async function chatPaper(paperId: number, messages: ApiPaperChatMessage[]): Promise<ApiPaperChatResponse> {
+export async function chatPaper(
+  paperId: number,
+  messages: ApiPaperChatMessage[],
+  provider?: string
+): Promise<ApiPaperChatResponse> {
   return request<ApiPaperChatResponse>(`/papers/${paperId}/chat`, {
     method: "POST",
-    body: JSON.stringify({ messages })
+    body: JSON.stringify({ messages, provider })
   });
 }
 
