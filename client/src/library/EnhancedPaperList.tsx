@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Trash2, Eye, Sparkles, Search, X, Filter } from 'lucide-react';
+import { FileType2, Globe, Trash2, Eye, Sparkles, Search, X, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface EnhancedPaperListProps {
@@ -267,8 +267,22 @@ export function EnhancedPaperList({
                       className="mt-1"
                     />
                   )}
-                  <div className="h-10 w-10 rounded bg-secondary flex items-center justify-center shrink-0">
-                    <FileText className="h-5 w-5 text-muted-foreground" />
+                  <div className="h-10 w-10 rounded bg-secondary flex items-center justify-center shrink-0 relative">
+                    {paper.pdfUrl ? (
+                      <FileType2 className="h-5 w-5 text-muted-foreground" />
+                    ) : (
+                      <Globe className="h-5 w-5 text-muted-foreground" />
+                    )}
+                    <span
+                      className={cn(
+                        "absolute -bottom-1 -right-1 rounded px-1 text-[9px] font-medium leading-3 border",
+                        paper.pdfUrl
+                          ? "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-200 dark:border-red-800/60"
+                          : "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-200 dark:border-blue-800/60"
+                      )}
+                    >
+                      {paper.pdfUrl ? "PDF" : "WEB"}
+                    </span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 

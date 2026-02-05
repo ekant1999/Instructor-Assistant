@@ -101,6 +101,40 @@ async def ingest_single_paper(
         raise
 
 
+async def ingest_blocks(
+    blocks: List[Dict[str, Any]],
+    paper_id: int,
+    paper_title: str,
+) -> Dict[str, Any]:
+    """
+    Ingest pre-built text blocks (e.g., from web pages) into pgvector.
+    """
+    if not blocks:
+        raise ValueError("No blocks provided for ingestion.")
+    try:
+        pool = await get_pool()
+        pgvector_store = PgVectorStore(pool)
+
+        deleted = await pgvector_store.delete_paper_blocks(paper_id)
+        if deleted > 0:
+            logger.info("  Deleted %s existing blocks", deleted)
+
+        inserted = await pgvector_store.insert_blocks(blocks, paper_id)
+        logger.info("  ✓ Inserted %s blocks with embeddings", inserted)
+
+        return {
+            "success": True,
+            "paper_id": paper_id,
+            "paper_title": paper_title,
+            "num_blocks": len(blocks),
+            "num_chunks": len(blocks),
+            "num_inserted": inserted,
+        }
+    except Exception as e:
+        logger.error("Failed to ingest blocks for paper %s: %s", paper_id, e)
+        raise
+
+
 async def ingest_papers_from_db(
     paper_ids: Optional[List[int]] = None,
     chunk_size: int = 1000,
@@ -133,6 +167,12 @@ async def ingest_papers_from_db(
     
     if not papers:
         logger.warning("No papers found to ingest")
+        return {"success": True, "papers_ingested": 0, "total_chunks": 0}
+
+    # Skip entries without a PDF path (e.g., web documents).
+    papers = [p for p in papers if p.get("pdf_path")]
+    if not papers:
+        logger.warning("No PDF-backed papers found to ingest")
         return {"success": True, "papers_ingested": 0, "total_chunks": 0}
     
     logger.info(f"Ingesting {len(papers)} paper(s)...")

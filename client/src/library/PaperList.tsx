@@ -2,7 +2,7 @@ import React from 'react';
 import { Paper } from '@/shared/types';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Trash2, Eye, Sparkles } from 'lucide-react';
+import { FileType2, Globe, Trash2, Eye, Sparkles } from 'lucide-react';
 
 interface PaperListProps {
   papers: Paper[];
@@ -22,8 +22,21 @@ export function PaperList({ papers, onSelect, onDelete, onSummarize, selectedId 
           onClick={() => onSelect(paper)}
         >
           <div className="flex items-start gap-3">
-            <div className="h-10 w-10 rounded bg-secondary flex items-center justify-center shrink-0">
-              <FileText className="h-5 w-5 text-muted-foreground" />
+            <div className="h-10 w-10 rounded bg-secondary flex items-center justify-center shrink-0 relative">
+              {paper.pdfUrl ? (
+                <FileType2 className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <Globe className="h-5 w-5 text-muted-foreground" />
+              )}
+              <span
+                className={`absolute -bottom-1 -right-1 rounded px-1 text-[9px] font-medium leading-3 border ${
+                  paper.pdfUrl
+                    ? 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-200 dark:border-red-800/60'
+                    : 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-200 dark:border-blue-800/60'
+                }`}
+              >
+                {paper.pdfUrl ? 'PDF' : 'WEB'}
+              </span>
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-sm truncate" title={paper.title}>{paper.title}</h3>

@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import threading
+from urllib.parse import urlparse
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -18,7 +19,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.core.database import get_conn, init_db
 from backend.core.postgres import init_db as init_pg_db
-from backend.core.library import render_library_structured, add_paper, delete_paper as delete_paper_record
+from backend.core.library import (
+    render_library_structured,
+    add_paper,
+    add_web_page,
+    delete_paper as delete_paper_record,
+)
 from backend.core.questions import (
     create_question_set,
     delete_question_set,
@@ -279,6 +285,74 @@ def _build_match_snippet(query: str, tokens: List[str], text: str, max_len: int 
     return clean[start:end]
 
 
+def _looks_like_url(value: str) -> bool:
+    try:
+        parsed = urlparse(value)
+        return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+    except Exception:
+        return False
+
+
+def _build_web_blocks(paper_id: int, source_url: Optional[str], title: Optional[str]) -> List[Dict[str, Any]]:
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT page_no, text FROM sections WHERE paper_id=? ORDER BY page_no ASC",
+            (paper_id,),
+        ).fetchall()
+    blocks: List[Dict[str, Any]] = []
+    for row in rows:
+        text = (row["text"] or "").replace("\x00", "").strip()
+        if not text:
+            continue
+        blocks.append(
+            {
+                "page_no": row["page_no"],
+                "block_index": 0,
+                "text": text,
+                "bbox": None,
+                "metadata": {
+                    "source_type": "web",
+                    "source_url": source_url,
+                    "paper_title": title,
+                },
+            }
+        )
+    return blocks
+
+
+async def _ingest_web_papers(papers: List[Dict[str, Any]]) -> Dict[str, Any]:
+    if not papers:
+        return {"papers_ingested": 0, "total_chunks": 0, "failed": []}
+    total_chunks = 0
+    failed: List[Dict[str, Any]] = []
+    for paper in papers:
+        try:
+            blocks = _build_web_blocks(paper["id"], paper.get("source_url"), paper.get("title"))
+            if not blocks:
+                raise RuntimeError("No text sections available for web document.")
+            result = await ingest_pgvector.ingest_blocks(
+                blocks=blocks,
+                paper_id=paper["id"],
+                paper_title=paper.get("title") or "Untitled",
+            )
+            total_chunks += result.get("num_chunks", len(blocks))
+        except Exception as exc:
+            failed.append(
+                {
+                    "paper_id": paper.get("id"),
+                    "title": paper.get("title"),
+                    "error": str(exc),
+                }
+            )
+    return {
+        "papers_ingested": len(papers) - len(failed),
+        "total_papers": len(papers),
+        "total_chunks": total_chunks,
+        "failed": failed,
+        "success": len(failed) == 0,
+    }
+
+
 def _pgvector_search_paper_ids(query: str, search_type: str, limit: int = 100) -> Dict[int, float]:
     async def _run() -> Dict[int, float]:
         alpha_raw = os.getenv("HYBRID_SEARCH_ALPHA", "0.5")
@@ -508,7 +582,6 @@ def _collect_rag_papers() -> List[Dict[str, Any]]:
             """
             SELECT id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at
             FROM papers
-            WHERE pdf_path IS NOT NULL
             """
         ).fetchall()
     return [dict(r) for r in rows]
@@ -555,13 +628,15 @@ def _run_full_rag_ingestion() -> None:
         return
 
     paper_ids = [p["id"] for p in papers]
-    pdf_paths = [p["pdf_path"] for p in papers if p.get("pdf_path")]
+    pdf_papers = [p for p in papers if p.get("pdf_path")]
+    web_papers = [p for p in papers if not p.get("pdf_path")]
+    pdf_paths = [p["pdf_path"] for p in pdf_papers if p.get("pdf_path")]
     metadata_by_path = {
         str(Path(p["pdf_path"]).expanduser().resolve()): {
             "paper_id": p["id"],
             "paper_title": p.get("title") or Path(p["pdf_path"]).stem,
         }
-        for p in papers
+        for p in pdf_papers
         if p.get("pdf_path")
     }
     _set_rag_status(paper_ids, "processing", None)
@@ -570,11 +645,16 @@ def _run_full_rag_ingestion() -> None:
         async def _ingest() -> Dict[str, Any]:
             try:
                 await _upsert_pg_papers(papers)
-                return await ingest_pgvector.ingest_papers_from_db(
-                    paper_ids=paper_ids,
-                    chunk_size=1200,
-                    chunk_overlap=200,
-                )
+                pdf_result: Dict[str, Any] = {"papers_ingested": 0, "total_chunks": 0, "failed": []}
+                if pdf_papers:
+                    pdf_ids = [p["id"] for p in pdf_papers]
+                    pdf_result = await ingest_pgvector.ingest_papers_from_db(
+                        paper_ids=pdf_ids,
+                        chunk_size=1200,
+                        chunk_overlap=200,
+                    )
+                web_result = await _ingest_web_papers(web_papers)
+                return {"pdf": pdf_result, "web": web_result}
             finally:
                 await close_pg_pool()
 
@@ -586,8 +666,19 @@ def _run_full_rag_ingestion() -> None:
                 image_index.build_image_index(pdf_paths, metadata_by_path, figure_dir, image_index_dir)
             except Exception as exc:
                 logger.exception("Image indexing failed: %s", exc)
-        _set_rag_status(paper_ids, "done", None)
-        logger.info("RAG ingestion complete for %s papers", result.get("papers_ingested", len(paper_ids)))
+        failed: List[Dict[str, Any]] = []
+        for key in ("pdf", "web"):
+            failed.extend(result.get(key, {}).get("failed") or [])
+        failed_ids = {f.get("paper_id") for f in failed if f.get("paper_id")}
+        success_ids = [pid for pid in paper_ids if pid not in failed_ids]
+        if success_ids:
+            _set_rag_status(success_ids, "done", None)
+        for f in failed:
+            pid = f.get("paper_id")
+            if pid is not None:
+                _set_rag_status([pid], "error", str(f.get("error") or "Ingestion failed")[:500])
+        total_ingested = result.get("pdf", {}).get("papers_ingested", 0) + result.get("web", {}).get("papers_ingested", 0)
+        logger.info("RAG ingestion complete for %s papers", total_ingested)
     except Exception as exc:
         logger.exception("RAG ingestion failed")
         _set_rag_status(paper_ids, "error", str(exc))
@@ -824,7 +915,10 @@ def download_paper_file(paper_id: int):
         row = conn.execute("SELECT title, pdf_path FROM papers WHERE id=?", (paper_id,)).fetchone()
     if not row:
         raise HTTPException(status_code=404, detail="Paper not found.")
-    pdf_path = Path(row["pdf_path"]).expanduser()
+    raw_pdf_path = row["pdf_path"] or ""
+    if not raw_pdf_path:
+        raise HTTPException(status_code=404, detail="PDF not available on server.")
+    pdf_path = Path(raw_pdf_path).expanduser()
     if not pdf_path.exists():
         fallback = DATA_DIR / "pdfs" / pdf_path.name
         if fallback.exists():
@@ -1403,7 +1497,10 @@ async def download_paper(payload: PaperDownloadRequest) -> Dict[str, PaperRecord
     try:
         result = await add_paper(source, payload.source_url or source)
     except RuntimeError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+        if _looks_like_url(source) and "Could not locate a PDF" in str(exc):
+            result = await add_web_page(source, payload.source_url or source)
+        else:
+            raise HTTPException(status_code=400, detail=str(exc))
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
     with get_conn() as conn:
@@ -1548,7 +1645,7 @@ def agent_chat(payload: AgentChatRequest) -> AgentChatResponse:
 
 @app.post("/api/rag/ingest", response_model=RAGIngestResponse)
 async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
-    """Ingest PDFs into PostgreSQL (pgvector)."""
+    """Ingest library documents into PostgreSQL (pgvector)."""
     chunk_size = payload.chunk_size or 1200
     chunk_overlap = payload.chunk_overlap or 200
     requested_ids = payload.paper_ids or []
@@ -1560,7 +1657,7 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
                 f"""
                 SELECT id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at
                 FROM papers
-                WHERE id IN ({placeholders}) AND pdf_path IS NOT NULL
+                WHERE id IN ({placeholders})
                 """,
                 tuple(requested_ids),
             ).fetchall()
@@ -1569,7 +1666,6 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
                 """
                 SELECT id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at
                 FROM papers
-                WHERE pdf_path IS NOT NULL
                 """
             ).fetchall()
 
@@ -1577,29 +1673,35 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
     if not papers:
         return RAGIngestResponse(
             success=False,
-            message="No PDFs found for ingestion.",
+            message="No documents found for ingestion.",
             num_documents=0,
         )
 
     paper_ids = [p["id"] for p in papers]
-    pdf_paths = [p["pdf_path"] for p in papers if p.get("pdf_path")]
+    pdf_papers = [p for p in papers if p.get("pdf_path")]
+    web_papers = [p for p in papers if not p.get("pdf_path")]
+    pdf_paths = [p["pdf_path"] for p in pdf_papers if p.get("pdf_path")]
     metadata_by_path = {
         str(Path(p["pdf_path"]).expanduser().resolve()): {
             "paper_id": p["id"],
             "paper_title": p.get("title") or Path(p["pdf_path"]).stem,
         }
-        for p in papers
+        for p in pdf_papers
         if p.get("pdf_path")
     }
     _set_rag_status(paper_ids, "processing", None)
 
     try:
         await _upsert_pg_papers(papers)
-        result = await ingest_pgvector.ingest_papers_from_db(
-            paper_ids=paper_ids,
-            chunk_size=chunk_size,
-            chunk_overlap=chunk_overlap,
-        )
+        pdf_result: Dict[str, Any] = {"papers_ingested": 0, "total_chunks": 0, "failed": []}
+        if pdf_papers:
+            pdf_ids = [p["id"] for p in pdf_papers]
+            pdf_result = await ingest_pgvector.ingest_papers_from_db(
+                paper_ids=pdf_ids,
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap,
+            )
+        web_result = await _ingest_web_papers(web_papers)
         if os.getenv("ENABLE_IMAGE_INDEX", "true").lower() in {"1", "true", "yes"}:
             image_index_dir = os.getenv("IMAGE_INDEX_DIR", str(BACKEND_ROOT / "index_images"))
             figure_dir = os.getenv("FIGURE_OUTPUT_DIR", str(DATA_DIR / "figures"))
@@ -1608,16 +1710,27 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
             except Exception as exc:
                 logger.exception("Image indexing failed: %s", exc)
 
-        _set_rag_status(paper_ids, "done", None)
-        papers_ingested = result.get("papers_ingested", len(paper_ids))
-        message = f"Successfully ingested {papers_ingested} paper(s) into pgvector."
-        if result.get("failed"):
-            message = f"Ingested {papers_ingested} paper(s); {len(result['failed'])} failed."
+        failed: List[Dict[str, Any]] = []
+        failed.extend(pdf_result.get("failed") or [])
+        failed.extend(web_result.get("failed") or [])
+        failed_ids = {f.get("paper_id") for f in failed if f.get("paper_id")}
+        success_ids = [pid for pid in paper_ids if pid not in failed_ids]
+        if success_ids:
+            _set_rag_status(success_ids, "done", None)
+        for f in failed:
+            pid = f.get("paper_id")
+            if pid is not None:
+                _set_rag_status([pid], "error", str(f.get("error") or "Ingestion failed")[:500])
+
+        papers_ingested = pdf_result.get("papers_ingested", 0) + web_result.get("papers_ingested", 0)
+        message = f"Successfully ingested {papers_ingested} document(s) into pgvector."
+        if failed:
+            message = f"Ingested {papers_ingested} document(s); {len(failed)} failed."
         return RAGIngestResponse(
-            success=bool(result.get("success", True)),
+            success=len(failed) == 0,
             message=message,
             num_documents=papers_ingested,
-            num_chunks=result.get("total_chunks"),
+            num_chunks=(pdf_result.get("total_chunks", 0) or 0) + (web_result.get("total_chunks", 0) or 0),
             index_dir=payload.index_dir or "pgvector",
         )
     except Exception as exc:

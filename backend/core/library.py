@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from collections import defaultdict
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import logging
@@ -9,6 +10,7 @@ import threading
 
 from .database import get_conn
 from .pdf import resolve_any_to_pdf, extract_pages
+from .web import extract_web_document, chunk_web_text
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +36,34 @@ async def add_paper(input_str: str, source_url: str | None = None, auto_index: b
         _trigger_background_reindex(paper_id, title)
     
     return {"paper_id": paper_id, "title": title, "pdf_path": str(pdf_path)}
+
+
+async def add_web_page(url: str, source_url: str | None = None, auto_index: bool = True) -> Dict[str, Any]:
+    title, text = await extract_web_document(url)
+    chunk_size = int(os.getenv("WEB_CHUNK_SIZE", "1000"))
+    chunk_overlap = int(os.getenv("WEB_CHUNK_OVERLAP", "200"))
+    chunks = chunk_web_text(text, chunk_size=chunk_size, overlap=chunk_overlap)
+    if not chunks:
+        raise RuntimeError("No text could be extracted from the web page.")
+
+    with get_conn() as conn:
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO papers(title, source_url, pdf_path) VALUES(?,?,?)",
+            (title, source_url or url, ""),
+        )
+        paper_id = c.lastrowid
+        for idx, chunk in enumerate(chunks, start=1):
+            c.execute(
+                "INSERT INTO sections(paper_id, page_no, text) VALUES(?,?,?)",
+                (paper_id, idx, chunk),
+            )
+        conn.commit()
+
+    if auto_index:
+        _trigger_background_reindex(paper_id, title)
+
+    return {"paper_id": paper_id, "title": title, "pdf_path": "", "source_url": source_url or url}
 
 
 def add_local_pdf(
@@ -148,8 +178,9 @@ def _trigger_background_reindex(paper_id: int, paper_title: str):
                     logger.error(f"Paper {paper_id} not found for reindexing")
                     return
                 
-                pdf_path = row["pdf_path"]
+                pdf_path = row["pdf_path"] or ""
                 title = row["title"]
+                source_url = row["source_url"]
 
             async def _reindex_async():
                 try:
@@ -177,11 +208,42 @@ def _trigger_background_reindex(paper_id: int, paper_title: str):
                         normalize_timestamp(row["created_at"]),
                     )
 
-                    result = await ingest_pgvector.ingest_single_paper(
-                        pdf_path=pdf_path,
-                        paper_id=paper_id,
-                        paper_title=title,
-                    )
+                    if pdf_path:
+                        result = await ingest_pgvector.ingest_single_paper(
+                            pdf_path=pdf_path,
+                            paper_id=paper_id,
+                            paper_title=title,
+                        )
+                    else:
+                        with get_conn() as conn:
+                            section_rows = conn.execute(
+                                "SELECT page_no, text FROM sections WHERE paper_id=? ORDER BY page_no ASC",
+                                (paper_id,),
+                            ).fetchall()
+                        blocks = []
+                        for section in section_rows:
+                            text = (section["text"] or "").replace("\x00", "").strip()
+                            if not text:
+                                continue
+                            blocks.append(
+                                {
+                                    "page_no": section["page_no"],
+                                    "block_index": 0,
+                                    "text": text,
+                                    "bbox": None,
+                                    "metadata": {
+                                        "source_type": "web",
+                                    "source_url": source_url,
+                                    },
+                                }
+                            )
+                        if not blocks:
+                            raise RuntimeError("No text sections available for web document.")
+                        result = await ingest_pgvector.ingest_blocks(
+                            blocks=blocks,
+                            paper_id=paper_id,
+                            paper_title=title,
+                        )
 
                     async with pool.acquire() as pg_conn:
                         await pg_conn.execute(

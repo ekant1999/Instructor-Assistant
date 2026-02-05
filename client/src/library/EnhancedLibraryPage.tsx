@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { EnhancedPaperList } from './EnhancedPaperList';
 import { PdfPreview } from './PdfPreview';
+import { WebPreview } from './WebPreview';
 import { UploadPanel } from './UploadPanel';
 import { SectionSelector } from './SectionSelector';
 import { SummarizePanel, SummarizeConfig } from './SummarizePanel';
@@ -48,6 +49,7 @@ export default function EnhancedLibraryPage() {
   const [selectedPaperIds, setSelectedPaperIds] = useState<Set<string>>(new Set());
   const [selectedSections, setSelectedSections] = useState<Set<string>>(new Set());
   const [sectionsByPaperId, setSectionsByPaperId] = useState<Record<string, Section[]>>({});
+  const [searchSectionsByPaperId, setSearchSectionsByPaperId] = useState<Record<string, Section[]>>({});
   const [summaries, setSummaries] = useState<Map<string, Summary[]>>(new Map());
   const [currentSummary, setCurrentSummary] = useState<Summary | null>(null);
   const [isSummarizing, setIsSummarizing] = useState(false);
@@ -70,14 +72,27 @@ export default function EnhancedLibraryPage() {
     if (!selectedId) return null;
     const base = papers.find((p) => p.id === selectedId);
     if (!base) return null;
-    const sections = sectionsByPaperId[selectedId];
+    const sections = searchQuery
+      ? (searchSectionsByPaperId[selectedId] ?? sectionsByPaperId[selectedId])
+      : sectionsByPaperId[selectedId];
     if (sections) {
       return { ...base, sections };
     }
     return base;
-  }, [papers, selectedId, sectionsByPaperId]);
+  }, [papers, selectedId, sectionsByPaperId, searchSectionsByPaperId, searchQuery]);
 
   const paperSummaries = selectedPaper ? summaries.get(selectedPaper.id) || [] : [];
+
+  useEffect(() => {
+    if (!selectedPaper) return;
+    const wantsWeb = !selectedPaper.pdfUrl;
+    if (wantsWeb && activeTab === 'preview') {
+      setActiveTab('web');
+    }
+    if (!wantsWeb && activeTab === 'web') {
+      setActiveTab('preview');
+    }
+  }, [selectedPaper, activeTab]);
 
   const upsertSummaryForPaper = (paperId: string, summary: Summary, replaceId?: string) => {
     setSummaries((prev) => {
@@ -149,14 +164,24 @@ export default function EnhancedLibraryPage() {
   }, [selectedId, searchQuery]);
 
   useEffect(() => {
+    if (searchQuery) return;
+    setHighlightSectionId(undefined);
+    setScrollToSectionId(undefined);
+    setHighlightBbox(undefined);
+    setHighlightText(undefined);
+  }, [searchQuery]);
+
+  useEffect(() => {
     if (!selectedId || summaries.get(selectedId)) return;
     void ensureSummaries(selectedId);
   }, [selectedId, summaries]);
 
   async function ensureSections(paperId: string, searchQuery?: string): Promise<Section[]> {
-    // If searching, always fetch fresh; otherwise use cache
-    const cached = !searchQuery ? sectionsByPaperId[paperId] : undefined;
-    if (cached) return cached;
+    // If searching, always fetch fresh; otherwise use cached full list
+    if (!searchQuery) {
+      const cached = sectionsByPaperId[paperId];
+      if (cached) return cached;
+    }
     try {
       const apiSections = await listPaperSections(
         Number(paperId),
@@ -166,7 +191,15 @@ export default function EnhancedLibraryPage() {
         searchQuery ? 'hybrid' : undefined
       );
       const mapped = apiSections.map(mapApiSection);
-      setSectionsByPaperId((prev) => ({ ...prev, [paperId]: mapped }));
+      if (searchQuery) {
+        setSearchSectionsByPaperId((prev) => ({ ...prev, [paperId]: mapped }));
+      } else {
+        setSectionsByPaperId((prev) => ({ ...prev, [paperId]: mapped }));
+        setSearchSectionsByPaperId((prev) => {
+          const { [paperId]: _, ...rest } = prev;
+          return rest;
+        });
+      }
       
       // If search found matches, navigate to first match
       if (searchQuery && mapped.length > 0 && mapped[0].matchScore !== undefined) {
@@ -225,7 +258,7 @@ export default function EnhancedLibraryPage() {
     setSelectedId(newPapers[0].id);
     setSelectedSections(new Set());
     setCurrentSummary(null);
-    setActiveTab('preview');
+    setActiveTab(newPapers[0].pdfUrl ? 'preview' : 'web');
   };
 
   const handleSelectSection = (sectionId: string) => {
@@ -754,16 +787,23 @@ export default function EnhancedLibraryPage() {
         const { [id]: _, ...rest } = prev;
         return rest;
       });
+      setSearchSectionsByPaperId((prev) => {
+        const { [id]: _, ...rest } = prev;
+        return rest;
+      });
       setSummaries((prev) => {
         const next = new Map(prev);
         next.delete(id);
         return next;
       });
       if (selectedId === id || (selectedId && !mappedPapers.find((p) => p.id === selectedId))) {
-        setSelectedId(mappedPapers[0]?.id);
+        const nextPaper = mappedPapers[0];
+        setSelectedId(nextPaper?.id);
         setSelectedSections(new Set());
         setCurrentSummary(null);
-        setActiveTab('preview');
+        if (nextPaper) {
+          setActiveTab(nextPaper.pdfUrl ? 'preview' : 'web');
+        }
       }
       toast.success('Paper deleted');
     } catch (error) {
@@ -800,7 +840,7 @@ export default function EnhancedLibraryPage() {
                 setNavigateToPage(undefined);
                 setHighlightSectionId(undefined);
                 setScrollToSectionId(undefined);
-                setActiveTab('preview');
+                setActiveTab(paper.pdfUrl ? 'preview' : 'web');
               }}
               onDelete={handleDeletePaper}
               onSummarize={(id) => {
@@ -822,10 +862,17 @@ export default function EnhancedLibraryPage() {
           {!isLoading && selectedPaper ? (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
               <TabsList className="w-full justify-start rounded-none border-b h-auto p-0 bg-transparent ia-tabs-scroll">
-                <TabsTrigger value="preview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Preview
-                </TabsTrigger>
+                {selectedPaper.pdfUrl ? (
+                  <TabsTrigger value="preview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Preview
+                  </TabsTrigger>
+                ) : (
+                  <TabsTrigger value="web" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Web
+                  </TabsTrigger>
+                )}
                 <TabsTrigger value="sections" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary">
                   <Layers className="h-4 w-4 mr-2" />
                   Sections
@@ -850,20 +897,33 @@ export default function EnhancedLibraryPage() {
                 )}
               </TabsList>
 
-              <TabsContent value="preview" className="flex-1 overflow-hidden">
-                <PdfPreview 
-                  paper={selectedPaper} 
-                  initialPage={navigateToPage}
-                  highlight={highlightBbox}
-                  highlightText={highlightText}
-                  onPageChange={(page) => {
-                    // Clear navigation state after first page load
-                    if (navigateToPage && page === navigateToPage) {
-                      setNavigateToPage(undefined);
-                    }
-                  }}
-                />
-              </TabsContent>
+              {selectedPaper.pdfUrl && (
+                <TabsContent value="preview" className="flex-1 overflow-hidden">
+                  <PdfPreview 
+                    paper={selectedPaper} 
+                    initialPage={navigateToPage}
+                    highlight={highlightBbox}
+                    highlightText={highlightText}
+                    onPageChange={(page) => {
+                      // Clear navigation state after first page load
+                      if (navigateToPage && page === navigateToPage) {
+                        setNavigateToPage(undefined);
+                      }
+                    }}
+                  />
+                </TabsContent>
+              )}
+
+              {!selectedPaper.pdfUrl && (
+                <TabsContent value="web" className="flex-1 overflow-hidden">
+                  <WebPreview
+                    paper={selectedPaper}
+                    highlightText={highlightText}
+                    highlightSectionId={highlightSectionId}
+                    scrollToSectionId={scrollToSectionId}
+                  />
+                </TabsContent>
+              )}
 
               <TabsContent value="sections" className="flex-1 overflow-hidden">
                 <SectionSelector
