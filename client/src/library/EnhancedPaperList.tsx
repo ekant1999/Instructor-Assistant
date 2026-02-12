@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileType2, Globe, Trash2, Eye, Sparkles, Search, X, Filter } from 'lucide-react';
+import { FileType2, Globe, Trash2, Eye, Sparkles, Search, X, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface EnhancedPaperListProps {
@@ -13,6 +13,7 @@ interface EnhancedPaperListProps {
   onSelect: (paper: Paper) => void;
   onDelete: (id: string) => void;
   onSummarize: (id: string) => void;
+  onInfo?: (paper: Paper) => void;
   selectedId?: string;
   selectedIds?: Set<string>;
   onSelectionChange?: (selectedIds: Set<string>) => void;
@@ -24,6 +25,7 @@ export function EnhancedPaperList({
   onSelect, 
   onDelete, 
   onSummarize, 
+  onInfo,
   selectedId,
   selectedIds = new Set(),
   onSelectionChange,
@@ -338,6 +340,19 @@ export function EnhancedPaperList({
                   >
                     <Sparkles className="h-3 w-3 mr-1" /> Summarize
                   </Button>
+                  {onInfo && paper.pdfUrl && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onInfo(paper);
+                      }}
+                    >
+                      <Info className="h-3 w-3 mr-1" /> Info
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"

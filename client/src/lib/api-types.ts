@@ -168,6 +168,11 @@ export interface ApiRagContextInfo {
   caption?: string | null;
   image_path?: string | null;
   page_number?: number | null;
+  section_primary?: string | null;
+  section_all?: string[] | null;
+  section_titles?: string[] | null;
+  section_source?: string | null;
+  section_confidence?: number | null;
 }
 
 export interface ApiRagQueryRequest {
@@ -204,6 +209,82 @@ export interface ApiRagQnaItem {
   scope?: string | null;
   provider?: string | null;
   created_at?: string | null;
+}
+
+export interface ApiSectionSourceCount {
+  source: string;
+  count: number;
+}
+
+export interface ApiPaperIngestionSectionInfo {
+  canonical: string;
+  chunk_count: number;
+  pages: number[];
+  title_samples: string[];
+  primary_source: string;
+  source_counts: ApiSectionSourceCount[];
+  avg_confidence?: number | null;
+}
+
+export interface ApiPaperChunkInfo {
+  id: number;
+  page_no: number;
+  block_index: number;
+  char_count: number;
+  text_preview: string;
+  bbox?: Record<string, any> | null;
+  section_primary?: string | null;
+  section_all?: string[];
+  section_titles?: string[];
+  metadata_summary?: Record<string, any>;
+  metadata?: Record<string, any>;
+}
+
+export interface ApiPaperIngestionInfo {
+  paper_id: number;
+  paper_title?: string | null;
+  source_url?: string | null;
+  pdf_url?: string | null;
+  total_chunks: number;
+  returned_chunks: number;
+  chunk_limit: number;
+  truncated: boolean;
+  section_strategy?: string;
+  section_source_summary?: ApiSectionSourceCount[];
+  sections: ApiPaperIngestionSectionInfo[];
+  chunks: ApiPaperChunkInfo[];
+  sqlite_section_count?: number;
+  message?: string;
+}
+
+export interface ApiPaperFigureInfo {
+  id: number;
+  page_no: number;
+  file_name: string;
+  image_path?: string;
+  url: string;
+  width?: number | null;
+  height?: number | null;
+  bbox?: Record<string, any> | null;
+  section_canonical?: string | null;
+  section_title?: string | null;
+  section_source?: string | null;
+  section_confidence?: number | null;
+}
+
+export interface ApiPaperIngestionSectionDetail {
+  paper_id: number;
+  paper_title?: string | null;
+  section_canonical: string;
+  section_title_samples: string[];
+  pages: number[];
+  source_block_count: number;
+  chunk_count: number;
+  full_text: string;
+  full_text_chars: number;
+  truncated: boolean;
+  section_source_counts: ApiSectionSourceCount[];
+  images: ApiPaperFigureInfo[];
 }
 
 export type SearchType = "keyword" | "embedding" | "hybrid";

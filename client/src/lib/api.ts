@@ -4,6 +4,8 @@ import {
   ApiCanvasPushResult,
   ApiNote,
   ApiPaper,
+  ApiPaperIngestionSectionDetail,
+  ApiPaperIngestionInfo,
   ApiPaperChatMessage,
   ApiPaperChatResponse,
   ApiPaperSection,
@@ -463,6 +465,29 @@ export async function ragQuery(input: ApiRagQueryRequest): Promise<ApiRagQueryRe
     method: "POST",
     body: JSON.stringify(input)
   });
+}
+
+export async function getPaperIngestionInfo(
+  paperId: number,
+  chunkLimit: number = 120
+): Promise<ApiPaperIngestionInfo> {
+  const params = new URLSearchParams();
+  params.set("chunk_limit", String(chunkLimit));
+  const query = params.toString() ? `?${params}` : "";
+  return request<ApiPaperIngestionInfo>(`/papers/${paperId}/ingestion-info${query}`);
+}
+
+export async function getPaperIngestionSectionDetail(
+  paperId: number,
+  sectionCanonical: string,
+  maxChars: number = 250000
+): Promise<ApiPaperIngestionSectionDetail> {
+  const params = new URLSearchParams();
+  params.set("max_chars", String(maxChars));
+  const query = params.toString() ? `?${params}` : "";
+  return request<ApiPaperIngestionSectionDetail>(
+    `/papers/${paperId}/ingestion-sections/${encodeURIComponent(sectionCanonical)}${query}`
+  );
 }
 
 export async function listPaperRagQna(paperId: number): Promise<ApiRagQnaItem[]> {

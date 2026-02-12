@@ -302,6 +302,11 @@ class RAGContextInfo(BaseModel):
     caption: str | None = None
     image_path: str | None = None
     page_number: int | None = None
+    section_primary: str | None = None
+    section_all: List[str] | None = None
+    section_titles: List[str] | None = None
+    section_source: str | None = None
+    section_confidence: float | None = None
 
 
 class RAGQueryResponse(BaseModel):

@@ -21,6 +21,8 @@ from core.pdf import extract_text_blocks
 from core.postgres import get_pool
 from .chunking import chunk_text_blocks, simple_chunk_blocks
 from .pgvector_store import PgVectorStore
+from .section_extractor import annotate_blocks_with_sections
+from .paper_figures import extract_and_store_paper_figures
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +31,7 @@ async def ingest_single_paper(
     pdf_path: str,
     paper_id: int,
     paper_title: str,
+    source_url: Optional[str] = None,
     chunk_size: int = 1000,
     chunk_overlap: int = 200,
     use_simple_chunking: bool = False
@@ -61,6 +64,32 @@ async def ingest_single_paper(
         
         if not blocks:
             raise ValueError("No text blocks extracted from PDF")
+
+        section_report = annotate_blocks_with_sections(
+            blocks,
+            pdf_path_obj,
+            source_url=source_url,
+        )
+        logger.info(
+            "  Section extraction strategy=%s, sections=%s",
+            section_report.get("strategy"),
+            len(section_report.get("sections") or []),
+        )
+
+        figure_report: Dict[str, Any] = {"num_images": 0}
+        try:
+            figure_report = extract_and_store_paper_figures(
+                pdf_path=pdf_path_obj,
+                paper_id=paper_id,
+                blocks=blocks,
+            )
+            logger.info(
+                "  Extracted %s figures to dedicated folder",
+                figure_report.get("num_images", 0),
+            )
+        except Exception as exc:
+            # Figure extraction failure should not block text ingestion.
+            logger.warning("  Figure extraction failed for paper %s: %s", paper_id, exc)
         
         # Chunk the blocks
         logger.info("  Chunking blocks...")
@@ -93,7 +122,10 @@ async def ingest_single_paper(
             "paper_id": paper_id,
             "num_blocks": len(blocks),
             "num_chunks": len(chunks),
-            "num_inserted": inserted
+            "num_inserted": inserted,
+            "section_strategy": section_report.get("strategy"),
+            "num_sections": len(section_report.get("sections") or []),
+            "num_figures": figure_report.get("num_images", 0),
         }
     
     except Exception as e:
@@ -157,12 +189,12 @@ async def ingest_papers_from_db(
     async with pool.acquire() as conn:
         if paper_ids:
             papers = await conn.fetch(
-                "SELECT id, title, pdf_path FROM papers WHERE id = ANY($1) ORDER BY id",
+                "SELECT id, title, source_url, pdf_path FROM papers WHERE id = ANY($1) ORDER BY id",
                 paper_ids
             )
         else:
             papers = await conn.fetch(
-                "SELECT id, title, pdf_path FROM papers ORDER BY id"
+                "SELECT id, title, source_url, pdf_path FROM papers ORDER BY id"
             )
     
     if not papers:
@@ -187,6 +219,7 @@ async def ingest_papers_from_db(
                 pdf_path=paper["pdf_path"],
                 paper_id=paper["id"],
                 paper_title=paper["title"] or "Untitled",
+                source_url=paper.get("source_url"),
                 chunk_size=chunk_size,
                 chunk_overlap=chunk_overlap
             )

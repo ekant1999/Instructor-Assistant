@@ -96,7 +96,7 @@ from .mcp_client import (
 )
 from .canvas_service import CanvasPushError, push_question_set_to_canvas
 from . import qwen_tools
-from .rag import ingest_pgvector, query_pgvector, image_index
+from .rag import ingest_pgvector, query_pgvector, image_index, paper_figures
 from backend.core.postgres import (
     get_pool as get_pg_pool,
     close_pool as close_pg_pool,
@@ -551,6 +551,32 @@ def _parse_rag_sources(raw: Optional[str]) -> List[Dict[str, Any]]:
         return []
     if isinstance(data, list):
         return data
+    return []
+
+
+def _as_json_dict(raw: Any) -> Dict[str, Any]:
+    if isinstance(raw, dict):
+        return raw
+    if isinstance(raw, str):
+        try:
+            parsed = json.loads(raw)
+        except (TypeError, json.JSONDecodeError):
+            return {}
+        if isinstance(parsed, dict):
+            return parsed
+    return {}
+
+
+def _as_json_list(raw: Any) -> List[Any]:
+    if isinstance(raw, list):
+        return raw
+    if isinstance(raw, str):
+        try:
+            parsed = json.loads(raw)
+        except (TypeError, json.JSONDecodeError):
+            return []
+        if isinstance(parsed, list):
+            return parsed
     return []
 
 
@@ -1078,6 +1104,439 @@ def get_paper_context(
     if max_chars and max_chars > 0:
         context = context[:max_chars]
     return {"paper_id": paper_id, "context": context}
+
+
+@app.get("/api/papers/{paper_id}/ingestion-info")
+async def get_paper_ingestion_info(
+    paper_id: int,
+    chunk_limit: int = 120,
+) -> Dict[str, Any]:
+    """
+    Debug endpoint for viewing extracted section/chunk metadata for a paper.
+
+    This is intended for temporary inspection in the library UI.
+    """
+    if chunk_limit < 1 or chunk_limit > 1000:
+        raise HTTPException(status_code=400, detail="chunk_limit must be between 1 and 1000.")
+
+    paper = _get_paper(paper_id)
+    if not paper:
+        raise HTTPException(status_code=404, detail="Paper not found.")
+
+    try:
+        pool = await get_pg_pool()
+        async with pool.acquire() as conn:
+            total_chunks = int(
+                await conn.fetchval(
+                    "SELECT COUNT(*) FROM text_blocks WHERE paper_id=$1",
+                    paper_id,
+                )
+                or 0
+            )
+            rows = []
+            if total_chunks:
+                rows = await conn.fetch(
+                    """
+                    SELECT id, page_no, block_index, text, bbox, metadata
+                    FROM text_blocks
+                    WHERE paper_id=$1
+                    ORDER BY page_no ASC, block_index ASC
+                    LIMIT $2
+                    """,
+                    paper_id,
+                    chunk_limit,
+                )
+    except Exception as exc:
+        logger.exception("Failed to load ingestion info for paper %s", paper_id)
+        raise HTTPException(status_code=500, detail=str(exc))
+
+    if not total_chunks:
+        with get_conn() as conn:
+            sqlite_sections = conn.execute(
+                "SELECT COUNT(*) FROM sections WHERE paper_id=?",
+                (paper_id,),
+            ).fetchone()
+            sqlite_section_count = int(sqlite_sections[0] if sqlite_sections else 0)
+        return {
+            "paper_id": paper_id,
+            "paper_title": paper.get("title"),
+            "source_url": paper.get("source_url"),
+            "pdf_url": paper.get("pdf_url"),
+            "total_chunks": 0,
+            "returned_chunks": 0,
+            "chunk_limit": chunk_limit,
+            "truncated": False,
+            "sections": [],
+            "chunks": [],
+            "sqlite_section_count": sqlite_section_count,
+            "message": "No pgvector chunks found for this paper. Run ingestion/indexing first.",
+        }
+
+    section_accumulator: Dict[str, Dict[str, Any]] = {}
+    source_counts: Dict[str, int] = {}
+    chunk_items: List[Dict[str, Any]] = []
+
+    for row in rows:
+        metadata = _as_json_dict(row["metadata"])
+        bbox = _as_json_dict(row["bbox"]) if row["bbox"] is not None else None
+        text = (row["text"] or "").replace("\x00", "")
+        text_preview = " ".join(text.split())[:320]
+
+        section_primary = str(metadata.get("section_primary") or metadata.get("section_canonical") or "").strip()
+        section_all = metadata.get("section_all")
+        if not isinstance(section_all, list):
+            section_all = [section_primary] if section_primary else []
+        section_all = [str(item).strip() for item in section_all if str(item).strip()]
+
+        section_titles = metadata.get("section_titles")
+        if not isinstance(section_titles, list):
+            section_titles = [metadata.get("section_title")] if metadata.get("section_title") else []
+        section_titles = [str(item).strip() for item in section_titles if str(item).strip()]
+
+        section_source = str(metadata.get("section_source") or "unknown").strip() or "unknown"
+        section_confidence = metadata.get("section_confidence")
+        source_counts[section_source] = source_counts.get(section_source, 0) + 1
+
+        row_page = int(row["page_no"])
+        row_block_index = int(row["block_index"])
+
+        def _get_bucket(canonical: str) -> Dict[str, Any]:
+            return section_accumulator.setdefault(
+                canonical,
+                {
+                    "canonical": canonical,
+                    "chunk_count": 0,
+                    "pages": set(),
+                    "titles": set(),
+                    "source_counts": {},
+                    "confidence_sum": 0.0,
+                    "confidence_count": 0,
+                    "first_page": row_page,
+                    "first_block_index": row_block_index,
+                },
+            )
+
+        block_items = _as_json_list(metadata.get("blocks"))
+        chunk_memberships: set[str] = set()
+
+        for block in block_items:
+            if not isinstance(block, dict):
+                continue
+            block_meta = block.get("metadata")
+            block_meta = block_meta if isinstance(block_meta, dict) else {}
+            canonical = str(block_meta.get("section_canonical") or "").strip()
+            if not canonical:
+                canonical = section_primary or "other"
+            page_no = int(block.get("page_no") or row_page)
+            block_index = int(block.get("block_index") or 0)
+            title = str(block_meta.get("section_title") or "").strip()
+            if not title and section_titles:
+                title = section_titles[0]
+            source_name = str(block_meta.get("section_source") or section_source).strip() or "unknown"
+            confidence = block_meta.get("section_confidence")
+            if not isinstance(confidence, (int, float)):
+                confidence = section_confidence
+
+            bucket = _get_bucket(canonical)
+            bucket["pages"].add(page_no)
+            if (
+                page_no < bucket["first_page"]
+                or (page_no == bucket["first_page"] and block_index < bucket["first_block_index"])
+            ):
+                bucket["first_page"] = page_no
+                bucket["first_block_index"] = block_index
+            if title:
+                bucket["titles"].add(title)
+            source_bucket = bucket["source_counts"]
+            source_bucket[source_name] = source_bucket.get(source_name, 0) + 1
+            if isinstance(confidence, (int, float)):
+                bucket["confidence_sum"] += float(confidence)
+                bucket["confidence_count"] += 1
+            chunk_memberships.add(canonical)
+
+        if not chunk_memberships:
+            for canonical in section_all or [section_primary or "other"]:
+                bucket = _get_bucket(canonical)
+                bucket["pages"].add(row_page)
+                if (
+                    row_page < bucket["first_page"]
+                    or (row_page == bucket["first_page"] and row_block_index < bucket["first_block_index"])
+                ):
+                    bucket["first_page"] = row_page
+                    bucket["first_block_index"] = row_block_index
+                for title in section_titles:
+                    bucket["titles"].add(title)
+                source_bucket = bucket["source_counts"]
+                source_bucket[section_source] = source_bucket.get(section_source, 0) + 1
+                if isinstance(section_confidence, (int, float)):
+                    bucket["confidence_sum"] += float(section_confidence)
+                    bucket["confidence_count"] += 1
+                chunk_memberships.add(canonical)
+
+        for canonical in chunk_memberships:
+            bucket = _get_bucket(canonical)
+            bucket["chunk_count"] += 1
+
+        chunk_items.append(
+            {
+                "id": int(row["id"]),
+                "page_no": int(row["page_no"]),
+                "block_index": int(row["block_index"]),
+                "char_count": len(text),
+                "text_preview": text_preview,
+                "bbox": bbox,
+                "section_primary": section_primary,
+                "section_all": section_all,
+                "section_titles": section_titles,
+                "metadata_summary": {
+                    "chunk_type": metadata.get("chunk_type"),
+                    "section_source": section_source,
+                    "section_confidence": section_confidence,
+                    "spans_multiple_sections": metadata.get("spans_multiple_sections"),
+                    "block_count": len(metadata.get("blocks") or []) if isinstance(metadata.get("blocks"), list) else 0,
+                },
+                "metadata": metadata,
+            }
+        )
+
+    sections: List[Dict[str, Any]] = []
+    for canonical, payload in section_accumulator.items():
+        source_items = sorted(
+            payload["source_counts"].items(),
+            key=lambda item: item[1],
+            reverse=True,
+        )
+        primary_source = source_items[0][0] if source_items else "unknown"
+        avg_confidence = None
+        if payload["confidence_count"] > 0:
+            avg_confidence = round(payload["confidence_sum"] / payload["confidence_count"], 3)
+        sections.append(
+            {
+                "canonical": canonical,
+                "chunk_count": payload["chunk_count"],
+                "pages": sorted(payload["pages"]),
+                "first_page": payload["first_page"],
+                "first_block_index": payload["first_block_index"],
+                "title_samples": sorted(payload["titles"])[:8],
+                "primary_source": primary_source,
+                "source_counts": [
+                    {"source": source, "count": count}
+                    for source, count in source_items
+                ],
+                "avg_confidence": avg_confidence,
+            }
+        )
+
+    sections.sort(
+        key=lambda item: (
+            item.get("first_page", 10**9),
+            item.get("first_block_index", 10**9),
+            item.get("canonical", ""),
+        )
+    )
+    source_summary = sorted(source_counts.items(), key=lambda item: item[1], reverse=True)
+    strategy = source_summary[0][0] if source_summary else "unknown"
+
+    return {
+        "paper_id": paper_id,
+        "paper_title": paper.get("title"),
+        "source_url": paper.get("source_url"),
+        "pdf_url": paper.get("pdf_url"),
+        "total_chunks": total_chunks,
+        "returned_chunks": len(chunk_items),
+        "chunk_limit": chunk_limit,
+        "truncated": total_chunks > len(chunk_items),
+        "section_strategy": strategy,
+        "section_source_summary": [
+            {"source": source, "count": count}
+            for source, count in source_summary
+        ],
+        "sections": sections,
+        "chunks": chunk_items,
+    }
+
+
+@app.get("/api/papers/{paper_id}/figures/{figure_name}")
+def get_paper_figure_file(paper_id: int, figure_name: str):
+    paper = _get_paper(paper_id)
+    if not paper:
+        raise HTTPException(status_code=404, detail="Paper not found.")
+    try:
+        figure_path = paper_figures.resolve_figure_file(paper_id, figure_name)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    if not figure_path.exists():
+        raise HTTPException(status_code=404, detail="Figure image not found.")
+    return FileResponse(figure_path)
+
+
+@app.get("/api/papers/{paper_id}/ingestion-sections/{section_canonical}")
+async def get_paper_ingestion_section_detail(
+    paper_id: int,
+    section_canonical: str,
+    max_chars: int = 250000,
+) -> Dict[str, Any]:
+    if max_chars < 1000 or max_chars > 2_000_000:
+        raise HTTPException(status_code=400, detail="max_chars must be between 1000 and 2000000.")
+
+    target = str(section_canonical or "").strip().lower()
+    if not target:
+        raise HTTPException(status_code=400, detail="section_canonical is required.")
+
+    paper = _get_paper(paper_id)
+    if not paper:
+        raise HTTPException(status_code=404, detail="Paper not found.")
+
+    try:
+        pool = await get_pg_pool()
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(
+                """
+                SELECT id, page_no, block_index, text, metadata
+                FROM text_blocks
+                WHERE paper_id=$1
+                ORDER BY page_no ASC, block_index ASC
+                """,
+                paper_id,
+            )
+    except Exception as exc:
+        logger.exception("Failed to load ingestion section detail for paper %s", paper_id)
+        raise HTTPException(status_code=500, detail=str(exc))
+
+    source_blocks: Dict[tuple[int, int, str], Dict[str, Any]] = {}
+    chunk_ids: set[int] = set()
+    section_titles: set[str] = set()
+    section_source_counts: Dict[str, int] = {}
+
+    for row in rows:
+        metadata = _as_json_dict(row["metadata"])
+        section_primary = str(metadata.get("section_primary") or "").strip().lower()
+        section_all_raw = metadata.get("section_all")
+        if not isinstance(section_all_raw, list):
+            section_all_raw = [section_primary] if section_primary else []
+        section_all = [str(item).strip().lower() for item in section_all_raw if str(item).strip()]
+        if target in section_all or section_primary == target:
+            chunk_ids.add(int(row["id"]))
+
+        block_items = _as_json_list(metadata.get("blocks"))
+        if not block_items:
+            # Fallback for chunks without original source-block metadata.
+            if target in section_all or section_primary == target:
+                chunk_text = str(row["text"] or "").replace("\x00", "").strip()
+                if chunk_text:
+                    key = (int(row["page_no"]), int(row["block_index"]), chunk_text)
+                    source_blocks.setdefault(
+                        key,
+                        {
+                            "page_no": int(row["page_no"]),
+                            "block_index": int(row["block_index"]),
+                            "text": chunk_text,
+                            "bbox": None,
+                            "section_title": str(metadata.get("section_title") or ""),
+                            "section_source": str(metadata.get("section_source") or "unknown"),
+                            "section_confidence": metadata.get("section_confidence"),
+                        },
+                    )
+            continue
+
+        for block in block_items:
+            if not isinstance(block, dict):
+                continue
+            block_text = str(block.get("text") or "").replace("\x00", "").strip()
+            if not block_text:
+                continue
+            block_meta = block.get("metadata")
+            block_meta = block_meta if isinstance(block_meta, dict) else {}
+            block_canonical = str(block_meta.get("section_canonical") or "").strip().lower()
+            if not block_canonical:
+                block_canonical = section_primary
+            if block_canonical != target:
+                continue
+
+            page_no = int(block.get("page_no") or row["page_no"])
+            block_index = int(block.get("block_index") or 0)
+            section_title = str(block_meta.get("section_title") or "").strip()
+            section_source = str(
+                block_meta.get("section_source")
+                or metadata.get("section_source")
+                or "unknown"
+            ).strip() or "unknown"
+            section_confidence = block_meta.get("section_confidence")
+            block_bbox = _as_json_dict(block.get("bbox"))
+            if not block_bbox:
+                block_bbox = None
+
+            key = (page_no, block_index, block_text)
+            source_blocks.setdefault(
+                key,
+                {
+                    "page_no": page_no,
+                    "block_index": block_index,
+                    "text": block_text,
+                    "bbox": block_bbox,
+                    "section_title": section_title,
+                    "section_source": section_source,
+                    "section_confidence": section_confidence,
+                },
+            )
+
+            if section_title:
+                section_titles.add(section_title)
+            section_source_counts[section_source] = section_source_counts.get(section_source, 0) + 1
+
+    ordered_blocks = sorted(
+        source_blocks.values(),
+        key=lambda item: (item["page_no"], item["block_index"]),
+    )
+    pages = sorted({item["page_no"] for item in ordered_blocks})
+    full_text = "\n\n".join(item["text"] for item in ordered_blocks).strip()
+    truncated = False
+    if len(full_text) > max_chars:
+        full_text = full_text[:max_chars]
+        truncated = True
+
+    manifest = paper_figures.load_paper_figure_manifest(paper_id)
+    all_images = manifest.get("images") or []
+    section_images = [
+        img for img in all_images
+        if str(img.get("section_canonical") or "").strip().lower() == target
+    ]
+    if not section_images and pages:
+        page_set = set(pages)
+        section_images = [
+            img for img in all_images
+            if int(img.get("page_no") or 0) in page_set
+        ]
+
+    section_images = sorted(
+        section_images,
+        key=lambda item: (
+            int(item.get("page_no") or 0),
+            int(item.get("id") or 0),
+        ),
+    )
+
+    return {
+        "paper_id": paper_id,
+        "paper_title": paper.get("title"),
+        "section_canonical": target,
+        "section_title_samples": sorted(section_titles)[:10],
+        "pages": pages,
+        "source_block_count": len(ordered_blocks),
+        "chunk_count": len(chunk_ids),
+        "full_text": full_text,
+        "full_text_chars": len(full_text),
+        "truncated": truncated,
+        "section_source_counts": [
+            {"source": source, "count": count}
+            for source, count in sorted(
+                section_source_counts.items(),
+                key=lambda item: item[1],
+                reverse=True,
+            )
+        ],
+        "images": section_images,
+    }
 
 
 @app.get("/api/notes")

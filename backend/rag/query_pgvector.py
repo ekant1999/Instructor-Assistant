@@ -6,6 +6,7 @@ Uses:
 - PostgreSQL full-text search
 - Hybrid search with reciprocal rank fusion
 """
+import json
 import os
 import logging
 from typing import Dict, Any, Optional, List, Literal
@@ -17,6 +18,19 @@ from backend.rag.graph_pgvector import get_llm, generate_answer
 from backend.services import call_local_llm
 
 logger = logging.getLogger(__name__)
+
+
+def _parse_metadata(payload: Any) -> Dict[str, Any]:
+    if isinstance(payload, dict):
+        return payload
+    if isinstance(payload, str):
+        try:
+            decoded = json.loads(payload)
+            if isinstance(decoded, dict):
+                return decoded
+        except (json.JSONDecodeError, TypeError):
+            return {}
+    return {}
 
 
 async def query_rag(
@@ -89,6 +103,15 @@ async def query_rag(
     # Format context for LLM
     context = []
     for idx, result in enumerate(results, start=1):
+        metadata = _parse_metadata(result.get("metadata"))
+        section_primary = metadata.get("section_primary") or metadata.get("section_canonical")
+        section_all = metadata.get("section_all")
+        if not isinstance(section_all, list):
+            section_all = [section_primary] if section_primary else []
+        section_titles = metadata.get("section_titles")
+        if not isinstance(section_titles, list):
+            fallback_title = metadata.get("section_title")
+            section_titles = [fallback_title] if fallback_title else []
         context.append({
             "text": result["text"],
             "meta": {
@@ -98,6 +121,11 @@ async def query_rag(
                 "page_number": result["page_no"],
                 "block_index": result["block_index"],
                 "kind": "text",
+                "section_primary": section_primary,
+                "section_all": section_all,
+                "section_titles": section_titles,
+                "section_source": metadata.get("section_source"),
+                "section_confidence": metadata.get("section_confidence"),
             },
             "index": idx,
             "chunk_count": 1,
@@ -143,6 +171,11 @@ async def query_rag(
             "kind": meta.get("kind") or "text",
             "page_number": meta.get("page_number"),
             "block_index": meta.get("block_index"),
+            "section_primary": meta.get("section_primary"),
+            "section_all": meta.get("section_all"),
+            "section_titles": meta.get("section_titles"),
+            "section_source": meta.get("section_source"),
+            "section_confidence": meta.get("section_confidence"),
             "similarity": item.get("similarity"),
             "hybrid_score": item.get("hybrid_score")
         })

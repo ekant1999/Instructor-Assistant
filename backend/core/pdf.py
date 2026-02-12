@@ -118,38 +118,81 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
     This provides more granular location tracking than page-level extraction.
     """
     doc = pymupdf.open(str(pdf_path))
-    blocks = []
-    
-    for page_num in range(len(doc)):
-        page = doc[page_num]
-        
-        # Get text blocks (preserves layout structure)
-        # Each block is a tuple: (x0, y0, x1, y1, "text", block_no, block_type)
-        text_blocks = page.get_text("blocks")
-        
-        block_idx = 0
-        for block in text_blocks:
-            # block[6] is block_type: 0=text, 1=image
-            if block[6] == 0:  # Text block only
-                text = block[4].strip().replace("\x00", "")
-                
-                # Skip empty blocks
+    blocks: List[Dict[str, Any]] = []
+
+    try:
+        for page_num in range(len(doc)):
+            page = doc[page_num]
+            page_dict = page.get_text("dict")
+            text_blocks = [b for b in page_dict.get("blocks", []) if b.get("type") == 0]
+
+            block_idx = 0
+            for block in text_blocks:
+                lines = block.get("lines", [])
+                text_lines: List[str] = []
+                span_sizes: List[float] = []
+                span_fonts: List[str] = []
+                bold_spans = 0
+                total_spans = 0
+
+                for line in lines:
+                    spans = line.get("spans", [])
+                    line_parts: List[str] = []
+                    for span in spans:
+                        span_text = str(span.get("text") or "").replace("\x00", "")
+                        if not span_text.strip():
+                            continue
+                        line_parts.append(span_text)
+                        size = span.get("size")
+                        try:
+                            span_sizes.append(float(size))
+                        except (TypeError, ValueError):
+                            pass
+                        font_name = str(span.get("font") or "")
+                        if font_name:
+                            span_fonts.append(font_name)
+                        total_spans += 1
+                        if "bold" in font_name.lower():
+                            bold_spans += 1
+                    if line_parts:
+                        text_lines.append("".join(line_parts).strip())
+
+                text = "\n".join(text_lines).strip().replace("\x00", "")
                 if not text:
                     continue
-                
-                blocks.append({
-                    "page_no": page_num + 1,  # 1-indexed
-                    "block_index": block_idx,
-                    "text": text,
-                    "bbox": {
-                        "x0": block[0],
-                        "y0": block[1],
-                        "x1": block[2],
-                        "y1": block[3]
+
+                bbox = block.get("bbox", [0, 0, 0, 0])
+                first_line = text_lines[0].strip() if text_lines else text.splitlines()[0].strip()
+                max_font = max(span_sizes) if span_sizes else 0.0
+                avg_font = (sum(span_sizes) / len(span_sizes)) if span_sizes else 0.0
+                min_font = min(span_sizes) if span_sizes else 0.0
+                bold_ratio = (bold_spans / total_spans) if total_spans else 0.0
+
+                blocks.append(
+                    {
+                        "page_no": page_num + 1,  # 1-indexed
+                        "block_index": block_idx,
+                        "text": text,
+                        "bbox": {
+                            "x0": float(bbox[0]) if len(bbox) > 0 else 0.0,
+                            "y0": float(bbox[1]) if len(bbox) > 1 else 0.0,
+                            "x1": float(bbox[2]) if len(bbox) > 2 else 0.0,
+                            "y1": float(bbox[3]) if len(bbox) > 3 else 0.0,
+                        },
+                        "metadata": {
+                            "first_line": first_line,
+                            "line_count": len(text_lines),
+                            "char_count": len(text),
+                            "max_font_size": round(max_font, 3),
+                            "avg_font_size": round(avg_font, 3),
+                            "min_font_size": round(min_font, 3),
+                            "bold_ratio": round(bold_ratio, 3),
+                            "font_names": sorted(set(span_fonts))[:6],
+                        },
                     }
-                })
-                
+                )
                 block_idx += 1
-    
-    doc.close()
+    finally:
+        doc.close()
+
     return blocks

@@ -13,6 +13,7 @@ import { SummaryHistory } from './SummaryHistory';
 import { AskQuestionsPanel } from './AskQuestionsPanel';
 import { SaveSummaryModal } from './SaveSummaryModal';
 import { ExportSummaryDialog } from './ExportSummaryDialog';
+import { PaperIngestionInfoDialog } from './PaperIngestionInfoDialog';
 import { Paper, Summary, Document, Section } from '@/shared/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Layers, Sparkles, BookOpen, History, MessageSquare } from 'lucide-react';
@@ -23,6 +24,7 @@ import {
   deleteSummary,
   createPaperSummary,
   downloadPaper,
+  getPaperIngestionInfo,
   listNotes,
   listPaperSections,
   listPapers,
@@ -31,6 +33,7 @@ import {
   updateNote,
   createNote,
 } from '@/lib/api';
+import { ApiPaperIngestionInfo } from '@/lib/api-types';
 import { mapApiNote, mapApiPaper, mapApiSection, mapApiSummary } from '@/lib/mappers';
 
 const countWords = (text: string) => text.split(/\s+/).filter(Boolean).length;
@@ -56,6 +59,10 @@ export default function EnhancedLibraryPage() {
   const [batchProgress, setBatchProgress] = useState<{ current?: string; progress?: number; total?: number }>({});
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+  const [paperIngestionInfo, setPaperIngestionInfo] = useState<ApiPaperIngestionInfo | null>(null);
+  const [paperInfoLoading, setPaperInfoLoading] = useState(false);
+  const [paperInfoError, setPaperInfoError] = useState<string | null>(null);
   const [existingNotes, setExistingNotes] = useState<Document[]>([]);
   const [activeTab, setActiveTab] = useState<string>('preview');
   const [isLoading, setIsLoading] = useState(false);
@@ -827,6 +834,30 @@ export default function EnhancedLibraryPage() {
     }
   };
 
+  const handleOpenIngestionInfo = async (paper: Paper) => {
+    const paperId = Number(paper.id);
+    if (Number.isNaN(paperId)) {
+      toast.error('Invalid paper id');
+      return;
+    }
+
+    setInfoDialogOpen(true);
+    setPaperInfoLoading(true);
+    setPaperInfoError(null);
+    setPaperIngestionInfo(null);
+
+    try {
+      const info = await getPaperIngestionInfo(paperId, 160);
+      setPaperIngestionInfo(info);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to load ingestion info';
+      setPaperInfoError(message);
+      toast.error(message);
+    } finally {
+      setPaperInfoLoading(false);
+    }
+  };
+
   return (
     <div className="flex h-full w-full flex-col bg-background min-h-0 ia-page-root">
       <UploadPanel onUpload={handleAddPapers} onDownload={downloadPaper} />
@@ -864,6 +895,7 @@ export default function EnhancedLibraryPage() {
                 setSelectedSections(new Set());
                 setActiveTab('summarize');
               }}
+              onInfo={handleOpenIngestionInfo}
             />
           </div>
         </div>
@@ -1038,6 +1070,14 @@ export default function EnhancedLibraryPage() {
         year={selectedPaper?.year}
         agent={currentSummary?.agent}
         style={currentSummary?.style}
+      />
+
+      <PaperIngestionInfoDialog
+        open={infoDialogOpen}
+        onOpenChange={setInfoDialogOpen}
+        data={paperIngestionInfo}
+        loading={paperInfoLoading}
+        error={paperInfoError}
       />
     </div>
   );

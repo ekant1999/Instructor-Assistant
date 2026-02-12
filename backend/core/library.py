@@ -213,6 +213,7 @@ def _trigger_background_reindex(paper_id: int, paper_title: str):
                             pdf_path=pdf_path,
                             paper_id=paper_id,
                             paper_title=title,
+                            source_url=source_url,
                         )
                     else:
                         with get_conn() as conn:
