@@ -20,3 +20,8 @@ chatgpt-sdk-app/server/exports/canvas/*
 !chatgpt-sdk-app/server/exports/canvas/example_question_set.md
 ngrok-mcp.yml
 ngrok-fastapi.yml
+.ia_phase1_data/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/

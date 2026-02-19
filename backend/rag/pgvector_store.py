@@ -21,6 +21,65 @@ def _sanitize_value(value: Any) -> Any:
     return value
 
 
+def _safe_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _ensure_unique_page_block_indices(blocks: List[Dict[str, Any]]) -> int:
+    """
+    Ensure each block has a unique (page_no, block_index) tuple.
+
+    Some chunking strategies may emit multiple chunks for the same source block,
+    which can collide with the DB unique key `(paper_id, page_no, block_index)`.
+    """
+    if not blocks:
+        return 0
+
+    max_by_page: Dict[int, int] = {}
+    for block in blocks:
+        page_no = _safe_int(block.get("page_no"), 1)
+        block_index = _safe_int(block.get("block_index"), 0)
+        max_by_page[page_no] = max(max_by_page.get(page_no, -1), block_index)
+
+    next_by_page = {page_no: max_idx + 1 for page_no, max_idx in max_by_page.items()}
+    used_by_page: Dict[int, Set[int]] = {}
+    rewrites = 0
+
+    for block in blocks:
+        page_no = _safe_int(block.get("page_no"), 1)
+        block_index = _safe_int(block.get("block_index"), 0)
+        block["page_no"] = page_no
+
+        used = used_by_page.setdefault(page_no, set())
+        if block_index in used:
+            new_index = next_by_page.get(page_no, 0)
+            while new_index in used:
+                new_index += 1
+
+            metadata = block.get("metadata")
+            if not isinstance(metadata, dict):
+                metadata = {}
+                block["metadata"] = metadata
+            metadata.setdefault("source_block_index", block_index)
+            metadata.setdefault("source_page_no", page_no)
+
+            block["block_index"] = new_index
+            block_index = new_index
+            next_by_page[page_no] = new_index + 1
+            rewrites += 1
+        else:
+            if block_index >= next_by_page.get(page_no, 0):
+                next_by_page[page_no] = block_index + 1
+            block["block_index"] = block_index
+
+        used.add(block_index)
+
+    return rewrites
+
+
 class PgVectorStore:
     """Vector store using PostgreSQL with pgvector extension."""
     
@@ -51,6 +110,8 @@ class PgVectorStore:
         """
         if not blocks:
             return 0
+
+        _ensure_unique_page_block_indices(blocks)
         
         # Extract texts for embedding (sanitize NULL bytes)
         texts = []

@@ -1,0 +1,13 @@
+README.md
+pyproject.toml
+src/ia_phase1/__init__.py
+src/ia_phase1/chunking.py
+src/ia_phase1/figures.py
+src/ia_phase1/parser.py
+src/ia_phase1/sectioning.py
+src/ia_phase1/tables.py
+src/ia_phase1.egg-info/PKG-INFO
+src/ia_phase1.egg-info/SOURCES.txt
+src/ia_phase1.egg-info/dependency_links.txt
+src/ia_phase1.egg-info/requires.txt
+src/ia_phase1.egg-info/top_level.txt
