@@ -317,46 +317,48 @@ export function EnhancedPaperList({
                   </div>
                 </div>
 
-                <div className="flex justify-end items-center gap-1 mt-3 pt-3 border-t border-border/50">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelect(paper);
-                    }}
-                  >
-                    <Eye className="h-3 w-3 mr-1" /> Preview
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSummarize(paper.id);
-                    }}
-                  >
-                    <Sparkles className="h-3 w-3 mr-1" /> Summarize
-                  </Button>
-                  {onInfo && paper.pdfUrl && (
+                <div className="mt-3 pt-3 border-t border-border/50 flex items-start gap-1">
+                  <div className="flex-1 min-w-0 flex flex-wrap items-center gap-1">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 text-xs"
+                      className="h-7 text-xs px-2 shrink-0"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onInfo(paper);
+                        onSelect(paper);
                       }}
                     >
-                      <Info className="h-3 w-3 mr-1" /> Info
+                      <Eye className="h-3 w-3 mr-1" /> Preview
                     </Button>
-                  )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs px-2 shrink-0 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSummarize(paper.id);
+                      }}
+                    >
+                      <Sparkles className="h-3 w-3 mr-1" /> Summarize
+                    </Button>
+                    {onInfo && paper.pdfUrl && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs px-2 shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onInfo(paper);
+                        }}
+                      >
+                        <Info className="h-3 w-3 mr-1" /> Info
+                      </Button>
+                    )}
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    className="h-7 w-7 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(paper.id);

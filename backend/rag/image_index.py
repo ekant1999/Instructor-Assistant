@@ -12,8 +12,6 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from pypdf import PdfReader
 
-from .vision import caption_image
-
 logger = logging.getLogger(__name__)
 
 
@@ -199,8 +197,6 @@ def build_image_index(
             caption = None
             if captions:
                 figure_number, caption = captions.pop(0)
-            if not caption and os.getenv("VISION_CAPTION_ENABLED", "false").lower() in {"1", "true", "yes"}:
-                caption = caption_image(image_path)
             figure_records.append(
                 FigureRecord(
                     paper_id=paper_id,

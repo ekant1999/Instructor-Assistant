@@ -96,7 +96,7 @@ from .mcp_client import (
 )
 from .canvas_service import CanvasPushError, push_question_set_to_canvas
 from . import qwen_tools
-from .rag import ingest_pgvector, query_pgvector, image_index, paper_figures
+from .rag import ingest_pgvector, query_pgvector, image_index, paper_figures, table_extractor
 from backend.core.postgres import (
     get_pool as get_pg_pool,
     close_pool as close_pg_pool,
@@ -1123,6 +1123,49 @@ async def get_paper_ingestion_info(
     if not paper:
         raise HTTPException(status_code=404, detail="Paper not found.")
 
+    table_manifest = table_extractor.load_paper_table_manifest(paper_id)
+    table_entries_raw = table_manifest.get("tables") or []
+    table_entries = table_entries_raw if isinstance(table_entries_raw, list) else []
+    table_preview_max_rows = 8
+    table_preview_max_cell_chars = 240
+    table_preview_max_header_chars = 120
+    table_items = [
+        {
+            "id": int(item.get("id") or 0),
+            "page_no": int(item.get("page_no") or 0),
+            "n_rows": int(item.get("n_rows") or 0),
+            "n_cols": int(item.get("n_cols") or 0),
+            "caption": str(item.get("caption") or "").strip() or None,
+            "section_canonical": str(item.get("section_canonical") or "other"),
+            "section_source": str(item.get("section_source") or "unknown"),
+            "section_confidence": item.get("section_confidence"),
+            "markdown_preview": str(item.get("markdown") or "").strip()[:1500] or None,
+            "headers_preview": [
+                str(cell or "").strip()[:table_preview_max_header_chars]
+                for cell in (item.get("headers") if isinstance(item.get("headers"), list) else [])
+            ],
+            "rows_preview": [
+                [
+                    str(cell or "").strip()[:table_preview_max_cell_chars]
+                    for cell in (row if isinstance(row, list) else [])
+                ]
+                for row in (
+                    item.get("rows")[:table_preview_max_rows]
+                    if isinstance(item.get("rows"), list)
+                    else []
+                )
+                if isinstance(row, list)
+            ],
+            "preview_truncated": (
+                len(item.get("rows"))
+                if isinstance(item.get("rows"), list)
+                else 0
+            ) > table_preview_max_rows,
+        }
+        for item in table_entries
+        if isinstance(item, dict)
+    ]
+
     try:
         pool = await get_pg_pool()
         async with pool.acquire() as conn:
@@ -1157,6 +1200,12 @@ async def get_paper_ingestion_info(
                 (paper_id,),
             ).fetchone()
             sqlite_section_count = int(sqlite_sections[0] if sqlite_sections else 0)
+        logger.info(
+            "Paper %s ingestion info: no pgvector chunks (sqlite_sections=%s, tables=%s)",
+            paper_id,
+            sqlite_section_count,
+            len(table_items),
+        )
         return {
             "paper_id": paper_id,
             "paper_title": paper.get("title"),
@@ -1168,6 +1217,8 @@ async def get_paper_ingestion_info(
             "truncated": False,
             "sections": [],
             "chunks": [],
+            "num_tables": len(table_items),
+            "tables": table_items,
             "sqlite_section_count": sqlite_section_count,
             "message": "No pgvector chunks found for this paper. Run ingestion/indexing first.",
         }
@@ -1336,6 +1387,15 @@ async def get_paper_ingestion_info(
     )
     source_summary = sorted(source_counts.items(), key=lambda item: item[1], reverse=True)
     strategy = source_summary[0][0] if source_summary else "unknown"
+    logger.info(
+        "Paper %s ingestion info: strategy=%s sources=%s tables=%s returned_chunks=%s total_chunks=%s",
+        paper_id,
+        strategy,
+        ", ".join(f"{source} ({count})" for source, count in source_summary) or "n/a",
+        len(table_items),
+        len(chunk_items),
+        total_chunks,
+    )
 
     return {
         "paper_id": paper_id,
@@ -1353,6 +1413,8 @@ async def get_paper_ingestion_info(
         ],
         "sections": sections,
         "chunks": chunk_items,
+        "num_tables": len(table_items),
+        "tables": table_items,
     }
 
 

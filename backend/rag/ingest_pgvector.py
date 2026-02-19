@@ -23,6 +23,7 @@ from .chunking import chunk_text_blocks, simple_chunk_blocks
 from .pgvector_store import PgVectorStore
 from .section_extractor import annotate_blocks_with_sections
 from .paper_figures import extract_and_store_paper_figures
+from .table_extractor import extract_and_store_paper_tables, table_records_to_chunks
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +91,30 @@ async def ingest_single_paper(
         except Exception as exc:
             # Figure extraction failure should not block text ingestion.
             logger.warning("  Figure extraction failed for paper %s: %s", paper_id, exc)
+
+        table_report: Dict[str, Any] = {"num_tables": 0, "tables": []}
+        table_chunks: List[Dict[str, Any]] = []
+        try:
+            table_report = extract_and_store_paper_tables(
+                pdf_path=pdf_path_obj,
+                paper_id=paper_id,
+                blocks=blocks,
+            )
+            table_chunks = table_records_to_chunks(
+                tables=table_report.get("tables") or [],
+                text_blocks=blocks,
+            )
+            if table_chunks:
+                logger.info(
+                    "  Extracted %s tables and built %s table chunks",
+                    table_report.get("num_tables", 0),
+                    len(table_chunks),
+                )
+            elif table_report.get("num_tables", 0):
+                logger.info("  Extracted %s tables", table_report.get("num_tables", 0))
+        except Exception as exc:
+            # Table extraction failure should not block text ingestion.
+            logger.warning("  Table extraction failed for paper %s: %s", paper_id, exc)
         
         # Chunk the blocks
         logger.info("  Chunking blocks...")
@@ -101,6 +126,8 @@ async def ingest_single_paper(
                 target_size=chunk_size,
                 overlap=chunk_overlap
             )
+        if table_chunks:
+            chunks.extend(table_chunks)
         logger.info(f"  Created {len(chunks)} chunks")
         
         # Get pgvector store
@@ -126,6 +153,8 @@ async def ingest_single_paper(
             "section_strategy": section_report.get("strategy"),
             "num_sections": len(section_report.get("sections") or []),
             "num_figures": figure_report.get("num_images", 0),
+            "num_tables": table_report.get("num_tables", 0),
+            "num_table_chunks": len(table_chunks),
         }
     
     except Exception as e:

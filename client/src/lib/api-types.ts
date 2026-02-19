@@ -240,6 +240,21 @@ export interface ApiPaperChunkInfo {
   metadata?: Record<string, any>;
 }
 
+export interface ApiPaperTableInfo {
+  id: number;
+  page_no: number;
+  n_rows: number;
+  n_cols: number;
+  caption?: string | null;
+  section_canonical?: string | null;
+  section_source?: string | null;
+  section_confidence?: number | null;
+  markdown_preview?: string | null;
+  headers_preview?: string[];
+  rows_preview?: string[][];
+  preview_truncated?: boolean;
+}
+
 export interface ApiPaperIngestionInfo {
   paper_id: number;
   paper_title?: string | null;
@@ -253,6 +268,8 @@ export interface ApiPaperIngestionInfo {
   section_source_summary?: ApiSectionSourceCount[];
   sections: ApiPaperIngestionSectionInfo[];
   chunks: ApiPaperChunkInfo[];
+  num_tables?: number;
+  tables?: ApiPaperTableInfo[];
   sqlite_section_count?: number;
   message?: string;
 }
