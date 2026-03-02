@@ -185,6 +185,27 @@ class PaperChatRequest(BaseModel):
     section_ids: List[int] | None = None
 
 
+class SectionChatRequest(BaseModel):
+    question: str = Field(..., min_length=1)
+    max_context_chars: int | None = Field(default=None, ge=1000, le=350000)
+    provider: str | None = Field(
+        default="local",
+        description="LLM provider identifier. Currently local/Ollama is recommended.",
+    )
+
+
+class SectionChatResponse(BaseModel):
+    paper_id: int
+    section_canonical: str
+    question: str
+    answer: str
+    provider: str
+    context_chars: int
+    source_block_count: int
+    chunk_count: int
+    pages: List[int] = Field(default_factory=list)
+
+
 class CanvasPushRequest(BaseModel):
     title: Optional[str] = Field(default=None, max_length=255)
     course_id: Optional[str] = Field(default=None, min_length=1)

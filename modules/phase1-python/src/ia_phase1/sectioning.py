@@ -24,6 +24,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import requests
 import pymupdf
+from pypdf import PdfReader
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +68,10 @@ _HEADING_NUMBER_PREFIX_RE = re.compile(
 _ROMAN_HEADING_RE = re.compile(r"^\s*(?P<num>[IVXLCDM]+)\.\s+(?P<rest>.+)$")
 _NUMERIC_HEADING_RE = re.compile(r"^\s*(?P<num>\d+(?:\.\d+){0,3})\.?\s+(?P<rest>.+)$")
 _HEADING_NOISE_RE = re.compile(r"^(table|fig\.?|figure|algorithm|lemma|theorem)\b", re.IGNORECASE)
+_STANDALONE_HEADING_MARKER_RE = re.compile(
+    r"^\s*(?:\d+(?:\.\d+){0,3}|[IVXLCDM]+)\.?\s*$",
+    re.IGNORECASE,
+)
 
 
 @dataclass
@@ -91,6 +96,9 @@ class SectionSpan:
     end_idx: int
     start_page: int
     end_page: int
+
+
+KNOWN_CANONICALS = {canonical for canonical, _ in SECTION_PATTERNS} | {"front_matter", "other"}
 
 
 def _normalize_text(value: str) -> str:
@@ -139,6 +147,34 @@ def _extract_arxiv_id(source_url: Optional[str]) -> Optional[str]:
     if arxiv_id.lower().endswith(".pdf"):
         arxiv_id = arxiv_id[:-4]
     return arxiv_id
+
+
+def _extract_arxiv_id_from_pdf_metadata(pdf_path: Path) -> Optional[str]:
+    try:
+        reader = PdfReader(str(pdf_path))
+    except Exception:
+        return None
+
+    metadata = reader.metadata or {}
+    candidates = [
+        metadata.get("/arXivID"),
+        metadata.get("arXivID"),
+        metadata.get("/DOI"),
+        metadata.get("doi"),
+        metadata.get("/Subject"),
+        metadata.get("subject"),
+    ]
+    for candidate in candidates:
+        if not candidate:
+            continue
+        match = _ARXIV_ID_RE.search(str(candidate))
+        if not match:
+            continue
+        arxiv_id = match.group("id")
+        if arxiv_id.lower().endswith(".pdf"):
+            arxiv_id = arxiv_id[:-4]
+        return arxiv_id
+    return None
 
 
 def _strip_latex_comments(content: str) -> str:
@@ -212,8 +248,13 @@ def _parse_latex_headings(tex_content: str) -> List[HeadingCandidate]:
     return _dedupe_headings(headings)
 
 
-def _extract_headings_from_arxiv_source(source_url: Optional[str]) -> List[HeadingCandidate]:
+def _extract_headings_from_arxiv_source(
+    source_url: Optional[str],
+    pdf_path: Optional[Path] = None,
+) -> List[HeadingCandidate]:
     arxiv_id = _extract_arxiv_id(source_url)
+    if not arxiv_id and pdf_path is not None:
+        arxiv_id = _extract_arxiv_id_from_pdf_metadata(pdf_path)
     if not arxiv_id:
         return []
 
@@ -443,6 +484,27 @@ def _extract_numeric_heading_title(text: str) -> str:
     return _clean_heading_title(" ".join(title_tokens))
 
 
+def _is_standalone_heading_marker(text: str) -> bool:
+    return bool(_STANDALONE_HEADING_MARKER_RE.match(text or ""))
+
+
+def _looks_like_heading_phrase(text: str) -> bool:
+    line = " ".join((text or "").split())
+    if not line:
+        return False
+    if line.endswith("."):
+        return False
+    if line.count(",") > 1:
+        return False
+    tokens = line.split()
+    if len(tokens) == 0 or len(tokens) > 12:
+        return False
+    if _HEADING_NOISE_RE.match(line.lower()):
+        return False
+    title_case_tokens = sum(1 for token in tokens if token[:1].isupper() or _is_upper_token(token))
+    return title_case_tokens >= max(2, len(tokens) - 2)
+
+
 def _is_reasonable_heading_title(title: str) -> bool:
     cleaned = _clean_heading_title(title)
     normalized = _normalize_text(cleaned)
@@ -492,6 +554,8 @@ def _extract_heuristic_headings(blocks: List[Dict[str, Any]]) -> List[HeadingCan
         raw_text = str(block.get("text") or "").replace("\x00", "").strip()
         if not raw_text:
             continue
+        raw_lines = [" ".join(line.split()) for line in raw_text.splitlines() if line.strip()]
+        page_no = int(block.get("page_no") or 1)
         metadata = block.get("metadata")
         first_line_raw = ""
         if isinstance(metadata, dict):
@@ -501,6 +565,22 @@ def _extract_heuristic_headings(blocks: List[Dict[str, Any]]) -> List[HeadingCan
         line = " ".join(first_line_raw.split())
         if not line:
             continue
+
+        next_line = ""
+        next_meta: Dict[str, Any] = {}
+        if idx + 1 < len(blocks):
+            next_block = blocks[idx + 1]
+            next_page_no = int(next_block.get("page_no") or page_no)
+            if next_page_no == page_no:
+                raw_next_text = str(next_block.get("text") or "").replace("\x00", "").strip()
+                if raw_next_text:
+                    candidate = next_block.get("metadata")
+                    if isinstance(candidate, dict):
+                        next_meta = candidate
+                        next_line = str(candidate.get("first_line") or "").strip()
+                    if not next_line:
+                        next_line = raw_next_text.splitlines()[0].strip()
+                    next_line = " ".join(next_line.split())
 
         candidate_title = ""
         line_l = line.lower()
@@ -519,6 +599,18 @@ def _extract_heuristic_headings(blocks: List[Dict[str, Any]]) -> List[HeadingCan
                 words = line.split()
                 if 1 <= len(words) <= 12 and all(_is_upper_token(token) for token in words):
                     candidate_title = _clean_heading_title(line)
+
+        if not candidate_title and _is_standalone_heading_marker(line):
+            inline_heading_line = raw_lines[1] if len(raw_lines) >= 2 else ""
+            if _looks_like_heading_phrase(inline_heading_line):
+                candidate_title = _clean_heading_title(inline_heading_line)
+            elif _looks_like_heading_phrase(next_line):
+                next_line_count = int(_safe_float(next_meta.get("line_count"), 1)) if next_meta else 1
+                next_max_font = _safe_float(next_meta.get("max_font_size"), 0.0) if next_meta else 0.0
+                next_bold_ratio = _safe_float(next_meta.get("bold_ratio"), 0.0) if next_meta else 0.0
+                next_font_prominent = body_font > 0 and next_max_font >= (body_font + 0.6)
+                if next_line_count <= 2 and (next_font_prominent or next_bold_ratio >= 0.25):
+                    candidate_title = _clean_heading_title(next_line)
 
         if not candidate_title and isinstance(metadata, dict):
             max_font = _safe_float(metadata.get("max_font_size"), 0.0)
@@ -549,7 +641,7 @@ def _extract_heuristic_headings(blocks: List[Dict[str, Any]]) -> List[HeadingCan
                 source="heuristic",
                 confidence=0.72,
                 block_hint=idx,
-                page_hint=int(block.get("page_no") or 1),
+                page_hint=page_no,
             )
         )
     return _dedupe_headings(headings)
@@ -754,6 +846,107 @@ def _apply_spans_to_blocks(blocks: List[Dict[str, Any]], spans: List[SectionSpan
             metadata["section_index"] = span.index
 
 
+def _count_non_front_spans(span_items: List[SectionSpan]) -> int:
+    return sum(1 for item in span_items if item.canonical != "front_matter")
+
+
+def _extract_document_title(pdf_path: Path, blocks: List[Dict[str, Any]]) -> str:
+    try:
+        reader = PdfReader(str(pdf_path))
+        metadata = reader.metadata or {}
+        title = str(metadata.get("/Title") or metadata.get("Title") or "").strip()
+        if title:
+            return _normalize_text(title)
+    except Exception:
+        pass
+
+    if blocks:
+        first_meta = blocks[0].get("metadata")
+        if isinstance(first_meta, dict):
+            first_line = str(first_meta.get("first_line") or "").strip()
+            if first_line:
+                return _normalize_text(first_line)
+        first_text = str(blocks[0].get("text") or "").splitlines()
+        if first_text:
+            return _normalize_text(first_text[0])
+    return ""
+
+
+def _strategy_score(
+    source_name: str,
+    heading_items: List[HeadingCandidate],
+    span_items: List[SectionSpan],
+    total_pages: int,
+    document_title_norm: str,
+) -> float:
+    matched_non_front = _count_non_front_spans(span_items)
+    if matched_non_front <= 0:
+        return -1.0
+
+    non_front_spans = [item for item in span_items if item.canonical != "front_matter"]
+    coverage = matched_non_front / max(1, len(heading_items))
+    confidences = [item.confidence for item in non_front_spans]
+    avg_confidence = (sum(confidences) / len(confidences)) if confidences else 0.0
+    source_bonus = {
+        "pdf_toc": 1.25,
+        "arxiv_source": 1.1,
+        "grobid": 1.0,
+        "heuristic": 0.7,
+    }.get(source_name, 0.6)
+    score = source_bonus + (matched_non_front * 0.25) + (coverage * 1.5) + (avg_confidence * 0.5)
+
+    unique_canonicals = {item.canonical for item in non_front_spans}
+    diversity = len(unique_canonicals) / max(1, matched_non_front)
+    score += diversity * 0.4
+
+    if total_pages > 0 and non_front_spans:
+        span_lengths = [max(1, item.end_page - item.start_page + 1) for item in non_front_spans]
+        longest_ratio = max(span_lengths) / max(1, total_pages)
+        if longest_ratio > 0.6:
+            score -= (longest_ratio - 0.6) * 2.4
+
+        abstract_span = next((item for item in non_front_spans if item.canonical == "abstract"), None)
+        if abstract_span:
+            abstract_pages = max(1, abstract_span.end_page - abstract_span.start_page + 1)
+            if abstract_pages > 2:
+                score -= min(1.2, 0.45 * (abstract_pages - 2))
+
+    if source_name == "pdf_toc":
+        if len(heading_items) <= 2:
+            score -= 1.0
+
+        if document_title_norm:
+            title_like_headings = 0
+            for heading in heading_items:
+                heading_norm = _normalize_text(heading.title)
+                if not heading_norm:
+                    continue
+                similarity = SequenceMatcher(None, heading_norm, document_title_norm).ratio()
+                if similarity >= 0.84:
+                    title_like_headings += 1
+            if title_like_headings:
+                score -= min(1.6, title_like_headings * 0.8)
+
+    if source_name == "heuristic":
+        if len(heading_items) > 18:
+            score -= min(4.5, 1.0 + (len(heading_items) - 18) * 0.35)
+        elif len(heading_items) > 12:
+            score -= (len(heading_items) - 12) * 0.15
+
+        reference_like = sum(1 for span in non_front_spans if span.canonical == "references")
+        if reference_like >= 3:
+            score -= min(1.8, (reference_like - 2) * 0.4)
+
+        generic_long_slugs = sum(
+            1 for span in non_front_spans
+            if span.canonical not in KNOWN_CANONICALS and len(span.canonical.split("_")) >= 5
+        )
+        if generic_long_slugs:
+            score -= min(3.2, generic_long_slugs * 0.22)
+
+    return score
+
+
 def annotate_blocks_with_sections(
     blocks: List[Dict[str, Any]],
     pdf_path: Path,
@@ -771,24 +964,6 @@ def annotate_blocks_with_sections(
             "matched_headings": 0,
             "sections": [],
         }
-
-    def _count_non_front(span_items: List[SectionSpan]) -> int:
-        return sum(1 for item in span_items if item.canonical != "front_matter")
-
-    def _strategy_score(source_name: str, heading_items: List[HeadingCandidate], span_items: List[SectionSpan]) -> float:
-        matched_non_front = _count_non_front(span_items)
-        if matched_non_front <= 0:
-            return -1.0
-        coverage = matched_non_front / max(1, len(heading_items))
-        confidences = [item.confidence for item in span_items if item.canonical != "front_matter"]
-        avg_confidence = (sum(confidences) / len(confidences)) if confidences else 0.0
-        source_bonus = {
-            "pdf_toc": 1.25,
-            "arxiv_source": 1.1,
-            "grobid": 1.0,
-            "heuristic": 0.7,
-        }.get(source_name, 0.6)
-        return source_bonus + (matched_non_front * 0.25) + (coverage * 1.5) + (avg_confidence * 0.5)
 
     strategy = "heuristic"
     headings: List[HeadingCandidate] = []
@@ -814,34 +989,37 @@ def annotate_blocks_with_sections(
             toc_headings = [*toc_headings, references_heading]
         toc_headings = _dedupe_headings(toc_headings)
 
-    toc_spans = _align_headings_to_spans(toc_headings, blocks) if toc_headings else []
-    if toc_headings and _count_non_front(toc_spans) >= 3:
-        strategy = "pdf_toc"
-        headings = toc_headings
-        spans = toc_spans
+    total_pages = max(int(block.get("page_no") or 1) for block in blocks)
+    document_title_norm = _extract_document_title(pdf_path, blocks)
+
+    candidates: List[Tuple[str, List[HeadingCandidate], List[SectionSpan], float]] = []
+    strategy_inputs = [
+        ("pdf_toc", toc_headings),
+        ("arxiv_source", _extract_headings_from_arxiv_source(source_url, pdf_path=pdf_path)),
+        ("grobid", _extract_headings_with_grobid(pdf_path)),
+        ("heuristic", heuristic_headings),
+    ]
+
+    for source_name, source_headings in strategy_inputs:
+        if not source_headings:
+            continue
+        source_spans = _align_headings_to_spans(source_headings, blocks)
+        score = _strategy_score(
+            source_name,
+            source_headings,
+            source_spans,
+            total_pages=total_pages,
+            document_title_norm=document_title_norm,
+        )
+        candidates.append((source_name, source_headings, source_spans, score))
+
+    if candidates:
+        candidates.sort(key=lambda item: item[3], reverse=True)
+        strategy, headings, spans, _ = candidates[0]
     else:
-        candidates: List[Tuple[str, List[HeadingCandidate], List[SectionSpan], float]] = []
-        strategy_inputs = [
-            ("pdf_toc", toc_headings),
-            ("arxiv_source", _extract_headings_from_arxiv_source(source_url)),
-            ("grobid", _extract_headings_with_grobid(pdf_path)),
-            ("heuristic", heuristic_headings),
-        ]
-
-        for source_name, source_headings in strategy_inputs:
-            if not source_headings:
-                continue
-            source_spans = _align_headings_to_spans(source_headings, blocks)
-            score = _strategy_score(source_name, source_headings, source_spans)
-            candidates.append((source_name, source_headings, source_spans, score))
-
-        if candidates:
-            candidates.sort(key=lambda item: item[3], reverse=True)
-            strategy, headings, spans, _ = candidates[0]
-        else:
-            headings = heuristic_headings
-            spans = _align_headings_to_spans(headings, blocks)
-            strategy = "heuristic"
+        headings = heuristic_headings
+        spans = _align_headings_to_spans(headings, blocks)
+        strategy = "heuristic"
 
     _apply_spans_to_blocks(blocks, spans)
 

@@ -6,6 +6,7 @@ import {
   ApiPaper,
   ApiPaperIngestionSectionDetail,
   ApiPaperIngestionInfo,
+  ApiPaperSectionChatResponse,
   ApiPaperChatMessage,
   ApiPaperChatResponse,
   ApiPaperSection,
@@ -487,6 +488,25 @@ export async function getPaperIngestionSectionDetail(
   const query = params.toString() ? `?${params}` : "";
   return request<ApiPaperIngestionSectionDetail>(
     `/papers/${paperId}/ingestion-sections/${encodeURIComponent(sectionCanonical)}${query}`
+  );
+}
+
+export async function chatPaperIngestionSection(
+  paperId: number,
+  sectionCanonical: string,
+  question: string,
+  maxContextChars?: number
+): Promise<ApiPaperSectionChatResponse> {
+  return request<ApiPaperSectionChatResponse>(
+    `/papers/${paperId}/ingestion-sections/${encodeURIComponent(sectionCanonical)}/chat`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        question,
+        provider: "local",
+        ...(typeof maxContextChars === "number" ? { max_context_chars: maxContextChars } : {})
+      })
+    }
   );
 }
 

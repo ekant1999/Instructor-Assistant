@@ -10,6 +10,7 @@ This directory contains tests for reusable `ia_phase1` modules.
   - `test_chunking.py`
   - `test_tables.py`
   - `test_figures.py`
+  - `test_youtube_transcript.py`
 - Integration contract:
   - `test_contract_integration.py` (marked `integration`)
 

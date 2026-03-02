@@ -7,7 +7,7 @@ import logging
 import os
 import re
 import threading
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -22,6 +22,7 @@ from backend.core.postgres import init_db as init_pg_db
 from backend.core.library import (
     render_library_structured,
     add_paper,
+    add_youtube_transcript,
     add_web_page,
     delete_paper as delete_paper_record,
 )
@@ -50,6 +51,8 @@ from .schemas import (
     SummaryCreate,
     SummaryUpdate,
     PaperChatRequest,
+    SectionChatRequest,
+    SectionChatResponse,
     PaperDownloadRequest,
     PaperRecord,
     QuestionContextUploadResponse,
@@ -81,6 +84,7 @@ from .schemas import (
 )
 from .services import (
     QuestionGenerationError,
+    call_local_llm,
     extract_context_from_upload,
     generate_insertion_preview,
     generate_questions,
@@ -159,6 +163,11 @@ def _pgvector_score(row: Dict[str, Any]) -> float:
 
 
 _WORD_RE = re.compile(r"[A-Za-z0-9]+")
+_DOI_RE = re.compile(r"^10\.\d{4,9}/\S+$", re.I)
+_ARXIV_ID_RE = re.compile(
+    r"^(?:arxiv:)?(?:\d{4}\.\d{4,5}|[a-z\-]+(?:\.[A-Z]{2})?/\d{7})(?:v\d+)?$",
+    re.I,
+)
 
 
 def _query_tokens(query: str) -> List[str]:
@@ -180,12 +189,20 @@ def _select_block_for_query(row: Dict[str, Any], tokens: List[str]) -> Dict[str,
     metadata = row.get("metadata")
     blocks = metadata.get("blocks") if isinstance(metadata, dict) else None
     if not blocks:
+        section_canonical = ""
+        if isinstance(metadata, dict):
+            section_canonical = str(
+                metadata.get("section_primary")
+                or metadata.get("section_canonical")
+                or ""
+            ).strip()
         return {
             "page_no": row.get("page_no"),
             "block_index": row.get("block_index"),
             "bbox": row.get("bbox"),
             "text": row.get("text") or "",
             "lex_hits": _lexical_hits(tokens, row.get("text") or ""),
+            "section_canonical": section_canonical,
         }
 
     best_block: Optional[Dict[str, Any]] = None
@@ -200,13 +217,36 @@ def _select_block_for_query(row: Dict[str, Any], tokens: List[str]) -> Dict[str,
             best_len = len(text)
 
     if not best_block:
+        section_canonical = ""
+        if isinstance(metadata, dict):
+            section_canonical = str(
+                metadata.get("section_primary")
+                or metadata.get("section_canonical")
+                or ""
+            ).strip()
         return {
             "page_no": row.get("page_no"),
             "block_index": row.get("block_index"),
             "bbox": row.get("bbox"),
             "text": row.get("text") or "",
             "lex_hits": _lexical_hits(tokens, row.get("text") or ""),
+            "section_canonical": section_canonical,
         }
+
+    block_meta = best_block.get("metadata") if isinstance(best_block, dict) else None
+    section_canonical = ""
+    if isinstance(block_meta, dict):
+        section_canonical = str(
+            block_meta.get("section_canonical")
+            or block_meta.get("section_primary")
+            or ""
+        ).strip()
+    if not section_canonical and isinstance(metadata, dict):
+        section_canonical = str(
+            metadata.get("section_primary")
+            or metadata.get("section_canonical")
+            or ""
+        ).strip()
 
     return {
         "page_no": best_block.get("page_no") or row.get("page_no"),
@@ -214,6 +254,7 @@ def _select_block_for_query(row: Dict[str, Any], tokens: List[str]) -> Dict[str,
         "bbox": best_block.get("bbox") or row.get("bbox"),
         "text": best_block.get("text") or row.get("text") or "",
         "lex_hits": best_hits,
+        "section_canonical": section_canonical,
     }
 
 
@@ -291,6 +332,108 @@ def _looks_like_url(value: str) -> bool:
         return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
     except Exception:
         return False
+
+
+def _looks_like_doi(value: str) -> bool:
+    return bool(_DOI_RE.match((value or "").strip()))
+
+
+def _looks_like_direct_pdf_source(value: str) -> bool:
+    raw = (value or "").strip()
+    if not raw:
+        return False
+    if raw.lower().endswith(".pdf"):
+        return True
+    if _looks_like_url(raw):
+        try:
+            parsed = urlparse(raw)
+            path = (parsed.path or "").lower()
+            if path.endswith(".pdf"):
+                return True
+            query = (parsed.query or "").lower()
+            if "format=pdf" in query or "type=pdf" in query:
+                return True
+        except Exception:
+            return False
+    return False
+
+
+def _looks_like_arxiv_source(value: str) -> bool:
+    raw = (value or "").strip()
+    if not raw:
+        return False
+    if _ARXIV_ID_RE.match(raw):
+        return True
+    if not _looks_like_url(raw):
+        return False
+    try:
+        parsed = urlparse(raw)
+    except Exception:
+        return False
+    host = (parsed.netloc or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    if host != "arxiv.org":
+        return False
+    path = (parsed.path or "").lower()
+    return path.startswith("/abs/") or path.startswith("/pdf/") or path.endswith(".pdf")
+
+
+def _looks_like_youtube_source(value: str) -> bool:
+    raw = (value or "").strip()
+    if not raw or not _looks_like_url(raw):
+        return False
+    try:
+        parsed = urlparse(raw)
+    except Exception:
+        return False
+    host = (parsed.netloc or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    if host == "youtu.be":
+        return bool((parsed.path or "").strip("/"))
+    if host not in {"youtube.com", "m.youtube.com", "music.youtube.com"}:
+        return False
+    path = (parsed.path or "").lower().strip("/")
+    if path == "watch":
+        return bool(parse_qs(parsed.query or "").get("v", [None])[0])
+    return path.startswith("shorts/") or path.startswith("live/") or path.startswith("embed/")
+
+
+def _resolve_download_mode(source: str) -> str:
+    """
+    Decide ingestion mode for /api/papers/download:
+    - youtube: YouTube URL (caption transcript)
+    - pdf: DOI / arXiv / direct PDF
+    - web: generic URL
+    """
+    value = (source or "").strip()
+    if _looks_like_youtube_source(value):
+        return "youtube"
+    if _looks_like_doi(value):
+        return "pdf"
+    if _looks_like_arxiv_source(value):
+        return "pdf"
+    if _looks_like_direct_pdf_source(value):
+        return "pdf"
+    if _looks_like_url(value):
+        return "web"
+    return "pdf"
+
+
+def _normalize_pdf_source(source: str) -> str:
+    value = (source or "").strip()
+    if (
+        value
+        and _ARXIV_ID_RE.match(value)
+        and not _looks_like_url(value)
+        and not _looks_like_doi(value)
+    ):
+        normalized = value
+        if normalized.lower().startswith("arxiv:"):
+            normalized = normalized.split(":", 1)[1]
+        return f"https://arxiv.org/abs/{normalized}"
+    return value
 
 
 def _build_web_blocks(paper_id: int, source_url: Optional[str], title: Optional[str]) -> List[Dict[str, Any]]:
@@ -448,6 +591,7 @@ def _pgvector_search_sections(
                 "block_index": match_block.get("block_index") or row.get("block_index"),
                 "text": match_block.get("text") or row.get("text"),
                 "lex_hits": match_block.get("lex_hits", 0),
+                "section_canonical": match_block.get("section_canonical") or "",
             }
 
         lex_hits = match_block.get("lex_hits", 0)
@@ -458,6 +602,7 @@ def _pgvector_search_sections(
                 "block_index": match_block.get("block_index") or row.get("block_index"),
                 "text": match_block.get("text") or row.get("text"),
                 "lex_hits": lex_hits,
+                "section_canonical": match_block.get("section_canonical") or "",
             }
 
     if not page_scores:
@@ -490,6 +635,7 @@ def _pgvector_search_sections(
             "match_score": page_scores.get(r["page_no"], 0),
             "match_bbox": best.get("bbox"),
             "match_block_index": best.get("block_index"),
+            "match_section_canonical": best.get("section_canonical"),
         }
         best_text = best.get("text") or ""
         match_text = _build_match_snippet(query, tokens, best_text)
@@ -504,6 +650,41 @@ def _pgvector_search_sections(
 
     sections.sort(key=lambda item: item.get("match_score", 0), reverse=True)
     return sections
+
+
+def _keyword_match_lookup_for_sections(paper_id: int, query: str, limit: int = 200) -> Dict[int, Dict[str, Any]]:
+    """
+    Build section-id keyed match metadata (block index/bbox/snippet) from pg text_blocks keyword search.
+
+    This is used to enrich SQLite FTS section results so the UI can map a hit to the correct
+    source block and section on mixed-content pages.
+    """
+    enriched_rows = _pgvector_search_sections(
+        paper_id=paper_id,
+        query=query,
+        search_type="keyword",
+        include_text=False,
+        max_chars=None,
+        limit=limit,
+    )
+    lookup: Dict[int, Dict[str, Any]] = {}
+    for row in enriched_rows:
+        try:
+            section_id = int(row.get("id"))
+        except (TypeError, ValueError):
+            continue
+        payload: Dict[str, Any] = {}
+        if row.get("match_bbox") is not None:
+            payload["match_bbox"] = row.get("match_bbox")
+        if row.get("match_block_index") is not None:
+            payload["match_block_index"] = row.get("match_block_index")
+        if row.get("match_section_canonical"):
+            payload["match_section_canonical"] = row.get("match_section_canonical")
+        if row.get("match_text"):
+            payload["match_text"] = row.get("match_text")
+        if payload:
+            lookup[section_id] = payload
+    return lookup
 
 
 def _get_paper(paper_id: int) -> Optional[Dict[str, Any]]:
@@ -988,11 +1169,13 @@ def list_paper_sections(
         st = search_type or "keyword"
         if st not in ["keyword", "embedding", "hybrid"]:
             st = "keyword"
+        query_tokens = _query_tokens(q)
 
         # For hybrid searches, prefer exact keyword hits when available.
         if st == "hybrid":
             keyword_results = search_sections(q, search_type="keyword", paper_ids=[paper_id], limit=100)
             if keyword_results:
+                match_lookup = _keyword_match_lookup_for_sections(paper_id, q, limit=200)
                 sections: List[Dict[str, Any]] = []
                 for r in keyword_results:
                     entry = {
@@ -1001,6 +1184,13 @@ def list_paper_sections(
                         "paper_id": r["paper_id"],
                         "match_score": r.get("rank", 0),
                     }
+                    matched = match_lookup.get(int(r["id"]))
+                    if matched:
+                        entry.update(matched)
+                    else:
+                        fallback_snippet = _build_match_snippet(q, query_tokens, r.get("text") or "")
+                        if fallback_snippet:
+                            entry["match_text"] = fallback_snippet
                     if include_text:
                         text = r["text"] or ""
                         if max_chars is not None and max_chars > 0:
@@ -1027,6 +1217,7 @@ def list_paper_sections(
             st = "keyword"
 
         results = search_sections(q, search_type="keyword", paper_ids=[paper_id], limit=100)
+        match_lookup = _keyword_match_lookup_for_sections(paper_id, q, limit=200)
         sections: List[Dict[str, Any]] = []
         for r in results:
             entry = {
@@ -1035,6 +1226,13 @@ def list_paper_sections(
                 "paper_id": r["paper_id"],
                 "match_score": r.get("rank", 0)  # Include relevance score for highlighting
             }
+            matched = match_lookup.get(int(r["id"]))
+            if matched:
+                entry.update(matched)
+            else:
+                fallback_snippet = _build_match_snippet(q, query_tokens, r.get("text") or "")
+                if fallback_snippet:
+                    entry["match_text"] = fallback_snippet
             if include_text:
                 text = r["text"] or ""
                 if max_chars is not None and max_chars > 0:
@@ -1601,6 +1799,81 @@ async def get_paper_ingestion_section_detail(
     }
 
 
+@app.post(
+    "/api/papers/{paper_id}/ingestion-sections/{section_canonical}/chat",
+    response_model=SectionChatResponse,
+)
+async def chat_paper_ingestion_section(
+    paper_id: int,
+    section_canonical: str,
+    payload: SectionChatRequest,
+) -> Dict[str, Any]:
+    question = str(payload.question or "").strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Question cannot be empty.")
+
+    provider = (payload.provider or "local").strip().lower()
+    if provider in {"qwen", "ollama"}:
+        provider = "local"
+    if provider != "local":
+        raise HTTPException(
+            status_code=400,
+            detail="Only local/Ollama provider is supported for section-level chat.",
+        )
+
+    context_limit = payload.max_context_chars
+    if context_limit is None:
+        context_limit = int(os.getenv("LOCAL_CONTEXT_CHAR_LIMIT", "12000"))
+
+    try:
+        section_data = await get_paper_ingestion_section_detail(
+            paper_id=paper_id,
+            section_canonical=section_canonical,
+            max_chars=context_limit,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Failed to resolve section context for paper %s", paper_id)
+        raise HTTPException(status_code=500, detail=str(exc))
+
+    context = str(section_data.get("full_text") or "").strip()
+    if not context:
+        raise HTTPException(status_code=400, detail="No text available for the selected section.")
+
+    system_prompt = (
+        "You are a research assistant. Answer using only the provided section context. "
+        "If the answer is not in the context, say you cannot find it in this section."
+    )
+    user_prompt = (
+        f"Section: {section_data.get('section_canonical')}\n"
+        f"Pages: {', '.join(str(p) for p in section_data.get('pages') or [])}\n\n"
+        f"Context:\n{context}\n\n"
+        f"Question: {question}"
+    )
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+    try:
+        answer = await run_in_threadpool(call_local_llm, messages)
+    except Exception as exc:
+        logger.exception("Section-level local LLM request failed for paper %s", paper_id)
+        raise HTTPException(status_code=500, detail=f"Local LLM request failed: {exc}")
+
+    return {
+        "paper_id": paper_id,
+        "section_canonical": str(section_data.get("section_canonical") or section_canonical).strip().lower(),
+        "question": question,
+        "answer": str(answer or "").strip(),
+        "provider": provider,
+        "context_chars": int(section_data.get("full_text_chars") or len(context)),
+        "source_block_count": int(section_data.get("source_block_count") or 0),
+        "chunk_count": int(section_data.get("chunk_count") or 0),
+        "pages": [int(p) for p in (section_data.get("pages") or [])],
+    }
+
+
 @app.get("/api/notes")
 def list_notes(
     q: Optional[str] = None,
@@ -2015,13 +2288,19 @@ async def download_paper(payload: PaperDownloadRequest) -> Dict[str, PaperRecord
     source = payload.source.strip()
     if not source:
         raise HTTPException(status_code=400, detail="Enter a DOI, URL, or PDF source.")
+    source_url = payload.source_url or source
+    mode = _resolve_download_mode(source)
+    logger.info("download_paper source=%s mode=%s", source[:240], mode)
     try:
-        result = await add_paper(source, payload.source_url or source)
-    except RuntimeError as exc:
-        if _looks_like_url(source) and "Could not locate a PDF" in str(exc):
-            result = await add_web_page(source, payload.source_url or source)
+        if mode == "youtube":
+            result = await add_youtube_transcript(source, source_url)
+        elif mode == "web":
+            result = await add_web_page(source, source_url)
         else:
-            raise HTTPException(status_code=400, detail=str(exc))
+            pdf_source = _normalize_pdf_source(source)
+            result = await add_paper(pdf_source, source_url)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
     with get_conn() as conn:

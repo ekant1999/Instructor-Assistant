@@ -18,6 +18,7 @@ export interface ApiPaperSection {
   match_score?: number;  // Relevance score from search
   match_bbox?: { x0: number; y0: number; x1: number; y1: number };
   match_block_index?: number;
+  match_section_canonical?: string;
   match_text?: string;
 }
 
@@ -302,6 +303,18 @@ export interface ApiPaperIngestionSectionDetail {
   truncated: boolean;
   section_source_counts: ApiSectionSourceCount[];
   images: ApiPaperFigureInfo[];
+}
+
+export interface ApiPaperSectionChatResponse {
+  paper_id: number;
+  section_canonical: string;
+  question: string;
+  answer: string;
+  provider: string;
+  context_chars: number;
+  source_block_count: number;
+  chunk_count: number;
+  pages: number[];
 }
 
 export type SearchType = "keyword" | "embedding" | "hybrid";

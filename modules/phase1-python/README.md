@@ -9,6 +9,7 @@ Reusable Python modules extracted from the Instructor Assistant ingestion pipeli
 - `ia_phase1.chunking`: chunk generation with section-aware metadata.
 - `ia_phase1.tables`: structured table extraction + table chunk conversion.
 - `ia_phase1.figures`: embedded + vector figure extraction with section mapping.
+- `ia_phase1.youtube_transcript`: YouTube subtitle extraction + cleaned transcript text generation.
 
 ## Install
 
@@ -74,6 +75,7 @@ Override with environment variables:
 - `features/chunking/README.md`
 - `features/tables/README.md`
 - `features/figures/README.md`
+- `features/youtube-transcript/README.md`
 
 ## Testing
 

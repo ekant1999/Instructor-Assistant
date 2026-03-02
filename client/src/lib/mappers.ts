@@ -64,6 +64,7 @@ export function mapApiSection(section: ApiPaperSection): Section {
     matchScore: section.match_score,
     matchBbox: section.match_bbox,
     matchBlockIndex: section.match_block_index,
+    matchSectionCanonical: section.match_section_canonical,
     matchText: section.match_text,
   };
 }

@@ -7,6 +7,7 @@ Modules:
 - chunking: build embedding-ready text chunks from blocks.
 - tables: extract structured tables and convert them to table chunks.
 - figures: extract embedded/vector figures with section mapping.
+- youtube_transcript: download and normalize YouTube subtitles to transcript text.
 """
 
 from .chunking import chunk_text_blocks, simple_chunk_blocks
@@ -21,6 +22,11 @@ from .tables import (
     extract_and_store_paper_tables,
     load_paper_table_manifest,
     table_records_to_chunks,
+)
+from .youtube_transcript import (
+    download_youtube_transcript,
+    extract_youtube_video_id,
+    is_youtube_url,
 )
 
 __all__ = [
@@ -37,6 +43,9 @@ __all__ = [
     "extract_and_store_paper_figures",
     "load_paper_figure_manifest",
     "resolve_figure_file",
+    "extract_youtube_video_id",
+    "is_youtube_url",
+    "download_youtube_transcript",
 ]
 
 __version__ = "0.1.0"

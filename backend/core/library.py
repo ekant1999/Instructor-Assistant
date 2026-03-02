@@ -11,6 +11,7 @@ import threading
 from .database import get_conn
 from .pdf import resolve_any_to_pdf, extract_pages
 from .web import extract_web_document, chunk_web_text
+from .youtube_transcript import download_youtube_transcript, is_youtube_url
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,61 @@ async def add_web_page(url: str, source_url: str | None = None, auto_index: bool
         _trigger_background_reindex(paper_id, title)
 
     return {"paper_id": paper_id, "title": title, "pdf_path": "", "source_url": source_url or url}
+
+
+async def add_youtube_transcript(
+    video_url: str,
+    source_url: str | None = None,
+    auto_index: bool = True,
+) -> Dict[str, Any]:
+    if not is_youtube_url(video_url):
+        raise RuntimeError("Invalid YouTube URL.")
+
+    transcript = await asyncio.to_thread(download_youtube_transcript, video_url)
+    title = str(transcript.get("title") or "YouTube Video").strip() or "YouTube Video"
+    display_title = f"{title} (YouTube Transcript)"
+    transcript_text = str(transcript.get("transcript_text") or "").strip()
+    if not transcript_text:
+        raise RuntimeError("No transcript text extracted from this YouTube URL.")
+
+    chunk_size = int(os.getenv("YOUTUBE_CHUNK_SIZE", os.getenv("WEB_CHUNK_SIZE", "1000")))
+    chunk_overlap = int(os.getenv("YOUTUBE_CHUNK_OVERLAP", os.getenv("WEB_CHUNK_OVERLAP", "200")))
+    chunks = chunk_web_text(transcript_text, chunk_size=chunk_size, overlap=chunk_overlap)
+    if not chunks:
+        raise RuntimeError("Transcript extraction succeeded but produced no ingestible text chunks.")
+
+    with get_conn() as conn:
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO papers(title, source_url, pdf_path) VALUES(?,?,?)",
+            (display_title, source_url or video_url, ""),
+        )
+        paper_id = c.lastrowid
+        for idx, chunk in enumerate(chunks, start=1):
+            c.execute(
+                "INSERT INTO sections(paper_id, page_no, text) VALUES(?,?,?)",
+                (paper_id, idx, chunk),
+            )
+        conn.commit()
+
+    logger.info(
+        "Added YouTube transcript paper_id=%s video_id=%s transcript_path=%s",
+        paper_id,
+        transcript.get("video_id"),
+        transcript.get("transcript_path"),
+    )
+
+    if auto_index:
+        _trigger_background_reindex(paper_id, display_title)
+
+    return {
+        "paper_id": paper_id,
+        "title": display_title,
+        "pdf_path": "",
+        "source_url": source_url or video_url,
+        "transcript_path": transcript.get("transcript_path"),
+        "subtitle_path": transcript.get("subtitle_path"),
+    }
 
 
 def add_local_pdf(

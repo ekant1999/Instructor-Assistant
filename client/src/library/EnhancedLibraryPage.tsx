@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { EnhancedPaperList } from './EnhancedPaperList';
 import { PdfPreview } from './PdfPreview';
+import { SearchResultContextPanel } from './SearchResultContextPanel';
 import { WebPreview } from './WebPreview';
 import { UploadPanel } from './UploadPanel';
 import { SectionSelector } from './SectionSelector';
@@ -14,6 +15,7 @@ import { AskQuestionsPanel } from './AskQuestionsPanel';
 import { SaveSummaryModal } from './SaveSummaryModal';
 import { ExportSummaryDialog } from './ExportSummaryDialog';
 import { PaperIngestionInfoDialog } from './PaperIngestionInfoDialog';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Paper, Summary, Document, Section } from '@/shared/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Layers, Sparkles, BookOpen, History, MessageSquare } from 'lucide-react';
@@ -89,6 +91,19 @@ export default function EnhancedLibraryPage() {
   }, [papers, selectedId, sectionsByPaperId, searchSectionsByPaperId, searchQuery]);
 
   const paperSummaries = selectedPaper ? summaries.get(selectedPaper.id) || [] : [];
+  const searchResultsForSelectedPaper = useMemo(() => {
+    if (!selectedId || !searchQuery) return [];
+    return searchSectionsByPaperId[selectedId] || [];
+  }, [selectedId, searchQuery, searchSectionsByPaperId]);
+
+  const activeSearchMatch = useMemo(() => {
+    if (!searchQuery || searchResultsForSelectedPaper.length === 0) return null;
+    if (highlightSectionId) {
+      const highlighted = searchResultsForSelectedPaper.find((section) => section.id === highlightSectionId);
+      if (highlighted) return highlighted;
+    }
+    return searchResultsForSelectedPaper[0];
+  }, [searchQuery, searchResultsForSelectedPaper, highlightSectionId]);
 
   useEffect(() => {
     if (!selectedPaper) return;
@@ -947,18 +962,55 @@ export default function EnhancedLibraryPage() {
 
               {selectedPaper.pdfUrl && (
                 <TabsContent value="preview" className="flex-1 overflow-hidden">
-                  <PdfPreview 
-                    paper={selectedPaper} 
-                    initialPage={navigateToPage}
-                    highlight={highlightBbox}
-                    highlightText={highlightText}
-                    onPageChange={(page) => {
-                      // Clear navigation state after first page load
-                      if (navigateToPage && page === navigateToPage) {
-                        setNavigateToPage(undefined);
-                      }
-                    }}
-                  />
+                  {searchQuery.trim() ? (
+                    <div className="h-full min-h-0 p-3 bg-muted/10">
+                      <ResizablePanelGroup direction="horizontal" className="h-full min-h-0 rounded-lg border bg-background">
+                        <ResizablePanel defaultSize={66} minSize={38}>
+                          <div className="h-full min-h-0 overflow-hidden">
+                            <PdfPreview
+                              paper={selectedPaper}
+                              initialPage={navigateToPage}
+                              highlight={highlightBbox}
+                              highlightText={highlightText}
+                              onPageChange={(page) => {
+                                // Clear navigation state after first page load
+                                if (navigateToPage && page === navigateToPage) {
+                                  setNavigateToPage(undefined);
+                                }
+                              }}
+                            />
+                          </div>
+                        </ResizablePanel>
+                        <ResizableHandle withHandle className="bg-border/80 hover:bg-primary/45 transition-colors" />
+                        <ResizablePanel defaultSize={34} minSize={22}>
+                          <div className="h-full min-h-0 overflow-hidden">
+                            <SearchResultContextPanel
+                              paperId={Number(selectedPaper.id)}
+                              paperTitle={selectedPaper.title}
+                              query={searchQuery}
+                              matchPageNo={activeSearchMatch?.pageNo}
+                              matchBlockIndex={activeSearchMatch?.matchBlockIndex}
+                              matchSectionCanonical={activeSearchMatch?.matchSectionCanonical}
+                              matchText={activeSearchMatch?.matchText || highlightText}
+                            />
+                          </div>
+                        </ResizablePanel>
+                      </ResizablePanelGroup>
+                    </div>
+                  ) : (
+                    <PdfPreview
+                      paper={selectedPaper}
+                      initialPage={navigateToPage}
+                      highlight={highlightBbox}
+                      highlightText={highlightText}
+                      onPageChange={(page) => {
+                        // Clear navigation state after first page load
+                        if (navigateToPage && page === navigateToPage) {
+                          setNavigateToPage(undefined);
+                        }
+                      }}
+                    />
+                  )}
                 </TabsContent>
               )}
 

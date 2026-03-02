@@ -19,6 +19,7 @@ export interface Section {
   matchScore?: number;  // Search relevance score for highlighting
   matchBbox?: { x0: number; y0: number; x1: number; y1: number };
   matchBlockIndex?: number;
+  matchSectionCanonical?: string;
   matchText?: string;
   selected?: boolean;
 }
