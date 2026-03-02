@@ -10,6 +10,9 @@ Reusable Python modules extracted from the Instructor Assistant ingestion pipeli
 - `ia_phase1.tables`: structured table extraction + table chunk conversion.
 - `ia_phase1.figures`: embedded + vector figure extraction with section mapping.
 - `ia_phase1.youtube_transcript`: YouTube subtitle extraction + cleaned transcript text generation.
+- `ia_phase1.search_keyword`: keyword search utilities for SQLite-backed library data.
+- `ia_phase1.search_hybrid`: pgvector + PostgreSQL FTS hybrid retrieval helpers.
+- `ia_phase1.search_context`: section match localization/snippet helpers.
 
 ## Install
 
@@ -76,6 +79,7 @@ Override with environment variables:
 - `features/tables/README.md`
 - `features/figures/README.md`
 - `features/youtube-transcript/README.md`
+- `features/search/README.md`
 
 ## Testing
 

@@ -11,6 +11,9 @@ This directory contains tests for reusable `ia_phase1` modules.
   - `test_tables.py`
   - `test_figures.py`
   - `test_youtube_transcript.py`
+  - `test_search_keyword.py`
+  - `test_search_hybrid.py`
+  - `test_search_context.py`
 - Integration contract:
   - `test_contract_integration.py` (marked `integration`)
 

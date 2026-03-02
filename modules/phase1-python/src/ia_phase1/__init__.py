@@ -8,6 +8,9 @@ Modules:
 - tables: extract structured tables and convert them to table chunks.
 - figures: extract embedded/vector figures with section mapping.
 - youtube_transcript: download and normalize YouTube subtitles to transcript text.
+- search_keyword: SQLite FTS/LIKE search helpers.
+- search_hybrid: pgvector + PostgreSQL FTS hybrid ranking helpers.
+- search_context: section-match resolver utilities for hit localization/snippets.
 """
 
 from .chunking import chunk_text_blocks, simple_chunk_blocks
@@ -18,6 +21,28 @@ from .figures import (
 )
 from .parser import extract_pages, extract_text_blocks, resolve_any_to_pdf
 from .sectioning import annotate_blocks_with_sections, canonicalize_heading
+from .search_context import (
+    build_match_snippet,
+    lexical_hits,
+    pgvector_score,
+    query_tokens,
+    select_block_for_query,
+)
+from .search_hybrid import (
+    full_text_search,
+    hybrid_search,
+    reciprocal_rank_fusion,
+    search_with_reranking,
+)
+from .search_keyword import (
+    SearchType,
+    configure_connection_factory,
+    search_all,
+    search_notes,
+    search_papers,
+    search_sections,
+    search_summaries,
+)
 from .tables import (
     extract_and_store_paper_tables,
     load_paper_table_manifest,
@@ -43,6 +68,22 @@ __all__ = [
     "extract_and_store_paper_figures",
     "load_paper_figure_manifest",
     "resolve_figure_file",
+    "SearchType",
+    "configure_connection_factory",
+    "search_papers",
+    "search_sections",
+    "search_notes",
+    "search_summaries",
+    "search_all",
+    "full_text_search",
+    "reciprocal_rank_fusion",
+    "hybrid_search",
+    "search_with_reranking",
+    "query_tokens",
+    "lexical_hits",
+    "pgvector_score",
+    "select_block_for_query",
+    "build_match_snippet",
     "extract_youtube_video_id",
     "is_youtube_url",
     "download_youtube_transcript",

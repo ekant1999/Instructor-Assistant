@@ -13,7 +13,7 @@ if str(BACKEND_ROOT) not in sys.path:
 
 
 def test_backend_wrappers_delegate_to_ia_phase1() -> None:
-    from core import pdf
+    from core import pdf, search, hybrid_search, search_context
     from rag import chunking, section_extractor, table_extractor, paper_figures
 
     assert pdf.extract_text_blocks.__module__ == "ia_phase1.parser"
@@ -22,6 +22,9 @@ def test_backend_wrappers_delegate_to_ia_phase1() -> None:
     assert section_extractor.annotate_blocks_with_sections.__module__ == "ia_phase1.sectioning"
     assert table_extractor.extract_and_store_paper_tables.__module__ == "ia_phase1.tables"
     assert paper_figures.extract_and_store_paper_figures.__module__ == "ia_phase1.figures"
+    assert search.search_sections.__module__ == "ia_phase1.search_keyword"
+    assert hybrid_search.hybrid_search.__module__ == "ia_phase1.search_hybrid"
+    assert search_context.build_match_snippet.__module__ == "ia_phase1.search_context"
 
 
 def test_pgvector_insert_index_remap_prevents_collisions() -> None:

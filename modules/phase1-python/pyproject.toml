@@ -35,6 +35,9 @@ tables = [
 figures = [
   "PyMuPDF>=1.24.0",
 ]
+search = [
+  "asyncpg>=0.29.0",
+]
 youtube_transcript = [
   "yt-dlp>=2024.10.22",
 ]
@@ -44,6 +47,7 @@ all = [
   "pypdf>=4.2.0",
   "PyMuPDF>=1.24.0",
   "requests>=2.31.0",
+  "asyncpg>=0.29.0",
   "yt-dlp>=2024.10.22",
 ]
 test = [

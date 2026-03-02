@@ -1,6 +1,6 @@
 # Modularization
 
-This project currently exposes reusable ingestion features as a Python package:
+This project currently exposes reusable ingestion + search/retrieval features as a Python package:
 
 - Package root: `modules/phase1-python`
 - Import path after install: `ia_phase1`
@@ -36,6 +36,14 @@ This project currently exposes reusable ingestion features as a Python package:
 - What: YouTube subtitle extraction (`yt-dlp`) + cleaned transcript text generation.
 - Module: `modules/phase1-python/src/ia_phase1/youtube_transcript.py`
 - Docs: `modules/phase1-python/features/youtube-transcript/README.md`
+
+7. `search` (keyword + hybrid + context helpers)
+- What: SQLite keyword search, pgvector/PostgreSQL hybrid fusion, and section-hit snippet localization.
+- Modules:
+  - `modules/phase1-python/src/ia_phase1/search_keyword.py`
+  - `modules/phase1-python/src/ia_phase1/search_hybrid.py`
+  - `modules/phase1-python/src/ia_phase1/search_context.py`
+- Docs: `modules/phase1-python/features/search/README.md`
 
 ## Install
 
