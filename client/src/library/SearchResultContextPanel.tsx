@@ -13,6 +13,7 @@ import {
   withNgrokSkipParam,
 } from '@/lib/api';
 import {
+  ApiPaperEquationInfo,
   ApiPaperFigureInfo,
   ApiPaperIngestionInfo,
   ApiPaperIngestionSectionDetail,
@@ -75,6 +76,12 @@ function normalizeLooseText(value: string): string {
 function buildFigureUrl(image: ApiPaperFigureInfo): string {
   const apiRoot = API_BASE.replace(/\/api\/?$/, '');
   return withNgrokSkipParam(`${apiRoot}${image.url}`);
+}
+
+function buildEquationUrl(equation: ApiPaperEquationInfo): string | null {
+  if (!equation.url) return null;
+  const apiRoot = API_BASE.replace(/\/api\/?$/, '');
+  return withNgrokSkipParam(`${apiRoot}${equation.url}`);
 }
 
 function resolveCanonicalFromMatch(
@@ -380,6 +387,26 @@ export function SearchResultContextPanel({
       });
   }, [ingestionInfo, selectedCanonical]);
 
+  const equationsInSection = React.useMemo(() => {
+    if (!selectedCanonical) return [];
+    const fromDetail = Array.isArray(activeDetail?.equations) ? activeDetail.equations : [];
+    if (fromDetail.length > 0) {
+      return [...fromDetail].sort((a, b) => {
+        const pageDiff = (a.page_no || 0) - (b.page_no || 0);
+        if (pageDiff !== 0) return pageDiff;
+        return (a.id || 0) - (b.id || 0);
+      });
+    }
+    if (!ingestionInfo) return [];
+    return (ingestionInfo.equations || [])
+      .filter((equation) => normalizeCanonical(equation.section_canonical) === selectedCanonical)
+      .sort((a, b) => {
+        const pageDiff = (a.page_no || 0) - (b.page_no || 0);
+        if (pageDiff !== 0) return pageDiff;
+        return (a.id || 0) - (b.id || 0);
+      });
+  }, [activeDetail, ingestionInfo, selectedCanonical]);
+
   const qaTurns = React.useMemo(() => {
     if (!selectedCanonical) return [];
     return qaByCanonical[selectedCanonical] || [];
@@ -527,10 +554,14 @@ export function SearchResultContextPanel({
                   )}
                 </Card>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <Card className="p-3">
                     <div className="text-[11px] text-muted-foreground">Tables in section</div>
                     <div className="text-lg font-semibold">{tablesInSection.length}</div>
+                  </Card>
+                  <Card className="p-3">
+                    <div className="text-[11px] text-muted-foreground">Equations in section</div>
+                    <div className="text-lg font-semibold">{equationsInSection.length}</div>
                   </Card>
                   <Card className="p-3">
                     <div className="text-[11px] text-muted-foreground">Figures in section</div>
@@ -563,6 +594,43 @@ export function SearchResultContextPanel({
                         </div>
                       )}
                     </>
+                  )}
+                </Card>
+
+                <Card className="p-3 bg-muted/10">
+                  <div className="text-sm font-medium mb-2">Equations ({equationsInSection.length})</div>
+                  {equationsInSection.length === 0 && (
+                    <div className="text-sm text-muted-foreground">No extracted equations mapped to this section.</div>
+                  )}
+                  {equationsInSection.length > 0 && (
+                    <div className="space-y-2">
+                      {equationsInSection.map((equation) => {
+                        const equationUrl = buildEquationUrl(equation);
+                        return (
+                          <Card key={`search-eq-${equation.id}`} className="p-2 bg-background">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <Badge variant="outline">eq {equation.equation_number || equation.id}</Badge>
+                              <Badge variant="outline">p{equation.page_no}</Badge>
+                            </div>
+                            {(equation.text_preview || equation.text) && (
+                              <div className="text-xs text-muted-foreground whitespace-pre-wrap mb-2">
+                                {equation.text_preview || equation.text}
+                              </div>
+                            )}
+                            {equationUrl && (
+                              <a href={equationUrl} target="_blank" rel="noreferrer">
+                                <img
+                                  src={equationUrl}
+                                  alt={`eq-${equation.id}`}
+                                  className="w-full rounded border object-contain max-h-40 bg-muted/10"
+                                  loading="lazy"
+                                />
+                              </a>
+                            )}
+                          </Card>
+                        );
+                      })}
+                    </div>
                   )}
                 </Card>
 

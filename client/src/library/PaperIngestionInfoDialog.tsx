@@ -5,7 +5,12 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { API_BASE, getPaperIngestionSectionDetail, withNgrokSkipParam } from '@/lib/api';
-import { ApiPaperFigureInfo, ApiPaperIngestionInfo, ApiPaperIngestionSectionDetail } from '@/lib/api-types';
+import {
+  ApiPaperEquationInfo,
+  ApiPaperFigureInfo,
+  ApiPaperIngestionInfo,
+  ApiPaperIngestionSectionDetail,
+} from '@/lib/api-types';
 
 const MIN_TOP_PANELS_HEIGHT = 72;
 const MIN_SECTION_DETAIL_HEIGHT = 140;
@@ -29,6 +34,12 @@ function sectionButtonClasses(active: boolean): string {
 function buildFigureUrl(image: ApiPaperFigureInfo): string {
   const apiRoot = API_BASE.replace(/\/api\/?$/, '');
   return withNgrokSkipParam(`${apiRoot}${image.url}`);
+}
+
+function buildEquationUrl(equation: ApiPaperEquationInfo): string | null {
+  if (!equation.url) return null;
+  const apiRoot = API_BASE.replace(/\/api\/?$/, '');
+  return withNgrokSkipParam(`${apiRoot}${equation.url}`);
 }
 
 export function PaperIngestionInfoDialog({
@@ -158,10 +169,12 @@ export function PaperIngestionInfoDialog({
 
   React.useEffect(() => {
     if (!open || !data || !selectedCanonical) return;
+    const paperId = data.paper_id;
+    const canonical = selectedCanonical;
     if (
       sectionDetail &&
-      sectionDetail.paper_id === data.paper_id &&
-      sectionDetail.section_canonical === selectedCanonical
+      sectionDetail.paper_id === paperId &&
+      sectionDetail.section_canonical === canonical
     ) {
       return;
     }
@@ -171,7 +184,7 @@ export function PaperIngestionInfoDialog({
       setSectionLoading(true);
       setSectionError(null);
       try {
-        const detail = await getPaperIngestionSectionDetail(data.paper_id, selectedCanonical, 350000);
+        const detail = await getPaperIngestionSectionDetail(paperId, canonical, 350000);
         if (!cancelled) {
           setSectionDetail(detail);
         }
@@ -190,7 +203,7 @@ export function PaperIngestionInfoDialog({
     return () => {
       cancelled = true;
     };
-  }, [open, data, selectedCanonical]);
+  }, [open, data, selectedCanonical, sectionDetail]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -216,7 +229,7 @@ export function PaperIngestionInfoDialog({
 
         {!loading && !error && data && (
           <div className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
               <Card className="p-3">
                 <div className="text-xs text-muted-foreground">Total Chunks</div>
                 <div className="text-lg font-semibold">{data.total_chunks}</div>
@@ -236,6 +249,10 @@ export function PaperIngestionInfoDialog({
               <Card className="p-3">
                 <div className="text-xs text-muted-foreground">Structured Tables</div>
                 <div className="text-lg font-semibold">{data.num_tables ?? data.tables?.length ?? 0}</div>
+              </Card>
+              <Card className="p-3">
+                <div className="text-xs text-muted-foreground">Equations</div>
+                <div className="text-lg font-semibold">{data.num_equations ?? data.equations?.length ?? 0}</div>
               </Card>
             </div>
 
@@ -350,6 +367,58 @@ export function PaperIngestionInfoDialog({
               )}
             </Card>
 
+            <Card className="p-3 min-h-0 flex flex-col shrink-0 max-h-[22vh]">
+              <div className="font-medium text-sm mb-2">
+                Extracted Equations ({data.equations?.length ?? 0})
+              </div>
+              {(!data.equations || data.equations.length === 0) && (
+                <div className="text-sm text-muted-foreground">No display equations detected for this paper.</div>
+              )}
+              {data.equations && data.equations.length > 0 && (
+                <ScrollArea className="flex-1 pr-2">
+                  <div className="space-y-2">
+                    {data.equations.map((equation) => {
+                      const equationUrl = buildEquationUrl(equation);
+                      return (
+                        <Card key={`equation-${equation.id}`} className="p-3 bg-muted/20">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <Badge variant="outline">
+                              eq {equation.equation_number || equation.id}
+                            </Badge>
+                            <Badge variant="outline">p{equation.page_no}</Badge>
+                            {equation.section_canonical && <Badge variant="outline">{equation.section_canonical}</Badge>}
+                            {typeof equation.section_confidence === 'number' && (
+                              <Badge variant="outline">conf {equation.section_confidence.toFixed(2)}</Badge>
+                            )}
+                          </div>
+                          {equation.text_preview && (
+                            <div className="text-xs text-muted-foreground whitespace-pre-wrap mb-2">
+                              {equation.text_preview}
+                            </div>
+                          )}
+                          {equationUrl && (
+                            <details>
+                              <summary className="text-xs cursor-pointer text-muted-foreground">
+                                Show equation image
+                              </summary>
+                              <a href={equationUrl} target="_blank" rel="noreferrer" className="block mt-2">
+                                <img
+                                  src={equationUrl}
+                                  alt={`equation-${equation.id}`}
+                                  className="w-full rounded-md border object-contain max-h-44 bg-background"
+                                  loading="lazy"
+                                />
+                              </a>
+                            </details>
+                          )}
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              )}
+            </Card>
+
             <div ref={splitContainerRef} className="flex-1 min-h-0 flex flex-col overflow-hidden">
               <div
                 className="grid grid-cols-1 lg:grid-cols-2 gap-4 shrink-0 min-h-[72px]"
@@ -383,7 +452,7 @@ export function PaperIngestionInfoDialog({
                             </div>
                           )}
                           <div className="text-[11px] mt-2 text-muted-foreground">
-                            Click to view full section text and related figures
+                            Click to view full section text and related equations/figures
                           </div>
                         </button>
                       ))}
@@ -456,7 +525,7 @@ export function PaperIngestionInfoDialog({
                   {selectedCanonical && <Badge variant="outline">{selectedCanonical}</Badge>}
                 </div>
                 {!selectedCanonical && (
-                  <div className="text-sm text-muted-foreground">Select a section to view its full text and figures.</div>
+                  <div className="text-sm text-muted-foreground">Select a section to view its full text, equations, and figures.</div>
                 )}
                 {selectedCanonical && sectionLoading && (
                   <div className="text-sm text-muted-foreground">Loading section detail...</div>
@@ -483,11 +552,46 @@ export function PaperIngestionInfoDialog({
                     </div>
 
                     <div className="min-h-0 flex flex-col">
-                      <div className="text-xs text-muted-foreground mb-2">
-                        Figures in this section ({sectionDetail.images.length})
-                      </div>
                       <ScrollArea className="flex-1 pr-2">
                         <div className="space-y-3">
+                          <div className="text-xs text-muted-foreground">
+                            Equations in this section ({sectionDetail.equations?.length ?? 0})
+                          </div>
+                          {(sectionDetail.equations || []).map((equation) => {
+                            const equationUrl = buildEquationUrl(equation);
+                            return (
+                              <Card key={`section-eq-${equation.id}`} className="p-2 bg-muted/20">
+                                <div className="flex items-center gap-2 flex-wrap mb-1">
+                                  <Badge variant="outline">eq {equation.equation_number || equation.id}</Badge>
+                                  <Badge variant="outline">p{equation.page_no}</Badge>
+                                </div>
+                                {equation.text && (
+                                  <div className="text-xs text-muted-foreground whitespace-pre-wrap mb-2">
+                                    {equation.text}
+                                  </div>
+                                )}
+                                {equationUrl && (
+                                  <a href={equationUrl} target="_blank" rel="noreferrer">
+                                    <img
+                                      src={equationUrl}
+                                      alt={`${sectionDetail.section_canonical} eq-${equation.id}`}
+                                      className="w-full rounded-md border object-contain max-h-52 bg-background"
+                                      loading="lazy"
+                                    />
+                                  </a>
+                                )}
+                              </Card>
+                            );
+                          })}
+                          {(sectionDetail.equations?.length ?? 0) === 0 && (
+                            <div className="text-sm text-muted-foreground">
+                              No extracted equations mapped to this section.
+                            </div>
+                          )}
+
+                          <div className="text-xs text-muted-foreground pt-2">
+                            Figures in this section ({sectionDetail.images.length})
+                          </div>
                           {sectionDetail.images.map((image) => (
                             <Card key={`${image.id}-${image.file_name}`} className="p-2 bg-muted/20">
                               <a href={buildFigureUrl(image)} target="_blank" rel="noreferrer">

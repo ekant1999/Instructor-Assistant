@@ -37,7 +37,12 @@ This project currently exposes reusable ingestion + search/retrieval features as
 - Module: `modules/phase1-python/src/ia_phase1/youtube_transcript.py`
 - Docs: `modules/phase1-python/features/youtube-transcript/README.md`
 
-7. `search` (keyword + hybrid + context helpers)
+7. `equations`
+- What: display-equation extraction + equation image crops + equation chunk conversion.
+- Module: `modules/phase1-python/src/ia_phase1/equations.py`
+- Docs: `modules/phase1-python/features/equations/README.md`
+
+8. `search` (keyword + hybrid + context helpers)
 - What: SQLite keyword search, pgvector/PostgreSQL hybrid fusion, and section-hit snippet localization.
 - Modules:
   - `modules/phase1-python/src/ia_phase1/search_keyword.py`

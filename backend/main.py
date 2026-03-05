@@ -106,7 +106,14 @@ from .mcp_client import (
 )
 from .canvas_service import CanvasPushError, push_question_set_to_canvas
 from . import qwen_tools
-from .rag import ingest_pgvector, query_pgvector, image_index, paper_figures, table_extractor
+from .rag import (
+    ingest_pgvector,
+    query_pgvector,
+    image_index,
+    paper_figures,
+    table_extractor,
+    equation_extractor,
+)
 from backend.core.postgres import (
     get_pool as get_pg_pool,
     close_pool as close_pg_pool,
@@ -1217,6 +1224,32 @@ async def get_paper_ingestion_info(
         if isinstance(item, dict)
     ]
 
+    equation_manifest = equation_extractor.load_paper_equation_manifest(paper_id)
+    equation_entries_raw = equation_manifest.get("equations") or []
+    equation_entries = equation_entries_raw if isinstance(equation_entries_raw, list) else []
+    equation_preview_max_chars = 900
+    equation_items = [
+        {
+            "id": int(item.get("id") or 0),
+            "page_no": int(item.get("page_no") or 0),
+            "equation_number": str(item.get("equation_number") or "").strip() or None,
+            "text_preview": str(item.get("text") or "").strip()[:equation_preview_max_chars] or None,
+            "char_count": int(item.get("char_count") or 0),
+            "line_count": int(item.get("line_count") or 0),
+            "bbox": _as_json_dict(item.get("bbox")) if isinstance(item.get("bbox"), dict) else None,
+            "section_canonical": str(item.get("section_canonical") or "other"),
+            "section_title": str(item.get("section_title") or "").strip() or None,
+            "section_source": str(item.get("section_source") or "unknown"),
+            "section_confidence": item.get("section_confidence"),
+            "detection_score": item.get("detection_score"),
+            "detection_flags": item.get("detection_flags") if isinstance(item.get("detection_flags"), list) else [],
+            "file_name": str(item.get("file_name") or "").strip() or None,
+            "url": str(item.get("url") or "").strip() or None,
+        }
+        for item in equation_entries
+        if isinstance(item, dict)
+    ]
+
     try:
         pool = await get_pg_pool()
         async with pool.acquire() as conn:
@@ -1252,10 +1285,11 @@ async def get_paper_ingestion_info(
             ).fetchone()
             sqlite_section_count = int(sqlite_sections[0] if sqlite_sections else 0)
         logger.info(
-            "Paper %s ingestion info: no pgvector chunks (sqlite_sections=%s, tables=%s)",
+            "Paper %s ingestion info: no pgvector chunks (sqlite_sections=%s, tables=%s, equations=%s)",
             paper_id,
             sqlite_section_count,
             len(table_items),
+            len(equation_items),
         )
         return {
             "paper_id": paper_id,
@@ -1270,6 +1304,8 @@ async def get_paper_ingestion_info(
             "chunks": [],
             "num_tables": len(table_items),
             "tables": table_items,
+            "num_equations": len(equation_items),
+            "equations": equation_items,
             "sqlite_section_count": sqlite_section_count,
             "message": "No pgvector chunks found for this paper. Run ingestion/indexing first.",
         }
@@ -1439,11 +1475,12 @@ async def get_paper_ingestion_info(
     source_summary = sorted(source_counts.items(), key=lambda item: item[1], reverse=True)
     strategy = source_summary[0][0] if source_summary else "unknown"
     logger.info(
-        "Paper %s ingestion info: strategy=%s sources=%s tables=%s returned_chunks=%s total_chunks=%s",
+        "Paper %s ingestion info: strategy=%s sources=%s tables=%s equations=%s returned_chunks=%s total_chunks=%s",
         paper_id,
         strategy,
         ", ".join(f"{source} ({count})" for source, count in source_summary) or "n/a",
         len(table_items),
+        len(equation_items),
         len(chunk_items),
         total_chunks,
     )
@@ -1466,6 +1503,8 @@ async def get_paper_ingestion_info(
         "chunks": chunk_items,
         "num_tables": len(table_items),
         "tables": table_items,
+        "num_equations": len(equation_items),
+        "equations": equation_items,
     }
 
 
@@ -1481,6 +1520,20 @@ def get_paper_figure_file(paper_id: int, figure_name: str):
     if not figure_path.exists():
         raise HTTPException(status_code=404, detail="Figure image not found.")
     return FileResponse(figure_path)
+
+
+@app.get("/api/papers/{paper_id}/equations/{equation_name}")
+def get_paper_equation_file(paper_id: int, equation_name: str):
+    paper = _get_paper(paper_id)
+    if not paper:
+        raise HTTPException(status_code=404, detail="Paper not found.")
+    try:
+        equation_path = equation_extractor.resolve_equation_file(paper_id, equation_name)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    if not equation_path.exists():
+        raise HTTPException(status_code=404, detail="Equation image not found.")
+    return FileResponse(equation_path)
 
 
 @app.get("/api/papers/{paper_id}/ingestion-sections/{section_canonical}")
@@ -1629,6 +1682,50 @@ async def get_paper_ingestion_section_detail(
         ),
     )
 
+    equation_manifest = equation_extractor.load_paper_equation_manifest(paper_id)
+    all_equations_raw = equation_manifest.get("equations") or []
+    all_equations = all_equations_raw if isinstance(all_equations_raw, list) else []
+    section_equations = [
+        equation
+        for equation in all_equations
+        if str(equation.get("section_canonical") or "").strip().lower() == target
+    ]
+    if not section_equations and pages:
+        page_set = set(pages)
+        section_equations = [
+            equation
+            for equation in all_equations
+            if int(equation.get("page_no") or 0) in page_set
+        ]
+    section_equations = sorted(
+        section_equations,
+        key=lambda item: (
+            int(item.get("page_no") or 0),
+            int(item.get("id") or 0),
+        ),
+    )
+    equation_items = [
+        {
+            "id": int(item.get("id") or 0),
+            "page_no": int(item.get("page_no") or 0),
+            "equation_number": str(item.get("equation_number") or "").strip() or None,
+            "text": str(item.get("text") or "").strip() or "",
+            "char_count": int(item.get("char_count") or 0),
+            "line_count": int(item.get("line_count") or 0),
+            "bbox": _as_json_dict(item.get("bbox")) if isinstance(item.get("bbox"), dict) else None,
+            "section_canonical": str(item.get("section_canonical") or "other").strip(),
+            "section_title": str(item.get("section_title") or "").strip() or None,
+            "section_source": str(item.get("section_source") or "unknown").strip(),
+            "section_confidence": item.get("section_confidence"),
+            "detection_score": item.get("detection_score"),
+            "detection_flags": item.get("detection_flags") if isinstance(item.get("detection_flags"), list) else [],
+            "file_name": str(item.get("file_name") or "").strip() or None,
+            "url": str(item.get("url") or "").strip() or None,
+        }
+        for item in section_equations
+        if isinstance(item, dict)
+    ]
+
     return {
         "paper_id": paper_id,
         "paper_title": paper.get("title"),
@@ -1649,6 +1746,7 @@ async def get_paper_ingestion_section_detail(
             )
         ],
         "images": section_images,
+        "equations": equation_items,
     }
 
 
@@ -1691,6 +1789,23 @@ async def chat_paper_ingestion_section(
         raise HTTPException(status_code=500, detail=str(exc))
 
     context = str(section_data.get("full_text") or "").strip()
+    equation_items = section_data.get("equations")
+    if isinstance(equation_items, list) and equation_items:
+        equation_lines: List[str] = []
+        for item in equation_items:
+            if not isinstance(item, dict):
+                continue
+            equation_text = str(item.get("text") or "").strip()
+            if not equation_text:
+                continue
+            eq_label = str(item.get("equation_number") or item.get("id") or "").strip()
+            prefix = f"Equation {eq_label}" if eq_label else "Equation"
+            equation_lines.append(f"{prefix}: {equation_text}")
+        if equation_lines:
+            equation_context = "\n".join(equation_lines)
+            context = f"{context}\n\nEquations:\n{equation_context}".strip()
+            if context_limit and len(context) > context_limit:
+                context = context[:context_limit]
     if not context:
         raise HTTPException(status_code=400, detail="No text available for the selected section.")
 

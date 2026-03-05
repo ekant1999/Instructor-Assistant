@@ -10,6 +10,7 @@ This directory contains tests for reusable `ia_phase1` modules.
   - `test_chunking.py`
   - `test_tables.py`
   - `test_figures.py`
+  - `test_equations.py`
   - `test_youtube_transcript.py`
   - `test_search_keyword.py`
   - `test_search_hybrid.py`

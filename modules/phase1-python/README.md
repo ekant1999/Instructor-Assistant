@@ -9,6 +9,7 @@ Reusable Python modules extracted from the Instructor Assistant ingestion pipeli
 - `ia_phase1.chunking`: chunk generation with section-aware metadata.
 - `ia_phase1.tables`: structured table extraction + table chunk conversion.
 - `ia_phase1.figures`: embedded + vector figure extraction with section mapping.
+- `ia_phase1.equations`: display-equation extraction + equation chunk conversion.
 - `ia_phase1.youtube_transcript`: YouTube subtitle extraction + cleaned transcript text generation.
 - `ia_phase1.search_keyword`: keyword search utilities for SQLite-backed library data.
 - `ia_phase1.search_hybrid`: pgvector + PostgreSQL FTS hybrid retrieval helpers.
@@ -30,6 +31,7 @@ from pathlib import Path
 from ia_phase1 import (
     annotate_blocks_with_sections,
     chunk_text_blocks,
+    extract_and_store_paper_equations,
     extract_and_store_paper_figures,
     extract_and_store_paper_tables,
     extract_text_blocks,
@@ -49,12 +51,20 @@ async def run() -> None:
 
     chunks = chunk_text_blocks(blocks, target_size=1000, overlap=200)
     table_manifest = extract_and_store_paper_tables(pdf_path, paper_id=1, blocks=blocks)
+    equation_manifest = extract_and_store_paper_equations(pdf_path, paper_id=1, blocks=blocks)
     figure_manifest = extract_and_store_paper_figures(pdf_path, paper_id=1, blocks=blocks)
 
     print(title)
     print(section_report["strategy"], len(section_report["sections"]))
     print("chunks:", len(chunks))
-    print("tables:", table_manifest["num_tables"], "figures:", figure_manifest["num_images"])
+    print(
+        "tables:",
+        table_manifest["num_tables"],
+        "equations:",
+        equation_manifest["num_equations"],
+        "figures:",
+        figure_manifest["num_images"],
+    )
 
 
 asyncio.run(run())
@@ -64,11 +74,13 @@ asyncio.run(run())
 
 - Default parser download dir: `.ia_phase1_data/pdfs`
 - Default table output dir: `.ia_phase1_data/tables`
+- Default equation output dir: `.ia_phase1_data/equations`
 - Default figure output dir: `.ia_phase1_data/figures`
 
 Override with environment variables:
 
 - `TABLE_OUTPUT_DIR`
+- `EQUATION_OUTPUT_DIR`
 - `FIGURE_OUTPUT_DIR`
 
 ## Feature-specific docs
@@ -78,6 +90,7 @@ Override with environment variables:
 - `features/chunking/README.md`
 - `features/tables/README.md`
 - `features/figures/README.md`
+- `features/equations/README.md`
 - `features/youtube-transcript/README.md`
 - `features/search/README.md`
 

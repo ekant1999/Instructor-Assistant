@@ -256,6 +256,25 @@ export interface ApiPaperTableInfo {
   preview_truncated?: boolean;
 }
 
+export interface ApiPaperEquationInfo {
+  id: number;
+  page_no: number;
+  equation_number?: string | null;
+  text_preview?: string | null;
+  text?: string | null;
+  char_count?: number | null;
+  line_count?: number | null;
+  bbox?: Record<string, any> | null;
+  section_canonical?: string | null;
+  section_title?: string | null;
+  section_source?: string | null;
+  section_confidence?: number | null;
+  detection_score?: number | null;
+  detection_flags?: string[];
+  file_name?: string | null;
+  url?: string | null;
+}
+
 export interface ApiPaperIngestionInfo {
   paper_id: number;
   paper_title?: string | null;
@@ -271,6 +290,8 @@ export interface ApiPaperIngestionInfo {
   chunks: ApiPaperChunkInfo[];
   num_tables?: number;
   tables?: ApiPaperTableInfo[];
+  num_equations?: number;
+  equations?: ApiPaperEquationInfo[];
   sqlite_section_count?: number;
   message?: string;
 }
@@ -303,6 +324,7 @@ export interface ApiPaperIngestionSectionDetail {
   truncated: boolean;
   section_source_counts: ApiSectionSourceCount[];
   images: ApiPaperFigureInfo[];
+  equations: ApiPaperEquationInfo[];
 }
 
 export interface ApiPaperSectionChatResponse {

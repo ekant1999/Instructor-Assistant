@@ -22,6 +22,7 @@ from core.postgres import get_pool
 from .chunking import chunk_text_blocks, simple_chunk_blocks
 from .pgvector_store import PgVectorStore
 from .section_extractor import annotate_blocks_with_sections
+from .equation_extractor import extract_and_store_paper_equations, equation_records_to_chunks
 from .paper_figures import extract_and_store_paper_figures
 from .table_extractor import extract_and_store_paper_tables, table_records_to_chunks
 
@@ -115,6 +116,30 @@ async def ingest_single_paper(
         except Exception as exc:
             # Table extraction failure should not block text ingestion.
             logger.warning("  Table extraction failed for paper %s: %s", paper_id, exc)
+
+        equation_report: Dict[str, Any] = {"num_equations": 0, "equations": []}
+        equation_chunks: List[Dict[str, Any]] = []
+        try:
+            equation_report = extract_and_store_paper_equations(
+                pdf_path=pdf_path_obj,
+                paper_id=paper_id,
+                blocks=blocks,
+            )
+            equation_chunks = equation_records_to_chunks(
+                equations=equation_report.get("equations") or [],
+                text_blocks=blocks,
+            )
+            if equation_chunks:
+                logger.info(
+                    "  Extracted %s equations and built %s equation chunks",
+                    equation_report.get("num_equations", 0),
+                    len(equation_chunks),
+                )
+            elif equation_report.get("num_equations", 0):
+                logger.info("  Extracted %s equations", equation_report.get("num_equations", 0))
+        except Exception as exc:
+            # Equation extraction failure should not block text ingestion.
+            logger.warning("  Equation extraction failed for paper %s: %s", paper_id, exc)
         
         # Chunk the blocks
         logger.info("  Chunking blocks...")
@@ -128,6 +153,8 @@ async def ingest_single_paper(
             )
         if table_chunks:
             chunks.extend(table_chunks)
+        if equation_chunks:
+            chunks.extend(equation_chunks)
         logger.info(f"  Created {len(chunks)} chunks")
         
         # Get pgvector store
@@ -155,6 +182,8 @@ async def ingest_single_paper(
             "num_figures": figure_report.get("num_images", 0),
             "num_tables": table_report.get("num_tables", 0),
             "num_table_chunks": len(table_chunks),
+            "num_equations": equation_report.get("num_equations", 0),
+            "num_equation_chunks": len(equation_chunks),
         }
     
     except Exception as e:

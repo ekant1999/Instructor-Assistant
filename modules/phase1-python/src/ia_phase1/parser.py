@@ -24,6 +24,66 @@ def _safe_filename(seed: str) -> str:
     return f"{h}.pdf"
 
 
+def _safe_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _span_x0(span: Dict[str, Any]) -> float:
+    bbox = span.get("bbox")
+    if isinstance(bbox, (list, tuple)) and len(bbox) >= 1:
+        return _safe_float(bbox[0])
+    origin = span.get("origin")
+    if isinstance(origin, (list, tuple)) and len(origin) >= 1:
+        return _safe_float(origin[0])
+    return 0.0
+
+
+def _span_x1(span: Dict[str, Any]) -> float:
+    bbox = span.get("bbox")
+    if isinstance(bbox, (list, tuple)) and len(bbox) >= 3:
+        return _safe_float(bbox[2], _span_x0(span))
+    return _span_x0(span)
+
+
+def _should_insert_span_space(previous: str, current: str, x_gap: float) -> bool:
+    if not previous or not current:
+        return False
+    prev_ch = previous[-1]
+    next_ch = current[0]
+    if prev_ch.isspace() or next_ch.isspace():
+        return False
+    if next_ch in ".,;:!?)]}":
+        return False
+    if prev_ch in "([{/":
+        return False
+    if x_gap > 1.5:
+        return True
+    return prev_ch.isalnum() and next_ch.isalnum()
+
+
+def _join_line_spans(spans: List[Dict[str, Any]]) -> str:
+    ordered = sorted(spans, key=_span_x0)
+    pieces: List[str] = []
+    prev_text = ""
+    prev_x1: Optional[float] = None
+    for span in ordered:
+        span_text = str(span.get("text") or "").replace("\x00", "")
+        if not span_text.strip():
+            continue
+        x0 = _span_x0(span)
+        if pieces and prev_x1 is not None and _should_insert_span_space(prev_text, span_text, x0 - prev_x1):
+            pieces.append(" ")
+        pieces.append(span_text)
+        prev_text = span_text
+        prev_x1 = _span_x1(span)
+    if not pieces:
+        return ""
+    return re.sub(r"[ \t]{2,}", " ", "".join(pieces)).strip()
+
+
 async def _fetch_text(url: str) -> str:
     async with httpx.AsyncClient(
         headers={"User-Agent": USER_AGENT},
@@ -147,12 +207,10 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
 
                 for line in lines:
                     spans = line.get("spans", [])
-                    line_parts: List[str] = []
                     for span in spans:
                         span_text = str(span.get("text") or "").replace("\x00", "")
                         if not span_text.strip():
                             continue
-                        line_parts.append(span_text)
                         size = span.get("size")
                         try:
                             span_sizes.append(float(size))
@@ -164,8 +222,9 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
                         total_spans += 1
                         if "bold" in font_name.lower():
                             bold_spans += 1
-                    if line_parts:
-                        text_lines.append("".join(line_parts).strip())
+                    line_text = _join_line_spans(spans)
+                    if line_text:
+                        text_lines.append(line_text)
 
                 text = "\n".join(text_lines).strip().replace("\x00", "")
                 if not text:

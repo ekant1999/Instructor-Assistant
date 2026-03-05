@@ -7,6 +7,7 @@ Modules:
 - chunking: build embedding-ready text chunks from blocks.
 - tables: extract structured tables and convert them to table chunks.
 - figures: extract embedded/vector figures with section mapping.
+- equations: detect/display equations and convert them to equation chunks.
 - youtube_transcript: download and normalize YouTube subtitles to transcript text.
 - search_keyword: SQLite FTS/LIKE search helpers.
 - search_hybrid: pgvector + PostgreSQL FTS hybrid ranking helpers.
@@ -14,6 +15,12 @@ Modules:
 """
 
 from .chunking import chunk_text_blocks, simple_chunk_blocks
+from .equations import (
+    equation_records_to_chunks,
+    extract_and_store_paper_equations,
+    load_paper_equation_manifest,
+    resolve_equation_file,
+)
 from .figures import (
     extract_and_store_paper_figures,
     load_paper_figure_manifest,
@@ -62,6 +69,10 @@ __all__ = [
     "canonicalize_heading",
     "chunk_text_blocks",
     "simple_chunk_blocks",
+    "extract_and_store_paper_equations",
+    "load_paper_equation_manifest",
+    "equation_records_to_chunks",
+    "resolve_equation_file",
     "extract_and_store_paper_tables",
     "load_paper_table_manifest",
     "table_records_to_chunks",
