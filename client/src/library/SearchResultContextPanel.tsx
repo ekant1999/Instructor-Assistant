@@ -93,11 +93,14 @@ function resolveCanonicalFromMatch(
   matchSectionCanonical?: string,
 ): { canonical: string | null; reason: string } {
   const directCanonical = normalizeCanonical(matchSectionCanonical);
-  if (directCanonical && directCanonical !== 'other') {
-    return { canonical: directCanonical, reason: 'match_section' };
-  }
+  const hasDirectCanonical = Boolean(directCanonical && directCanonical !== 'other');
   const candidateTokens = tokenize(matchText || query);
   const scoreTokens = candidateTokens.length ? candidateTokens : tokenize(query);
+
+  // If backend already resolved the exact matched source block's section, trust it first.
+  if (hasDirectCanonical) {
+    return { canonical: directCanonical, reason: 'match_section' };
+  }
 
   if (pageNo) {
     const chunksOnPage = data.chunks.filter((chunk) => chunk.page_no === pageNo);

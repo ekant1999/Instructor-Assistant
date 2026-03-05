@@ -44,10 +44,70 @@ def test_select_block_for_query_prefers_best_lexical_hit() -> None:
             ],
         },
     }
-    best = select_block_for_query(row, ["define", "one", "shot", "sequential", "planning"])
+    best = select_block_for_query(
+        row,
+        ["define", "one", "shot", "sequential", "planning"],
+        query="We define one-shot and then sequential planning",
+    )
     assert best["block_index"] == 4
     assert best["section_canonical"] == "problem_definition"
     assert best["lex_hits"] >= 4
+
+
+def test_select_block_for_query_prefers_exact_phrase_over_token_overlap() -> None:
+    row = {
+        "page_no": 2,
+        "block_index": 7,
+        "bbox": {"x0": 0, "y0": 0, "x1": 10, "y1": 10},
+        "text": "fallback text",
+        "metadata": {
+            "section_primary": "related_work",
+            "blocks": [
+                {
+                    "page_no": 2,
+                    "block_index": 3,
+                    "text": "We define planning sequentially and compare planning methods broadly.",
+                    "metadata": {"section_canonical": "related_work"},
+                },
+                {
+                    "page_no": 2,
+                    "block_index": 4,
+                    "text": "We define one-shot and then sequential planning as a process of solving tasks.",
+                    "metadata": {"section_canonical": "problem_definition"},
+                },
+            ],
+        },
+    }
+    best = select_block_for_query(
+        row,
+        ["define", "one", "shot", "sequential", "planning"],
+        query="We define one-shot and then sequential planning",
+    )
+    assert best["block_index"] == 4
+    assert best["section_canonical"] == "problem_definition"
+    assert bool(best.get("exact_phrase"))
+
+
+def test_select_block_for_query_keeps_zero_block_index() -> None:
+    row = {
+        "page_no": 5,
+        "block_index": 19,
+        "bbox": {"x0": 0, "y0": 0, "x1": 10, "y1": 10},
+        "text": "fallback",
+        "metadata": {
+            "blocks": [
+                {
+                    "page_no": 5,
+                    "block_index": 0,
+                    "text": "Exact phrase appears here.",
+                    "metadata": {"section_canonical": "abstract"},
+                }
+            ],
+        },
+    }
+    best = select_block_for_query(row, ["exact", "phrase"], query="Exact phrase appears")
+    assert best["block_index"] == 0
+    assert best["section_canonical"] == "abstract"
 
 
 def test_build_match_snippet_contains_query_focus() -> None:

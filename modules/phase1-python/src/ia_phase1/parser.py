@@ -193,7 +193,8 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
     try:
         for page_num in range(len(doc)):
             page = doc[page_num]
-            page_dict = page.get_text("dict")
+            # Use MuPDF's sort order to stabilize block reading order across PDFs.
+            page_dict = page.get_text("dict", sort=True)
             text_blocks = [b for b in page_dict.get("blocks", []) if b.get("type") == 0]
 
             block_idx = 0

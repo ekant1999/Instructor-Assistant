@@ -178,12 +178,19 @@ def _query_tokens(query: str) -> List[str]:
     return _query_tokens_impl(query)
 
 
-def _select_block_for_query(row: Dict[str, Any], tokens: List[str]) -> Dict[str, Any]:
-    return _select_block_for_query_impl(row, tokens)
+def _select_block_for_query(row: Dict[str, Any], tokens: List[str], query: str = "") -> Dict[str, Any]:
+    return _select_block_for_query_impl(row, tokens, query=query)
 
 
 def _build_match_snippet(query: str, tokens: List[str], text: str, max_len: int = 240) -> str:
     return _build_match_snippet_impl(query, tokens, text, max_len=max_len)
+
+
+def _coalesce_not_none(*values: Any) -> Any:
+    for value in values:
+        if value is not None:
+            return value
+    return None
 
 
 def _looks_like_url(value: str) -> bool:
@@ -435,35 +442,70 @@ def _pgvector_search_sections(
     tokens = _query_tokens(query)
     page_scores: Dict[int, float] = {}
     page_best: Dict[int, Dict[str, Any]] = {}
-    page_best_lex: Dict[int, Dict[str, Any]] = {}
+    page_best_match: Dict[int, Dict[str, Any]] = {}
     for row in results:
-        match_block = _select_block_for_query(row, tokens)
+        match_block = _select_block_for_query(row, tokens, query)
         page_no = match_block.get("page_no") or row.get("page_no")
         if not page_no:
             continue
         score = _pgvector_score(row)
         page_no_int = int(page_no)
+        row_block_index = _coalesce_not_none(match_block.get("block_index"), row.get("block_index"))
+        row_bbox = _coalesce_not_none(match_block.get("bbox"), row.get("bbox"))
+        row_text = match_block.get("text") or row.get("text")
+        row_lex_hits = int(match_block.get("lex_hits") or 0)
+        row_match_score = float(match_block.get("match_score") or 0.0)
+        row_exact_phrase = bool(match_block.get("exact_phrase") or False)
+        row_section_canonical = str(match_block.get("section_canonical") or "")
         prev = page_scores.get(page_no_int)
         if prev is None or score > prev:
             page_scores[page_no_int] = score
             page_best[page_no_int] = {
-                "bbox": match_block.get("bbox") or row.get("bbox"),
-                "block_index": match_block.get("block_index") or row.get("block_index"),
-                "text": match_block.get("text") or row.get("text"),
-                "lex_hits": match_block.get("lex_hits", 0),
-                "section_canonical": match_block.get("section_canonical") or "",
+                "bbox": row_bbox,
+                "block_index": row_block_index,
+                "text": row_text,
+                "lex_hits": row_lex_hits,
+                "match_score": row_match_score,
+                "exact_phrase": row_exact_phrase,
+                "section_canonical": row_section_canonical,
             }
 
-        lex_hits = match_block.get("lex_hits", 0)
-        prev_lex = page_best_lex.get(page_no_int)
-        if prev_lex is None or lex_hits > prev_lex.get("lex_hits", 0):
-            page_best_lex[page_no_int] = {
-                "bbox": match_block.get("bbox") or row.get("bbox"),
-                "block_index": match_block.get("block_index") or row.get("block_index"),
-                "text": match_block.get("text") or row.get("text"),
-                "lex_hits": lex_hits,
-                "section_canonical": match_block.get("section_canonical") or "",
+        prev_match = page_best_match.get(page_no_int)
+        if prev_match is None:
+            page_best_match[page_no_int] = {
+                "bbox": row_bbox,
+                "block_index": row_block_index,
+                "text": row_text,
+                "lex_hits": row_lex_hits,
+                "match_score": row_match_score,
+                "exact_phrase": row_exact_phrase,
+                "section_canonical": row_section_canonical,
+                "semantic_score": score,
             }
+        else:
+            prev_key = (
+                bool(prev_match.get("exact_phrase")),
+                float(prev_match.get("match_score") or 0.0),
+                int(prev_match.get("lex_hits") or 0),
+                float(prev_match.get("semantic_score") or 0.0),
+            )
+            curr_key = (
+                row_exact_phrase,
+                row_match_score,
+                row_lex_hits,
+                score,
+            )
+            if curr_key > prev_key:
+                page_best_match[page_no_int] = {
+                    "bbox": row_bbox,
+                    "block_index": row_block_index,
+                    "text": row_text,
+                    "lex_hits": row_lex_hits,
+                    "match_score": row_match_score,
+                    "exact_phrase": row_exact_phrase,
+                    "section_canonical": row_section_canonical,
+                    "semantic_score": score,
+                }
 
     if not page_scores:
         return []
@@ -483,11 +525,11 @@ def _pgvector_search_sections(
     sections: List[Dict[str, Any]] = []
     for r in rows:
         best = page_best.get(r["page_no"]) or {}
-        lex = page_best_lex.get(r["page_no"])
-        if lex and tokens:
+        matched = page_best_match.get(r["page_no"])
+        if matched and tokens:
             min_hits = 1 if len(tokens) <= 3 else 2
-            if lex.get("lex_hits", 0) >= min_hits:
-                best = lex
+            if bool(matched.get("exact_phrase")) or int(matched.get("lex_hits", 0)) >= min_hits:
+                best = matched
         entry = {
             "id": r["id"],
             "page_no": r["page_no"],
