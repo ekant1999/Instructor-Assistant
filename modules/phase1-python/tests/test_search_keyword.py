@@ -152,3 +152,41 @@ def test_search_all_aggregates_all_categories() -> None:
         assert result["summaries"]
     finally:
         conn.close()
+
+
+def test_search_sections_boundary_fallback_recovers_short_acronym_plural() -> None:
+    conn = _build_conn()
+    try:
+        conn.execute(
+            "INSERT INTO papers(id, title, source_url, pdf_path, rag_status, rag_error, rag_updated_at, created_at) VALUES(?,?,?,?,?,?,?,?)",
+            (2, "Prompt Tuning for Vision-Language Models", "https://arxiv.org/abs/9999.0001", "/tmp/b.pdf", "indexed", None, None, "2026-01-02"),
+        )
+        conn.execute(
+            "INSERT INTO papers_fts(rowid, title, source_url) VALUES(?,?,?)",
+            (2, "Prompt Tuning for Vision-Language Models", "https://arxiv.org/abs/9999.0001"),
+        )
+        conn.execute(
+            "INSERT INTO sections(id, paper_id, page_no, text) VALUES(?,?,?,?)",
+            (11, 2, 4, "Prompt tuning in VLMs often borrows hard prompt templates used in LLMs or CLIP."),
+        )
+        conn.execute(
+            "INSERT INTO sections_fts(rowid, text, paper_id, page_no) VALUES(?,?,?,?)",
+            (11, "Prompt tuning in VLMs often borrows hard prompt templates used in LLMs or CLIP.", "2", "4"),
+        )
+        conn.execute(
+            "INSERT INTO sections(id, paper_id, page_no, text) VALUES(?,?,?,?)",
+            (12, 2, 5, "This smallmodel controller is unrelated to acronym search."),
+        )
+        conn.execute(
+            "INSERT INTO sections_fts(rowid, text, paper_id, page_no) VALUES(?,?,?,?)",
+            (12, "This smallmodel controller is unrelated to acronym search.", "2", "5"),
+        )
+        conn.commit()
+
+        factory = lambda: _conn_factory(conn)
+        sections = search_sections("LLM", get_conn_fn=factory, limit=10)
+
+        assert [row["id"] for row in sections] == [11]
+        assert sections[0]["paper_id"] == 2
+    finally:
+        conn.close()

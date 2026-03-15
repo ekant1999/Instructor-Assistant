@@ -19,6 +19,12 @@ def test_extract_pages_and_blocks(sample_pdf: Path) -> None:
     assert all("text" in block for block in blocks)
     assert all("metadata" in block for block in blocks)
     assert {block["page_no"] for block in blocks} == {1, 2}
+    assert any(block["metadata"].get("lines") for block in blocks)
+    first_with_lines = next(block for block in blocks if block["metadata"].get("lines"))
+    first_line = first_with_lines["metadata"]["lines"][0]
+    assert "text" in first_line
+    assert "bbox" in first_line
+    assert isinstance(first_line.get("spans"), list)
 
 
 @pytest.mark.asyncio

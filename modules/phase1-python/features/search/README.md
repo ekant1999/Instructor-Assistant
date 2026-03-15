@@ -4,12 +4,19 @@ Files:
 - `src/ia_phase1/search_keyword.py`
 - `src/ia_phase1/search_hybrid.py`
 - `src/ia_phase1/search_context.py`
+- `src/ia_phase1/search_pipeline.py`
+- `examples/example_search_pipeline.py`
 
 ## What is modularized
 
 - Keyword search over SQLite FTS/LIKE tables (`papers`, `sections`, `notes`, `summaries`).
 - Hybrid retrieval helpers for pgvector similarity + PostgreSQL full-text fusion (RRF).
 - Section hit localization helpers (query tokenization, best block selection, snippet building).
+- Unified search pipeline helpers for:
+  - section-hit merging
+  - no-match gating
+  - title rescue
+  - section-to-paper aggregation
 
 ## APIs
 
@@ -30,6 +37,20 @@ Files:
   - `select_block_for_query(...)`
   - `build_match_snippet(...)`
   - `pgvector_score(...)`
+- `search_pipeline.py`
+  - `configure_connection_factory(factory)`
+  - `rrf_score(...)`
+  - `token_overlap(...)`
+  - `infer_search_section_bucket(...)`
+  - `section_bucket_multiplier(...)`
+  - `query_token_stats(...)`
+  - `paper_title_bonus_lookup(...)`
+  - `filter_section_hits_for_query(...)`
+  - `filter_aggregated_papers_for_query(...)`
+  - `inject_title_only_candidates(...)`
+  - `merge_section_hits(...)`
+  - `search_section_hits_unified(...)`
+  - `aggregate_section_hits_to_papers(...)`
 
 ## Minimal usage
 
@@ -46,3 +67,61 @@ from ia_phase1.search_context import query_tokens, build_match_snippet
 tokens = query_tokens("sequential planning process")
 snippet = build_match_snippet("sequential planning process", tokens, long_text)
 ```
+
+```python
+from ia_phase1.search_pipeline import (
+    configure_connection_factory,
+    filter_section_hits_for_query,
+    aggregate_section_hits_to_papers,
+    search_section_hits_unified,
+)
+
+configure_connection_factory(get_conn)
+
+section_hits = search_section_hits_unified(
+    "large language model",
+    "hybrid",
+    keyword_section_hits_fn=keyword_section_hits_fn,
+    semantic_section_hits_fn=semantic_section_hits_fn,
+    include_text=False,
+    max_chars=None,
+    limit=100,
+)
+section_hits = filter_section_hits_for_query("large language model", section_hits)
+paper_scores = aggregate_section_hits_to_papers(section_hits)
+```
+
+## Runnable Example
+
+See:
+- `modules/phase1-python/examples/example_search_pipeline.py`
+
+Run it:
+
+```bash
+cd modules/phase1-python
+python examples/example_search_pipeline.py
+python examples/example_search_pipeline.py "vision benchmark"
+python examples/example_search_pipeline.py "molecule property prediction"
+```
+
+Notes:
+- the example uses a tiny in-memory SQLite corpus
+- keyword retrieval is real SQLite FTS
+- semantic retrieval is a toy callback for demonstration only
+- replace that callback with your pgvector/embedding retrieval in a real app
+
+## Module Boundary
+
+- Keep environment-specific retrieval inside the app:
+  - SQLite connection ownership
+  - pgvector pool/store usage
+  - endpoint response shaping
+- Move reusable policy into `search_pipeline.py`:
+  - ranking formulas
+  - bucket penalties
+  - query gating
+  - title rescue
+  - section-to-paper aggregation
+
+That keeps the package reusable while avoiding hard-coupling it to one backend runtime.

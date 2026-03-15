@@ -121,3 +121,121 @@ def test_build_match_snippet_contains_query_focus() -> None:
     lower = snippet.lower()
     assert "sequential planning" in lower
     assert len(snippet) <= 120
+
+
+def test_select_block_for_query_returns_phrase_bbox_when_line_spans_exist() -> None:
+    row = {
+        "page_no": 1,
+        "block_index": 1,
+        "bbox": {"x0": 0, "y0": 0, "x1": 200, "y1": 80},
+        "text": "fallback",
+        "metadata": {
+            "blocks": [
+                {
+                    "page_no": 1,
+                    "block_index": 1,
+                    "bbox": {"x0": 0, "y0": 0, "x1": 200, "y1": 80},
+                    "text": "We use prompt tuning for robust adaptation.",
+                    "metadata": {
+                        "section_canonical": "method",
+                        "lines": [
+                            {
+                                "text": "We use prompt tuning for robust adaptation.",
+                                "bbox": {"x0": 0, "y0": 0, "x1": 200, "y1": 20},
+                                "spans": [
+                                    {"text": "We use", "bbox": {"x0": 0, "y0": 0, "x1": 40, "y1": 20}},
+                                    {"text": "prompt", "bbox": {"x0": 50, "y0": 0, "x1": 90, "y1": 20}},
+                                    {"text": "tuning", "bbox": {"x0": 95, "y0": 0, "x1": 135, "y1": 20}},
+                                    {"text": "for robust adaptation.", "bbox": {"x0": 145, "y0": 0, "x1": 200, "y1": 20}},
+                                ],
+                            }
+                        ],
+                    },
+                }
+            ],
+        },
+    }
+    best = select_block_for_query(row, ["prompt", "tuning"], query="prompt tuning")
+    assert best["block_index"] == 1
+    assert best["bbox"] == {"x0": 50.0, "y0": 0.0, "x1": 135.0, "y1": 20.0}
+
+
+def test_select_block_for_query_falls_back_to_best_line_bbox_when_phrase_is_split() -> None:
+    row = {
+        "page_no": 2,
+        "block_index": 3,
+        "bbox": {"x0": 0, "y0": 0, "x1": 200, "y1": 100},
+        "text": "fallback",
+        "metadata": {
+            "blocks": [
+                {
+                    "page_no": 2,
+                    "block_index": 3,
+                    "bbox": {"x0": 0, "y0": 0, "x1": 200, "y1": 100},
+                    "text": "We study infeasible states.\nAdditional details follow below.",
+                    "metadata": {
+                        "section_canonical": "results",
+                        "lines": [
+                            {
+                                "text": "We study infeasible states.",
+                                "bbox": {"x0": 0, "y0": 0, "x1": 160, "y1": 16},
+                                "spans": [
+                                    {"text": "We study", "bbox": {"x0": 0, "y0": 0, "x1": 48, "y1": 16}},
+                                    {"text": "infeasible", "bbox": {"x0": 56, "y0": 0, "x1": 108, "y1": 16}},
+                                    {"text": "states.", "bbox": {"x0": 116, "y0": 0, "x1": 160, "y1": 16}},
+                                ],
+                            },
+                            {
+                                "text": "Additional details follow below.",
+                                "bbox": {"x0": 0, "y0": 20, "x1": 180, "y1": 36},
+                                "spans": [
+                                    {"text": "Additional details follow below.", "bbox": {"x0": 0, "y0": 20, "x1": 180, "y1": 36}},
+                                ],
+                            },
+                        ],
+                    },
+                }
+            ],
+        },
+    }
+    best = select_block_for_query(row, ["infeasible"], query="infeasible")
+    assert best["bbox"] == {"x0": 56.0, "y0": 0.0, "x1": 108.0, "y1": 16.0}
+
+
+def test_select_block_for_query_slices_single_span_bbox_for_short_phrase() -> None:
+    row = {
+        "page_no": 1,
+        "block_index": 5,
+        "bbox": {"x0": 0, "y0": 0, "x1": 220, "y1": 18},
+        "text": "fallback",
+        "metadata": {
+            "blocks": [
+                {
+                    "page_no": 1,
+                    "block_index": 5,
+                    "bbox": {"x0": 0, "y0": 0, "x1": 220, "y1": 18},
+                    "text": "We use prompt tuning for robust adaptation.",
+                    "metadata": {
+                        "section_canonical": "method",
+                        "lines": [
+                            {
+                                "text": "We use prompt tuning for robust adaptation.",
+                                "bbox": {"x0": 0, "y0": 0, "x1": 220, "y1": 18},
+                                "spans": [
+                                    {
+                                        "text": "We use prompt tuning for robust adaptation.",
+                                        "bbox": {"x0": 0, "y0": 0, "x1": 220, "y1": 18},
+                                    }
+                                ],
+                            }
+                        ],
+                    },
+                }
+            ],
+        },
+    }
+    best = select_block_for_query(row, ["prompt", "tuning"], query="prompt tuning")
+    bbox = best["bbox"]
+    assert bbox["y0"] == 0.0
+    assert bbox["y1"] == 18.0
+    assert 0.0 < bbox["x0"] < bbox["x1"] < 220.0

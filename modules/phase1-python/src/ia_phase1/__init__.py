@@ -12,6 +12,7 @@ Modules:
 - search_keyword: SQLite FTS/LIKE search helpers.
 - search_hybrid: pgvector + PostgreSQL FTS hybrid ranking helpers.
 - search_context: section-match resolver utilities for hit localization/snippets.
+- search_pipeline: unified search scoring, gating, merging, and paper aggregation helpers.
 """
 
 from .chunking import chunk_text_blocks, simple_chunk_blocks
@@ -34,6 +35,24 @@ from .search_context import (
     pgvector_score,
     query_tokens,
     select_block_for_query,
+)
+from .search_pipeline import (
+    aggregate_section_hits_to_papers,
+    annotate_hit_query_support,
+    configure_connection_factory as configure_search_pipeline_connection_factory,
+    filter_aggregated_papers_for_query,
+    filter_section_hits_for_query,
+    infer_search_section_bucket,
+    inject_title_only_candidates,
+    merge_section_hits,
+    paper_passes_search_gate,
+    paper_title_bonus_lookup,
+    query_token_stats,
+    rrf_score,
+    search_section_hits_unified,
+    section_bucket_multiplier,
+    section_passes_search_gate,
+    token_overlap,
 )
 from .search_hybrid import (
     full_text_search,
@@ -95,6 +114,22 @@ __all__ = [
     "pgvector_score",
     "select_block_for_query",
     "build_match_snippet",
+    "configure_search_pipeline_connection_factory",
+    "rrf_score",
+    "token_overlap",
+    "infer_search_section_bucket",
+    "section_bucket_multiplier",
+    "query_token_stats",
+    "paper_title_bonus_lookup",
+    "annotate_hit_query_support",
+    "section_passes_search_gate",
+    "filter_section_hits_for_query",
+    "paper_passes_search_gate",
+    "filter_aggregated_papers_for_query",
+    "inject_title_only_candidates",
+    "merge_section_hits",
+    "search_section_hits_unified",
+    "aggregate_section_hits_to_papers",
     "extract_youtube_video_id",
     "is_youtube_url",
     "download_youtube_transcript",

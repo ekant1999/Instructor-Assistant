@@ -42,12 +42,13 @@ This project currently exposes reusable ingestion + search/retrieval features as
 - Module: `modules/phase1-python/src/ia_phase1/equations.py`
 - Docs: `modules/phase1-python/features/equations/README.md`
 
-8. `search` (keyword + hybrid + context helpers)
-- What: SQLite keyword search, pgvector/PostgreSQL hybrid fusion, and section-hit snippet localization.
+8. `search` (keyword + hybrid + context + pipeline helpers)
+- What: SQLite keyword search, pgvector/PostgreSQL hybrid fusion, section-hit localization, and unified search scoring/gating/aggregation.
 - Modules:
   - `modules/phase1-python/src/ia_phase1/search_keyword.py`
   - `modules/phase1-python/src/ia_phase1/search_hybrid.py`
   - `modules/phase1-python/src/ia_phase1/search_context.py`
+  - `modules/phase1-python/src/ia_phase1/search_pipeline.py`
 - Docs: `modules/phase1-python/features/search/README.md`
 
 ## Install

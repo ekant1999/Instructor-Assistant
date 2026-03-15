@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import AbstractContextManager
+import re
 from typing import Any, Callable, Dict, List, Literal, Optional
 
 
@@ -8,6 +9,7 @@ SearchType = Literal["keyword", "embedding", "hybrid"]
 ConnectionFactory = Callable[[], AbstractContextManager[Any]]
 
 _conn_factory: Optional[ConnectionFactory] = None
+_SHORT_TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
 
 def configure_connection_factory(factory: ConnectionFactory) -> None:
@@ -27,6 +29,84 @@ def _resolve_conn_factory(explicit: Optional[ConnectionFactory]) -> ConnectionFa
 
 def _fts_query(query: str) -> str:
     return f'"{query}"' if " " in query or "-" in query else query
+
+
+def _should_try_boundary_fallback(query: str) -> bool:
+    tokens = _SHORT_TOKEN_RE.findall(query or "")
+    if len(tokens) != 1:
+        return False
+    token = tokens[0]
+    if len(token) <= 4:
+        return True
+    return len(token) <= 8 and any(ch.isupper() for ch in token)
+
+
+def _boundary_fallback_terms(query: str) -> List[str]:
+    tokens = _SHORT_TOKEN_RE.findall(query or "")
+    if len(tokens) != 1:
+        return []
+    token = tokens[0].lower()
+    terms = [token]
+    if len(token) >= 2 and not token.endswith("s"):
+        terms.append(f"{token}s")
+    deduped: List[str] = []
+    for term in terms:
+        if term not in deduped:
+            deduped.append(term)
+    return deduped
+
+
+def _normalized_text_sql(column: str) -> str:
+    expr = f"lower(coalesce({column}, ''))"
+    expr = f"replace(replace(replace({expr}, char(10), ' '), char(13), ' '), char(9), ' ')"
+    for char in (".", ",", ";", ":", "!", "?", "(", ")", "[", "]", "{", "}", "\"", "'", "`", "/", "\\", "|", "-", "_"):
+        escaped = char.replace("'", "''")
+        expr = f"replace({expr}, '{escaped}', ' ')"
+    return f"' ' || {expr} || ' '"
+
+
+def _search_sections_boundary_fallback(
+    conn: Any,
+    *,
+    query: str,
+    paper_ids: Optional[List[int]],
+    limit: int,
+) -> List[Dict[str, Any]]:
+    terms = _boundary_fallback_terms(query)
+    if not terms:
+        return []
+
+    normalized_text = _normalized_text_sql("s.text")
+    like_clause = " OR ".join(f"{normalized_text} LIKE ?" for _ in terms)
+    params: List[Any] = [f"% {term} %" for term in terms]
+
+    if paper_ids:
+        placeholders = ",".join("?" * len(paper_ids))
+        sql = f"""
+            SELECT s.id, s.paper_id, s.page_no, s.text,
+                   p.title as paper_title, p.source_url,
+                   0 as rank
+            FROM sections s
+            JOIN papers p ON s.paper_id = p.id
+            WHERE ({like_clause}) AND s.paper_id IN ({placeholders})
+            ORDER BY s.page_no, s.id
+            LIMIT ?
+        """
+        params.extend(paper_ids)
+    else:
+        sql = f"""
+            SELECT s.id, s.paper_id, s.page_no, s.text,
+                   p.title as paper_title, p.source_url,
+                   0 as rank
+            FROM sections s
+            JOIN papers p ON s.paper_id = p.id
+            WHERE ({like_clause})
+            ORDER BY s.page_no, s.id
+            LIMIT ?
+        """
+    params.append(limit)
+    rows = conn.execute(sql, params).fetchall()
+    return [dict(row) for row in rows]
 
 
 def search_papers(
@@ -121,8 +201,26 @@ def search_sections(
                 """
                 params = [fts_query, limit]
             rows = conn.execute(sql, params).fetchall()
-            return [dict(row) for row in rows]
+            if rows:
+                return [dict(row) for row in rows]
+            if _should_try_boundary_fallback(query):
+                return _search_sections_boundary_fallback(
+                    conn,
+                    query=query,
+                    paper_ids=paper_ids,
+                    limit=limit,
+                )
+            return []
         except Exception:
+            if _should_try_boundary_fallback(query):
+                rows = _search_sections_boundary_fallback(
+                    conn,
+                    query=query,
+                    paper_ids=paper_ids,
+                    limit=limit,
+                )
+                if rows:
+                    return rows
             if paper_ids:
                 placeholders = ",".join("?" * len(paper_ids))
                 sql = f"""

@@ -48,6 +48,24 @@ def _span_x1(span: Dict[str, Any]) -> float:
     return _span_x0(span)
 
 
+def _bbox_payload(value: Any) -> Dict[str, float]:
+    if isinstance(value, dict):
+        return {
+            "x0": _safe_float(value.get("x0")),
+            "y0": _safe_float(value.get("y0")),
+            "x1": _safe_float(value.get("x1")),
+            "y1": _safe_float(value.get("y1")),
+        }
+    if isinstance(value, (list, tuple)):
+        return {
+            "x0": _safe_float(value[0]) if len(value) > 0 else 0.0,
+            "y0": _safe_float(value[1]) if len(value) > 1 else 0.0,
+            "x1": _safe_float(value[2]) if len(value) > 2 else 0.0,
+            "y1": _safe_float(value[3]) if len(value) > 3 else 0.0,
+        }
+    return {"x0": 0.0, "y0": 0.0, "x1": 0.0, "y1": 0.0}
+
+
 def _should_insert_span_space(previous: str, current: str, x_gap: float) -> bool:
     if not previous or not current:
         return False
@@ -201,6 +219,7 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
             for block in text_blocks:
                 lines = block.get("lines", [])
                 text_lines: List[str] = []
+                line_payloads: List[Dict[str, Any]] = []
                 span_sizes: List[float] = []
                 span_fonts: List[str] = []
                 bold_spans = 0
@@ -208,6 +227,7 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
 
                 for line in lines:
                     spans = line.get("spans", [])
+                    line_spans: List[Dict[str, Any]] = []
                     for span in spans:
                         span_text = str(span.get("text") or "").replace("\x00", "")
                         if not span_text.strip():
@@ -223,15 +243,28 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
                         total_spans += 1
                         if "bold" in font_name.lower():
                             bold_spans += 1
+                        line_spans.append(
+                            {
+                                "text": span_text,
+                                "bbox": _bbox_payload(span.get("bbox")),
+                            }
+                        )
                     line_text = _join_line_spans(spans)
                     if line_text:
                         text_lines.append(line_text)
+                        line_payloads.append(
+                            {
+                                "text": line_text,
+                                "bbox": _bbox_payload(line.get("bbox")),
+                                "spans": line_spans,
+                            }
+                        )
 
                 text = "\n".join(text_lines).strip().replace("\x00", "")
                 if not text:
                     continue
 
-                bbox = block.get("bbox", [0, 0, 0, 0])
+                bbox = _bbox_payload(block.get("bbox", [0, 0, 0, 0]))
                 first_line = text_lines[0].strip() if text_lines else text.splitlines()[0].strip()
                 max_font = max(span_sizes) if span_sizes else 0.0
                 avg_font = (sum(span_sizes) / len(span_sizes)) if span_sizes else 0.0
@@ -243,12 +276,7 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
                         "page_no": page_num + 1,
                         "block_index": block_idx,
                         "text": text,
-                        "bbox": {
-                            "x0": float(bbox[0]) if len(bbox) > 0 else 0.0,
-                            "y0": float(bbox[1]) if len(bbox) > 1 else 0.0,
-                            "x1": float(bbox[2]) if len(bbox) > 2 else 0.0,
-                            "y1": float(bbox[3]) if len(bbox) > 3 else 0.0,
-                        },
+                        "bbox": bbox,
                         "metadata": {
                             "first_line": first_line,
                             "line_count": len(text_lines),
@@ -258,6 +286,7 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
                             "min_font_size": round(min_font, 3),
                             "bold_ratio": round(bold_ratio, 3),
                             "font_names": sorted(set(span_fonts))[:6],
+                            "lines": line_payloads,
                         },
                     }
                 )

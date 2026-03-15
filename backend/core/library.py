@@ -9,6 +9,7 @@ import logging
 import threading
 
 from .database import get_conn
+from .search_cache import bump_search_index_version
 from .pdf import resolve_any_to_pdf, extract_pages
 from .web import extract_web_document, chunk_web_text
 from .youtube_transcript import download_youtube_transcript, is_youtube_url
@@ -31,6 +32,7 @@ async def add_paper(input_str: str, source_url: str | None = None, auto_index: b
                 (paper_id, page_no, text),
             )
         conn.commit()
+    bump_search_index_version("add_paper")
     
     # Automatically trigger background reindexing for embedding search
     if auto_index:
@@ -60,6 +62,7 @@ async def add_web_page(url: str, source_url: str | None = None, auto_index: bool
                 (paper_id, idx, chunk),
             )
         conn.commit()
+    bump_search_index_version("add_web_page")
 
     if auto_index:
         _trigger_background_reindex(paper_id, title)
@@ -101,6 +104,7 @@ async def add_youtube_transcript(
                 (paper_id, idx, chunk),
             )
         conn.commit()
+    bump_search_index_version("add_youtube_transcript")
 
     logger.info(
         "Added YouTube transcript paper_id=%s video_id=%s transcript_path=%s",
@@ -145,6 +149,7 @@ def add_local_pdf(
                 (paper_id, page_no, text),
             )
         conn.commit()
+    bump_search_index_version("add_local_pdf")
     
     # Automatically trigger background reindexing for embedding search
     if auto_index:
@@ -169,6 +174,7 @@ def delete_paper(paper_id: int, detach_notes: bool = False) -> Dict[str, Any]:
         if not detach_notes:
             conn.execute("DELETE FROM notes WHERE paper_id=?", (paper_id,))
         conn.execute("COMMIT")
+    bump_search_index_version("delete_paper")
     return {"deleted": True}
 
 
@@ -326,6 +332,7 @@ def _trigger_background_reindex(paper_id: int, paper_title: str):
                     (paper_id,)
                 )
                 conn.commit()
+            bump_search_index_version("background_reindex_done")
             
             logger.info(f"✅ Background reindex completed for paper {paper_id}: {result['num_chunks']} chunks added")
             
@@ -341,6 +348,7 @@ def _trigger_background_reindex(paper_id: int, paper_title: str):
                         (str(e)[:500], paper_id)
                     )
                     conn.commit()
+                bump_search_index_version("background_reindex_error")
             except:
                 pass
     

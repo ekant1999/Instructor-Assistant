@@ -87,6 +87,166 @@ def _coalesce_not_none(*values: Any) -> Any:
     return None
 
 
+def _bbox_from_payload(value: Any) -> Optional[Dict[str, float]]:
+    if isinstance(value, dict):
+        try:
+            x0 = float(value["x0"])
+            y0 = float(value["y0"])
+            x1 = float(value["x1"])
+            y1 = float(value["y1"])
+        except (KeyError, TypeError, ValueError):
+            return None
+        if x1 <= x0 or y1 <= y0:
+            return None
+        return {"x0": x0, "y0": y0, "x1": x1, "y1": y1}
+    if isinstance(value, (list, tuple)) and len(value) >= 4:
+        try:
+            x0 = float(value[0])
+            y0 = float(value[1])
+            x1 = float(value[2])
+            y1 = float(value[3])
+        except (TypeError, ValueError):
+            return None
+        if x1 <= x0 or y1 <= y0:
+            return None
+        return {"x0": x0, "y0": y0, "x1": x1, "y1": y1}
+    return None
+
+
+def _bbox_union(a: Optional[Dict[str, float]], b: Optional[Dict[str, float]]) -> Optional[Dict[str, float]]:
+    if not a:
+        return b
+    if not b:
+        return a
+    return {
+        "x0": min(float(a["x0"]), float(b["x0"])),
+        "y0": min(float(a["y0"]), float(b["y0"])),
+        "x1": max(float(a["x1"]), float(b["x1"])),
+        "y1": max(float(a["y1"]), float(b["y1"])),
+    }
+
+
+def _line_text_segments(line: Dict[str, Any]) -> List[Dict[str, Any]]:
+    spans = line.get("spans")
+    if not isinstance(spans, list):
+        return []
+    segments: List[Dict[str, Any]] = []
+    pieces: List[str] = []
+    for span in spans:
+        text = str(span.get("text") or "")
+        if not text.strip():
+            continue
+        if pieces:
+            pieces.append(" ")
+        start = len("".join(pieces))
+        pieces.append(text)
+        end = len("".join(pieces))
+        bbox = _bbox_from_payload(span.get("bbox"))
+        if not bbox:
+            continue
+        segments.append({"start": start, "end": end, "bbox": bbox, "text": text})
+    return segments
+
+
+def _slice_segment_bbox(segment: Dict[str, Any], start: int, end: int) -> Optional[Dict[str, float]]:
+    bbox = segment.get("bbox")
+    text = str(segment.get("text") or "")
+    if not bbox or not text:
+        return bbox
+    seg_start = int(segment.get("start") or 0)
+    seg_end = int(segment.get("end") or seg_start)
+    if seg_end <= seg_start:
+        return bbox
+    local_start = max(0, start - seg_start)
+    local_end = min(len(text), end - seg_start)
+    if local_end <= local_start:
+        return None
+    width = max(0.0, float(bbox["x1"]) - float(bbox["x0"]))
+    char_count = max(1, len(text))
+    x0 = float(bbox["x0"]) + width * (local_start / char_count)
+    x1 = float(bbox["x0"]) + width * (local_end / char_count)
+    if x1 <= x0:
+        return bbox
+    return {
+        "x0": x0,
+        "y0": float(bbox["y0"]),
+        "x1": x1,
+        "y1": float(bbox["y1"]),
+    }
+
+
+def _phrase_bbox_from_line(line: Dict[str, Any], query: str, tokens: List[str]) -> Optional[Dict[str, float]]:
+    line_text = str(line.get("text") or "")
+    if not line_text:
+        return _bbox_from_payload(line.get("bbox"))
+
+    line_bbox = _bbox_from_payload(line.get("bbox"))
+    segments = _line_text_segments(line)
+    lowered = line_text.lower()
+    query_l = query.strip().lower()
+
+    if query_l and len(query_l) > 1:
+        idx = lowered.find(query_l)
+        if idx != -1 and segments:
+            end = idx + len(query_l)
+            phrase_bbox: Optional[Dict[str, float]] = None
+            for segment in segments:
+                if int(segment["end"]) <= idx or int(segment["start"]) >= end:
+                    continue
+                phrase_bbox = _bbox_union(phrase_bbox, _slice_segment_bbox(segment, idx, end))
+            if phrase_bbox:
+                return phrase_bbox
+
+    if tokens and segments:
+        token_bbox: Optional[Dict[str, float]] = None
+        search_from = 0
+        for token in tokens:
+            idx = lowered.find(token, search_from)
+            if idx == -1:
+                idx = lowered.find(token)
+            if idx == -1:
+                continue
+            end = idx + len(token)
+            for segment in segments:
+                if int(segment["end"]) <= idx or int(segment["start"]) >= end:
+                    continue
+                token_bbox = _bbox_union(token_bbox, _slice_segment_bbox(segment, idx, end))
+            search_from = end
+        if token_bbox:
+            return token_bbox
+
+    return line_bbox
+
+
+def _phrase_bbox_for_block(block: Dict[str, Any], query: str, tokens: List[str]) -> Optional[Dict[str, float]]:
+    block_meta = block.get("metadata")
+    lines = block_meta.get("lines") if isinstance(block_meta, dict) else None
+    if not isinstance(lines, list) or not lines:
+        return _bbox_from_payload(block.get("bbox"))
+
+    best_line_bbox: Optional[Dict[str, float]] = None
+    best_line_score = -1.0
+    best_line_exact = False
+    best_line_hits = -1
+    for line in lines:
+        line_text = str(line.get("text") or "")
+        match_eval = _query_match_score(query, tokens, line_text)
+        score = float(match_eval.get("score", 0.0))
+        hits = int(match_eval.get("lex_hits", 0))
+        exact = bool(match_eval.get("exact_phrase", False))
+        if (
+            score > best_line_score
+            or (score == best_line_score and exact and not best_line_exact)
+            or (score == best_line_score and exact == best_line_exact and hits > best_line_hits)
+        ):
+            best_line_bbox = _phrase_bbox_from_line(line, query, tokens)
+            best_line_score = score
+            best_line_exact = exact
+            best_line_hits = hits
+
+    return best_line_bbox or _bbox_from_payload(block.get("bbox"))
+
+
 def pgvector_score(row: Dict[str, Any]) -> float:
     for key in ("hybrid_score", "similarity", "score"):
         val = row.get(key)
@@ -187,7 +347,11 @@ def select_block_for_query(row: Dict[str, Any], tokens: List[str], query: str = 
     return {
         "page_no": _coalesce_not_none(best_block.get("page_no"), row.get("page_no")),
         "block_index": _coalesce_not_none(best_block.get("block_index"), row.get("block_index")),
-        "bbox": _coalesce_not_none(best_block.get("bbox"), row.get("bbox")),
+        "bbox": _coalesce_not_none(
+            _phrase_bbox_for_block(best_block, query, tokens),
+            best_block.get("bbox"),
+            row.get("bbox"),
+        ),
         "text": best_block.get("text") or row.get("text") or "",
         "lex_hits": best_hits,
         "match_score": best_match_score,

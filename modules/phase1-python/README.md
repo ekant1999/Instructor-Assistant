@@ -14,12 +14,20 @@ Reusable Python modules extracted from the Instructor Assistant ingestion pipeli
 - `ia_phase1.search_keyword`: keyword search utilities for SQLite-backed library data.
 - `ia_phase1.search_hybrid`: pgvector + PostgreSQL FTS hybrid retrieval helpers.
 - `ia_phase1.search_context`: section match localization/snippet helpers.
+- `ia_phase1.search_pipeline`: unified search scoring, gating, merging, title rescue, and section-to-paper aggregation helpers.
 
 ## Install
 
 ```bash
 cd modules/phase1-python
 pip install -e .
+```
+
+For search/hybrid features specifically:
+
+```bash
+cd modules/phase1-python
+pip install -e .[search]
 ```
 
 ## Quick example (end-to-end)
@@ -93,6 +101,20 @@ Override with environment variables:
 - `features/equations/README.md`
 - `features/youtube-transcript/README.md`
 - `features/search/README.md`
+
+## Search example
+
+A runnable example for the modular search pipeline lives at:
+
+- `examples/example_search_pipeline.py`
+
+Run it:
+
+```bash
+cd modules/phase1-python
+python examples/example_search_pipeline.py
+python examples/example_search_pipeline.py "vision benchmark"
+```
 
 ## Testing
 

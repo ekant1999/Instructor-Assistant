@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ia-phase1"
 version = "0.1.0"
-description = "Reusable PDF ingestion modules: parser, sectioning, chunking, tables, figures, and equations."
+description = "Reusable PDF ingestion and search modules: parser, sectioning, chunking, tables, figures, equations, search, and YouTube transcript."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

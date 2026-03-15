@@ -18,7 +18,9 @@ import { PaperIngestionInfoDialog } from './PaperIngestionInfoDialog';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Paper, Summary, Document, Section } from '@/shared/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Layers, Sparkles, BookOpen, History, MessageSquare } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { BookOpen, ChevronDown, ChevronUp, FileText, History, Layers, MessageSquare, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   chatPaper,
@@ -105,6 +107,15 @@ export default function EnhancedLibraryPage() {
     return searchResultsForSelectedPaper[0];
   }, [searchQuery, searchResultsForSelectedPaper, highlightSectionId]);
 
+  const activeSearchMatchIndex = useMemo(() => {
+    if (!searchQuery || searchResultsForSelectedPaper.length === 0) return -1;
+    if (highlightSectionId) {
+      const index = searchResultsForSelectedPaper.findIndex((section) => section.id === highlightSectionId);
+      if (index >= 0) return index;
+    }
+    return 0;
+  }, [searchQuery, searchResultsForSelectedPaper, highlightSectionId]);
+
   useEffect(() => {
     if (!selectedPaper) return;
     const wantsWeb = !selectedPaper.pdfUrl;
@@ -125,6 +136,38 @@ export default function EnhancedLibraryPage() {
       next.set(paperId, sorted);
       return next;
     });
+  };
+
+  const focusSearchMatch = (match: Section, queryOverride?: string) => {
+    const effectiveQuery = queryOverride ?? searchQuery;
+    if (match.pageNo) {
+      setNavigateToPage(match.pageNo);
+    }
+    setHighlightSectionId(match.id);
+    setScrollToSectionId(match.id);
+    if (match.pageNo && match.matchBbox) {
+      setHighlightBbox({ pageNo: match.pageNo, bbox: match.matchBbox });
+    } else {
+      setHighlightBbox(undefined);
+    }
+    if (effectiveQuery) {
+      setHighlightText(effectiveQuery);
+    } else {
+      const matchText = match.matchText?.trim();
+      if (matchText) {
+        setHighlightText(matchText);
+      } else {
+        setHighlightText(undefined);
+      }
+    }
+  };
+
+  const moveToSearchMatch = (direction: -1 | 1) => {
+    if (searchResultsForSelectedPaper.length === 0) return;
+    const currentIndex = activeSearchMatchIndex >= 0 ? activeSearchMatchIndex : 0;
+    const nextIndex = currentIndex + direction;
+    if (nextIndex < 0 || nextIndex >= searchResultsForSelectedPaper.length) return;
+    focusSearchMatch(searchResultsForSelectedPaper[nextIndex]);
   };
 
   useEffect(() => {
@@ -225,23 +268,7 @@ export default function EnhancedLibraryPage() {
       
       // If search found matches, navigate to first match
       if (searchQuery && mapped.length > 0 && mapped[0].matchScore !== undefined) {
-        const firstMatch = mapped[0];
-        if (firstMatch.pageNo) {
-          setNavigateToPage(firstMatch.pageNo);
-        }
-        setHighlightSectionId(firstMatch.id);
-        setScrollToSectionId(firstMatch.id);
-        if (firstMatch.pageNo && firstMatch.matchBbox) {
-          setHighlightBbox({ pageNo: firstMatch.pageNo, bbox: firstMatch.matchBbox });
-        } else {
-          setHighlightBbox(undefined);
-        }
-        const matchText = firstMatch.matchText?.trim();
-        if (matchText) {
-          setHighlightText(matchText);
-        } else {
-          setHighlightText(searchQuery);
-        }
+        focusSearchMatch(mapped[0], searchQuery);
       } else if (!searchQuery) {
         setHighlightSectionId(undefined);
         setScrollToSectionId(undefined);
@@ -959,6 +986,60 @@ export default function EnhancedLibraryPage() {
                   </TabsTrigger>
                 )}
               </TabsList>
+
+              {searchQuery.trim() && searchResultsForSelectedPaper.length > 0 && (
+                <div className="border-b bg-muted/15 px-4 py-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="secondary" className="shrink-0">
+                          Search results in this paper
+                        </Badge>
+                        <span className="text-sm font-medium text-foreground">
+                          Showing {activeSearchMatchIndex + 1} of {searchResultsForSelectedPaper.length}
+                        </span>
+                        {activeSearchMatch?.pageNo ? (
+                          <Badge variant="outline" className="shrink-0">
+                            Page {activeSearchMatch.pageNo}
+                          </Badge>
+                        ) : null}
+                      </div>
+                      <div className="min-w-0 text-sm text-muted-foreground truncate">
+                        {activeSearchMatch?.matchText?.trim() || `Jump through search hits in ${selectedPaper.title}`}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8"
+                        disabled={activeSearchMatchIndex <= 0}
+                        onClick={() => moveToSearchMatch(-1)}
+                        aria-label="Previous search hit"
+                        title="Go to previous result in this paper"
+                      >
+                        <ChevronUp className="h-4 w-4 mr-1" />
+                        Previous
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8"
+                        disabled={
+                          activeSearchMatchIndex < 0 ||
+                          activeSearchMatchIndex >= searchResultsForSelectedPaper.length - 1
+                        }
+                        onClick={() => moveToSearchMatch(1)}
+                        aria-label="Next search hit"
+                        title="Go to next result in this paper"
+                      >
+                        Next
+                        <ChevronDown className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {selectedPaper.pdfUrl && (
                 <TabsContent value="preview" className="flex-1 overflow-hidden">

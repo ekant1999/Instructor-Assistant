@@ -4,6 +4,7 @@ import asyncio
 import base64
 import json
 import logging
+import math
 import os
 import re
 import threading
@@ -19,6 +20,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.core.database import get_conn, init_db
 from backend.core.postgres import init_db as init_pg_db
+from backend.core.search_cache import (
+    bump_search_index_version,
+    current_search_index_version,
+    get_cached_paper_search,
+    get_cached_section_search,
+    normalize_search_query,
+    set_cached_paper_search,
+    set_cached_section_search,
+)
 from backend.core.library import (
     render_library_structured,
     add_paper,
@@ -46,6 +56,23 @@ from backend.core.search_context import (
     pgvector_score as _pgvector_score_impl,
     query_tokens as _query_tokens_impl,
     select_block_for_query as _select_block_for_query_impl,
+)
+from backend.core.search_pipeline import (
+    aggregate_section_hits_to_papers as _aggregate_section_hits_to_papers_impl,
+    annotate_hit_query_support as _annotate_hit_query_support_impl,
+    filter_aggregated_papers_for_query as _filter_aggregated_papers_for_query_impl,
+    filter_section_hits_for_query as _filter_section_hits_for_query_impl,
+    infer_search_section_bucket as _infer_search_section_bucket_impl,
+    inject_title_only_candidates as _inject_title_only_candidates_impl,
+    merge_section_hits as _merge_section_hits_impl,
+    paper_passes_search_gate as _paper_passes_search_gate_impl,
+    paper_title_bonus_lookup as _paper_title_bonus_lookup_impl,
+    query_token_stats as _query_token_stats_impl,
+    rrf_score as _rrf_score_impl,
+    search_section_hits_unified as _search_section_hits_unified_impl,
+    section_bucket_multiplier as _section_bucket_multiplier_impl,
+    section_passes_search_gate as _section_passes_search_gate_impl,
+    token_overlap as _token_overlap_impl,
 )
 from backend.rag.pgvector_store import PgVectorStore
 
@@ -184,6 +211,27 @@ def _select_block_for_query(row: Dict[str, Any], tokens: List[str], query: str =
 
 def _build_match_snippet(query: str, tokens: List[str], text: str, max_len: int = 240) -> str:
     return _build_match_snippet_impl(query, tokens, text, max_len=max_len)
+
+
+def _paper_search_cache_key(query: str, search_type: str) -> tuple[int, str, str]:
+    return (current_search_index_version(), normalize_search_query(query), search_type)
+
+
+def _section_search_cache_key(
+    paper_id: int,
+    query: str,
+    search_type: str,
+    include_text: bool,
+    max_chars: Optional[int],
+) -> tuple[int, int, str, str, bool, Optional[int]]:
+    return (
+        current_search_index_version(),
+        paper_id,
+        normalize_search_query(query),
+        search_type,
+        bool(include_text),
+        max_chars,
+    )
 
 
 def _coalesce_not_none(*values: Any) -> Any:
@@ -402,10 +450,289 @@ def _pgvector_search_paper_ids(query: str, search_type: str, limit: int = 100) -
             pass
 
 
-def _pgvector_search_sections(
-    paper_id: int,
+def _rrf_score(rank_index: int, k: int = 20) -> float:
+    return _rrf_score_impl(rank_index, k=k)
+
+
+def _token_overlap(tokens: List[str], text: str) -> int:
+    return _token_overlap_impl(tokens, text)
+
+
+def _paper_title_bonus_lookup(query: str, limit: int = 100) -> Dict[int, float]:
+    return _paper_title_bonus_lookup_impl(query, limit=limit)
+
+
+_REFERENCE_HEADING_RE = re.compile(r"^\s*(references|bibliography)\b", re.I)
+_REFERENCE_SIGNAL_RE = re.compile(
+    r"(?:\[[0-9]{1,3}\])|(?:\b(?:19|20)\d{2}\b)|(?:\b(?:proc\.?|proceedings|conference|journal|arxiv|doi)\b)",
+    re.I,
+)
+_FRONT_MATTER_SIGNAL_RE = re.compile(
+    r"(?:\babstract\b)|(?:@)|(?:\buniversity\b)|(?:\bdepartment\b)|(?:\bcorrespond(?:ing|ence)\b)|(?:\bemail\b)",
+    re.I,
+)
+_SEARCH_STOPWORDS = {
+    "about",
+    "above",
+    "across",
+    "after",
+    "against",
+    "also",
+    "and",
+    "are",
+    "based",
+    "before",
+    "below",
+    "between",
+    "can",
+    "could",
+    "during",
+    "each",
+    "for",
+    "from",
+    "had",
+    "has",
+    "have",
+    "here",
+    "into",
+    "less",
+    "more",
+    "not",
+    "other",
+    "over",
+    "per",
+    "should",
+    "such",
+    "than",
+    "that",
+    "their",
+    "them",
+    "then",
+    "there",
+    "these",
+    "they",
+    "this",
+    "those",
+    "through",
+    "throughout",
+    "toward",
+    "towards",
+    "under",
+    "use",
+    "used",
+    "using",
+    "via",
+    "was",
+    "were",
+    "what",
+    "when",
+    "where",
+    "which",
+    "while",
+    "with",
+    "within",
+    "without",
+    "would",
+}
+_TITLE_ONLY_RESCUE_MIN_SCORE = 0.30
+
+
+def _infer_search_section_bucket(
+    text: str,
+    *,
+    page_no: Optional[int] = None,
+    section_canonical: Optional[str] = None,
+) -> str:
+    return _infer_search_section_bucket_impl(
+        text,
+        page_no=page_no,
+        section_canonical=section_canonical,
+    )
+
+
+def _section_bucket_multiplier(bucket: str) -> float:
+    return _section_bucket_multiplier_impl(bucket)
+
+
+def _safe_float(value: Any) -> float:
+    try:
+        if value is None:
+            return 0.0
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _safe_int(value: Any) -> int:
+    try:
+        if value is None:
+            return 0
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _min_lex_hits_for_query(token_count: int) -> int:
+    return 1 if token_count <= 2 else 2
+
+
+def _content_query_tokens(query: str) -> List[str]:
+    return [token for token in _query_tokens(query) if token not in _SEARCH_STOPWORDS]
+
+
+def _query_token_stats(query: str) -> Dict[str, Any]:
+    return _query_token_stats_impl(query)
+
+
+def _content_token_hits(tokens: List[str], text: str) -> int:
+    if not tokens or not text:
+        return 0
+    haystack = text.lower()
+    return sum(1 for token in tokens if token in haystack)
+
+
+def _weighted_token_coverage(token_stats: Dict[str, Dict[str, float]], text: str) -> float:
+    if not token_stats or not text:
+        return 0.0
+    haystack = text.lower()
+    total_weight = sum(float(meta.get("weight") or 0.0) for meta in token_stats.values())
+    if total_weight <= 0.0:
+        return 0.0
+    matched_weight = sum(
+        float(meta.get("weight") or 0.0)
+        for token, meta in token_stats.items()
+        if token in haystack
+    )
+    return matched_weight / total_weight
+
+
+def _is_low_salience_section(section_canonical: Optional[str]) -> bool:
+    canonical = str(section_canonical or "").strip().lower()
+    return canonical in {
+        "acknowledgements",
+        "acknowledgments",
+        "acknowledgement",
+        "acknowledgment",
+        "experimental_protocol",
+        "supplementary",
+        "supplementary_material",
+        "appendix",
+        "appendices",
+    }
+
+
+def _annotate_hit_query_support(hit: Dict[str, Any], *, query_stats: Dict[str, Any]) -> Dict[str, Any]:
+    return _annotate_hit_query_support_impl(hit, query_stats=query_stats)
+
+
+def _section_passes_search_gate(
+    hit: Dict[str, Any],
+    *,
+    token_count: int,
+    content_tokens: List[str],
+) -> bool:
+    return _section_passes_search_gate_impl(
+        hit,
+        token_count=token_count,
+        content_tokens=content_tokens,
+    )
+
+
+def _filter_section_hits_for_query(query: str, hits: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return _filter_section_hits_for_query_impl(query, hits)
+
+
+def _paper_passes_search_gate(
+    query: str,
+    paper_meta: Dict[str, Any],
+) -> bool:
+    return _paper_passes_search_gate_impl(query, paper_meta)
+
+
+def _filter_aggregated_papers_for_query(
+    query: str,
+    aggregated: Dict[int, Dict[str, Any]],
+) -> Dict[int, Dict[str, Any]]:
+    return _filter_aggregated_papers_for_query_impl(query, aggregated)
+
+
+def _inject_title_only_candidates(
+    aggregated: Dict[int, Dict[str, Any]],
+    title_bonus_by_id: Dict[int, float],
+) -> Dict[int, Dict[str, Any]]:
+    return _inject_title_only_candidates_impl(aggregated, title_bonus_by_id)
+
+
+def _keyword_section_hits(
+    query: str,
+    paper_ids: Optional[List[int]] = None,
+    *,
+    include_text: bool,
+    max_chars: Optional[int],
+    limit: int,
+) -> List[Dict[str, Any]]:
+    rows = search_sections(query, search_type="keyword", paper_ids=paper_ids, limit=limit)
+    if not rows:
+        return []
+
+    tokens = _query_tokens(query)
+    match_lookup: Dict[int, Dict[str, Any]] = {}
+    if paper_ids and len(paper_ids) == 1:
+        match_lookup = _keyword_match_lookup_for_sections(paper_ids[0], query, limit=max(limit, 200))
+
+    hits: List[Dict[str, Any]] = []
+    query_l = (query or "").strip().lower()
+    for idx, row in enumerate(rows):
+        section_id = int(row["id"])
+        text = str(row.get("text") or "")
+        matched = match_lookup.get(section_id) or {}
+        lex_hits = _token_overlap(tokens, text)
+        exact_phrase = bool(query_l and len(query_l) >= 3 and query_l in text.lower())
+        keyword_score = _rrf_score(idx, k=10)
+        if exact_phrase:
+            keyword_score += 0.08
+        keyword_score += min(lex_hits, 4) * 0.015
+        search_bucket = _infer_search_section_bucket(
+            text,
+            page_no=int(row["page_no"]),
+            section_canonical=matched.get("match_section_canonical"),
+        )
+
+        entry: Dict[str, Any] = {
+            "id": section_id,
+            "paper_id": int(row["paper_id"]),
+            "page_no": int(row["page_no"]),
+            "match_score": keyword_score * _section_bucket_multiplier(search_bucket),
+            "keyword_score": keyword_score,
+            "semantic_score": 0.0,
+            "semantic_raw_score": 0.0,
+            "block_match_score": float(lex_hits) + (8.0 if exact_phrase else 0.0),
+            "lex_hits": lex_hits,
+            "exact_phrase": exact_phrase,
+            "match_bbox": matched.get("match_bbox"),
+            "match_block_index": matched.get("match_block_index"),
+            "match_section_canonical": matched.get("match_section_canonical"),
+            "search_bucket": search_bucket,
+            "source_text": text,
+        }
+        snippet = matched.get("match_text") or _build_match_snippet(query, tokens, text)
+        if snippet:
+            entry["match_text"] = snippet
+        if include_text:
+            trimmed = text
+            if max_chars is not None and max_chars > 0:
+                trimmed = trimmed[:max_chars]
+            entry["text"] = trimmed
+        hits.append(entry)
+    hits.sort(key=lambda item: item.get("match_score", 0.0), reverse=True)
+    return hits
+
+
+def _pgvector_search_section_hits(
     query: str,
     search_type: str,
+    paper_ids: Optional[List[int]] = None,
+    *,
     include_text: bool,
     max_chars: Optional[int],
     limit: int = 100,
@@ -420,10 +747,10 @@ def _pgvector_search_sections(
         store = PgVectorStore(pool)
         retrieve_k = max(20, min(limit * 5, 300))
         if search_type == "embedding":
-            return await store.similarity_search(query, k=retrieve_k, paper_ids=[paper_id])
+            return await store.similarity_search(query, k=retrieve_k, paper_ids=paper_ids)
         if search_type == "keyword":
-            return await full_text_search(query, pool, k=retrieve_k, paper_ids=[paper_id])
-        return await hybrid_search(query, store, pool, k=retrieve_k, paper_ids=[paper_id], alpha=alpha)
+            return await full_text_search(query, pool, k=retrieve_k, paper_ids=paper_ids)
+        return await hybrid_search(query, store, pool, k=retrieve_k, paper_ids=paper_ids, alpha=alpha)
 
     try:
         results = asyncio.run(_run())
@@ -440,16 +767,20 @@ def _pgvector_search_sections(
         return []
 
     tokens = _query_tokens(query)
-    page_scores: Dict[int, float] = {}
-    page_best: Dict[int, Dict[str, Any]] = {}
-    page_best_match: Dict[int, Dict[str, Any]] = {}
-    for row in results:
+    page_scores: Dict[tuple[int, int], float] = {}
+    page_best: Dict[tuple[int, int], Dict[str, Any]] = {}
+    page_best_match: Dict[tuple[int, int], Dict[str, Any]] = {}
+    for idx, row in enumerate(results):
+        pid = row.get("paper_id")
+        if pid is None:
+            continue
         match_block = _select_block_for_query(row, tokens, query)
         page_no = match_block.get("page_no") or row.get("page_no")
         if not page_no:
             continue
-        score = _pgvector_score(row)
-        page_no_int = int(page_no)
+        raw_score = _pgvector_score(row)
+        semantic_score = _rrf_score(idx, k=15) + min(max(raw_score, 0.0), 1.0) * 0.15
+        key = (int(pid), int(page_no))
         row_block_index = _coalesce_not_none(match_block.get("block_index"), row.get("block_index"))
         row_bbox = _coalesce_not_none(match_block.get("bbox"), row.get("bbox"))
         row_text = match_block.get("text") or row.get("text")
@@ -457,10 +788,11 @@ def _pgvector_search_sections(
         row_match_score = float(match_block.get("match_score") or 0.0)
         row_exact_phrase = bool(match_block.get("exact_phrase") or False)
         row_section_canonical = str(match_block.get("section_canonical") or "")
-        prev = page_scores.get(page_no_int)
-        if prev is None or score > prev:
-            page_scores[page_no_int] = score
-            page_best[page_no_int] = {
+
+        prev = page_scores.get(key)
+        if prev is None or semantic_score > prev:
+            page_scores[key] = semantic_score
+            page_best[key] = {
                 "bbox": row_bbox,
                 "block_index": row_block_index,
                 "text": row_text,
@@ -468,11 +800,13 @@ def _pgvector_search_sections(
                 "match_score": row_match_score,
                 "exact_phrase": row_exact_phrase,
                 "section_canonical": row_section_canonical,
+                "semantic_score": semantic_score,
+                "semantic_raw_score": raw_score,
             }
 
-        prev_match = page_best_match.get(page_no_int)
+        prev_match = page_best_match.get(key)
         if prev_match is None:
-            page_best_match[page_no_int] = {
+            page_best_match[key] = {
                 "bbox": row_bbox,
                 "block_index": row_block_index,
                 "text": row_text,
@@ -480,7 +814,8 @@ def _pgvector_search_sections(
                 "match_score": row_match_score,
                 "exact_phrase": row_exact_phrase,
                 "section_canonical": row_section_canonical,
-                "semantic_score": score,
+                "semantic_score": semantic_score,
+                "semantic_raw_score": raw_score,
             }
         else:
             prev_key = (
@@ -493,10 +828,10 @@ def _pgvector_search_sections(
                 row_exact_phrase,
                 row_match_score,
                 row_lex_hits,
-                score,
+                semantic_score,
             )
             if curr_key > prev_key:
-                page_best_match[page_no_int] = {
+                page_best_match[key] = {
                     "bbox": row_bbox,
                     "block_index": row_block_index,
                     "text": row_text,
@@ -504,54 +839,128 @@ def _pgvector_search_sections(
                     "match_score": row_match_score,
                     "exact_phrase": row_exact_phrase,
                     "section_canonical": row_section_canonical,
-                    "semantic_score": score,
+                    "semantic_score": semantic_score,
+                    "semantic_raw_score": raw_score,
                 }
 
     if not page_scores:
         return []
 
-    pages = list(page_scores.keys())
-    placeholders = ",".join("?" for _ in pages)
+    paper_list = sorted({paper_id for paper_id, _ in page_scores.keys()})
+    page_list = sorted({page_no for _, page_no in page_scores.keys()})
+    paper_placeholders = ",".join("?" for _ in paper_list)
+    page_placeholders = ",".join("?" for _ in page_list)
     with get_conn() as conn:
         rows = conn.execute(
             f"""
-            SELECT id, page_no, text
+            SELECT id, paper_id, page_no, text
             FROM sections
-            WHERE paper_id=? AND page_no IN ({placeholders})
+            WHERE paper_id IN ({paper_placeholders}) AND page_no IN ({page_placeholders})
             """,
-            (paper_id, *pages),
+            (*paper_list, *page_list),
         ).fetchall()
 
     sections: List[Dict[str, Any]] = []
-    for r in rows:
-        best = page_best.get(r["page_no"]) or {}
-        matched = page_best_match.get(r["page_no"])
+    for row in rows:
+        key = (int(row["paper_id"]), int(row["page_no"]))
+        if key not in page_scores:
+            continue
+        best = page_best.get(key) or {}
+        matched = page_best_match.get(key)
         if matched and tokens:
             min_hits = 1 if len(tokens) <= 3 else 2
             if bool(matched.get("exact_phrase")) or int(matched.get("lex_hits", 0)) >= min_hits:
                 best = matched
-        entry = {
-            "id": r["id"],
-            "page_no": r["page_no"],
-            "paper_id": paper_id,
-            "match_score": page_scores.get(r["page_no"], 0),
+        search_bucket = _infer_search_section_bucket(
+            str((row["text"] or "") or best.get("text") or ""),
+            page_no=int(row["page_no"]),
+            section_canonical=best.get("section_canonical"),
+        )
+        entry: Dict[str, Any] = {
+            "id": int(row["id"]),
+            "page_no": int(row["page_no"]),
+            "paper_id": int(row["paper_id"]),
+            "match_score": page_scores.get(key, 0.0) * _section_bucket_multiplier(search_bucket),
+            "keyword_score": 0.0,
+            "semantic_score": float(best.get("semantic_score") or page_scores.get(key, 0.0)),
+            "semantic_raw_score": float(best.get("semantic_raw_score") or 0.0),
+            "block_match_score": float(best.get("match_score") or 0.0),
+            "lex_hits": int(best.get("lex_hits") or 0),
+            "exact_phrase": bool(best.get("exact_phrase") or False),
             "match_bbox": best.get("bbox"),
             "match_block_index": best.get("block_index"),
             "match_section_canonical": best.get("section_canonical"),
+            "search_bucket": search_bucket,
+            "source_text": best.get("text") or row["text"] or "",
         }
-        best_text = best.get("text") or ""
+        best_text = str(best.get("text") or "")
         match_text = _build_match_snippet(query, tokens, best_text)
         if match_text:
             entry["match_text"] = match_text
         if include_text:
-            text = r["text"] or ""
+            text = str(row["text"] or "")
             if max_chars is not None and max_chars > 0:
                 text = text[:max_chars]
             entry["text"] = text
         sections.append(entry)
 
-    sections.sort(key=lambda item: item.get("match_score", 0), reverse=True)
-    return sections
+    sections.sort(key=lambda item: item.get("match_score", 0.0), reverse=True)
+    return sections[:limit]
+
+
+def _merge_section_hits(
+    keyword_hits: List[Dict[str, Any]],
+    semantic_hits: List[Dict[str, Any]],
+    *,
+    limit: int,
+) -> List[Dict[str, Any]]:
+    return _merge_section_hits_impl(keyword_hits, semantic_hits, limit=limit)
+
+
+def _search_section_hits_unified(
+    query: str,
+    search_type: str,
+    *,
+    paper_ids: Optional[List[int]] = None,
+    include_text: bool,
+    max_chars: Optional[int],
+    limit: int = 100,
+) -> List[Dict[str, Any]]:
+    return _search_section_hits_unified_impl(
+        query,
+        search_type,
+        keyword_section_hits_fn=_keyword_section_hits,
+        semantic_section_hits_fn=_pgvector_search_section_hits,
+        paper_ids=paper_ids,
+        include_text=include_text,
+        max_chars=max_chars,
+        limit=limit,
+    )
+
+
+def _aggregate_section_hits_to_papers(
+    section_hits: List[Dict[str, Any]],
+    title_bonus_by_id: Optional[Dict[int, float]] = None,
+) -> Dict[int, Dict[str, Any]]:
+    return _aggregate_section_hits_to_papers_impl(section_hits, title_bonus_by_id)
+
+
+def _pgvector_search_sections(
+    paper_id: int,
+    query: str,
+    search_type: str,
+    include_text: bool,
+    max_chars: Optional[int],
+    limit: int = 100,
+) -> List[Dict[str, Any]]:
+    return _pgvector_search_section_hits(
+        query,
+        search_type,
+        [paper_id],
+        include_text=include_text,
+        max_chars=max_chars,
+        limit=limit,
+    )
 
 
 def _keyword_match_lookup_for_sections(paper_id: int, query: str, limit: int = 200) -> Dict[int, Dict[str, Any]]:
@@ -674,6 +1083,7 @@ def _set_rag_status(paper_ids: List[int], status: str, error: Optional[str] = No
             params,
         )
         conn.commit()
+    bump_search_index_version(f"rag_status:{status}")
 
 
 def _set_all_rag_status(status: str, error: Optional[str] = None) -> None:
@@ -683,6 +1093,7 @@ def _set_all_rag_status(status: str, error: Optional[str] = None) -> None:
             (status, error),
         )
         conn.commit()
+    bump_search_index_version(f"rag_status_all:{status}")
 
 
 def _collect_rag_papers() -> List[Dict[str, Any]]:
@@ -945,44 +1356,28 @@ def list_papers(
     - PDF content (sections)
     """
     if q:
-        # Search papers by title AND sections
         st = search_type or "keyword"
         if st not in ["keyword", "embedding", "hybrid"]:
             st = "keyword"
+        cache_key = _paper_search_cache_key(q, st)
+        cached = get_cached_paper_search(cache_key)
+        if cached is not None:
+            return cached
 
-        score_by_id: Dict[int, float] = {}
-        matching_paper_ids: set[int] = set()
+        section_hits = _search_section_hits_unified(
+            q,
+            st,
+            include_text=False,
+            max_chars=None,
+            limit=300,
+        )
+        section_hits = _filter_section_hits_for_query(q, section_hits)
+        title_bonus_by_id = _paper_title_bonus_lookup(q, limit=100) if st in ["keyword", "hybrid"] else {}
+        aggregated = _aggregate_section_hits_to_papers(section_hits, title_bonus_by_id)
+        aggregated = _inject_title_only_candidates(aggregated, title_bonus_by_id)
+        aggregated = _filter_aggregated_papers_for_query(q, aggregated)
+        matching_paper_ids = set(aggregated.keys())
 
-        # Keyword search over titles/URLs (SQLite FTS)
-        paper_results = []
-        if st in ["keyword", "hybrid"]:
-            paper_results = search_papers(q, search_type="keyword", limit=100)
-            for p in paper_results:
-                pid = p.get("id")
-                if pid is None:
-                    continue
-                matching_paper_ids.add(pid)
-                score_by_id[pid] = max(score_by_id.get(pid, float("-inf")), _sqlite_rank_score(p.get("rank")))
-
-        # Keyword search over sections (SQLite FTS)
-        section_results = []
-        if st in ["keyword", "hybrid"]:
-            section_results = search_sections(q, search_type="keyword", limit=500)
-            for s in section_results:
-                pid = s.get("paper_id")
-                if pid is None:
-                    continue
-                matching_paper_ids.add(pid)
-                score_by_id[pid] = max(score_by_id.get(pid, float("-inf")), _sqlite_rank_score(s.get("rank")))
-
-        # pgvector semantic/hybrid search over text_blocks (PostgreSQL)
-        if st in ["embedding", "hybrid"]:
-            pg_scores = _pgvector_search_paper_ids(q, st, limit=100)
-            for pid, score in pg_scores.items():
-                matching_paper_ids.add(pid)
-                score_by_id[pid] = max(score_by_id.get(pid, float("-inf")), score)
-
-        # Fetch full paper details for all matching papers
         if matching_paper_ids:
             with get_conn() as conn:
                 placeholders = ','.join('?' for _ in matching_paper_ids)
@@ -1002,16 +1397,25 @@ def list_papers(
                 for p in papers:
                     pdf_path = p.get("pdf_path")
                     p["pdf_url"] = f"/papers/{p['id']}/file" if pdf_path else None
+                    paper_meta = aggregated.get(int(p["id"])) or {}
+                    best_hit = paper_meta.get("best_hit") or {}
+                    p["search_score"] = paper_meta.get("score")
+                    if best_hit:
+                        p["search_match_page_no"] = best_hit.get("page_no")
+                        p["search_match_section_id"] = best_hit.get("id")
+                        p["search_match_text"] = best_hit.get("match_text")
+                        p["search_match_section_canonical"] = best_hit.get("match_section_canonical")
 
-                if score_by_id:
-                    papers.sort(
-                        key=lambda p: score_by_id.get(p["id"], float("-inf")),
-                        reverse=True,
-                    )
+                papers.sort(
+                    key=lambda p: float((aggregated.get(int(p["id"])) or {}).get("score", float("-inf"))),
+                    reverse=True,
+                )
         else:
             papers = []
-        
-        return {"papers": papers}
+
+        response = {"papers": papers}
+        set_cached_paper_search(cache_key, response)
+        return response
     else:
         # Return all papers
         data = render_library_structured()
@@ -1067,81 +1471,31 @@ def list_paper_sections(
             raise HTTPException(status_code=404, detail="Paper not found.")
 
     if q:
-        # Search sections
         st = search_type or "keyword"
         if st not in ["keyword", "embedding", "hybrid"]:
             st = "keyword"
-        query_tokens = _query_tokens(q)
-
-        # For hybrid searches, prefer exact keyword hits when available.
-        if st == "hybrid":
-            keyword_results = search_sections(q, search_type="keyword", paper_ids=[paper_id], limit=100)
-            if keyword_results:
-                match_lookup = _keyword_match_lookup_for_sections(paper_id, q, limit=200)
-                sections: List[Dict[str, Any]] = []
-                for r in keyword_results:
-                    entry = {
-                        "id": r["id"],
-                        "page_no": r["page_no"],
-                        "paper_id": r["paper_id"],
-                        "match_score": r.get("rank", 0),
-                    }
-                    matched = match_lookup.get(int(r["id"]))
-                    if matched:
-                        entry.update(matched)
-                    else:
-                        fallback_snippet = _build_match_snippet(q, query_tokens, r.get("text") or "")
-                        if fallback_snippet:
-                            entry["match_text"] = fallback_snippet
-                    if include_text:
-                        text = r["text"] or ""
-                        if max_chars is not None and max_chars > 0:
-                            text = text[:max_chars]
-                        entry["text"] = text
-                    sections.append(entry)
-                return {"sections": sections}
-
-        # Use pgvector for embedding/hybrid searches when keyword has no hits
-        if st in ["embedding", "hybrid"]:
-            pg_sections = _pgvector_search_sections(
-                paper_id,
-                q,
-                st,
-                include_text=include_text,
-                max_chars=max_chars,
-                limit=100,
-            )
-            if pg_sections:
-                return {"sections": pg_sections}
-            if st == "embedding":
-                return {"sections": []}
-            # fall back to keyword if hybrid found nothing
-            st = "keyword"
-
-        results = search_sections(q, search_type="keyword", paper_ids=[paper_id], limit=100)
-        match_lookup = _keyword_match_lookup_for_sections(paper_id, q, limit=200)
-        sections: List[Dict[str, Any]] = []
-        for r in results:
-            entry = {
-                "id": r["id"],
-                "page_no": r["page_no"],
-                "paper_id": r["paper_id"],
-                "match_score": r.get("rank", 0)  # Include relevance score for highlighting
-            }
-            matched = match_lookup.get(int(r["id"]))
-            if matched:
-                entry.update(matched)
-            else:
-                fallback_snippet = _build_match_snippet(q, query_tokens, r.get("text") or "")
-                if fallback_snippet:
-                    entry["match_text"] = fallback_snippet
-            if include_text:
-                text = r["text"] or ""
-                if max_chars is not None and max_chars > 0:
-                    text = text[:max_chars]
-                entry["text"] = text
-            sections.append(entry)
-        return {"sections": sections}
+        cache_key = _section_search_cache_key(
+            paper_id,
+            q,
+            st,
+            include_text,
+            max_chars,
+        )
+        cached = get_cached_section_search(cache_key)
+        if cached is not None:
+            return cached
+        sections = _search_section_hits_unified(
+            q,
+            st,
+            paper_ids=[paper_id],
+            include_text=include_text,
+            max_chars=max_chars,
+            limit=100,
+        )
+        sections = _filter_section_hits_for_query(q, sections)
+        response = {"sections": sections}
+        set_cached_section_search(cache_key, response)
+        return response
     else:
         # Return all sections
         with get_conn() as conn:

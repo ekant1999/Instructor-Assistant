@@ -3,6 +3,8 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
+from .search_cache import bump_search_index_version
+
 # Store backend data inside backend/data to keep services self-contained.
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = BACKEND_ROOT / "data"
@@ -28,6 +30,23 @@ def init_db() -> None:
     _ensure_notes_fk_set_null()
     ensure_question_tables()
     _ensure_fts_tables()
+
+
+def rebuild_fts_tables() -> None:
+    """
+    Rebuild all SQLite FTS indexes from their backing content tables.
+
+    This repairs drift between the external-content FTS tables and the
+    authoritative row data without touching the base tables or triggers.
+    """
+    init_db()
+    with get_conn() as conn:
+        conn.execute("INSERT INTO papers_fts(papers_fts) VALUES('rebuild')")
+        conn.execute("INSERT INTO sections_fts(sections_fts) VALUES('rebuild')")
+        conn.execute("INSERT INTO notes_fts(notes_fts) VALUES('rebuild')")
+        conn.execute("INSERT INTO summaries_fts(summaries_fts) VALUES('rebuild')")
+        conn.commit()
+    bump_search_index_version("sqlite_fts_rebuild")
 
 
 def _init_core_tables(conn: sqlite3.Connection) -> None:

@@ -1,13 +1,15 @@
 # Instructor Assistant
 
-A full-stack web application that helps instructors manage research papers, generate summaries, build question sets, and query documents using RAG (Retrieval-Augmented Generation).
+A full-stack web application for managing research papers, generating summaries, building question sets, and querying documents with hybrid search and RAG (Retrieval-Augmented Generation).
 
 ## 🎯 Features
 
 ### 📚 Research Library
 <img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/42174f6e-ee1a-464e-b289-8d25edf2f275" />
 
-- **Search & Filter**: Find papers by title, author, or keywords with real-time filtering
+- **Unified Hybrid Search**: Rank papers from section-level keyword + semantic hits with no-match gating and title rescue
+- **Hit Navigation**: Step through all search hits inside the selected paper with previous/next controls
+- **PDF Highlighting**: Phrase-first highlighting with bbox fallback for matched sections in the preview pane
 - **Batch Operations**: Select multiple papers to summarize or delete at once
 - **Multiple Summaries**: Generate and manage multiple summaries per paper with history
 - **Advanced Editor**: Markdown editor with Edit/Preview/Split modes and auto-save
@@ -36,7 +38,7 @@ A full-stack web application that helps instructors manage research papers, gene
 <img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/365b8a15-0812-412c-b545-8ef382d3322c" />
 
 - **Multiple Agents**: GPT Web, Gemini Web, and Qwen Local
-- **Selective Ingestion**: Choose which papers to index
+- **Selective Ingestion**: Choose which papers to index into PostgreSQL/pgvector
 - **Context Templates**: Save and reuse ingestion presets
 - **Query History**: Past queries with favorites and search
 - **Citations**: Context-backed answers with sources
@@ -57,7 +59,8 @@ A full-stack web application that helps instructors manage research papers, gene
 
 ### Backend
 - **FastAPI** + **Uvicorn**
-- **SQLite** (local, in `backend/data/app.db`)
+- **SQLite** (app/library metadata in `backend/data/app.db`)
+- **PostgreSQL + pgvector** (hybrid retrieval + RAG indexing)
 - **LiteLLM** for OpenAI/local providers
 - **PyPDF** + **python-pptx** for document parsing
 - **Ollama** for local LLMs
@@ -120,6 +123,7 @@ The ChatGPT SDK widget lives in `chatgpt-sdk-app/`. Follow `chatgpt-sdk-app/READ
 - **SQLite DB**: `backend/data/app.db`
 - **Downloaded PDFs**: `backend/data/pdfs/`
 - **Exports**: `backend/exports/`
+- **Search Benchmark Workspace**: `search_evaluation/`
 
 These are local artifacts and are not meant to be committed.
 
@@ -129,17 +133,31 @@ These are local artifacts and are not meant to be committed.
 Instructor-Assistant/
 ├── backend/               # FastAPI app, SQLite data, services
 ├── client/                # React + Vite SPA
-├── chatgpt-sdk-app/        # ChatGPT Apps SDK widget (optional)
-└── attached_assets/        # Static assets for the frontend
+├── modules/               # Reusable Python package(s), including ia_phase1
+├── search_evaluation/     # Isolated search benchmark workspace
+├── chatgpt-sdk-app/       # ChatGPT Apps SDK widget (optional)
+└── attached_assets/       # Static assets for the frontend
 ```
+
+## 🧩 Reusable Modules
+
+- `modules/phase1-python/` contains the reusable `ia_phase1` package for ingestion and search helpers.
+- `modules/phase1-python/README.md` documents package installation and usage.
+- `Modularization.md` summarizes the currently extracted reusable features.
+
+## 📊 Search Benchmarking
+
+- `search_evaluation/` contains the isolated benchmark corpus, curated queries/gold labels, scripts, and reports for evaluating the active library search pipeline.
+- Start with `search_evaluation/README.md` for the benchmark workflow.
 
 ## 📝 API Overview
 
 Main endpoints (FastAPI):
 
+- `/api/search` - Unified search across papers, sections, notes, and summaries
 - `/api/papers` - List papers
 - `/api/papers/download` - Download paper by DOI/URL
-- `/api/papers/{id}/sections` - Paper sections
+- `/api/papers/{id}/sections` - Paper sections or section-level matches inside one paper
 - `/api/papers/{id}/context` - Extracted context
 - `/api/papers/{id}/chat` - Paper Q&A / summarization
 - `/api/papers/{id}/summaries` - Summary history per paper
@@ -149,7 +167,7 @@ Main endpoints (FastAPI):
 - `/api/question-sets/generate` - Generate questions (JSON)
 - `/api/question-sets/generate/stream` - Streaming generation
 - `/api/question-sets/context` - Upload PDF/PPT/PPTX for context
-- `/api/rag/ingest` - Build FAISS index
+- `/api/rag/ingest` - Ingest library documents into PostgreSQL/pgvector
 - `/api/rag/query` - RAG queries
 - `/api/agent/chat` - Qwen agent chat
 
