@@ -16,7 +16,7 @@ fixed arXiv PDF corpus.
 - `state/`: isolated SQLite benchmark database and temporary manifests
 
 ## Screenshot of last run result metrics
-![result metrics screenshots](search_evaluation/screenshots/result_metrics.jpeg)
+![result metrics screenshots](screenshots/result_metrics.jpeg)
 
 
 ## Workflow
