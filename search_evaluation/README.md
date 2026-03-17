@@ -15,6 +15,10 @@ fixed arXiv PDF corpus.
 - `scripts/`: helpers for fetch, corpus build, review extraction, and benchmark runs
 - `state/`: isolated SQLite benchmark database and temporary manifests
 
+## Screenshot of last run result metrics
+![result metrics screenshots](search_evaluation/screenshots/result_metrics.jpeg)
+
+
 ## Workflow
 
 Fast path for the full flow:
