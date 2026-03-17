@@ -79,6 +79,52 @@ _SEARCH_STOPWORDS = {
     "would",
 }
 _TITLE_ONLY_RESCUE_MIN_SCORE = 0.30
+_METHOD_QUERY_TERMS = {
+    "approach",
+    "architecture",
+    "cache",
+    "curvature",
+    "defense",
+    "design",
+    "framework",
+    "mechanism",
+    "method",
+    "model",
+    "objective",
+    "pipeline",
+    "reuse",
+    "router",
+    "training",
+}
+_RESULT_QUERY_TERMS = {
+    "accuracy",
+    "benchmark",
+    "evaluation",
+    "f1",
+    "gain",
+    "gains",
+    "improvement",
+    "improvements",
+    "latency",
+    "performance",
+    "result",
+    "results",
+    "speedup",
+    "throughput",
+}
+_ANALYSIS_QUERY_TERMS = {
+    "analysis",
+    "challenge",
+    "discussion",
+    "failure",
+    "failures",
+    "insight",
+    "limitation",
+    "limitations",
+    "reasoning",
+    "tradeoff",
+    "understanding",
+}
 
 ConnectionFactory = Callable[[], Any]
 KeywordSectionHitsFn = Callable[..., List[Dict[str, Any]]]
@@ -117,6 +163,28 @@ def safe_int(value: Any) -> int:
         return int(value)
     except (TypeError, ValueError):
         return 0
+
+
+def _row_first_value(row: Any) -> Any:
+    if row is None:
+        return None
+    try:
+        return row[0]
+    except Exception:
+        pass
+    if isinstance(row, dict):
+        for value in row.values():
+            return value
+        return None
+    keys = getattr(row, "keys", None)
+    if callable(keys):
+        row_keys = list(keys())
+        if row_keys:
+            try:
+                return row[row_keys[0]]
+            except Exception:
+                return None
+    return None
 
 
 def rrf_score(rank_index: int, k: int = 20) -> float:
@@ -195,7 +263,7 @@ def query_token_stats(query: str, *, get_conn_fn: Optional[ConnectionFactory] = 
     conn_factory = get_conn_fn or _get_conn
     with conn_factory() as conn:
         total_sections_row = conn.execute("SELECT COUNT(*) FROM sections").fetchone()
-        total_sections = int(total_sections_row[0] or 0) if total_sections_row else 0
+        total_sections = int(_row_first_value(total_sections_row) or 0) if total_sections_row else 0
         rare_limit = max(3, int(total_sections * 0.06)) if total_sections > 0 else 3
         token_stats: Dict[str, Dict[str, float]] = {}
         rare_tokens: List[str] = []
@@ -205,14 +273,14 @@ def query_token_stats(query: str, *, get_conn_fn: Optional[ConnectionFactory] = 
                     "SELECT COUNT(*) FROM sections_fts WHERE sections_fts MATCH ?",
                     (token,),
                 ).fetchone()
-                df = int(df_row[0] or 0) if df_row else 0
+                df = int(_row_first_value(df_row) or 0) if df_row else 0
             except Exception:
                 like = f"%{token}%"
                 df_row = conn.execute(
                     "SELECT COUNT(*) FROM sections WHERE lower(text) LIKE ?",
                     (like,),
                 ).fetchone()
-                df = int(df_row[0] or 0) if df_row else 0
+                df = int(_row_first_value(df_row) or 0) if df_row else 0
             weight = math.log((total_sections + 1.0) / (df + 1.0)) + 1.0 if total_sections > 0 else 1.0
             token_stats[token] = {"df": float(df), "weight": weight}
             if df <= rare_limit:
@@ -264,6 +332,44 @@ def is_low_salience_section(section_canonical: Optional[str]) -> bool:
     }
 
 
+def infer_localization_query_profile(query: str) -> Dict[str, bool]:
+    tokens = query_tokens(query)
+    token_set = set(tokens)
+    method_like = bool(token_set & _METHOD_QUERY_TERMS)
+    result_like = bool(token_set & _RESULT_QUERY_TERMS)
+    analysis_like = bool(token_set & _ANALYSIS_QUERY_TERMS)
+    benchmark_like = "benchmark" in token_set or "dataset" in token_set or "evaluation" in token_set
+    overview_like = not (method_like or result_like or analysis_like or benchmark_like)
+    return {
+        "method_like": method_like,
+        "result_like": result_like,
+        "analysis_like": analysis_like,
+        "benchmark_like": benchmark_like,
+        "overview_like": overview_like,
+    }
+
+
+def infer_localization_section_role(section_canonical: Optional[str]) -> str:
+    canonical = str(section_canonical or "").strip().lower()
+    if not canonical:
+        return "body"
+    if is_low_salience_section(canonical):
+        return "low_salience"
+    if canonical == "abstract" or canonical.startswith("abstract"):
+        return "abstract"
+    if canonical == "front_matter":
+        return "front_matter"
+    if any(token in canonical for token in ("introduction", "background", "related_work", "preliminar")):
+        return "intro"
+    if any(token in canonical for token in ("conclusion", "discussion", "limitation")):
+        return "conclusion"
+    if any(token in canonical for token in ("analysis", "ablation", "experiment", "result", "evaluation", "benchmark")):
+        return "evaluation"
+    if any(token in canonical for token in ("method", "approach", "framework", "architecture", "training", "implementation", "pipeline", "model", "algorithm", "setup")):
+        return "method"
+    return "body"
+
+
 def annotate_hit_query_support(hit: Dict[str, Any], *, query_stats: Dict[str, Any]) -> Dict[str, Any]:
     content_tokens = list(query_stats.get("content_tokens") or [])
     rare_tokens = list(query_stats.get("rare_tokens") or [])
@@ -280,6 +386,130 @@ def annotate_hit_query_support(hit: Dict[str, Any], *, query_stats: Dict[str, An
     hit["rare_token_count"] = len(rare_tokens)
     hit["weighted_hit_ratio"] = weighted_token_coverage(token_stats, source_text)
     return hit
+
+
+def localization_score_for_hit(
+    query: str,
+    hit: Dict[str, Any],
+    *,
+    get_conn_fn: Optional[ConnectionFactory] = None,
+) -> float:
+    stats = query_token_stats(query, get_conn_fn=get_conn_fn)
+    profile = infer_localization_query_profile(query)
+    annotated = annotate_hit_query_support(dict(hit), query_stats=stats)
+    return _localization_score_for_annotated_hit(annotated, profile=profile)
+
+
+def _localization_score_for_annotated_hit(hit: Dict[str, Any], *, profile: Dict[str, bool]) -> float:
+    score = safe_float(hit.get("match_score"))
+    score += min(safe_int(hit.get("content_hits")), 4) * 0.015
+    score += min(safe_int(hit.get("lex_hits")), 4) * 0.008
+    score += min(safe_float(hit.get("block_match_score")), 12.0) * 0.002
+
+    exact_phrase = bool(hit.get("exact_phrase"))
+    if exact_phrase:
+        score += 0.08
+
+    bucket = str(hit.get("search_bucket") or "body").strip().lower()
+    if bucket == "references":
+        score -= 1.0
+    elif bucket == "front_matter":
+        score -= 0.10
+
+    role = infer_localization_section_role(hit.get("match_section_canonical"))
+    if role == "abstract":
+        score -= 0.05
+        if profile.get("overview_like") and exact_phrase:
+            score += 0.02
+    elif role == "intro":
+        score -= 0.03
+    elif role == "conclusion":
+        score -= 0.05
+        if profile.get("analysis_like") or profile.get("result_like"):
+            score += 0.015
+    elif role == "low_salience":
+        score -= 0.10
+    elif role == "method":
+        if profile.get("method_like"):
+            score += 0.08
+        elif profile.get("overview_like"):
+            score += 0.03
+        else:
+            score += 0.01
+    elif role == "evaluation":
+        if profile.get("result_like") or profile.get("benchmark_like"):
+            score += 0.09
+        elif profile.get("analysis_like"):
+            score += 0.04
+        else:
+            score += 0.02
+
+    if safe_float(hit.get("weighted_hit_ratio")) >= 0.85:
+        score += 0.02
+    if safe_int(hit.get("rare_hits")) > 0:
+        score += 0.015
+    return score
+
+
+def _rerank_section_hits_for_localization_with_stats(
+    hits: List[Dict[str, Any]],
+    *,
+    query_stats: Dict[str, Any],
+    profile: Dict[str, bool],
+) -> List[Dict[str, Any]]:
+    reranked: List[Dict[str, Any]] = []
+    for hit in hits:
+        annotated = annotate_hit_query_support(dict(hit), query_stats=query_stats)
+        annotated["localization_score"] = _localization_score_for_annotated_hit(annotated, profile=profile)
+        reranked.append(annotated)
+    reranked.sort(
+        key=lambda item: (
+            safe_float(item.get("localization_score")),
+            bool(item.get("exact_phrase")),
+            safe_int(item.get("content_hits")),
+            safe_int(item.get("lex_hits")),
+            safe_float(item.get("match_score")),
+        ),
+        reverse=True,
+    )
+    return reranked
+
+
+def rerank_section_hits_for_localization(
+    query: str,
+    hits: List[Dict[str, Any]],
+    *,
+    get_conn_fn: Optional[ConnectionFactory] = None,
+) -> List[Dict[str, Any]]:
+    stats = query_token_stats(query, get_conn_fn=get_conn_fn)
+    profile = infer_localization_query_profile(query)
+    return _rerank_section_hits_for_localization_with_stats(hits, query_stats=stats, profile=profile)
+
+
+def search_paper_sections_for_localization(
+    query: str,
+    search_type: str,
+    paper_id: int,
+    *,
+    keyword_section_hits_fn: KeywordSectionHitsFn,
+    semantic_section_hits_fn: SemanticSectionHitsFn,
+    include_text: bool,
+    max_chars: Optional[int],
+    limit: int = 100,
+    get_conn_fn: Optional[ConnectionFactory] = None,
+) -> List[Dict[str, Any]]:
+    hits = search_section_hits_unified(
+        query,
+        search_type,
+        keyword_section_hits_fn=keyword_section_hits_fn,
+        semantic_section_hits_fn=semantic_section_hits_fn,
+        paper_ids=[paper_id],
+        include_text=include_text,
+        max_chars=max_chars,
+        limit=limit,
+    )
+    hits = filter_section_hits_for_query(query, hits, get_conn_fn=get_conn_fn)
+    return rerank_section_hits_for_localization(query, hits, get_conn_fn=get_conn_fn)
 
 
 def section_passes_search_gate(
@@ -693,6 +923,9 @@ def search_section_hits_unified(
 def aggregate_section_hits_to_papers(
     section_hits: List[Dict[str, Any]],
     title_bonus_by_id: Optional[Dict[int, float]] = None,
+    *,
+    query: Optional[str] = None,
+    get_conn_fn: Optional[ConnectionFactory] = None,
 ) -> Dict[int, Dict[str, Any]]:
     grouped: Dict[int, List[Dict[str, Any]]] = {}
     for hit in section_hits:
@@ -725,6 +958,7 @@ def aggregate_section_hits_to_papers(
         aggregated[pid] = {
             "score": score,
             "best_hit": ranked[0],
+            "ranking_best_hit": ranked[0],
             "support_hits": ranked[:3],
             "title_bonus": title_bonus,
         }
@@ -738,8 +972,13 @@ __all__ = [
     "infer_search_section_bucket",
     "section_bucket_multiplier",
     "query_token_stats",
+    "infer_localization_query_profile",
+    "infer_localization_section_role",
     "paper_title_bonus_lookup",
     "annotate_hit_query_support",
+    "localization_score_for_hit",
+    "rerank_section_hits_for_localization",
+    "search_paper_sections_for_localization",
     "section_passes_search_gate",
     "filter_section_hits_for_query",
     "paper_passes_search_gate",

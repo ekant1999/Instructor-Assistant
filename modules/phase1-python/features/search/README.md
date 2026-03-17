@@ -17,6 +17,7 @@ Files:
   - no-match gating
   - title rescue
   - section-to-paper aggregation
+  - post-ranking localization reranking for picking a better page/section hit inside the selected paper
 
 ## APIs
 
@@ -44,7 +45,12 @@ Files:
   - `infer_search_section_bucket(...)`
   - `section_bucket_multiplier(...)`
   - `query_token_stats(...)`
+  - `infer_localization_query_profile(...)`
+  - `infer_localization_section_role(...)`
   - `paper_title_bonus_lookup(...)`
+  - `localization_score_for_hit(...)`
+  - `rerank_section_hits_for_localization(...)`
+  - `search_paper_sections_for_localization(...)`
   - `filter_section_hits_for_query(...)`
   - `filter_aggregated_papers_for_query(...)`
   - `inject_title_only_candidates(...)`
@@ -73,6 +79,7 @@ from ia_phase1.search_pipeline import (
     configure_connection_factory,
     filter_section_hits_for_query,
     aggregate_section_hits_to_papers,
+    search_paper_sections_for_localization,
     search_section_hits_unified,
 )
 
@@ -89,6 +96,16 @@ section_hits = search_section_hits_unified(
 )
 section_hits = filter_section_hits_for_query("large language model", section_hits)
 paper_scores = aggregate_section_hits_to_papers(section_hits)
+top_paper_id = max(paper_scores.items(), key=lambda item: item[1]["score"])[0]
+localized_hits = search_paper_sections_for_localization(
+    "large language model",
+    "hybrid",
+    paper_id=top_paper_id,
+    keyword_section_hits_fn=keyword_section_hits_fn,
+    semantic_section_hits_fn=semantic_section_hits_fn,
+    include_text=False,
+    max_chars=None,
+)
 ```
 
 ## Runnable Example
@@ -123,5 +140,6 @@ Notes:
   - query gating
   - title rescue
   - section-to-paper aggregation
+  - post-ranking intra-paper localization reranking
 
 That keeps the package reusable while avoiding hard-coupling it to one backend runtime.

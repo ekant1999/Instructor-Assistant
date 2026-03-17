@@ -14,7 +14,7 @@ Reusable Python modules extracted from the Instructor Assistant ingestion pipeli
 - `ia_phase1.search_keyword`: keyword search utilities for SQLite-backed library data.
 - `ia_phase1.search_hybrid`: pgvector + PostgreSQL FTS hybrid retrieval helpers.
 - `ia_phase1.search_context`: section match localization/snippet helpers.
-- `ia_phase1.search_pipeline`: unified search scoring, gating, merging, title rescue, and section-to-paper aggregation helpers.
+- `ia_phase1.search_pipeline`: unified search scoring, gating, merging, title rescue, section-to-paper aggregation, and post-ranking intra-paper localization helpers.
 
 ## Install
 

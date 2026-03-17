@@ -235,6 +235,29 @@ async def _run_query_async(backend_main: Any, store: Any, pool: Any, query: str,
         key=lambda item: float(item["score"]),
         reverse=True,
     )
+    if ranking:
+        top_paper_id = int(ranking[0]["paper_id"])
+        localized_keyword_hits = backend_main._keyword_section_hits(
+            query,
+            [top_paper_id],
+            include_text=False,
+            max_chars=None,
+            limit=100,
+        )
+        localized_semantic_hits = await _pgvector_search_section_hits_async(
+            backend_main,
+            store=store,
+            pool=pool,
+            query=query,
+            paper_ids=[top_paper_id],
+            limit=100,
+        )
+        localized_hits = backend_main._merge_section_hits(localized_keyword_hits, localized_semantic_hits, limit=100)
+        localized_hits = backend_main._filter_section_hits_for_query(query, localized_hits)
+        localized_hits = backend_main._rerank_section_hits_for_localization(query, localized_hits)
+        if localized_hits:
+            ranking[0]["best_hit"] = localized_hits[0]
+            ranking[0]["localized_hits"] = localized_hits[:3]
     latency_ms = (time.perf_counter() - start) * 1000.0
     return {
         "query": query,

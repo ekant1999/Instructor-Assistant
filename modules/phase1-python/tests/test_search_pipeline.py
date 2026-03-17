@@ -13,6 +13,8 @@ from ia_phase1.search_pipeline import (
     inject_title_only_candidates,
     merge_section_hits,
     paper_title_bonus_lookup,
+    rerank_section_hits_for_localization,
+    search_paper_sections_for_localization,
     search_section_hits_unified,
 )
 
@@ -187,6 +189,123 @@ def test_search_section_hits_unified_uses_callbacks_and_hybrid_merge() -> None:
     assert len(hits) == 1
     assert hits[0]["id"] == 51
     assert hits[0]["match_score"] > 0.40
+
+
+def test_rerank_section_hits_for_localization_prefers_method_section_for_method_query() -> None:
+    conn = _build_conn()
+    try:
+        configure_connection_factory(lambda: _conn_factory(conn))
+        reranked = rerank_section_hits_for_localization(
+            "feature matching method",
+            [
+                {
+                    "id": 1,
+                    "paper_id": 7,
+                    "page_no": 1,
+                    "match_score": 0.16,
+                    "lex_hits": 2,
+                    "content_hits": 2,
+                    "search_bucket": "body",
+                    "match_section_canonical": "abstract",
+                    "source_text": "We study a feature matching method for language models.",
+                },
+                {
+                    "id": 2,
+                    "paper_id": 7,
+                    "page_no": 4,
+                    "match_score": 0.14,
+                    "lex_hits": 2,
+                    "content_hits": 2,
+                    "search_bucket": "body",
+                    "match_section_canonical": "methodology",
+                    "source_text": "Our method uses feature matching objectives and block-parallel rollouts.",
+                },
+            ],
+        )
+        assert reranked[0]["id"] == 2
+        assert reranked[0]["localization_score"] > reranked[1]["localization_score"]
+    finally:
+        conn.close()
+
+
+def test_aggregate_section_hits_to_papers_keeps_ranking_best_hit() -> None:
+    conn = _build_conn()
+    try:
+        configure_connection_factory(lambda: _conn_factory(conn))
+        aggregated = aggregate_section_hits_to_papers(
+            [
+                {
+                    "id": 1,
+                    "paper_id": 10,
+                    "page_no": 1,
+                    "match_score": 0.22,
+                    "lex_hits": 3,
+                    "search_bucket": "body",
+                    "match_section_canonical": "abstract",
+                    "source_text": "This benchmark improves evaluation quality for scientific documents.",
+                },
+                {
+                    "id": 2,
+                    "paper_id": 10,
+                    "page_no": 6,
+                    "match_score": 0.18,
+                    "lex_hits": 3,
+                    "search_bucket": "body",
+                    "match_section_canonical": "experiments",
+                    "source_text": "Evaluation benchmark results and experiments are reported here.",
+                },
+            ],
+            {10: 0.0},
+        )
+        assert aggregated[10]["ranking_best_hit"]["id"] == 1
+        assert aggregated[10]["best_hit"]["id"] == 1
+    finally:
+        conn.close()
+
+
+def test_search_paper_sections_for_localization_prefers_evaluation_section_after_ranking() -> None:
+    conn = _build_conn()
+    try:
+        configure_connection_factory(lambda: _conn_factory(conn))
+        hits = search_paper_sections_for_localization(
+            "evaluation benchmark results",
+            "hybrid",
+            10,
+            keyword_section_hits_fn=lambda *args, **kwargs: [
+                {
+                    "id": 1,
+                    "paper_id": 10,
+                    "page_no": 1,
+                    "match_score": 0.22,
+                    "keyword_score": 0.22,
+                    "semantic_score": 0.0,
+                    "lex_hits": 3,
+                    "search_bucket": "body",
+                    "match_section_canonical": "abstract",
+                    "source_text": "This benchmark improves evaluation quality for scientific documents.",
+                },
+                {
+                    "id": 2,
+                    "paper_id": 10,
+                    "page_no": 6,
+                    "match_score": 0.18,
+                    "keyword_score": 0.18,
+                    "semantic_score": 0.0,
+                    "lex_hits": 3,
+                    "search_bucket": "body",
+                    "match_section_canonical": "experiments",
+                    "source_text": "Evaluation benchmark results and experiments are reported here.",
+                },
+            ],
+            semantic_section_hits_fn=lambda *args, **kwargs: [],
+            include_text=False,
+            max_chars=None,
+            limit=20,
+        )
+        assert hits[0]["id"] == 2
+        assert hits[0]["localization_score"] > hits[1]["localization_score"]
+    finally:
+        conn.close()
 
 
 def test_infer_search_section_bucket_detects_reference_and_front_matter() -> None:

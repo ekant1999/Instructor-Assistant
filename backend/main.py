@@ -62,6 +62,7 @@ from backend.core.search_pipeline import (
     annotate_hit_query_support as _annotate_hit_query_support_impl,
     filter_aggregated_papers_for_query as _filter_aggregated_papers_for_query_impl,
     filter_section_hits_for_query as _filter_section_hits_for_query_impl,
+    rerank_section_hits_for_localization as _rerank_section_hits_for_localization_impl,
     infer_search_section_bucket as _infer_search_section_bucket_impl,
     inject_title_only_candidates as _inject_title_only_candidates_impl,
     merge_section_hits as _merge_section_hits_impl,
@@ -69,6 +70,7 @@ from backend.core.search_pipeline import (
     paper_title_bonus_lookup as _paper_title_bonus_lookup_impl,
     query_token_stats as _query_token_stats_impl,
     rrf_score as _rrf_score_impl,
+    search_paper_sections_for_localization as _search_paper_sections_for_localization_impl,
     search_section_hits_unified as _search_section_hits_unified_impl,
     section_bucket_multiplier as _section_bucket_multiplier_impl,
     section_passes_search_gate as _section_passes_search_gate_impl,
@@ -459,7 +461,7 @@ def _token_overlap(tokens: List[str], text: str) -> int:
 
 
 def _paper_title_bonus_lookup(query: str, limit: int = 100) -> Dict[int, float]:
-    return _paper_title_bonus_lookup_impl(query, limit=limit)
+    return _paper_title_bonus_lookup_impl(query, limit=limit, get_conn_fn=get_conn)
 
 
 _REFERENCE_HEADING_RE = re.compile(r"^\s*(references|bibliography)\b", re.I)
@@ -581,7 +583,7 @@ def _content_query_tokens(query: str) -> List[str]:
 
 
 def _query_token_stats(query: str) -> Dict[str, Any]:
-    return _query_token_stats_impl(query)
+    return _query_token_stats_impl(query, get_conn_fn=get_conn)
 
 
 def _content_token_hits(tokens: List[str], text: str) -> int:
@@ -639,28 +641,57 @@ def _section_passes_search_gate(
 
 
 def _filter_section_hits_for_query(query: str, hits: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    return _filter_section_hits_for_query_impl(query, hits)
+    return _filter_section_hits_for_query_impl(query, hits, get_conn_fn=get_conn)
 
 
 def _paper_passes_search_gate(
     query: str,
     paper_meta: Dict[str, Any],
 ) -> bool:
-    return _paper_passes_search_gate_impl(query, paper_meta)
+    return _paper_passes_search_gate_impl(query, paper_meta, get_conn_fn=get_conn)
 
 
 def _filter_aggregated_papers_for_query(
     query: str,
     aggregated: Dict[int, Dict[str, Any]],
 ) -> Dict[int, Dict[str, Any]]:
-    return _filter_aggregated_papers_for_query_impl(query, aggregated)
+    return _filter_aggregated_papers_for_query_impl(query, aggregated, get_conn_fn=get_conn)
 
 
 def _inject_title_only_candidates(
     aggregated: Dict[int, Dict[str, Any]],
     title_bonus_by_id: Dict[int, float],
 ) -> Dict[int, Dict[str, Any]]:
-    return _inject_title_only_candidates_impl(aggregated, title_bonus_by_id)
+    return _inject_title_only_candidates_impl(aggregated, title_bonus_by_id, get_conn_fn=get_conn)
+
+
+def _rerank_section_hits_for_localization(
+    query: str,
+    hits: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    return _rerank_section_hits_for_localization_impl(query, hits, get_conn_fn=get_conn)
+
+
+def _search_paper_sections_for_localization(
+    query: str,
+    search_type: str,
+    paper_id: int,
+    *,
+    include_text: bool,
+    max_chars: Optional[int],
+    limit: int = 100,
+) -> List[Dict[str, Any]]:
+    return _search_paper_sections_for_localization_impl(
+        query,
+        search_type,
+        paper_id,
+        keyword_section_hits_fn=_keyword_section_hits,
+        semantic_section_hits_fn=_pgvector_search_section_hits,
+        include_text=include_text,
+        max_chars=max_chars,
+        limit=limit,
+        get_conn_fn=get_conn,
+    )
 
 
 def _keyword_section_hits(
@@ -941,8 +972,14 @@ def _search_section_hits_unified(
 def _aggregate_section_hits_to_papers(
     section_hits: List[Dict[str, Any]],
     title_bonus_by_id: Optional[Dict[int, float]] = None,
+    *,
+    query: Optional[str] = None,
 ) -> Dict[int, Dict[str, Any]]:
-    return _aggregate_section_hits_to_papers_impl(section_hits, title_bonus_by_id)
+    return _aggregate_section_hits_to_papers_impl(
+        section_hits,
+        title_bonus_by_id,
+        get_conn_fn=get_conn,
+    )
 
 
 def _pgvector_search_sections(
@@ -1484,15 +1521,14 @@ def list_paper_sections(
         cached = get_cached_section_search(cache_key)
         if cached is not None:
             return cached
-        sections = _search_section_hits_unified(
+        sections = _search_paper_sections_for_localization(
             q,
             st,
-            paper_ids=[paper_id],
+            paper_id,
             include_text=include_text,
             max_chars=max_chars,
             limit=100,
         )
-        sections = _filter_section_hits_for_query(q, sections)
         response = {"sections": sections}
         set_cached_section_search(cache_key, response)
         return response
