@@ -19,6 +19,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.core.database import get_conn, init_db
+from backend.core.async_utils import run_async_blocking
 from backend.core.postgres import init_db as init_pg_db
 from backend.core.search_cache import (
     bump_search_index_version,
@@ -415,41 +416,42 @@ async def _ingest_web_papers(papers: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 def _pgvector_search_paper_ids(query: str, search_type: str, limit: int = 100) -> Dict[int, float]:
     async def _run() -> Dict[int, float]:
-        alpha_raw = os.getenv("HYBRID_SEARCH_ALPHA", "0.5")
         try:
-            alpha = float(alpha_raw)
-        except ValueError:
-            alpha = 0.5
-        pool = await get_pg_pool()
-        store = PgVectorStore(pool)
-        retrieve_k = max(20, min(limit * 5, 300))
-        if search_type == "embedding":
-            results = await store.similarity_search(query, k=retrieve_k)
-        elif search_type == "keyword":
-            results = await full_text_search(query, pool, k=retrieve_k)
-        else:
-            results = await hybrid_search(query, store, pool, k=retrieve_k, alpha=alpha)
-        score_by_id: Dict[int, float] = {}
-        for row in results or []:
-            pid = row.get("paper_id")
-            if pid is None:
-                continue
-            score = _pgvector_score(row)
-            prev = score_by_id.get(pid)
-            if prev is None or score > prev:
-                score_by_id[pid] = score
-        return score_by_id
+            alpha_raw = os.getenv("HYBRID_SEARCH_ALPHA", "0.5")
+            try:
+                alpha = float(alpha_raw)
+            except ValueError:
+                alpha = 0.5
+            pool = await get_pg_pool()
+            store = PgVectorStore(pool)
+            retrieve_k = max(20, min(limit * 5, 300))
+            if search_type == "embedding":
+                results = await store.similarity_search(query, k=retrieve_k)
+            elif search_type == "keyword":
+                results = await full_text_search(query, pool, k=retrieve_k)
+            else:
+                results = await hybrid_search(query, store, pool, k=retrieve_k, alpha=alpha)
+            score_by_id: Dict[int, float] = {}
+            for row in results or []:
+                pid = row.get("paper_id")
+                if pid is None:
+                    continue
+                score = _pgvector_score(row)
+                prev = score_by_id.get(pid)
+                if prev is None or score > prev:
+                    score_by_id[pid] = score
+            return score_by_id
+        finally:
+            try:
+                await close_pg_pool()
+            except Exception:
+                pass
 
     try:
-        return asyncio.run(_run())
+        return run_async_blocking(_run)
     except Exception:
         logger.exception("pgvector search failed; falling back to SQLite search")
         return {}
-    finally:
-        try:
-            asyncio.run(close_pg_pool())
-        except Exception:
-            pass
 
 
 def _rrf_score(rank_index: int, k: int = 20) -> float:
@@ -769,30 +771,31 @@ def _pgvector_search_section_hits(
     limit: int = 100,
 ) -> List[Dict[str, Any]]:
     async def _run() -> List[Dict[str, Any]]:
-        alpha_raw = os.getenv("HYBRID_SEARCH_ALPHA", "0.5")
         try:
-            alpha = float(alpha_raw)
-        except ValueError:
-            alpha = 0.5
-        pool = await get_pg_pool()
-        store = PgVectorStore(pool)
-        retrieve_k = max(20, min(limit * 5, 300))
-        if search_type == "embedding":
-            return await store.similarity_search(query, k=retrieve_k, paper_ids=paper_ids)
-        if search_type == "keyword":
-            return await full_text_search(query, pool, k=retrieve_k, paper_ids=paper_ids)
-        return await hybrid_search(query, store, pool, k=retrieve_k, paper_ids=paper_ids, alpha=alpha)
+            alpha_raw = os.getenv("HYBRID_SEARCH_ALPHA", "0.5")
+            try:
+                alpha = float(alpha_raw)
+            except ValueError:
+                alpha = 0.5
+            pool = await get_pg_pool()
+            store = PgVectorStore(pool)
+            retrieve_k = max(20, min(limit * 5, 300))
+            if search_type == "embedding":
+                return await store.similarity_search(query, k=retrieve_k, paper_ids=paper_ids)
+            if search_type == "keyword":
+                return await full_text_search(query, pool, k=retrieve_k, paper_ids=paper_ids)
+            return await hybrid_search(query, store, pool, k=retrieve_k, paper_ids=paper_ids, alpha=alpha)
+        finally:
+            try:
+                await close_pg_pool()
+            except Exception:
+                pass
 
     try:
-        results = asyncio.run(_run())
+        results = run_async_blocking(_run)
     except Exception:
         logger.exception("pgvector section search failed; falling back to SQLite search")
         return []
-    finally:
-        try:
-            asyncio.run(close_pg_pool())
-        except Exception:
-            pass
 
     if not results:
         return []

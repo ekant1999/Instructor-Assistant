@@ -228,6 +228,46 @@ def test_rerank_section_hits_for_localization_prefers_method_section_for_method_
         conn.close()
 
 
+def test_rerank_section_hits_for_localization_does_not_auto_prefer_method_for_overview_query() -> None:
+    conn = _build_conn()
+    try:
+        configure_connection_factory(lambda: _conn_factory(conn))
+        reranked = rerank_section_hits_for_localization(
+            "image text alignment clip",
+            [
+                {
+                    "id": 1,
+                    "paper_id": 7,
+                    "page_no": 2,
+                    "match_score": 0.105,
+                    "block_match_score": 9.1,
+                    "lex_hits": 4,
+                    "search_bucket": "body",
+                    "match_section_canonical": "abstract",
+                    "source_text": "CLIP performs image-text alignment for vision-language training.",
+                },
+                {
+                    "id": 2,
+                    "paper_id": 7,
+                    "page_no": 7,
+                    "match_score": 0.086,
+                    "block_match_score": 7.95,
+                    "lex_hits": 4,
+                    "search_bucket": "body",
+                    "match_section_canonical": "methodology",
+                    "source_text": (
+                        "The backbone uses CLIP outputs and computes image and text logits in a "
+                        "later alignment stage for adaptive foreground routing."
+                    ),
+                },
+            ],
+        )
+        assert reranked[0]["id"] == 1
+        assert reranked[0]["localization_score"] > reranked[1]["localization_score"]
+    finally:
+        conn.close()
+
+
 def test_aggregate_section_hits_to_papers_keeps_ranking_best_hit() -> None:
     conn = _build_conn()
     try:

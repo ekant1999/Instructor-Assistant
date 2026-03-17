@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from pypdf import PdfReader
 
 USER_AGENT = "ia-phase1-parser/0.1 (+https://example.local)"
+_SURROGATE_RE = re.compile(r"[\ud800-\udfff]")
 
 
 def _default_pdf_dir() -> Path:
@@ -22,6 +23,11 @@ def _default_pdf_dir() -> Path:
 def _safe_filename(seed: str) -> str:
     h = hashlib.sha256(seed.encode("utf-8")).hexdigest()[:16]
     return f"{h}.pdf"
+
+
+def _sanitize_extracted_text(value: Any) -> str:
+    text = str(value or "").replace("\x00", "")
+    return _SURROGATE_RE.sub("\uFFFD", text)
 
 
 def _safe_float(value: Any, default: float = 0.0) -> float:
@@ -88,7 +94,7 @@ def _join_line_spans(spans: List[Dict[str, Any]]) -> str:
     prev_text = ""
     prev_x1: Optional[float] = None
     for span in ordered:
-        span_text = str(span.get("text") or "").replace("\x00", "")
+        span_text = _sanitize_extracted_text(span.get("text"))
         if not span_text.strip():
             continue
         x0 = _span_x0(span)
@@ -193,7 +199,7 @@ def extract_pages(pdf_path: Path) -> List[Tuple[int, str]]:
     pages: List[Tuple[int, str]] = []
     reader = PdfReader(str(pdf_path))
     for idx, page in enumerate(reader.pages):
-        text = (page.extract_text() or "").replace("\x00", "")
+        text = _sanitize_extracted_text(page.extract_text())
         pages.append((idx + 1, text))
     return pages
 
@@ -229,7 +235,7 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
                     spans = line.get("spans", [])
                     line_spans: List[Dict[str, Any]] = []
                     for span in spans:
-                        span_text = str(span.get("text") or "").replace("\x00", "")
+                        span_text = _sanitize_extracted_text(span.get("text"))
                         if not span_text.strip():
                             continue
                         size = span.get("size")
@@ -260,7 +266,7 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
                             }
                         )
 
-                text = "\n".join(text_lines).strip().replace("\x00", "")
+                text = _sanitize_extracted_text("\n".join(text_lines).strip())
                 if not text:
                     continue
 

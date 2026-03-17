@@ -285,10 +285,22 @@ def _evaluate_result(result: Dict[str, Any], gold: Dict[str, Any]) -> Dict[str, 
                 break
 
     top_hit = ranking[0]["best_hit"] if ranking else {}
+    localized_hits = ranking[0].get("localized_hits") if ranking else None
+    if localized_hits is None:
+        localized_hits = [top_hit] if top_hit else []
     gold_pages = [int(page) for page in gold.get("gold_pages") or []]
     gold_sections = [str(section) for section in gold.get("gold_section_canonicals") or []]
     page_hit = bool(gold_pages) and int(top_hit.get("page_no") or -1) in gold_pages
     section_hit = bool(gold_sections) and str(top_hit.get("match_section_canonical") or "") in gold_sections
+    page_hit_at_3 = bool(gold_pages) and any(
+        int(hit.get("page_no") or -1) in gold_pages for hit in localized_hits[:3]
+    )
+    section_hit_at_3 = bool(gold_sections) and any(
+        str(hit.get("match_section_canonical") or "") in gold_sections for hit in localized_hits[:3]
+    )
+    section_hit_in_top_5 = bool(gold_sections) and any(
+        str(hit.get("match_section_canonical") or "") in gold_sections for hit in localized_hits[:5]
+    )
 
     return {
         "query_id": gold["query_id"],
@@ -302,9 +314,13 @@ def _evaluate_result(result: Dict[str, Any], gold: Dict[str, Any]) -> Dict[str, 
         "paper_hit_at_5": any(pid in expected_ids for pid in ranked_ids[:5]) if expected_ids else paper_ok,
         "reciprocal_rank": reciprocal_rank,
         "page_hit_at_1": page_hit,
+        "page_hit_at_3": page_hit_at_3,
         "section_hit_at_1": section_hit,
+        "section_hit_at_3": section_hit_at_3,
+        "section_hit_in_top_5": section_hit_in_top_5,
         "latency_ms": result["latency_ms"],
         "top_hit": top_hit,
+        "localized_hits": localized_hits[:5],
         "notes": gold.get("notes"),
     }
 
@@ -358,15 +374,18 @@ def _build_markdown_report(
             f"- mrr: `{summary['mrr']:.3f}`",
             f"- no_match_accuracy: `{summary['no_match_accuracy']:.3f}`",
             f"- page_hit_at_1: `{summary['page_hit_at_1']:.3f}`",
+            f"- page_hit_at_3: `{summary['page_hit_at_3']:.3f}`",
             f"- section_hit_at_1: `{summary['section_hit_at_1']:.3f}`",
+            f"- section_hit_at_3: `{summary['section_hit_at_3']:.3f}`",
+            f"- section_hit_in_top_5: `{summary['section_hit_in_top_5']:.3f}`",
             f"- latency_mean_ms: `{summary['latency_mean_ms']:.1f}`",
             f"- latency_p50_ms: `{summary['latency_p50_ms']:.1f}`",
             f"- latency_p95_ms: `{summary['latency_p95_ms']:.1f}`",
             "",
             "## Per-Query Results",
             "",
-            "| Query | Type | Top Paper | Correct | Page Hit | Section Hit |",
-            "|---|---|---|---|---|---|",
+            "| Query | Type | Top Paper | Correct | Page@1 | Page@3 | Section@1 | Section@3 | Section@5 |",
+            "|---|---|---|---|---|---|---|---|---|",
         ]
     )
     for row in evaluated_rows:
@@ -376,7 +395,10 @@ def _build_markdown_report(
             f"| {row['query']} | {row.get('query_type') or ''} | {top_label} | "
             f"{'yes' if row['paper_hit_at_1'] else 'no'} | "
             f"{'yes' if row['page_hit_at_1'] else 'no'} | "
-            f"{'yes' if row['section_hit_at_1'] else 'no'} |"
+            f"{'yes' if row['page_hit_at_3'] else 'no'} | "
+            f"{'yes' if row['section_hit_at_1'] else 'no'} | "
+            f"{'yes' if row['section_hit_at_3'] else 'no'} | "
+            f"{'yes' if row['section_hit_in_top_5'] else 'no'} |"
         )
 
     failures = [row for row in evaluated_rows if not row["paper_hit_at_1"]]
@@ -387,8 +409,8 @@ def _build_markdown_report(
             "",
             f"- Top-1 paper accuracy is `{summary['hit_at_1']:.3f}` on this benchmark.",
             f"- No-match accuracy is `{summary['no_match_accuracy']:.3f}` on the unsupported-query slice.",
-            f"- Page localization is weak at `{summary['page_hit_at_1']:.3f}`.",
-            f"- Section localization is better than page localization but still limited at `{summary['section_hit_at_1']:.3f}`.",
+            f"- Page localization is `{summary['page_hit_at_1']:.3f}` at top-1 and `{summary['page_hit_at_3']:.3f}` within the top 3 localized hits.",
+            f"- Section localization is `{summary['section_hit_at_1']:.3f}` at top-1, `{summary['section_hit_at_3']:.3f}` within the top 3 localized hits, and `{summary['section_hit_in_top_5']:.3f}` within the top 5 localized hits.",
             "",
             "## Failure Cases",
             "",
@@ -427,8 +449,11 @@ async def _main_async() -> None:
     no_match_ok = 0
     page_rows = 0
     page_ok = 0
+    page_ok_at_3 = 0
     section_rows = 0
     section_ok = 0
+    section_ok_at_3 = 0
+    section_ok_in_top_5 = 0
 
     for gold in gold_rows:
         result = await _run_query_async(backend_main, store, pool, str(gold["query"]), paper_ids)
@@ -443,10 +468,16 @@ async def _main_async() -> None:
             page_rows += 1
             if eval_row["page_hit_at_1"]:
                 page_ok += 1
+            if eval_row["page_hit_at_3"]:
+                page_ok_at_3 += 1
         if gold.get("gold_section_canonicals"):
             section_rows += 1
             if eval_row["section_hit_at_1"]:
                 section_ok += 1
+            if eval_row["section_hit_at_3"]:
+                section_ok_at_3 += 1
+            if eval_row["section_hit_in_top_5"]:
+                section_ok_in_top_5 += 1
 
     summary = {
         "hit_at_1": sum(1 for row in evaluated_rows if row["paper_hit_at_1"]) / len(evaluated_rows),
@@ -455,7 +486,10 @@ async def _main_async() -> None:
         "mrr": sum(float(row["reciprocal_rank"]) for row in evaluated_rows) / len(evaluated_rows),
         "no_match_accuracy": (no_match_ok / no_match_rows) if no_match_rows else 0.0,
         "page_hit_at_1": (page_ok / page_rows) if page_rows else 0.0,
+        "page_hit_at_3": (page_ok_at_3 / page_rows) if page_rows else 0.0,
         "section_hit_at_1": (section_ok / section_rows) if section_rows else 0.0,
+        "section_hit_at_3": (section_ok_at_3 / section_rows) if section_rows else 0.0,
+        "section_hit_in_top_5": (section_ok_in_top_5 / section_rows) if section_rows else 0.0,
         "latency_mean_ms": statistics.fmean(latencies) if latencies else 0.0,
         "latency_p50_ms": _percentile(sorted(latencies), 0.50),
         "latency_p95_ms": _percentile(sorted(latencies), 0.95),

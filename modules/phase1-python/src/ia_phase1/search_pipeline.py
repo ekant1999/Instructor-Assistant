@@ -4,7 +4,7 @@ import math
 import re
 from typing import Any, Callable, Dict, List, Optional
 
-from .search_context import query_tokens
+from .search_context import query_tokens, sentence_focus_features
 
 _REFERENCE_HEADING_RE = re.compile(r"^\s*(references|bibliography)\b", re.I)
 _REFERENCE_SIGNAL_RE = re.compile(
@@ -374,6 +374,7 @@ def annotate_hit_query_support(hit: Dict[str, Any], *, query_stats: Dict[str, An
     content_tokens = list(query_stats.get("content_tokens") or [])
     rare_tokens = list(query_stats.get("rare_tokens") or [])
     token_stats = dict(query_stats.get("token_stats") or {})
+    query = str(query_stats.get("query") or "")
     source_text = str(
         hit.get("source_text")
         or hit.get("match_text")
@@ -385,6 +386,13 @@ def annotate_hit_query_support(hit: Dict[str, Any], *, query_stats: Dict[str, An
     hit["rare_hits"] = content_token_hits(rare_tokens, source_text)
     hit["rare_token_count"] = len(rare_tokens)
     hit["weighted_hit_ratio"] = weighted_token_coverage(token_stats, source_text)
+    sentence_focus = sentence_focus_features(query, content_tokens, source_text)
+    hit["sentence_hits"] = int(sentence_focus.get("sentence_hits", 0))
+    hit["sentence_ratio"] = safe_float(sentence_focus.get("sentence_ratio"))
+    hit["sentence_compactness"] = safe_float(sentence_focus.get("sentence_compactness"))
+    hit["sentence_exact"] = bool(sentence_focus.get("sentence_exact"))
+    hit["sentence_explanatory"] = bool(sentence_focus.get("sentence_explanatory"))
+    hit["sentence_len"] = safe_int(sentence_focus.get("sentence_len"))
     return hit
 
 
@@ -395,6 +403,7 @@ def localization_score_for_hit(
     get_conn_fn: Optional[ConnectionFactory] = None,
 ) -> float:
     stats = query_token_stats(query, get_conn_fn=get_conn_fn)
+    stats["query"] = query
     profile = infer_localization_query_profile(query)
     annotated = annotate_hit_query_support(dict(hit), query_stats=stats)
     return _localization_score_for_annotated_hit(annotated, profile=profile)
@@ -405,10 +414,23 @@ def _localization_score_for_annotated_hit(hit: Dict[str, Any], *, profile: Dict[
     score += min(safe_int(hit.get("content_hits")), 4) * 0.015
     score += min(safe_int(hit.get("lex_hits")), 4) * 0.008
     score += min(safe_float(hit.get("block_match_score")), 12.0) * 0.002
+    score += min(safe_int(hit.get("sentence_hits")), 4) * 0.010
+    score += min(1.0, safe_float(hit.get("sentence_compactness"))) * 0.055
 
     exact_phrase = bool(hit.get("exact_phrase"))
     if exact_phrase:
         score += 0.08
+
+    sentence_exact = bool(hit.get("sentence_exact"))
+    sentence_explanatory = bool(hit.get("sentence_explanatory"))
+    sentence_ratio = safe_float(hit.get("sentence_ratio"))
+    sentence_len = safe_int(hit.get("sentence_len"))
+    if sentence_exact:
+        score += 0.035
+    if sentence_explanatory and sentence_ratio >= 0.75:
+        score += 0.05
+    if sentence_len and sentence_len <= 180 and sentence_ratio >= 0.75:
+        score += 0.03
 
     bucket = str(hit.get("search_bucket") or "body").strip().lower()
     if bucket == "references":
@@ -418,11 +440,23 @@ def _localization_score_for_annotated_hit(hit: Dict[str, Any], *, profile: Dict[
 
     role = infer_localization_section_role(hit.get("match_section_canonical"))
     if role == "abstract":
-        score -= 0.05
-        if profile.get("overview_like") and exact_phrase:
-            score += 0.02
+        if profile.get("overview_like"):
+            score -= 0.01
+            if sentence_ratio >= 0.75:
+                score += 0.03
+            if sentence_explanatory and sentence_len and sentence_len <= 180:
+                score += 0.03
+            if exact_phrase:
+                score += 0.02
+        else:
+            score -= 0.05
+            if exact_phrase:
+                score += 0.02
     elif role == "intro":
-        score -= 0.03
+        if profile.get("overview_like") and sentence_ratio >= 0.75:
+            score -= 0.005
+        else:
+            score -= 0.03
     elif role == "conclusion":
         score -= 0.05
         if profile.get("analysis_like") or profile.get("result_like"):
@@ -432,8 +466,6 @@ def _localization_score_for_annotated_hit(hit: Dict[str, Any], *, profile: Dict[
     elif role == "method":
         if profile.get("method_like"):
             score += 0.08
-        elif profile.get("overview_like"):
-            score += 0.03
         else:
             score += 0.01
     elif role == "evaluation":
@@ -482,6 +514,7 @@ def rerank_section_hits_for_localization(
     get_conn_fn: Optional[ConnectionFactory] = None,
 ) -> List[Dict[str, Any]]:
     stats = query_token_stats(query, get_conn_fn=get_conn_fn)
+    stats["query"] = query
     profile = infer_localization_query_profile(query)
     return _rerank_section_hits_for_localization_with_stats(hits, query_stats=stats, profile=profile)
 

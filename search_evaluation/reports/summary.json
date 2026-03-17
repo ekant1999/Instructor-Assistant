@@ -1,0 +1,15 @@
+{
+  "hit_at_1": 0.91,
+  "hit_at_3": 0.92,
+  "hit_at_5": 0.92,
+  "mrr": 0.9133333333333334,
+  "no_match_accuracy": 0.8,
+  "page_hit_at_1": 0.25,
+  "page_hit_at_3": 0.5125,
+  "section_hit_at_1": 0.675,
+  "section_hit_at_3": 0.8125,
+  "section_hit_in_top_5": 0.8125,
+  "latency_mean_ms": 1352.8351962153101,
+  "latency_p50_ms": 1497.9446039942559,
+  "latency_p95_ms": 2018.924548191717
+}

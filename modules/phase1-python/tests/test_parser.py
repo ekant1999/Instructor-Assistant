@@ -7,6 +7,11 @@ import pytest
 from ia_phase1 import parser
 
 
+def test_sanitize_extracted_text_removes_invalid_unicode() -> None:
+    cleaned = parser._sanitize_extracted_text("A\x00B\ud835C")
+    assert cleaned == "AB\uFFFDC"
+
+
 def test_extract_pages_and_blocks(sample_pdf: Path) -> None:
     pages = parser.extract_pages(sample_pdf)
     assert len(pages) == 2

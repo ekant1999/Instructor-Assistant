@@ -27,11 +27,7 @@ coverage.xml
 htmlcov/
 
 # Search evaluation generated artifacts
-search_evaluation/pdfs/
-search_evaluation/reviews/
-search_evaluation/runs/
 search_evaluation/state/
-search_evaluation/reports/
 search_evaluation/*_backup.jsonl
 
 # Python packaging metadata

@@ -88,6 +88,42 @@ def test_select_block_for_query_prefers_exact_phrase_over_token_overlap() -> Non
     assert bool(best.get("exact_phrase"))
 
 
+def test_select_block_for_query_prefers_concise_explanatory_sentence_for_overview_query() -> None:
+    row = {
+        "page_no": 2,
+        "block_index": 7,
+        "bbox": {"x0": 0, "y0": 0, "x1": 10, "y1": 10},
+        "text": "fallback text",
+        "metadata": {
+            "section_primary": "methodology",
+            "blocks": [
+                {
+                    "page_no": 2,
+                    "block_index": 3,
+                    "text": (
+                        "The backbone uses CLIP features and computes image and text logits in a "
+                        "later alignment stage for adaptive foreground routing."
+                    ),
+                    "metadata": {"section_canonical": "methodology"},
+                },
+                {
+                    "page_no": 2,
+                    "block_index": 4,
+                    "text": "CLIP performs image-text alignment for vision-language representations.",
+                    "metadata": {"section_canonical": "abstract"},
+                },
+            ],
+        },
+    }
+    best = select_block_for_query(
+        row,
+        ["image", "text", "alignment", "clip"],
+        query="image text alignment clip",
+    )
+    assert best["block_index"] == 4
+    assert best["section_canonical"] == "abstract"
+
+
 def test_select_block_for_query_keeps_zero_block_index() -> None:
     row = {
         "page_no": 5,

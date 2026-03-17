@@ -17,6 +17,30 @@ fixed arXiv PDF corpus.
 
 ## Workflow
 
+Fast path for the full flow:
+
+```bash
+backend/.webenv/bin/python search_evaluation/scripts/run_full_benchmark.py
+```
+
+By default, this **does not fetch a new corpus**. It reuses the current
+`metadata.jsonl` and current benchmark PDFs, which is the safe mode for a
+manually curated gold set.
+
+Useful flags:
+
+```bash
+backend/.webenv/bin/python search_evaluation/scripts/run_full_benchmark.py --fetch
+backend/.webenv/bin/python search_evaluation/scripts/run_full_benchmark.py --refresh-fetch
+backend/.webenv/bin/python search_evaluation/scripts/run_full_benchmark.py --skip-cleanup
+```
+
+Use `--fetch` only when you intentionally want to create a new benchmark corpus.
+If you fetch a new corpus, you must also manually recurate
+`gold.jsonl`.
+
+Expanded step-by-step flow:
+
 1. Download a 20-paper arXiv corpus:
 
 ```bash
@@ -29,24 +53,23 @@ backend/.webenv/bin/python search_evaluation/scripts/fetch_arxiv_papers.py
 backend/.webenv/bin/python search_evaluation/scripts/build_eval_corpus.py
 ```
 
-3. Extract compact review summaries from each PDF for manual curation:
-
+3. Extract compact review summaries from each PDF for manual curation (optional):
 ```bash
 backend/.webenv/bin/python search_evaluation/scripts/review_papers.py
 ```
 
-4. Curate `gold.jsonl` and `queries.jsonl`.
+4. Curate `gold.jsonl`.
 
-5. Run the unified hybrid search benchmark:
+5. Run corpus building step benchmark:
 
 ```bash
-backend/.webenv/bin/python search_evaluation/scripts/run_benchmark.py
+backend/.webenv/bin/python search_evaluation/scripts/build_eval_corpus.py
 ```
 
-6. Remove benchmark papers from PostgreSQL after the run:
+6. Run full benchmark:
 
 ```bash
-backend/.webenv/bin/python search_evaluation/scripts/cleanup_eval_pg.py
+backend/.webenv/bin/python search_evaluation/scripts/run_full_benchmark.py
 ```
 
 ## Benchmark scope

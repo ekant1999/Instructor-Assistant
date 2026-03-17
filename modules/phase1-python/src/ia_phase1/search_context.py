@@ -7,6 +7,11 @@ from typing import Any, Dict, List, Optional
 _WORD_RE = re.compile(r"[A-Za-z0-9]+")
 _DASH_NORMALIZE_RE = re.compile(r"[‐‑‒–—―-]+")
 _NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+|\n+")
+_EXPLANATORY_VERB_RE = re.compile(
+    r"\b(?:is|are|was|were|be|performs?|uses?|builds?|consists?|means?|refers?|denotes?|aligns?|maps?|learns?|predicts?|shows?|provides?)\b",
+    re.I,
+)
 
 
 def query_tokens(query: str) -> List[str]:
@@ -46,10 +51,16 @@ def _ordered_token_coverage(tokens: List[str], normalized_text: str) -> float:
     return matched / max(1, len(tokens))
 
 
-def _query_match_score(query: str, tokens: List[str], text: str) -> Dict[str, Any]:
+def _base_query_match_features(query: str, tokens: List[str], text: str) -> Dict[str, Any]:
     token_hits = lexical_hits(tokens, text)
     if not text:
-        return {"score": 0.0, "lex_hits": token_hits, "exact_phrase": False}
+        return {
+            "score": 0.0,
+            "lex_hits": token_hits,
+            "exact_phrase": False,
+            "normalized_text": "",
+            "normalized_query": "",
+        }
 
     normalized_text = _normalize_loose_text(text)
     normalized_query = _normalize_loose_text(query)
@@ -77,6 +88,159 @@ def _query_match_score(query: str, tokens: List[str], text: str) -> Dict[str, An
         "score": score,
         "lex_hits": token_hits,
         "exact_phrase": exact_phrase,
+        "normalized_text": normalized_text,
+        "normalized_query": normalized_query,
+    }
+
+
+def _best_token_window(tokens: List[str], normalized_text: str) -> Dict[str, float]:
+    if not tokens or not normalized_text:
+        return {"matched": 0, "window_tokens": 0.0, "window_chars": 0.0}
+
+    occurrences: List[tuple[int, int]] = []
+    for token in dict.fromkeys(tokens):
+        start = normalized_text.find(token)
+        if start == -1:
+            continue
+        occurrences.append((start, start + len(token)))
+    if not occurrences:
+        return {"matched": 0, "window_tokens": 0.0, "window_chars": 0.0}
+
+    occurrences.sort()
+    token_count = max(1, len(tokens))
+    best = {
+        "matched": 0,
+        "window_tokens": 0.0,
+        "window_chars": 0.0,
+    }
+    for left in range(len(occurrences)):
+        seen = 0
+        for right in range(left, len(occurrences)):
+            seen += 1
+            start = occurrences[left][0]
+            end = occurrences[right][1]
+            window_chars = max(1, end - start)
+            token_density = seen / max(1, (right - left + 1))
+            window_token_score = (seen / token_count) * token_density
+            window_char_score = seen / window_chars
+            if (
+                seen > best["matched"]
+                or (seen == best["matched"] and window_token_score > best["window_tokens"])
+                or (
+                    seen == best["matched"]
+                    and window_token_score == best["window_tokens"]
+                    and window_char_score > best["window_chars"]
+                )
+            ):
+                best = {
+                    "matched": seen,
+                    "window_tokens": window_token_score,
+                    "window_chars": window_char_score,
+                }
+    return best
+
+
+def _sentence_focus_features(query: str, tokens: List[str], text: str) -> Dict[str, Any]:
+    if not text:
+        return {
+            "sentence_hits": 0,
+            "sentence_ratio": 0.0,
+            "sentence_exact": False,
+            "sentence_compactness": 0.0,
+            "sentence_explanatory": False,
+            "sentence_len": 0,
+        }
+
+    sentences = [segment.strip() for segment in _SENTENCE_SPLIT_RE.split(text) if segment.strip()]
+    if not sentences:
+        sentences = [text.strip()]
+
+    best = {
+        "sentence_hits": 0,
+        "sentence_ratio": 0.0,
+        "sentence_exact": False,
+        "sentence_compactness": 0.0,
+        "sentence_explanatory": False,
+        "sentence_len": 0,
+        "_score": -1.0,
+    }
+    token_count = max(1, len(tokens))
+    for sentence in sentences:
+        match_eval = _base_query_match_features(query, tokens, sentence)
+        hits = int(match_eval.get("lex_hits", 0))
+        ratio = hits / token_count
+        normalized_sentence = str(match_eval.get("normalized_text") or "")
+        window = _best_token_window(tokens, normalized_sentence)
+        compactness = min(1.0, float(window["window_tokens"]) * 0.85 + float(window["window_chars"]) * 8.0)
+        explanatory = bool(_EXPLANATORY_VERB_RE.search(sentence))
+        sentence_score = float(match_eval.get("score", 0.0))
+        sentence_score += compactness * 1.4
+        if explanatory and hits >= max(2, token_count - 1):
+            sentence_score += 0.7
+        if len(sentence) <= 180 and hits >= max(2, token_count - 1):
+            sentence_score += 0.45
+        if (
+            sentence_score > best["_score"]
+            or (
+                sentence_score == best["_score"]
+                and bool(match_eval.get("exact_phrase", False))
+                and not best["sentence_exact"]
+            )
+            or (
+                sentence_score == best["_score"]
+                and bool(match_eval.get("exact_phrase", False)) == best["sentence_exact"]
+                and hits > best["sentence_hits"]
+            )
+        ):
+            best = {
+                "sentence_hits": hits,
+                "sentence_ratio": ratio,
+                "sentence_exact": bool(match_eval.get("exact_phrase", False)),
+                "sentence_compactness": compactness,
+                "sentence_explanatory": explanatory,
+                "sentence_len": len(sentence),
+                "_score": sentence_score,
+            }
+
+    best.pop("_score", None)
+    return best
+
+
+def sentence_focus_features(query: str, tokens: List[str], text: str) -> Dict[str, Any]:
+    return _sentence_focus_features(query, tokens, text)
+
+
+def _query_match_score(query: str, tokens: List[str], text: str) -> Dict[str, Any]:
+    base = _base_query_match_features(query, tokens, text)
+    score = float(base.get("score", 0.0))
+
+    sentence_focus = _sentence_focus_features(query, tokens, text)
+    sentence_ratio = float(sentence_focus.get("sentence_ratio", 0.0))
+    sentence_compactness = float(sentence_focus.get("sentence_compactness", 0.0))
+    sentence_hits = int(sentence_focus.get("sentence_hits", 0))
+    sentence_exact = bool(sentence_focus.get("sentence_exact", False))
+    sentence_explanatory = bool(sentence_focus.get("sentence_explanatory", False))
+    sentence_len = int(sentence_focus.get("sentence_len", 0))
+
+    score += sentence_ratio * 0.8
+    score += sentence_compactness * 1.6
+    if sentence_exact:
+        score += 1.2
+    if sentence_explanatory and sentence_hits >= max(2, len(tokens) - 1):
+        score += 1.0
+    if sentence_len and sentence_len <= 180 and sentence_hits >= max(2, len(tokens) - 1):
+        score += 0.6
+
+    return {
+        "score": score,
+        "lex_hits": int(base.get("lex_hits", 0)),
+        "exact_phrase": bool(base.get("exact_phrase", False)),
+        "sentence_hits": sentence_hits,
+        "sentence_ratio": sentence_ratio,
+        "sentence_compactness": sentence_compactness,
+        "sentence_exact": sentence_exact,
+        "sentence_explanatory": sentence_explanatory,
+        "sentence_len": sentence_len,
     }
 
 
