@@ -27,7 +27,7 @@ from .figures import (
     load_paper_figure_manifest,
     resolve_figure_file,
 )
-from .parser import extract_pages, extract_text_blocks, resolve_any_to_pdf
+from .parser import describe_google_drive_source, extract_pages, extract_text_blocks, resolve_any_to_pdf
 from .sectioning import annotate_blocks_with_sections, canonicalize_heading
 from .search_context import (
     build_match_snippet,
@@ -87,6 +87,7 @@ from .youtube_transcript import (
 
 __all__ = [
     "resolve_any_to_pdf",
+    "describe_google_drive_source",
     "extract_pages",
     "extract_text_blocks",
     "annotate_blocks_with_sections",

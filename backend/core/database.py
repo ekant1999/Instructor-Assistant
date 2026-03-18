@@ -24,6 +24,7 @@ def init_db() -> None:
     """
     with get_conn() as conn:
         _init_core_tables(conn)
+        _ensure_paper_assets_table(conn)
         _ensure_papers_rag_columns(conn)
         _ensure_notes_title_column(conn)
         _ensure_notes_tags_column(conn)
@@ -120,6 +121,47 @@ def _init_core_tables(conn: sqlite3.Connection) -> None:
           created_at TEXT DEFAULT (datetime('now')),
           FOREIGN KEY(paper_id) REFERENCES papers(id) ON DELETE CASCADE
         );
+        """
+    )
+    conn.commit()
+
+
+def _ensure_paper_assets_table(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS paper_assets(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          paper_id INTEGER NOT NULL,
+          role TEXT NOT NULL,
+          storage_backend TEXT NOT NULL,
+          bucket TEXT NOT NULL,
+          object_key TEXT NOT NULL,
+          version_id TEXT,
+          mime_type TEXT,
+          size_bytes INTEGER,
+          sha256 TEXT,
+          etag TEXT,
+          original_filename TEXT,
+          source_kind TEXT,
+          external_file_id TEXT,
+          external_revision TEXT,
+          is_primary INTEGER DEFAULT 0,
+          created_at TEXT DEFAULT (datetime('now')),
+          updated_at TEXT DEFAULT (datetime('now')),
+          FOREIGN KEY(paper_id) REFERENCES papers(id) ON DELETE CASCADE
+        );
+        """
+    )
+    conn.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_paper_assets_paper_role
+        ON paper_assets(paper_id, role, is_primary)
+        """
+    )
+    conn.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_paper_assets_object
+        ON paper_assets(bucket, object_key)
         """
     )
     conn.commit()

@@ -4,7 +4,7 @@ Reusable Python modules extracted from the Instructor Assistant ingestion pipeli
 
 ## Included modules
 
-- `ia_phase1.parser`: resolve DOI/URL/PDF URL and extract page or block text.
+- `ia_phase1.parser`: resolve DOI/URL/PDF URL/public Google Docs or Drive links and extract page or block text.
 - `ia_phase1.sectioning`: section detection and block-level section metadata annotation.
 - `ia_phase1.chunking`: chunk generation with section-aware metadata.
 - `ia_phase1.tables`: structured table extraction + table chunk conversion.

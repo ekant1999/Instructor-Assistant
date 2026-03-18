@@ -61,6 +61,7 @@ A full-stack web application for managing research papers, generating summaries,
 - **FastAPI** + **Uvicorn**
 - **SQLite** (app/library metadata in `backend/data/app.db`)
 - **PostgreSQL + pgvector** (hybrid retrieval + RAG indexing)
+- **MinIO / S3-compatible object storage** (optional durable PDF storage)
 - **LiteLLM** for OpenAI/local providers
 - **PyPDF** + **python-pptx** for document parsing
 - **Ollama** for local LLMs
@@ -83,6 +84,24 @@ pip install -r backend/requirements.txt
 Create `backend/.env` (copy from `backend/.env.example`) and set your API keys and models:
 ```bash
 cp backend/.env.example backend/.env
+```
+
+### Optional: MinIO Object Storage
+If you want newly ingested library PDFs to be stored in MinIO instead of relying only on local files, run MinIO and set:
+
+```env
+MINIO_ENDPOINT=localhost:9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET_LIBRARY=library-docs
+MINIO_SECURE=false
+MINIO_AUTO_CREATE_BUCKET=true
+```
+
+Backfill existing local-library PDFs into MinIO:
+
+```bash
+backend/.webenv/bin/python backend/scripts/backfill_minio_assets.py
 ```
 
 ### Frontend Setup (Vite)

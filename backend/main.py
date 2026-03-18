@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.core.database import get_conn, init_db
 from backend.core.async_utils import run_async_blocking
+from backend.core.pdf import describe_google_drive_source
 from backend.core.postgres import init_db as init_pg_db
 from backend.core.search_cache import (
     bump_search_index_version,
@@ -37,6 +38,7 @@ from backend.core.library import (
     add_web_page,
     delete_paper as delete_paper_record,
 )
+from backend.core.storage import open_primary_pdf_stream, paper_ids_with_primary_pdf_assets
 from backend.core.questions import (
     create_question_set,
     delete_question_set,
@@ -333,6 +335,8 @@ def _resolve_download_mode(source: str) -> str:
     if _looks_like_arxiv_source(value):
         return "pdf"
     if _looks_like_direct_pdf_source(value):
+        return "pdf"
+    if describe_google_drive_source(value):
         return "pdf"
     if _looks_like_url(value):
         return "web"
@@ -1048,7 +1052,8 @@ def _get_paper(paper_id: int) -> Optional[Dict[str, Any]]:
         return None
     data = dict(row)
     pdf_path = data.get("pdf_path")
-    data["pdf_url"] = f"/papers/{data['id']}/file" if pdf_path else None
+    has_pdf_asset = int(data["id"]) in paper_ids_with_primary_pdf_assets([int(data["id"])])
+    data["pdf_url"] = f"/papers/{data['id']}/file" if pdf_path or has_pdf_asset else None
     return data
 
 app = FastAPI(title="Instructor Assistant Web API")
@@ -1188,17 +1193,9 @@ def _run_full_rag_ingestion() -> None:
         return
 
     paper_ids = [p["id"] for p in papers]
-    pdf_papers = [p for p in papers if p.get("pdf_path")]
-    web_papers = [p for p in papers if not p.get("pdf_path")]
-    pdf_paths = [p["pdf_path"] for p in pdf_papers if p.get("pdf_path")]
-    metadata_by_path = {
-        str(Path(p["pdf_path"]).expanduser().resolve()): {
-            "paper_id": p["id"],
-            "paper_title": p.get("title") or Path(p["pdf_path"]).stem,
-        }
-        for p in pdf_papers
-        if p.get("pdf_path")
-    }
+    asset_backed_ids = paper_ids_with_primary_pdf_assets(int(p["id"]) for p in papers)
+    pdf_papers = [p for p in papers if p.get("pdf_path") or int(p["id"]) in asset_backed_ids]
+    web_papers = [p for p in papers if int(p["id"]) not in {int(item["id"]) for item in pdf_papers}]
     _set_rag_status(paper_ids, "processing", None)
 
     try:
@@ -1223,7 +1220,7 @@ def _run_full_rag_ingestion() -> None:
             image_index_dir = os.getenv("IMAGE_INDEX_DIR", str(BACKEND_ROOT / "index_images"))
             figure_dir = os.getenv("FIGURE_OUTPUT_DIR", str(DATA_DIR / "figures"))
             try:
-                image_index.build_image_index(pdf_paths, metadata_by_path, figure_dir, image_index_dir)
+                image_index.build_image_index_for_papers(pdf_papers, figure_dir, image_index_dir)
             except Exception as exc:
                 logger.exception("Image indexing failed: %s", exc)
         failed: List[Dict[str, Any]] = []
@@ -1432,11 +1429,12 @@ def list_papers(
                     tuple(matching_paper_ids)
                 ).fetchall()
                 papers = [dict(row) for row in rows]
+                asset_backed_papers = paper_ids_with_primary_pdf_assets(matching_paper_ids)
                 
                 # Add pdf_url field for frontend compatibility
                 for p in papers:
                     pdf_path = p.get("pdf_path")
-                    p["pdf_url"] = f"/papers/{p['id']}/file" if pdf_path else None
+                    p["pdf_url"] = f"/papers/{p['id']}/file" if pdf_path or int(p["id"]) in asset_backed_papers else None
                     paper_meta = aggregated.get(int(p["id"])) or {}
                     best_hit = paper_meta.get("best_hit") or {}
                     p["search_score"] = paper_meta.get("score")
@@ -1468,6 +1466,34 @@ def download_paper_file(paper_id: int):
         row = conn.execute("SELECT title, pdf_path FROM papers WHERE id=?", (paper_id,)).fetchone()
     if not row:
         raise HTTPException(status_code=404, detail="Paper not found.")
+    try:
+        asset, storage_stream = open_primary_pdf_stream(paper_id)
+    except Exception as exc:
+        logger.warning("Failed to open object-stored PDF for paper_id=%s: %s", paper_id, exc)
+        asset, storage_stream = None, None
+    if asset and storage_stream is not None:
+        filename = asset.get("original_filename") or f"paper-{paper_id}.pdf"
+        headers = {
+            "Content-Disposition": f"inline; filename=\"{filename}\"",
+            "Content-Security-Policy": _pdf_frame_ancestors(),
+            "Cross-Origin-Resource-Policy": "cross-origin",
+        }
+        if asset.get("size_bytes"):
+            headers["Content-Length"] = str(asset["size_bytes"])
+
+        def _iter_stream():
+            try:
+                for chunk in storage_stream.stream(1024 * 1024):
+                    yield chunk
+            finally:
+                storage_stream.close()
+                storage_stream.release_conn()
+
+        return StreamingResponse(
+            _iter_stream(),
+            media_type=str(asset.get("mime_type") or "application/pdf"),
+            headers=headers,
+        )
     raw_pdf_path = row["pdf_path"] or ""
     if not raw_pdf_path:
         raise HTTPException(status_code=404, detail="PDF not available on server.")
@@ -2887,17 +2913,9 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
         )
 
     paper_ids = [p["id"] for p in papers]
-    pdf_papers = [p for p in papers if p.get("pdf_path")]
-    web_papers = [p for p in papers if not p.get("pdf_path")]
-    pdf_paths = [p["pdf_path"] for p in pdf_papers if p.get("pdf_path")]
-    metadata_by_path = {
-        str(Path(p["pdf_path"]).expanduser().resolve()): {
-            "paper_id": p["id"],
-            "paper_title": p.get("title") or Path(p["pdf_path"]).stem,
-        }
-        for p in pdf_papers
-        if p.get("pdf_path")
-    }
+    asset_backed_ids = paper_ids_with_primary_pdf_assets(int(p["id"]) for p in papers)
+    pdf_papers = [p for p in papers if p.get("pdf_path") or int(p["id"]) in asset_backed_ids]
+    web_papers = [p for p in papers if int(p["id"]) not in {int(item["id"]) for item in pdf_papers}]
     _set_rag_status(paper_ids, "processing", None)
 
     try:
@@ -2915,7 +2933,7 @@ async def rag_ingest(payload: RAGIngestRequest) -> RAGIngestResponse:
             image_index_dir = os.getenv("IMAGE_INDEX_DIR", str(BACKEND_ROOT / "index_images"))
             figure_dir = os.getenv("FIGURE_OUTPUT_DIR", str(DATA_DIR / "figures"))
             try:
-                image_index.build_image_index(pdf_paths, metadata_by_path, figure_dir, image_index_dir)
+                image_index.build_image_index_for_papers(pdf_papers, figure_dir, image_index_dir)
             except Exception as exc:
                 logger.exception("Image indexing failed: %s", exc)
 

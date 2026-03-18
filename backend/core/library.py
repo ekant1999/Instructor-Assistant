@@ -10,7 +10,13 @@ import threading
 
 from .database import get_conn
 from .search_cache import bump_search_index_version
-from .pdf import resolve_any_to_pdf, extract_pages
+from .pdf import describe_google_drive_source, resolve_any_to_pdf, extract_pages
+from .storage import (
+    delete_paper_assets,
+    materialize_primary_pdf_path,
+    paper_ids_with_primary_pdf_assets,
+    upload_primary_pdf_asset,
+)
 from .web import extract_web_document, chunk_web_text
 from .youtube_transcript import download_youtube_transcript, is_youtube_url
 
@@ -18,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 async def add_paper(input_str: str, source_url: str | None = None, auto_index: bool = True) -> Dict[str, Any]:
+    google_source = describe_google_drive_source(input_str)
     title, pdf_path = await resolve_any_to_pdf(input_str)
     with get_conn() as conn:
         c = conn.cursor()
@@ -32,6 +39,20 @@ async def add_paper(input_str: str, source_url: str | None = None, auto_index: b
                 (paper_id, page_no, text),
             )
         conn.commit()
+    try:
+        upload_primary_pdf_asset(
+            paper_id,
+            pdf_path,
+            source_kind=(google_source or {}).get("source_kind", "remote_pdf"),
+            original_filename=Path(pdf_path).name,
+            external_file_id=(google_source or {}).get("file_id"),
+        )
+    except Exception:
+        with get_conn() as conn:
+            conn.execute("DELETE FROM sections WHERE paper_id=?", (paper_id,))
+            conn.execute("DELETE FROM papers WHERE id=?", (paper_id,))
+            conn.commit()
+        raise
     bump_search_index_version("add_paper")
     
     # Automatically trigger background reindexing for embedding search
@@ -149,6 +170,19 @@ def add_local_pdf(
                 (paper_id, page_no, text),
             )
         conn.commit()
+    try:
+        upload_primary_pdf_asset(
+            paper_id,
+            path,
+            source_kind="local_pdf",
+            original_filename=path.name,
+        )
+    except Exception:
+        with get_conn() as conn:
+            conn.execute("DELETE FROM sections WHERE paper_id=?", (paper_id,))
+            conn.execute("DELETE FROM papers WHERE id=?", (paper_id,))
+            conn.commit()
+        raise
     bump_search_index_version("add_local_pdf")
     
     # Automatically trigger background reindexing for embedding search
@@ -164,6 +198,7 @@ def add_local_pdf(
 
 
 def delete_paper(paper_id: int, detach_notes: bool = False) -> Dict[str, Any]:
+    delete_paper_assets(paper_id)
     with get_conn() as conn:
         conn.execute("PRAGMA foreign_keys=ON")
         conn.execute("BEGIN")
@@ -270,14 +305,15 @@ def _trigger_background_reindex(paper_id: int, paper_title: str):
                         normalize_timestamp(row["created_at"]),
                     )
 
-                    if pdf_path:
-                        result = await ingest_pgvector.ingest_single_paper(
-                            pdf_path=pdf_path,
-                            paper_id=paper_id,
-                            paper_title=title,
-                            source_url=source_url,
-                        )
-                    else:
+                    try:
+                        with materialize_primary_pdf_path(paper_id, pdf_path) as resolved_pdf_path:
+                            result = await ingest_pgvector.ingest_single_paper(
+                                pdf_path=str(resolved_pdf_path),
+                                paper_id=paper_id,
+                                paper_title=title,
+                                source_url=source_url,
+                            )
+                    except FileNotFoundError:
                         with get_conn() as conn:
                             section_rows = conn.execute(
                                 "SELECT page_no, text FROM sections WHERE paper_id=? ORDER BY page_no ASC",
@@ -369,6 +405,7 @@ def render_library_structured() -> Dict[str, Any]:
         """
         ).fetchall()
         papers: List[Dict[str, Any]] = [dict(row) for row in paper_rows]
+        asset_backed_papers = paper_ids_with_primary_pdf_assets(int(p["id"]) for p in papers)
 
         notes_stmt = conn.execute(
             "SELECT id, paper_id, title, body, created_at FROM notes ORDER BY created_at DESC"
@@ -391,6 +428,7 @@ def render_library_structured() -> Dict[str, Any]:
                 notes_by_paper[key] = notes
             p["note_count"] = len(notes)
             pdf_path = p.get("pdf_path")
-            p["pdf_url"] = f"/papers/{p['id']}/file" if pdf_path else None
+            has_pdf = bool(pdf_path) or int(p["id"]) in asset_backed_papers
+            p["pdf_url"] = f"/papers/{p['id']}/file" if has_pdf else None
 
     return {"papers": papers, "notesByPaper": dict(notes_by_paper)}

@@ -12,6 +12,8 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from pypdf import PdfReader
 
+from backend.core.storage import materialize_primary_pdf_path
+
 logger = logging.getLogger(__name__)
 
 
@@ -158,57 +160,42 @@ def _match_captions(page_text: str) -> List[Tuple[Optional[int], str]]:
     return captions
 
 
-def build_image_index(
-    pdf_paths: Iterable[str],
-    metadata_by_path: Dict[str, Dict[str, Any]],
-    figure_dir: str,
-    index_dir: str,
-) -> int:
-    pdf_paths = list(pdf_paths)
-    if not pdf_paths:
-        logger.info("No PDFs provided for image indexing.")
-        return 0
-
-    figure_root = Path(figure_dir)
-    index_path = Path(index_dir)
-    index_path.mkdir(parents=True, exist_ok=True)
-
-    figure_records: List[FigureRecord] = []
-    for raw_path in pdf_paths:
-        pdf_path = Path(raw_path).expanduser().resolve()
-        meta = metadata_by_path.get(str(pdf_path), {})
-        paper_id_raw = meta.get("paper_id")
-        if paper_id_raw is None:
-            logger.warning("Skipping image indexing for %s because paper_id is missing.", pdf_path)
-            continue
-        paper_id = int(paper_id_raw)
-        paper_title = meta.get("paper_title") or pdf_path.stem
-        per_paper_dir = figure_root / str(paper_id)
-        extracted = _extract_figures(pdf_path, per_paper_dir)
-        if not extracted:
-            continue
-        page_texts = _extract_page_texts(pdf_path)
-        caption_cache: Dict[int, List[Tuple[Optional[int], str]]] = {}
-        for page_number, image_path in extracted:
-            if page_number not in caption_cache:
-                caption_cache[page_number] = _match_captions(page_texts.get(page_number, ""))
-            captions = caption_cache[page_number]
-            figure_number = None
-            caption = None
-            if captions:
-                figure_number, caption = captions.pop(0)
-            figure_records.append(
-                FigureRecord(
-                    paper_id=paper_id,
-                    paper_title=paper_title,
-                    page_number=page_number,
-                    image_path=image_path,
-                    figure_number=figure_number,
-                    caption=caption,
-                    source_pdf=str(pdf_path),
-                )
+def _append_figure_records_from_pdf(
+    figure_records: List[FigureRecord],
+    *,
+    pdf_path: Path,
+    paper_id: int,
+    paper_title: str,
+    figure_root: Path,
+) -> None:
+    per_paper_dir = figure_root / str(paper_id)
+    extracted = _extract_figures(pdf_path, per_paper_dir)
+    if not extracted:
+        return
+    page_texts = _extract_page_texts(pdf_path)
+    caption_cache: Dict[int, List[Tuple[Optional[int], str]]] = {}
+    for page_number, image_path in extracted:
+        if page_number not in caption_cache:
+            caption_cache[page_number] = _match_captions(page_texts.get(page_number, ""))
+        captions = caption_cache[page_number]
+        figure_number = None
+        caption = None
+        if captions:
+            figure_number, caption = captions.pop(0)
+        figure_records.append(
+            FigureRecord(
+                paper_id=paper_id,
+                paper_title=paper_title,
+                page_number=page_number,
+                image_path=image_path,
+                figure_number=figure_number,
+                caption=caption,
+                source_pdf=str(pdf_path),
             )
+        )
 
+
+def _save_figure_records(figure_records: List[FigureRecord], index_dir: str) -> int:
     if not figure_records:
         logger.info("No figures extracted for image index.")
         return 0
@@ -234,9 +221,88 @@ def build_image_index(
 
     embeddings = ImageEmbeddings()
     vectorstore = FAISS.from_documents(documents, embeddings)
-    vectorstore.save_local(str(index_path))
+    vectorstore.save_local(index_dir)
     logger.info("Saved image index to %s with %s figures", index_dir, len(documents))
     return len(documents)
+
+
+def build_image_index(
+    pdf_paths: Iterable[str],
+    metadata_by_path: Dict[str, Dict[str, Any]],
+    figure_dir: str,
+    index_dir: str,
+) -> int:
+    pdf_paths = list(pdf_paths)
+    if not pdf_paths:
+        logger.info("No PDFs provided for image indexing.")
+        return 0
+
+    figure_root = Path(figure_dir)
+    index_path = Path(index_dir)
+    index_path.mkdir(parents=True, exist_ok=True)
+
+    figure_records: List[FigureRecord] = []
+    for raw_path in pdf_paths:
+        pdf_path = Path(raw_path).expanduser().resolve()
+        meta = metadata_by_path.get(str(pdf_path), {})
+        paper_id_raw = meta.get("paper_id")
+        if paper_id_raw is None:
+            logger.warning("Skipping image indexing for %s because paper_id is missing.", pdf_path)
+            continue
+        paper_id = int(paper_id_raw)
+        paper_title = meta.get("paper_title") or pdf_path.stem
+        _append_figure_records_from_pdf(
+            figure_records,
+            pdf_path=pdf_path,
+            paper_id=paper_id,
+            paper_title=paper_title,
+            figure_root=figure_root,
+        )
+
+    return _save_figure_records(figure_records, str(index_path))
+
+
+def build_image_index_for_papers(
+    papers: Iterable[Dict[str, Any]],
+    figure_dir: str,
+    index_dir: str,
+) -> int:
+    papers = list(papers)
+    if not papers:
+        logger.info("No papers provided for image indexing.")
+        return 0
+
+    figure_root = Path(figure_dir)
+    index_path = Path(index_dir)
+    index_path.mkdir(parents=True, exist_ok=True)
+
+    figure_records: List[FigureRecord] = []
+    for paper in papers:
+        paper_id_raw = paper.get("id") or paper.get("paper_id")
+        if paper_id_raw is None:
+            logger.warning("Skipping image indexing for paper without id: %s", paper)
+            continue
+        paper_id = int(paper_id_raw)
+        paper_title = str(paper.get("title") or paper.get("paper_title") or f"paper-{paper_id}")
+        raw_pdf_path = paper.get("pdf_path")
+        try:
+            with materialize_primary_pdf_path(paper_id, raw_pdf_path) as resolved_pdf_path:
+                _append_figure_records_from_pdf(
+                    figure_records,
+                    pdf_path=resolved_pdf_path,
+                    paper_id=paper_id,
+                    paper_title=paper_title,
+                    figure_root=figure_root,
+                )
+        except FileNotFoundError:
+            logger.warning(
+                "Skipping image indexing for paper_id=%s because no PDF is available locally or in object storage.",
+                paper_id,
+            )
+        except Exception as exc:
+            logger.warning("Image extraction failed for paper_id=%s: %s", paper_id, exc)
+
+    return _save_figure_records(figure_records, str(index_path))
 
 
 def load_image_index(index_dir: str) -> FAISS:

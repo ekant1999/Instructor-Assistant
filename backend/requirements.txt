@@ -30,3 +30,4 @@ sentence-transformers>=2.3.0  # Upgraded for better embedding support
 psycopg2-binary==2.9.9
 asyncpg==0.29.0
 pgvector==0.2.5
+minio>=7.2.7

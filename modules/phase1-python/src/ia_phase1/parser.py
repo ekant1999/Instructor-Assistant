@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+from urllib.parse import parse_qs, urlparse
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -28,6 +29,70 @@ def _safe_filename(seed: str) -> str:
 def _sanitize_extracted_text(value: Any) -> str:
     text = str(value or "").replace("\x00", "")
     return _SURROGATE_RE.sub("\uFFFD", text)
+
+
+def _looks_like_pdf_bytes(data: bytes) -> bool:
+    head = data[:1024].lstrip()
+    return b"%PDF-" in head
+
+
+def describe_google_drive_source(value: str) -> Optional[Dict[str, str]]:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    try:
+        parsed = urlparse(raw)
+    except Exception:
+        return None
+    host = (parsed.netloc or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    path_parts = [part for part in (parsed.path or "").split("/") if part]
+    query = parse_qs(parsed.query or "")
+
+    def _build_doc_export(kind: str, file_id: str) -> Dict[str, str]:
+        if kind == "document":
+            return {
+                "source_kind": "google_doc_export",
+                "file_id": file_id,
+                "download_url": f"https://docs.google.com/document/d/{file_id}/export?format=pdf",
+            }
+        if kind == "spreadsheets":
+            return {
+                "source_kind": "google_sheet_export",
+                "file_id": file_id,
+                "download_url": f"https://docs.google.com/spreadsheets/d/{file_id}/export?format=pdf",
+            }
+        if kind == "presentation":
+            return {
+                "source_kind": "google_slide_export",
+                "file_id": file_id,
+                "download_url": f"https://docs.google.com/presentation/d/{file_id}/export/pdf",
+            }
+        return {}
+
+    if host == "docs.google.com" and len(path_parts) >= 3 and path_parts[1] == "d":
+        kind = path_parts[0]
+        file_id = path_parts[2]
+        if kind in {"document", "spreadsheets", "presentation"} and file_id:
+            return _build_doc_export(kind, file_id)
+
+    if host == "drive.google.com":
+        file_id = ""
+        if len(path_parts) >= 3 and path_parts[0] == "file" and path_parts[1] == "d":
+            file_id = path_parts[2]
+        elif path_parts[:1] in (["open"], ["uc"]):
+            file_id = (query.get("id") or [""])[0]
+        elif not path_parts:
+            file_id = (query.get("id") or [""])[0]
+        if file_id:
+            return {
+                "source_kind": "google_drive_file",
+                "file_id": file_id,
+                "download_url": f"https://drive.google.com/uc?export=download&id={file_id}",
+            }
+
+    return None
 
 
 def _safe_float(value: Any, default: float = 0.0) -> float:
@@ -127,7 +192,10 @@ async def _download_pdf(url: str, out_path: Path) -> None:
     ) as client:
         response = await client.get(url)
         response.raise_for_status()
-        out_path.write_bytes(response.content)
+        data = response.content
+        if not _looks_like_pdf_bytes(data):
+            raise RuntimeError("Resolved source did not return a PDF. Ensure the document is shared/exportable as PDF.")
+        out_path.write_bytes(data)
 
 
 def _guess_title_from_pdf(pdf_path: Path) -> str:
@@ -157,6 +225,13 @@ async def resolve_any_to_pdf(input_str: str, output_dir: Optional[Path] = None) 
     value = input_str.strip()
     if not value:
         raise ValueError("input_str cannot be empty")
+
+    google_source = describe_google_drive_source(value)
+    if google_source:
+        pdf_url = google_source["download_url"]
+        out = pdf_dir / _safe_filename(f"{google_source['file_id']}.pdf")
+        await _download_pdf(pdf_url, out)
+        return _guess_title_from_pdf(out), out
 
     # DOI shortcut
     if re.match(r"^10\.\d{4,9}/", value):

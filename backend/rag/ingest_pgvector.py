@@ -19,6 +19,7 @@ sys.path.insert(0, str(BACKEND_ROOT))
 
 from core.pdf import extract_text_blocks
 from core.postgres import get_pool
+from core.storage import materialize_primary_pdf_path, paper_ids_with_primary_pdf_assets
 from .chunking import chunk_text_blocks, simple_chunk_blocks
 from .pgvector_store import PgVectorStore
 from .section_extractor import annotate_blocks_with_sections
@@ -259,8 +260,9 @@ async def ingest_papers_from_db(
         logger.warning("No papers found to ingest")
         return {"success": True, "papers_ingested": 0, "total_chunks": 0}
 
-    # Skip entries without a PDF path (e.g., web documents).
-    papers = [p for p in papers if p.get("pdf_path")]
+    asset_backed_ids = paper_ids_with_primary_pdf_assets(int(p["id"]) for p in papers)
+    # Skip entries without any resolvable PDF source (e.g., web documents).
+    papers = [p for p in papers if p.get("pdf_path") or int(p["id"]) in asset_backed_ids]
     if not papers:
         logger.warning("No PDF-backed papers found to ingest")
         return {"success": True, "papers_ingested": 0, "total_chunks": 0}
@@ -273,14 +275,15 @@ async def ingest_papers_from_db(
     
     for paper in papers:
         try:
-            result = await ingest_single_paper(
-                pdf_path=paper["pdf_path"],
-                paper_id=paper["id"],
-                paper_title=paper["title"] or "Untitled",
-                source_url=paper.get("source_url"),
-                chunk_size=chunk_size,
-                chunk_overlap=chunk_overlap
-            )
+            with materialize_primary_pdf_path(int(paper["id"]), paper.get("pdf_path")) as resolved_pdf_path:
+                result = await ingest_single_paper(
+                    pdf_path=str(resolved_pdf_path),
+                    paper_id=paper["id"],
+                    paper_title=paper["title"] or "Untitled",
+                    source_url=paper.get("source_url"),
+                    chunk_size=chunk_size,
+                    chunk_overlap=chunk_overlap
+                )
             total_chunks += result["num_chunks"]
         except Exception as e:
             logger.error(f"Failed to ingest paper {paper['id']}: {e}")
