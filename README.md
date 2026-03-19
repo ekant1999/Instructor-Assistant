@@ -104,6 +104,10 @@ Backfill existing local-library PDFs into MinIO:
 backend/.webenv/bin/python backend/scripts/backfill_minio_assets.py
 ```
 
+For the full storage design, asset roles, backfill/audit/repair flow, and MinIO-only fallback behavior, see:
+
+- `docs/storage/minio.md`
+
 ### Frontend Setup (Vite)
 ```bash
 npm install
@@ -143,6 +147,7 @@ The ChatGPT SDK widget lives in `chatgpt-sdk-app/`. Follow `chatgpt-sdk-app/READ
 - **Downloaded PDFs**: `backend/data/pdfs/`
 - **Exports**: `backend/exports/`
 - **Search Benchmark Workspace**: `search_evaluation/`
+- **MinIO Storage Notes**: `docs/storage/minio.md`
 
 These are local artifacts and are not meant to be committed.
 
@@ -152,6 +157,7 @@ These are local artifacts and are not meant to be committed.
 Instructor-Assistant/
 ├── backend/               # FastAPI app, SQLite data, services
 ├── client/                # React + Vite SPA
+├── docs/                  # Architecture and operational notes
 ├── modules/               # Reusable Python package(s), including ia_phase1
 ├── search_evaluation/     # Isolated search benchmark workspace
 ├── chatgpt-sdk-app/       # ChatGPT Apps SDK widget (optional)
