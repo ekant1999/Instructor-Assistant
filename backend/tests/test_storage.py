@@ -10,6 +10,12 @@ class _FakePutResult:
     version_id = "v1"
 
 
+class _FakeS3Error(Exception):
+    def __init__(self, code: str):
+        super().__init__(code)
+        self.code = code
+
+
 class _FakeObjectResponse:
     def __init__(self, data: bytes):
         self._data = data
@@ -44,6 +50,11 @@ class _FakeMinioClient:
 
     def get_object(self, bucket: str, object_key: str, version_id: str | None = None):
         return _FakeObjectResponse(self.objects[(bucket, object_key)])
+
+    def stat_object(self, bucket: str, object_key: str, version_id: str | None = None):
+        if (bucket, object_key) not in self.objects:
+            raise _FakeS3Error("NoSuchKey")
+        return {"bucket": bucket, "object_key": object_key}
 
     def remove_object(self, bucket: str, object_key: str, version_id: str | None = None) -> None:
         self.objects.pop((bucket, object_key), None)
@@ -135,6 +146,113 @@ def test_open_and_delete_primary_pdf_asset(tmp_path: Path, monkeypatch) -> None:
     assert client.objects == {}
 
 
+def test_object_asset_exists_reports_true_and_false(tmp_path: Path, monkeypatch) -> None:
+    _configure_temp_db(tmp_path, monkeypatch)
+    client = _FakeMinioClient()
+    _configure_minio(monkeypatch, client)
+
+    pdf_path = tmp_path / "paper.pdf"
+    pdf_path.write_bytes(b"%PDF-1.4 object existence")
+
+    with database.get_conn() as conn:
+        cursor = conn.execute(
+            "INSERT INTO papers(title, source_url, pdf_path) VALUES(?,?,?)",
+            ("Asset Probe", "https://example.test/probe", str(pdf_path)),
+        )
+        paper_id = int(cursor.lastrowid)
+        conn.commit()
+
+    asset = storage.upload_primary_pdf_asset(
+        paper_id,
+        pdf_path,
+        source_kind="local_pdf",
+        original_filename="probe.pdf",
+    )
+    assert asset is not None
+    assert storage.object_asset_exists(asset) is True
+
+    client.remove_object(asset["bucket"], asset["object_key"])
+    assert storage.object_asset_exists(asset) is False
+
+
+def test_upload_and_delete_derived_figure_asset(tmp_path: Path, monkeypatch) -> None:
+    _configure_temp_db(tmp_path, monkeypatch)
+    client = _FakeMinioClient()
+    _configure_minio(monkeypatch, client)
+
+    pdf_path = tmp_path / "paper.pdf"
+    pdf_path.write_bytes(b"%PDF-1.4 paper")
+    figure_path = tmp_path / "figure.png"
+    figure_bytes = b"\x89PNG\r\n\x1a\nfake"
+    figure_path.write_bytes(figure_bytes)
+
+    with database.get_conn() as conn:
+        cursor = conn.execute(
+            "INSERT INTO papers(title, source_url, pdf_path) VALUES(?,?,?)",
+            ("Figure Paper", "https://example.test/figure", str(pdf_path)),
+        )
+        paper_id = int(cursor.lastrowid)
+        conn.commit()
+
+    asset = storage.upload_paper_asset(
+        paper_id,
+        figure_path,
+        role="figure_image",
+        source_kind="derived_figure",
+        original_filename="page_001_img_001.png",
+    )
+    assert asset is not None
+    assert asset["mime_type"] == "image/png"
+
+    loaded = storage.get_paper_asset(
+        paper_id,
+        role="figure_image",
+        original_filename="page_001_img_001.png",
+    )
+    assert loaded is not None
+    assert storage.object_asset_exists(loaded) is True
+
+    deleted = storage.delete_paper_assets_by_role(paper_id, ["figure_image"])
+    assert deleted == 1
+    assert storage.get_paper_asset(
+        paper_id,
+        role="figure_image",
+        original_filename="page_001_img_001.png",
+    ) is None
+
+
+def test_load_json_paper_asset_reads_manifest_payload(tmp_path: Path, monkeypatch) -> None:
+    _configure_temp_db(tmp_path, monkeypatch)
+    client = _FakeMinioClient()
+    _configure_minio(monkeypatch, client)
+
+    pdf_path = tmp_path / "paper.pdf"
+    pdf_path.write_bytes(b"%PDF-1.4 paper")
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text('{"paper_id": 7, "num_items": 2}', encoding="utf-8")
+
+    with database.get_conn() as conn:
+        cursor = conn.execute(
+            "INSERT INTO papers(title, source_url, pdf_path) VALUES(?,?,?)",
+            ("Manifest Paper", "https://example.test/manifest", str(pdf_path)),
+        )
+        paper_id = int(cursor.lastrowid)
+        conn.commit()
+
+    asset = storage.upload_paper_asset(
+        paper_id,
+        manifest_path,
+        role="table_manifest",
+        source_kind="derived_manifest",
+        original_filename="manifest.json",
+        mime_type="application/json",
+    )
+    assert asset is not None
+
+    payload = storage.load_json_paper_asset(paper_id, role="table_manifest")
+    assert payload == {"paper_id": 7, "num_items": 2}
+
+
 def test_materialize_primary_pdf_path_downloads_from_object_storage_when_local_missing(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -169,3 +287,35 @@ def test_materialize_primary_pdf_path_downloads_from_object_storage_when_local_m
         assert materialized.read_bytes() == pdf_bytes
 
     assert not materialized.exists()
+
+
+def test_restore_primary_pdf_to_path_writes_object_backed_pdf(tmp_path: Path, monkeypatch) -> None:
+    _configure_temp_db(tmp_path, monkeypatch)
+    client = _FakeMinioClient()
+    _configure_minio(monkeypatch, client)
+
+    source_pdf = tmp_path / "source.pdf"
+    pdf_bytes = b"%PDF-1.4 restored bytes"
+    source_pdf.write_bytes(pdf_bytes)
+
+    with database.get_conn() as conn:
+        cursor = conn.execute(
+            "INSERT INTO papers(title, source_url, pdf_path) VALUES(?,?,?)",
+            ("Restore Paper", "https://example.test/restore", str(source_pdf)),
+        )
+        paper_id = int(cursor.lastrowid)
+        conn.commit()
+
+    asset = storage.upload_primary_pdf_asset(
+        paper_id,
+        source_pdf,
+        source_kind="local_pdf",
+        original_filename="restore-paper.pdf",
+    )
+    assert asset is not None
+
+    destination = tmp_path / "restored" / "paper.pdf"
+    restored = storage.restore_primary_pdf_to_path(paper_id, destination)
+
+    assert restored == destination.resolve()
+    assert destination.read_bytes() == pdf_bytes

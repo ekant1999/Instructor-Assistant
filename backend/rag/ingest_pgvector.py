@@ -10,6 +10,7 @@ This ingests PDFs with:
 import os
 import sys
 import logging
+import json
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
@@ -19,15 +20,210 @@ sys.path.insert(0, str(BACKEND_ROOT))
 
 from core.pdf import extract_text_blocks
 from core.postgres import get_pool
-from core.storage import materialize_primary_pdf_path, paper_ids_with_primary_pdf_assets
+from core.storage import (
+    delete_paper_assets_by_role,
+    materialize_primary_pdf_path,
+    object_storage_enabled,
+    paper_ids_with_primary_pdf_assets,
+    upload_paper_asset,
+)
 from .chunking import chunk_text_blocks, simple_chunk_blocks
+from .preview_assets import generate_and_store_paper_thumbnail
 from .pgvector_store import PgVectorStore
 from .section_extractor import annotate_blocks_with_sections
 from .equation_extractor import extract_and_store_paper_equations, equation_records_to_chunks
-from .paper_figures import extract_and_store_paper_figures
+from .paper_figures import extract_and_store_paper_figures, load_paper_figure_manifest
 from .table_extractor import extract_and_store_paper_tables, table_records_to_chunks
 
 logger = logging.getLogger(__name__)
+
+
+def _load_manifest_json(manifest_path: str | Path) -> Dict[str, Any]:
+    path = Path(manifest_path).expanduser()
+    with path.open("r", encoding="utf-8") as handle:
+        payload = json.load(handle)
+    return payload if isinstance(payload, dict) else {}
+
+
+def _sync_figure_assets_from_manifest(paper_id: int, manifest_path: str | None = None) -> int:
+    if not object_storage_enabled():
+        return 0
+
+    if manifest_path:
+        manifest_file = Path(manifest_path).expanduser()
+        manifest = _load_manifest_json(manifest_file) if manifest_file.exists() else load_paper_figure_manifest(paper_id)
+    else:
+        manifest = load_paper_figure_manifest(paper_id)
+        manifest_file = Path(str(manifest.get("manifest_path") or "")).expanduser() if manifest.get("manifest_path") else None
+
+    images = manifest.get("images") if isinstance(manifest, dict) else []
+    image_records = images if isinstance(images, list) else []
+
+    delete_paper_assets_by_role(paper_id, ["figure_image", "figure_manifest"])
+
+    uploaded = 0
+    manifest_changed = False
+    for item in image_records:
+        if not isinstance(item, dict):
+            continue
+        image_path_raw = str(item.get("image_path") or "").strip()
+        if not image_path_raw:
+            continue
+        image_path = Path(image_path_raw).expanduser()
+        if not image_path.exists():
+            continue
+        asset = upload_paper_asset(
+            paper_id,
+            image_path,
+            role="figure_image",
+            source_kind="derived_figure",
+            original_filename=str(item.get("file_name") or image_path.name),
+        )
+        if asset is None:
+            continue
+        item["asset_storage_backend"] = asset.get("storage_backend")
+        item["asset_bucket"] = asset.get("bucket")
+        item["asset_object_key"] = asset.get("object_key")
+        item["asset_role"] = "figure_image"
+        uploaded += 1
+        manifest_changed = True
+
+    if manifest_changed and manifest_file and manifest_file.exists():
+        with manifest_file.open("w", encoding="utf-8") as handle:
+            json.dump(manifest, handle, ensure_ascii=False, indent=2)
+
+    if manifest_file and manifest_file.exists():
+        upload_paper_asset(
+            paper_id,
+            manifest_file,
+            role="figure_manifest",
+            source_kind="derived_manifest",
+            original_filename="manifest.json",
+            mime_type="application/json",
+        )
+
+    return uploaded
+
+
+def _sync_equation_assets_from_manifest(paper_id: int, manifest_path: str | None = None) -> Dict[str, int]:
+    if not object_storage_enabled():
+        return {"images": 0, "json": 0}
+    if not manifest_path:
+        return {"images": 0, "json": 0}
+
+    manifest_file = Path(manifest_path).expanduser()
+    if not manifest_file.exists():
+        return {"images": 0, "json": 0}
+
+    manifest = _load_manifest_json(manifest_file)
+    equations = manifest.get("equations")
+    records = equations if isinstance(equations, list) else []
+
+    delete_paper_assets_by_role(paper_id, ["equation_image", "equation_json", "equation_manifest"])
+    uploaded_images = 0
+    uploaded_json = 0
+
+    for item in records:
+        if not isinstance(item, dict):
+            continue
+        file_name = str(item.get("file_name") or "").strip()
+        image_path_raw = str(item.get("image_path") or "").strip()
+        if file_name and image_path_raw:
+            image_path = Path(image_path_raw).expanduser()
+            if image_path.exists():
+                upload_paper_asset(
+                    paper_id,
+                    image_path,
+                    role="equation_image",
+                    source_kind="derived_equation",
+                    original_filename=file_name,
+                )
+                uploaded_images += 1
+
+        json_name = str(item.get("json_file") or "").strip()
+        if json_name:
+            json_path = manifest_file.parent / json_name
+            if json_path.exists():
+                upload_paper_asset(
+                    paper_id,
+                    json_path,
+                    role="equation_json",
+                    source_kind="derived_equation",
+                    original_filename=json_name,
+                    mime_type="application/json",
+                )
+                uploaded_json += 1
+
+    upload_paper_asset(
+        paper_id,
+        manifest_file,
+        role="equation_manifest",
+        source_kind="derived_manifest",
+        original_filename="manifest.json",
+        mime_type="application/json",
+    )
+    return {"images": uploaded_images, "json": uploaded_json}
+
+
+def _sync_table_assets_from_manifest(paper_id: int, manifest_path: str | None = None) -> Dict[str, int]:
+    if not object_storage_enabled():
+        return {"json": 0}
+    if not manifest_path:
+        return {"json": 0}
+
+    manifest_file = Path(manifest_path).expanduser()
+    if not manifest_file.exists():
+        return {"json": 0}
+
+    manifest = _load_manifest_json(manifest_file)
+    tables = manifest.get("tables")
+    records = tables if isinstance(tables, list) else []
+
+    delete_paper_assets_by_role(paper_id, ["table_json", "table_manifest"])
+    uploaded_json = 0
+
+    for item in records:
+        if not isinstance(item, dict):
+            continue
+        json_name = str(item.get("json_file") or "").strip()
+        if not json_name:
+            continue
+        json_path = manifest_file.parent / json_name
+        if not json_path.exists():
+            continue
+        upload_paper_asset(
+            paper_id,
+            json_path,
+            role="table_json",
+            source_kind="derived_table",
+            original_filename=json_name,
+            mime_type="application/json",
+        )
+        uploaded_json += 1
+
+    upload_paper_asset(
+        paper_id,
+        manifest_file,
+        role="table_manifest",
+        source_kind="derived_manifest",
+        original_filename="manifest.json",
+        mime_type="application/json",
+    )
+    return {"json": uploaded_json}
+
+
+def _sync_thumbnail_asset(paper_id: int, thumbnail_path: Path | None) -> int:
+    if not object_storage_enabled() or thumbnail_path is None or not thumbnail_path.exists():
+        return 0
+    delete_paper_assets_by_role(paper_id, ["paper_thumbnail"])
+    asset = upload_paper_asset(
+        paper_id,
+        thumbnail_path,
+        role="paper_thumbnail",
+        source_kind="derived_thumbnail",
+        original_filename=thumbnail_path.name,
+    )
+    return 1 if asset is not None else 0
 
 
 async def ingest_single_paper(
@@ -86,9 +282,14 @@ async def ingest_single_paper(
                 paper_id=paper_id,
                 blocks=blocks,
             )
+            uploaded_figure_assets = _sync_figure_assets_from_manifest(
+                paper_id,
+                figure_report.get("manifest_path"),
+            )
             logger.info(
-                "  Extracted %s figures to dedicated folder",
+                "  Extracted %s figures to dedicated folder (%s synced to object storage)",
                 figure_report.get("num_images", 0),
+                uploaded_figure_assets,
             )
         except Exception as exc:
             # Figure extraction failure should not block text ingestion.
@@ -96,11 +297,16 @@ async def ingest_single_paper(
 
         table_report: Dict[str, Any] = {"num_tables": 0, "tables": []}
         table_chunks: List[Dict[str, Any]] = []
+        table_asset_report: Dict[str, int] = {"json": 0}
         try:
             table_report = extract_and_store_paper_tables(
                 pdf_path=pdf_path_obj,
                 paper_id=paper_id,
                 blocks=blocks,
+            )
+            table_asset_report = _sync_table_assets_from_manifest(
+                paper_id,
+                table_report.get("manifest_path"),
             )
             table_chunks = table_records_to_chunks(
                 tables=table_report.get("tables") or [],
@@ -108,23 +314,33 @@ async def ingest_single_paper(
             )
             if table_chunks:
                 logger.info(
-                    "  Extracted %s tables and built %s table chunks",
+                    "  Extracted %s tables, built %s table chunks, synced %s table JSON assets",
                     table_report.get("num_tables", 0),
                     len(table_chunks),
+                    table_asset_report.get("json", 0),
                 )
             elif table_report.get("num_tables", 0):
-                logger.info("  Extracted %s tables", table_report.get("num_tables", 0))
+                logger.info(
+                    "  Extracted %s tables and synced %s table JSON assets",
+                    table_report.get("num_tables", 0),
+                    table_asset_report.get("json", 0),
+                )
         except Exception as exc:
             # Table extraction failure should not block text ingestion.
             logger.warning("  Table extraction failed for paper %s: %s", paper_id, exc)
 
         equation_report: Dict[str, Any] = {"num_equations": 0, "equations": []}
         equation_chunks: List[Dict[str, Any]] = []
+        equation_asset_report: Dict[str, int] = {"images": 0, "json": 0}
         try:
             equation_report = extract_and_store_paper_equations(
                 pdf_path=pdf_path_obj,
                 paper_id=paper_id,
                 blocks=blocks,
+            )
+            equation_asset_report = _sync_equation_assets_from_manifest(
+                paper_id,
+                equation_report.get("manifest_path"),
             )
             equation_chunks = equation_records_to_chunks(
                 equations=equation_report.get("equations") or [],
@@ -132,15 +348,39 @@ async def ingest_single_paper(
             )
             if equation_chunks:
                 logger.info(
-                    "  Extracted %s equations and built %s equation chunks",
+                    "  Extracted %s equations, built %s equation chunks, synced %s equation images and %s JSON assets",
                     equation_report.get("num_equations", 0),
                     len(equation_chunks),
+                    equation_asset_report.get("images", 0),
+                    equation_asset_report.get("json", 0),
                 )
             elif equation_report.get("num_equations", 0):
-                logger.info("  Extracted %s equations", equation_report.get("num_equations", 0))
+                logger.info(
+                    "  Extracted %s equations and synced %s equation images and %s JSON assets",
+                    equation_report.get("num_equations", 0),
+                    equation_asset_report.get("images", 0),
+                    equation_asset_report.get("json", 0),
+                )
         except Exception as exc:
             # Equation extraction failure should not block text ingestion.
             logger.warning("  Equation extraction failed for paper %s: %s", paper_id, exc)
+
+        thumbnail_report: Dict[str, Any] = {"thumbnail_path": None}
+        thumbnail_uploaded = 0
+        try:
+            thumbnail_report = generate_and_store_paper_thumbnail(
+                pdf_path=pdf_path_obj,
+                paper_id=paper_id,
+            )
+            thumbnail_uploaded = _sync_thumbnail_asset(
+                paper_id,
+                Path(str(thumbnail_report.get("thumbnail_path"))).expanduser()
+                if thumbnail_report.get("thumbnail_path")
+                else None,
+            )
+            logger.info("  Generated thumbnail (%s synced to object storage)", thumbnail_uploaded)
+        except Exception as exc:
+            logger.warning("  Thumbnail generation failed for paper %s: %s", paper_id, exc)
         
         # Chunk the blocks
         logger.info("  Chunking blocks...")
@@ -185,6 +425,7 @@ async def ingest_single_paper(
             "num_table_chunks": len(table_chunks),
             "num_equations": equation_report.get("num_equations", 0),
             "num_equation_chunks": len(equation_chunks),
+            "thumbnail_uploaded": thumbnail_uploaded,
         }
     
     except Exception as e:

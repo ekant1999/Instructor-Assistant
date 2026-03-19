@@ -38,7 +38,7 @@ from backend.core.library import (
     add_web_page,
     delete_paper as delete_paper_record,
 )
-from backend.core.storage import open_primary_pdf_stream, paper_ids_with_primary_pdf_assets
+from backend.core.storage import get_paper_asset, open_paper_asset_stream, open_primary_pdf_stream, paper_ids_with_primary_pdf_assets
 from backend.core.questions import (
     create_question_set,
     delete_question_set,
@@ -143,6 +143,7 @@ from .rag import (
     query_pgvector,
     image_index,
     paper_figures,
+    preview_assets,
     table_extractor,
     equation_extractor,
 )
@@ -1979,6 +1980,30 @@ def get_paper_figure_file(paper_id: int, figure_name: str):
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     if not figure_path.exists():
+        safe_name = Path(figure_name).name
+        asset = get_paper_asset(paper_id, role="figure_image", original_filename=safe_name)
+        asset, storage_stream = open_paper_asset_stream(asset)
+        if asset and storage_stream is not None:
+            headers = {
+                "Content-Disposition": f"inline; filename=\"{safe_name}\"",
+                "Cross-Origin-Resource-Policy": "cross-origin",
+            }
+            if asset.get("size_bytes"):
+                headers["Content-Length"] = str(asset["size_bytes"])
+
+            def _iter_stream():
+                try:
+                    for chunk in storage_stream.stream(1024 * 1024):
+                        yield chunk
+                finally:
+                    storage_stream.close()
+                    storage_stream.release_conn()
+
+            return StreamingResponse(
+                _iter_stream(),
+                media_type=str(asset.get("mime_type") or "application/octet-stream"),
+                headers=headers,
+            )
         raise HTTPException(status_code=404, detail="Figure image not found.")
     return FileResponse(figure_path)
 
@@ -1993,8 +2018,66 @@ def get_paper_equation_file(paper_id: int, equation_name: str):
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     if not equation_path.exists():
+        safe_name = Path(equation_name).name
+        asset = get_paper_asset(paper_id, role="equation_image", original_filename=safe_name)
+        asset, storage_stream = open_paper_asset_stream(asset)
+        if asset and storage_stream is not None:
+            headers = {
+                "Content-Disposition": f"inline; filename=\"{safe_name}\"",
+                "Cross-Origin-Resource-Policy": "cross-origin",
+            }
+            if asset.get("size_bytes"):
+                headers["Content-Length"] = str(asset["size_bytes"])
+
+            def _iter_stream():
+                try:
+                    for chunk in storage_stream.stream(1024 * 1024):
+                        yield chunk
+                finally:
+                    storage_stream.close()
+                    storage_stream.release_conn()
+
+            return StreamingResponse(
+                _iter_stream(),
+                media_type=str(asset.get("mime_type") or "application/octet-stream"),
+                headers=headers,
+            )
         raise HTTPException(status_code=404, detail="Equation image not found.")
     return FileResponse(equation_path)
+
+
+@app.get("/api/papers/{paper_id}/thumbnail")
+def get_paper_thumbnail_file(paper_id: int):
+    paper = _get_paper(paper_id)
+    if not paper:
+        raise HTTPException(status_code=404, detail="Paper not found.")
+
+    thumbnail_path = preview_assets.resolve_paper_thumbnail_file(paper_id)
+    if thumbnail_path.exists():
+        return FileResponse(thumbnail_path, media_type="image/png")
+
+    asset = get_paper_asset(paper_id, role="paper_thumbnail")
+    asset, storage_stream = open_paper_asset_stream(asset)
+    if asset and storage_stream is not None:
+        headers = {"Cross-Origin-Resource-Policy": "cross-origin"}
+        if asset.get("size_bytes"):
+            headers["Content-Length"] = str(asset["size_bytes"])
+
+        def _iter_stream():
+            try:
+                for chunk in storage_stream.stream(1024 * 1024):
+                    yield chunk
+            finally:
+                storage_stream.close()
+                storage_stream.release_conn()
+
+        return StreamingResponse(
+            _iter_stream(),
+            media_type=str(asset.get("mime_type") or "image/png"),
+            headers=headers,
+        )
+
+    raise HTTPException(status_code=404, detail="Thumbnail not found.")
 
 
 @app.get("/api/papers/{paper_id}/ingestion-sections/{section_canonical}")
