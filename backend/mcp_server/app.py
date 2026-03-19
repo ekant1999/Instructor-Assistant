@@ -5,7 +5,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
@@ -18,6 +18,16 @@ from backend.core.questions import (
     list_question_sets,
     update_question_set,
 )
+from backend.core.library_tools import (
+    find_library_papers,
+    get_library_excerpt as get_library_excerpt_payload,
+    get_library_figure as get_library_figure_payload,
+    get_library_pdf as get_library_pdf_payload,
+    get_library_section as get_library_section_payload,
+    list_library_figures as list_library_figures_payload,
+    list_library_sections as list_library_sections_payload,
+    load_library_paper_context as load_library_paper_context_payload,
+)
 from backend import context_store, services
 from backend.schemas import QuestionGenerationRequest
 from backend.services import QuestionGenerationError
@@ -29,6 +39,9 @@ mcp = FastMCP(name="instructor-assistant-local")
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
 logger = logging.getLogger(__name__)
 
+LibrarySearchMode = Literal["hybrid", "keyword", "semantic"]
+DeliveryMode = Literal["reference", "base64"]
+
 
 def _result(
     message: str,
@@ -38,6 +51,44 @@ def _result(
         content=[TextContent(type="text", text=message)],
         structuredContent=structured or {},
     )
+
+
+def _truncate_for_log(value: Any, *, max_chars: int = 240, max_items: int = 5) -> Any:
+    if isinstance(value, str):
+        if len(value) <= max_chars:
+            return value
+        return value[:max_chars] + "...[truncated]"
+    if isinstance(value, list):
+        preview = [_truncate_for_log(item, max_chars=max_chars, max_items=max_items) for item in value[:max_items]]
+        if len(value) > max_items:
+            preview.append(f"...[{len(value) - max_items} more item(s)]")
+        return preview
+    if isinstance(value, dict):
+        return {
+            str(key): _truncate_for_log(val, max_chars=max_chars, max_items=max_items)
+            for key, val in list(value.items())[:20]
+        }
+    return value
+
+
+def _log_tool_response(tool_name: str, structured: Optional[Dict[str, Any]]) -> None:
+    if structured is None:
+        logger.info("MCP tool result: %s -> <no structured content>", tool_name)
+        return
+    logger.info(
+        "MCP tool result: %s -> %s",
+        tool_name,
+        json.dumps(_truncate_for_log(structured), ensure_ascii=False),
+    )
+
+
+def _normalize_library_search_type(search_type: Optional[LibrarySearchMode]) -> str:
+    mode = str(search_type or "hybrid").strip().lower()
+    if mode == "semantic":
+        return "embedding"
+    if mode in {"hybrid", "keyword", "embedding"}:
+        return mode
+    return "hybrid"
 
 
 def _context_payload(include_text: bool = False) -> List[Dict[str, Any]]:
@@ -244,6 +295,352 @@ def update_question_set_tool(set_id: int, items: List[Dict[str, Any]], prompt: O
 def delete_question_set_tool(set_id: int) -> CallToolResult:
     delete_question_set(int(set_id))
     return _result(f"Deleted question set {set_id}.", {"set_id": set_id})
+
+
+@mcp.tool("find_library_paper")
+def find_library_paper_tool(
+    query: str,
+    limit: Optional[int] = None,
+    search_type: LibrarySearchMode = "hybrid",
+) -> CallToolResult:
+    """
+    Find research-library papers by title/content query.
+
+    Args:
+        query: Required paper lookup string. This can be a title fragment, keyword phrase, or numeric paper id.
+        limit: Optional maximum number of papers to return. Clamped to 1..20.
+        search_type: Retrieval mode for the lookup stage.
+            - `hybrid`: combine keyword and semantic retrieval. Best default.
+            - `keyword`: lexical lookup only.
+            - `semantic`: vector/embedding retrieval only.
+
+    Returns:
+        Matching paper candidates with `paper_id`, title, source URL, availability flags, and PDF reference.
+    """
+    logger.info(
+        "MCP tool called: find_library_paper query=%r limit=%s search_type=%s",
+        query,
+        limit,
+        search_type,
+    )
+    if not str(query or "").strip():
+        return _result("query is required.", {"error": "missing_query"})
+    try:
+        papers = find_library_papers(
+            query,
+            limit=max(1, min(int(limit or 5), 20)),
+            search_type=_normalize_library_search_type(search_type),
+        )
+    except Exception as exc:
+        return _result(f"Library paper lookup failed: {exc}", {"error": "lookup_failed"})
+    structured = {"query": query, "papers": papers}
+    _log_tool_response("find_library_paper", structured)
+    return _result(
+        f"Found {len(papers)} matching paper(s).",
+        structured,
+    )
+
+
+@mcp.tool("get_library_pdf")
+def get_library_pdf_tool(
+    paper_id: int,
+    delivery: DeliveryMode = "reference",
+    max_inline_bytes: Optional[int] = None,
+) -> CallToolResult:
+    """
+    Resolve a library paper PDF as either a fetchable reference or inline base64 bytes.
+
+    Args:
+        paper_id: Target library paper id.
+        delivery: Output mode.
+            - `reference`: return an API reference payload. Preferred default for most tool use.
+            - `base64`: return the actual PDF bytes inline as base64.
+        max_inline_bytes: Maximum allowed inline payload size when `delivery='base64'`.
+            Ignored in `reference` mode and clamped to 1 KiB..25 MB.
+
+    Returns:
+        A structured PDF payload with metadata plus either a backend reference or inline bytes.
+    """
+    logger.info(
+        "MCP tool called: get_library_pdf paper_id=%s delivery=%s max_inline_bytes=%s",
+        paper_id,
+        delivery,
+        max_inline_bytes,
+    )
+    try:
+        payload = get_library_pdf_payload(
+            int(paper_id),
+            delivery=str(delivery or "reference").strip().lower(),
+            max_inline_bytes=max(1024, min(int(max_inline_bytes or 5_242_880), 25_000_000)),
+        )
+    except Exception as exc:
+        return _result(f"Failed to load library PDF: {exc}", {"error": "pdf_unavailable"})
+    _log_tool_response("get_library_pdf", {"paper": payload})
+    return _result(
+        f"Resolved PDF for paper {paper_id}.",
+        {"paper": payload},
+    )
+
+
+@mcp.tool("get_library_excerpt")
+def get_library_excerpt_tool(
+    paper_id: int,
+    query: Optional[str] = None,
+    page_no: Optional[int] = None,
+    section_id: Optional[int] = None,
+    max_chars: Optional[int] = None,
+    search_type: LibrarySearchMode = "hybrid",
+    limit: Optional[int] = None,
+) -> CallToolResult:
+    """
+    Return a targeted text excerpt from a library paper.
+
+    Provide exactly one selector:
+    - `query` to retrieve the best localized excerpt for a search phrase
+    - `page_no` to return text from a specific page
+    - `section_id` to return text for a specific section row
+
+    Args:
+        paper_id: Target library paper id.
+        query: Search phrase used to localize a relevant excerpt.
+        page_no: Specific page number to read directly.
+        section_id: Specific section id to read directly.
+        max_chars: Maximum number of characters to return. Clamped to 500..20,000.
+        search_type: Retrieval mode used only when `query` is provided.
+            - `hybrid`: combine keyword and semantic retrieval. Best default.
+            - `keyword`: lexical retrieval only.
+            - `semantic`: vector/embedding retrieval only.
+        limit: Maximum number of candidate hits to include in the response.
+
+    Returns:
+        A structured excerpt payload containing the top excerpt plus candidate hits when query mode is used.
+    """
+    logger.info(
+        "MCP tool called: get_library_excerpt paper_id=%s query=%r page_no=%s section_id=%s max_chars=%s search_type=%s limit=%s",
+        paper_id,
+        query,
+        page_no,
+        section_id,
+        max_chars,
+        search_type,
+        limit,
+    )
+    try:
+        payload = get_library_excerpt_payload(
+            int(paper_id),
+            query=query,
+            page_no=int(page_no) if page_no is not None else None,
+            section_id=int(section_id) if section_id is not None else None,
+            max_chars=max(500, min(int(max_chars or 4000), 20000)),
+            search_type=_normalize_library_search_type(search_type),
+            limit=max(1, min(int(limit or 5), 10)),
+        )
+    except Exception as exc:
+        return _result(f"Failed to load library excerpt: {exc}", {"error": "excerpt_unavailable"})
+
+    excerpt = payload.get("excerpt")
+    _log_tool_response("get_library_excerpt", payload)
+    if excerpt:
+        page_label = excerpt.get("page_no")
+        return _result(
+            f"Returned library excerpt from page {page_label}.",
+            payload,
+        )
+    return _result("No excerpt matched the request.", payload)
+
+
+@mcp.tool("list_library_sections")
+def list_library_sections_tool(paper_id: int) -> CallToolResult:
+    """
+    List canonical ingestion sections available for a library paper.
+
+    Args:
+        paper_id: Target library paper id.
+
+    Returns:
+        Section metadata such as canonical names, page coverage, source, and confidence.
+    """
+    logger.info("MCP tool called: list_library_sections paper_id=%s", paper_id)
+    try:
+        payload = list_library_sections_payload(int(paper_id))
+    except Exception as exc:
+        return _result(f"Failed to list library sections: {exc}", {"error": "section_list_failed"})
+    _log_tool_response("list_library_sections", payload)
+    return _result(
+        f"Found {payload.get('section_count', 0)} section(s) for paper {paper_id}.",
+        payload,
+    )
+
+
+@mcp.tool("get_library_section")
+def get_library_section_tool(
+    paper_id: int,
+    section_canonical: str,
+    max_chars: Optional[int] = None,
+) -> CallToolResult:
+    """
+    Return a full canonical section from a library paper.
+
+    Args:
+        paper_id: Target library paper id.
+        section_canonical: Canonical section name from `list_library_sections`.
+        max_chars: Maximum section text size to return. Clamped to 1,000..250,000.
+
+    Returns:
+        Section text, page coverage, and associated figures, equations, and tables for that section.
+    """
+    logger.info(
+        "MCP tool called: get_library_section paper_id=%s section_canonical=%r max_chars=%s",
+        paper_id,
+        section_canonical,
+        max_chars,
+    )
+    if not str(section_canonical or "").strip():
+        return _result("section_canonical is required.", {"error": "missing_section"})
+    try:
+        payload = get_library_section_payload(
+            int(paper_id),
+            section_canonical,
+            max_chars=max(1000, min(int(max_chars or 60000), 250000)),
+        )
+    except Exception as exc:
+        return _result(f"Failed to load library section: {exc}", {"error": "section_unavailable"})
+    _log_tool_response("get_library_section", payload)
+    return _result(
+        f"Returned section '{section_canonical}' for paper {paper_id}.",
+        payload,
+    )
+
+
+@mcp.tool("list_library_figures")
+def list_library_figures_tool(
+    paper_id: int,
+    section_canonical: Optional[str] = None,
+    page_no: Optional[int] = None,
+    limit: Optional[int] = None,
+) -> CallToolResult:
+    """
+    List extracted figures for a library paper.
+
+    Args:
+        paper_id: Target library paper id.
+        section_canonical: Optional canonical section filter.
+        page_no: Optional page filter.
+        limit: Maximum number of figures to return. Clamped to 1..100.
+
+    Returns:
+        Figure metadata with page, section, caption, bbox, and image references.
+    """
+    logger.info(
+        "MCP tool called: list_library_figures paper_id=%s section_canonical=%r page_no=%s limit=%s",
+        paper_id,
+        section_canonical,
+        page_no,
+        limit,
+    )
+    try:
+        payload = list_library_figures_payload(
+            int(paper_id),
+            section_canonical=section_canonical,
+            page_no=int(page_no) if page_no is not None else None,
+            limit=max(1, min(int(limit or 20), 100)),
+        )
+    except Exception as exc:
+        return _result(f"Failed to list library figures: {exc}", {"error": "figure_list_failed"})
+    _log_tool_response("list_library_figures", payload)
+    return _result(
+        f"Found {payload.get('figure_count', 0)} figure(s) for paper {paper_id}.",
+        payload,
+    )
+
+
+@mcp.tool("get_library_figure")
+def get_library_figure_tool(
+    paper_id: int,
+    figure_name: str,
+    delivery: DeliveryMode = "reference",
+    max_inline_bytes: Optional[int] = None,
+) -> CallToolResult:
+    """
+    Resolve an extracted paper figure as either a fetchable reference or inline base64 bytes.
+
+    Args:
+        paper_id: Target library paper id.
+        figure_name: Exact figure file name from `list_library_figures`.
+        delivery: Output mode.
+            - `reference`: return an API reference payload. Preferred default.
+            - `base64`: return the actual image bytes inline as base64.
+        max_inline_bytes: Maximum allowed inline payload size when `delivery='base64'`.
+            Ignored in `reference` mode and clamped to 1 KiB..25 MB.
+
+    Returns:
+        Figure metadata plus either a backend reference or inline bytes.
+    """
+    logger.info(
+        "MCP tool called: get_library_figure paper_id=%s figure_name=%r delivery=%s max_inline_bytes=%s",
+        paper_id,
+        figure_name,
+        delivery,
+        max_inline_bytes,
+    )
+    if not str(figure_name or "").strip():
+        return _result("figure_name is required.", {"error": "missing_figure_name"})
+    try:
+        payload = get_library_figure_payload(
+            int(paper_id),
+            figure_name,
+            delivery=str(delivery or "reference").strip().lower(),
+            max_inline_bytes=max(1024, min(int(max_inline_bytes or 5_242_880), 25_000_000)),
+        )
+    except Exception as exc:
+        return _result(f"Failed to load library figure: {exc}", {"error": "figure_unavailable"})
+    _log_tool_response("get_library_figure", payload)
+    return _result(
+        f"Resolved figure '{figure_name}' for paper {paper_id}.",
+        payload,
+    )
+
+
+@mcp.tool("load_library_paper_context")
+def load_library_paper_context_tool(
+    paper_id: int,
+    section_canonical: Optional[str] = None,
+    max_chars: Optional[int] = None,
+) -> CallToolResult:
+    """
+    Load a library paper, or one named section, into the MCP context store for incremental reading.
+
+    Args:
+        paper_id: Target library paper id.
+        section_canonical: Optional canonical section name. If omitted, the full paper text is loaded.
+        max_chars: Maximum amount of text to load into the context store. Clamped to 1,000..250,000.
+
+    Returns:
+        A normal MCP context payload containing `context_id`, preview text, and total character count.
+    """
+    logger.info(
+        "MCP tool called: load_library_paper_context paper_id=%s section_canonical=%r max_chars=%s",
+        paper_id,
+        section_canonical,
+        max_chars,
+    )
+    try:
+        ctx = load_library_paper_context_payload(
+            int(paper_id),
+            section_canonical=section_canonical,
+            max_chars=max(1000, min(int(max_chars or 60000), 250000)),
+        )
+    except Exception as exc:
+        return _result(f"Failed to load library paper context: {exc}", {"error": "context_load_failed"})
+
+    context_store.save_context(ctx)
+    structured = {"context": ctx.model_dump()}
+    _log_tool_response("load_library_paper_context", structured)
+    if section_canonical:
+        message = f"Loaded section '{section_canonical}' from paper {paper_id} into context store."
+    else:
+        message = f"Loaded paper {paper_id} into context store."
+    return _result(message, structured)
 
 
 def run_server() -> None:

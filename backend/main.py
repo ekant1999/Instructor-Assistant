@@ -2216,6 +2216,7 @@ async def get_paper_ingestion_section_detail(
         section_images = [
             img for img in all_images
             if int(img.get("page_no") or 0) in page_set
+            and str(img.get("section_canonical") or "").strip().lower() in {"", "other", "unknown", "unassigned"}
         ]
 
     section_images = sorted(
@@ -2240,6 +2241,7 @@ async def get_paper_ingestion_section_detail(
             equation
             for equation in all_equations
             if int(equation.get("page_no") or 0) in page_set
+            and str(equation.get("section_canonical") or "").strip().lower() in {"", "other", "unknown", "unassigned"}
         ]
     section_equations = sorted(
         section_equations,

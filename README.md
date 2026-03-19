@@ -138,6 +138,18 @@ python -m backend.mcp_server.app
 ```
 Set `LOCAL_MCP_SERVER_URL=http://127.0.0.1:8020/mcp` in `backend/.env`.
 
+The MCP server also exposes library retrieval tools for:
+
+- paper lookup
+- excerpt retrieval
+- section retrieval
+- figure retrieval
+- loading papers/sections into the MCP context store
+
+See:
+
+- `backend/mcp_server/README.md`
+
 ### ChatGPT SDK App
 The ChatGPT SDK widget lives in `chatgpt-sdk-app/`. Follow `chatgpt-sdk-app/README.md` to run it independently.
 
