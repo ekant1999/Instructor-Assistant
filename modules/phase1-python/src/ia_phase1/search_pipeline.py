@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
+import logging
 import math
+import os
 import re
 from typing import Any, Callable, Dict, List, Optional
 
@@ -131,6 +134,85 @@ KeywordSectionHitsFn = Callable[..., List[Dict[str, Any]]]
 SemanticSectionHitsFn = Callable[..., List[Dict[str, Any]]]
 
 _CONNECTION_FACTORY: Optional[ConnectionFactory] = None
+logger = logging.getLogger(__name__)
+
+
+def _search_trace_enabled() -> bool:
+    raw = os.getenv("SEARCH_TRACE_ENABLED", "false").strip().lower()
+    return raw in {"1", "true", "yes", "on"}
+
+
+def _search_trace_limit() -> int:
+    try:
+        return max(1, int(os.getenv("SEARCH_TRACE_MAX_HITS", "5")))
+    except (TypeError, ValueError):
+        return 5
+
+
+def _search_trace_text_chars() -> int:
+    try:
+        return max(40, int(os.getenv("SEARCH_TRACE_TEXT_CHARS", "160")))
+    except (TypeError, ValueError):
+        return 160
+
+
+def _truncate_for_trace(value: Any, *, max_chars: Optional[int] = None) -> str:
+    text = " ".join(str(value or "").split())
+    limit = max_chars if max_chars is not None else _search_trace_text_chars()
+    if len(text) <= limit:
+        return text
+    return text[: max(0, limit - 3)].rstrip() + "..."
+
+
+def _summarize_hit_for_trace(hit: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "id": safe_int(hit.get("id")),
+        "paper_id": safe_int(hit.get("paper_id")),
+        "page_no": safe_int(hit.get("page_no")),
+        "section": str(hit.get("match_section_canonical") or ""),
+        "bucket": str(hit.get("search_bucket") or ""),
+        "match_score": round(safe_float(hit.get("match_score")), 4),
+        "keyword_score": round(safe_float(hit.get("keyword_score")), 4),
+        "semantic_score": round(safe_float(hit.get("semantic_score")), 4),
+        "semantic_raw_score": round(safe_float(hit.get("semantic_raw_score")), 4),
+        "block_match_score": round(safe_float(hit.get("block_match_score")), 4),
+        "localization_score": round(safe_float(hit.get("localization_score")), 4),
+        "lex_hits": safe_int(hit.get("lex_hits")),
+        "content_hits": safe_int(hit.get("content_hits")),
+        "rare_hits": safe_int(hit.get("rare_hits")),
+        "weighted_hit_ratio": round(safe_float(hit.get("weighted_hit_ratio")), 4),
+        "exact_phrase": bool(hit.get("exact_phrase")),
+        "title_only_match": bool(hit.get("title_only_match")),
+        "snippet": _truncate_for_trace(hit.get("match_text") or hit.get("source_text") or hit.get("text")),
+    }
+
+
+def _summarize_hits_for_trace(hits: List[Dict[str, Any]], *, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+    max_items = limit if limit is not None else _search_trace_limit()
+    return [_summarize_hit_for_trace(hit) for hit in hits[:max_items]]
+
+
+def _summarize_paper_for_trace(paper_id: int, meta: Dict[str, Any]) -> Dict[str, Any]:
+    support_hits = list(meta.get("support_hits") or [])
+    return {
+        "paper_id": int(paper_id),
+        "score": round(safe_float(meta.get("score")), 4),
+        "title_bonus": round(safe_float(meta.get("title_bonus")), 4),
+        "title_only_match": bool(meta.get("title_only_match")),
+        "best_hit": _summarize_hit_for_trace(meta.get("best_hit") or {}),
+        "support_hits": _summarize_hits_for_trace(support_hits),
+    }
+
+
+def _trace_search(event: str, **payload: Any) -> None:
+    if not _search_trace_enabled():
+        return
+    record = {"event": event, **payload}
+    try:
+        rendered = json.dumps(record, ensure_ascii=False, sort_keys=True)
+    except TypeError:
+        rendered = json.dumps({"event": event, "payload_repr": repr(payload)}, ensure_ascii=False, sort_keys=True)
+    logger.info("[search-trace] %s", rendered)
 
 
 def configure_connection_factory(factory: ConnectionFactory) -> None:
@@ -542,7 +624,16 @@ def search_paper_sections_for_localization(
         limit=limit,
     )
     hits = filter_section_hits_for_query(query, hits, get_conn_fn=get_conn_fn)
-    return rerank_section_hits_for_localization(query, hits, get_conn_fn=get_conn_fn)
+    reranked = rerank_section_hits_for_localization(query, hits, get_conn_fn=get_conn_fn)
+    _trace_search(
+        "localization_hits",
+        query=query,
+        search_type=search_type,
+        paper_id=int(paper_id),
+        total=len(reranked),
+        top_hits=_summarize_hits_for_trace(reranked),
+    )
+    return reranked
 
 
 def section_passes_search_gate(
@@ -622,6 +713,7 @@ def filter_section_hits_for_query(
     token_count = len(query_tokens(query))
     stats = query_token_stats(query, get_conn_fn=get_conn_fn)
     filtered: List[Dict[str, Any]] = []
+    dropped: List[Dict[str, Any]] = []
     for hit in hits:
         annotated = annotate_hit_query_support(hit, query_stats=stats)
         if section_passes_search_gate(
@@ -630,6 +722,19 @@ def filter_section_hits_for_query(
             content_tokens=list(stats.get("content_tokens") or []),
         ):
             filtered.append(annotated)
+        else:
+            dropped.append(annotated)
+    _trace_search(
+        "section_hits_filtered",
+        query=query,
+        input_count=len(hits),
+        kept_count=len(filtered),
+        dropped_count=len(dropped),
+        content_tokens=list(stats.get("content_tokens") or []),
+        rare_tokens=list(stats.get("rare_tokens") or []),
+        kept_hits=_summarize_hits_for_trace(filtered),
+        dropped_hits=_summarize_hits_for_trace(dropped),
+    )
     return filtered
 
 
@@ -723,11 +828,25 @@ def filter_aggregated_papers_for_query(
     *,
     get_conn_fn: Optional[ConnectionFactory] = None,
 ) -> Dict[int, Dict[str, Any]]:
-    return {
+    kept = {
         pid: meta
         for pid, meta in aggregated.items()
         if paper_passes_search_gate(query, meta, get_conn_fn=get_conn_fn)
     }
+    rejected_ids = [pid for pid in aggregated.keys() if pid not in kept]
+    _trace_search(
+        "paper_hits_filtered",
+        query=query,
+        input_count=len(aggregated),
+        kept_count=len(kept),
+        dropped_count=len(rejected_ids),
+        kept_papers=[
+            _summarize_paper_for_trace(pid, meta)
+            for pid, meta in sorted(kept.items(), key=lambda item: safe_float(item[1].get("score")), reverse=True)[: _search_trace_limit()]
+        ],
+        dropped_paper_ids=rejected_ids[: _search_trace_limit()],
+    )
+    return kept
 
 
 def paper_title_bonus_lookup(
@@ -845,6 +964,11 @@ def inject_title_only_candidates(
             "title_bonus": title_bonus,
             "title_only_match": True,
         }
+    _trace_search(
+        "title_only_rescues",
+        rescued_ids=rescued_ids[: _search_trace_limit()],
+        total_rescued=len(rescued_ids),
+    )
     return aggregated
 
 
@@ -946,11 +1070,28 @@ def search_section_hits_unified(
             max_chars=max_chars,
             limit=limit,
         )
+    result: List[Dict[str, Any]]
     if st == "keyword":
-        return keyword_hits[:limit]
-    if st == "embedding":
-        return semantic_hits[:limit]
-    return merge_section_hits(keyword_hits, semantic_hits, limit=limit)
+        result = keyword_hits[:limit]
+    elif st == "embedding":
+        result = semantic_hits[:limit]
+    else:
+        result = merge_section_hits(keyword_hits, semantic_hits, limit=limit)
+    _trace_search(
+        "section_hits_unified",
+        query=query,
+        search_type=st,
+        paper_ids=[int(pid) for pid in (paper_ids or [])],
+        include_text=bool(include_text),
+        limit=int(limit),
+        keyword_count=len(keyword_hits),
+        semantic_count=len(semantic_hits),
+        result_count=len(result),
+        keyword_hits=_summarize_hits_for_trace(keyword_hits),
+        semantic_hits=_summarize_hits_for_trace(semantic_hits),
+        result_hits=_summarize_hits_for_trace(result),
+    )
+    return result
 
 
 def aggregate_section_hits_to_papers(
@@ -995,6 +1136,16 @@ def aggregate_section_hits_to_papers(
             "support_hits": ranked[:3],
             "title_bonus": title_bonus,
         }
+    _trace_search(
+        "paper_hits_aggregated",
+        query=query,
+        input_section_count=len(section_hits),
+        paper_count=len(aggregated),
+        top_papers=[
+            _summarize_paper_for_trace(pid, meta)
+            for pid, meta in sorted(aggregated.items(), key=lambda item: safe_float(item[1].get("score")), reverse=True)[: _search_trace_limit()]
+        ],
+    )
     return aggregated
 
 

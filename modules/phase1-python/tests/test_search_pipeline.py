@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import sqlite3
 from contextlib import contextmanager
 from typing import Iterator
@@ -189,6 +190,50 @@ def test_search_section_hits_unified_uses_callbacks_and_hybrid_merge() -> None:
     assert len(hits) == 1
     assert hits[0]["id"] == 51
     assert hits[0]["match_score"] > 0.40
+
+
+def test_search_pipeline_emits_trace_logs_when_enabled(
+    monkeypatch,
+    caplog,
+) -> None:
+    conn = _build_conn()
+    try:
+        configure_connection_factory(lambda: _conn_factory(conn))
+        monkeypatch.setenv("SEARCH_TRACE_ENABLED", "true")
+        monkeypatch.setenv("SEARCH_TRACE_MAX_HITS", "2")
+
+        with caplog.at_level(logging.INFO, logger="ia_phase1.search_pipeline"):
+            hits = search_section_hits_unified(
+                "vision benchmark",
+                "hybrid",
+                keyword_section_hits_fn=lambda *args, **kwargs: [
+                    {
+                        "id": 51,
+                        "paper_id": 5,
+                        "page_no": 3,
+                        "match_score": 0.18,
+                        "keyword_score": 0.18,
+                        "semantic_score": 0.0,
+                        "lex_hits": 2,
+                        "exact_phrase": True,
+                        "search_bucket": "body",
+                        "source_text": "Vision benchmark results are reported here.",
+                    }
+                ],
+                semantic_section_hits_fn=lambda *args, **kwargs: [],
+                include_text=False,
+                max_chars=None,
+                limit=20,
+            )
+            filtered = filter_section_hits_for_query("vision benchmark", hits)
+            aggregate_section_hits_to_papers(filtered, query="vision benchmark")
+    finally:
+        conn.close()
+
+    messages = [record.getMessage() for record in caplog.records if "[search-trace]" in record.getMessage()]
+    assert any('"event": "section_hits_unified"' in message for message in messages)
+    assert any('"event": "section_hits_filtered"' in message for message in messages)
+    assert any('"event": "paper_hits_aggregated"' in message for message in messages)
 
 
 def test_rerank_section_hits_for_localization_prefers_method_section_for_method_query() -> None:

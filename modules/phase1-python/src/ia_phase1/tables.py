@@ -446,6 +446,14 @@ def _table_enabled() -> bool:
     return raw in {"1", "true", "yes"}
 
 
+def _table_text_fallback_enabled() -> bool:
+    # Keep the permissive text-based fallback explicitly opt-in. The native
+    # PyMuPDF detector is materially less likely to convert nearby prose into
+    # fake tables, which is the failure mode we want to avoid by default.
+    raw = os.getenv("TABLE_TEXT_FALLBACK_ENABLED", "false").strip().lower()
+    return raw in {"1", "true", "yes"}
+
+
 def _prepare_page_blocks(blocks: Iterable[Dict[str, Any]]) -> Dict[int, List[Dict[str, Any]]]:
     page_map: Dict[int, List[Dict[str, Any]]] = {}
     for block in blocks:
@@ -617,6 +625,17 @@ def _to_csv_text(headers: List[str], rows: List[List[str]]) -> str:
         normalized = row[:len(headers)] + [""] * max(0, len(headers) - len(row))
         writer.writerow(normalized[:len(headers)])
     return buffer.getvalue().strip()
+
+
+def _render_table_markdown(table_obj: Any, headers: List[str], rows: List[List[str]]) -> str:
+    if table_obj is not None:
+        try:
+            native = (table_obj.to_markdown() or "").strip()
+        except Exception:
+            native = ""
+        if native:
+            return native
+    return _to_markdown(headers, rows)
 
 
 def _extract_block_text(block: Dict[str, Any]) -> str:
@@ -812,7 +831,7 @@ def extract_and_store_paper_tables(
     min_rows = max(1, _safe_int(os.getenv("TABLE_MIN_ROWS", "2"), 2))
     min_cols = max(1, _safe_int(os.getenv("TABLE_MIN_COLS", "2"), 2))
     min_area = max(1.0, _safe_float(os.getenv("TABLE_MIN_AREA_PT", "1600"), 1600.0))
-    text_fallback_enabled = os.getenv("TABLE_TEXT_FALLBACK_ENABLED", "true").strip().lower() in {"1", "true", "yes"}
+    text_fallback_enabled = _table_text_fallback_enabled()
     dedup_iou_threshold = min(1.0, max(0.0, _safe_float(os.getenv("TABLE_DEDUP_IOU_THRESHOLD", "0.80"), 0.80)))
 
     doc = pymupdf.open(str(pdf_path))
@@ -829,7 +848,7 @@ def extract_and_store_paper_tables(
             page_candidates: List[Dict[str, Any]] = []
 
             try:
-                finder = page.find_tables(strategy="lines")
+                finder = page.find_tables()
             except Exception as exc:
                 logger.warning("Table detection failed for paper %s page %s: %s", paper_id, page_no, exc)
                 continue
@@ -840,7 +859,7 @@ def extract_and_store_paper_tables(
                     page_tables,
                     min_area=min_area,
                     min_cols=min_cols,
-                    detection_strategy="lines",
+                    detection_strategy="pymupdf_native",
                 )
             )
 
@@ -860,7 +879,7 @@ def extract_and_store_paper_tables(
                 bbox = candidate.get("bbox")
                 matrix = candidate.get("matrix") or []
                 table_obj = candidate.get("table_obj")
-                detection_strategy = str(candidate.get("detection_strategy") or "lines")
+                detection_strategy = str(candidate.get("detection_strategy") or "pymupdf_native")
                 if not matrix:
                     continue
 
@@ -925,7 +944,7 @@ def extract_and_store_paper_tables(
                     continue
 
                 section = _infer_section_for_table(page_blocks.get(page_no, []), bbox)
-                markdown = _to_markdown(headers, rows)
+                markdown = _render_table_markdown(table_obj, headers, rows)
                 csv_text = _to_csv_text(headers, rows)
 
                 record = {

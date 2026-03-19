@@ -33,7 +33,7 @@ print(manifest["num_tables"], len(table_chunks))
 - `TABLE_MIN_ROWS`
 - `TABLE_MIN_COLS`
 - `TABLE_MIN_AREA_PT`
-- `TABLE_TEXT_FALLBACK_ENABLED`
+- `TABLE_TEXT_FALLBACK_ENABLED` (default `false`; opt-in caption-guided `strategy="text"` fallback)
 - `TABLE_DEDUP_IOU_THRESHOLD`
 
 ## Output

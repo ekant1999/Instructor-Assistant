@@ -128,6 +128,22 @@ Notes:
 - semantic retrieval is a toy callback for demonstration only
 - replace that callback with your pgvector/embedding retrieval in a real app
 
+## Trace Logging
+
+Enable compact search tracing with:
+
+- `SEARCH_TRACE_ENABLED=true`
+- optional `SEARCH_TRACE_MAX_HITS` (default `5`)
+- optional `SEARCH_TRACE_TEXT_CHARS` (default `160`)
+
+When enabled, `search_pipeline.py` logs:
+- raw unified section hits
+- kept vs dropped section hits after query gating
+- aggregated paper candidates
+- title-only rescues
+- final kept paper hits
+- localized section hits inside the selected paper
+
 ## Module Boundary
 
 - Keep environment-specific retrieval inside the app:

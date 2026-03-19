@@ -986,6 +986,7 @@ def _aggregate_section_hits_to_papers(
     return _aggregate_section_hits_to_papers_impl(
         section_hits,
         title_bonus_by_id,
+        query=query,
         get_conn_fn=get_conn,
     )
 
