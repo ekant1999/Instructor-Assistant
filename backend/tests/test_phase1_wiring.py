@@ -14,7 +14,7 @@ if str(BACKEND_ROOT) not in sys.path:
 
 def test_backend_wrappers_delegate_to_ia_phase1() -> None:
     from core import pdf, search, hybrid_search, search_context, search_pipeline
-    from rag import chunking, section_extractor, table_extractor, paper_figures
+    from rag import chunking, section_extractor, table_extractor, paper_figures, markdown_exporter
 
     assert pdf.extract_text_blocks.__module__ == "ia_phase1.parser"
     assert pdf.resolve_any_to_pdf.__module__ == "ia_phase1.parser"
@@ -23,6 +23,7 @@ def test_backend_wrappers_delegate_to_ia_phase1() -> None:
     assert table_extractor.extract_and_store_paper_tables.__module__ == "rag.table_extractor"
     assert table_extractor.table_records_to_chunks.__module__ == "ia_phase1.tables"
     assert paper_figures.extract_and_store_paper_figures.__module__ == "rag.paper_figures"
+    assert markdown_exporter.export_pdf_to_markdown.__module__ == "ia_phase1.markdown_export.export"
     assert search.search_sections.__module__ == "ia_phase1.search_keyword"
     assert hybrid_search.hybrid_search.__module__ == "ia_phase1.search_hybrid"
     assert search_context.build_match_snippet.__module__ == "ia_phase1.search_context"

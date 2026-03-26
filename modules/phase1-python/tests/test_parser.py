@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pymupdf
 import pytest
 
 from ia_phase1 import parser
@@ -66,6 +67,74 @@ def test_extract_pages_and_blocks(sample_pdf: Path) -> None:
     assert "text" in first_line
     assert "bbox" in first_line
     assert isinstance(first_line.get("spans"), list)
+
+
+def _build_two_column_order_pdf(path: Path) -> None:
+    doc = pymupdf.open()
+    page = doc.new_page(width=595, height=842)
+    page.insert_textbox((144, 48, 452, 76), "A Two Column Paper", fontsize=18, align=1)
+    page.insert_textbox((198, 82, 398, 102), "Author One / Author Two", fontsize=11, align=1)
+    page.insert_textbox((12, 120, 34, 340), "arXiv:\n2603.99999v1\n[cs.CV]\n24 Mar 2026", fontsize=8)
+    page.insert_textbox((72, 120, 270, 250), "Left column introduction paragraph with stable reading order. " * 3, fontsize=11)
+    page.insert_textbox((72, 266, 270, 396), "Left column continuation paragraph that should remain before the right column. " * 3, fontsize=11)
+    page.insert_textbox((320, 120, 520, 250), "Right column related work paragraph with separate content. " * 3, fontsize=11)
+    page.insert_textbox((320, 266, 520, 396), "Right column method paragraph with distinct text. " * 3, fontsize=11)
+    doc.save(str(path))
+    doc.close()
+
+
+def _build_first_page_preamble_pdf(path: Path) -> None:
+    doc = pymupdf.open()
+    page = doc.new_page(width=595, height=842)
+    page.insert_textbox((120, 84, 475, 118), "MemDLM: Memory-Enhanced DLM Training", fontsize=18, align=1)
+    page.insert_textbox((150, 150, 445, 182), "Zehua Pei 1, Hui-Ling Zhen 2, Bei Yu 1", fontsize=10, align=1)
+    page.insert_textbox((165, 182, 430, 204), "1 Example University 2 Example Lab", fontsize=9, align=1)
+    page.insert_textbox((285, 220, 330, 238), "Abstract", fontsize=12, align=1)
+    page.insert_textbox(
+        (145, 246, 470, 410),
+        "This abstract paragraph should remain before chart labels on the first page. " * 8,
+        fontsize=10,
+        align=0,
+    )
+    page.insert_textbox((105, 458, 220, 476), "Standard MDLM", fontsize=5, align=0)
+    page.insert_textbox((110, 652, 505, 708), "Figure 1: Needle-in-a-Haystack results overview.", fontsize=10, align=0)
+    doc.save(str(path))
+    doc.close()
+
+
+def test_extract_text_blocks_orders_two_column_pages_and_pushes_margin_notes_last(
+    tmp_path: Path,
+) -> None:
+    pdf_path = tmp_path / "two_column.pdf"
+    _build_two_column_order_pdf(pdf_path)
+
+    blocks = parser.extract_text_blocks(pdf_path)
+    texts = [" ".join(str(block.get("text") or "").split()) for block in blocks]
+
+    assert texts[0].startswith("Author One / Author Two")
+    assert texts[1].startswith("Left column introduction paragraph")
+    assert texts[2].startswith("Left column continuation paragraph")
+    assert texts[3].startswith("Right column related work paragraph")
+    assert texts[4].startswith("Right column method paragraph")
+    assert texts[-1].startswith("arXiv:")
+    assert blocks[-1]["metadata"]["layout_role"] == "margin_note"
+
+
+def test_extract_text_blocks_keeps_first_page_preamble_before_visual_labels(
+    tmp_path: Path,
+) -> None:
+    pdf_path = tmp_path / "first_page_preamble.pdf"
+    _build_first_page_preamble_pdf(pdf_path)
+
+    blocks = parser.extract_text_blocks(pdf_path)
+    texts = [" ".join(str(block.get("text") or "").split()) for block in blocks]
+
+    title_pos = next(i for i, text in enumerate(texts) if text.startswith("MemDLM: Memory-Enhanced DLM Training"))
+    author_pos = next(i for i, text in enumerate(texts) if text.startswith("Zehua Pei 1"))
+    abstract_block_pos = next(i for i, text in enumerate(texts) if "This abstract paragraph should remain" in text)
+    label_pos = next(i for i, text in enumerate(texts) if text.startswith("Standard MDLM"))
+
+    assert title_pos < author_pos < abstract_block_pos < label_pos
 
 
 @pytest.mark.asyncio

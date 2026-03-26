@@ -11,6 +11,7 @@ import {
   ApiPaperIngestionInfo,
   ApiPaperIngestionSectionDetail,
 } from '@/lib/api-types';
+import { StructuredTablePreview } from '@/library/StructuredTablePreview';
 
 const MIN_TOP_PANELS_HEIGHT = 72;
 const MIN_SECTION_DETAIL_HEIGHT = 140;
@@ -272,26 +273,7 @@ export function PaperIngestionInfoDialog({
                   <div className="space-y-2">
                     {data.tables.map((table) => (
                       <Card key={`table-${table.id}`} className="p-3 bg-muted/20">
-                        {(() => {
-                          const previewHeaders = Array.isArray(table.headers_preview) ? table.headers_preview : [];
-                          const previewRows = Array.isArray(table.rows_preview) ? table.rows_preview : [];
-                          const previewColCount = Math.max(
-                            table.n_cols || 0,
-                            previewHeaders.length,
-                            ...previewRows.map((row) => row.length),
-                          );
-                          const normalizedHeaders = Array.from({ length: previewColCount }, (_, idx) => {
-                            const value = previewHeaders[idx] || '';
-                            return value.trim() || `col_${idx + 1}`;
-                          });
-                          const normalizedRows = previewRows.map((row) => {
-                            if (row.length >= previewColCount) return row.slice(0, previewColCount);
-                            return [...row, ...Array(previewColCount - row.length).fill('')];
-                          });
-                          const hasStructuredPreview = normalizedHeaders.length > 0 && normalizedRows.length > 0;
-
-                          return (
-                            <>
+                        <>
                         <div className="flex items-center gap-2 flex-wrap mb-1">
                           <Badge variant="outline">table {table.id}</Badge>
                           <Badge variant="outline">p{table.page_no}</Badge>
@@ -307,59 +289,15 @@ export function PaperIngestionInfoDialog({
                         {table.caption && (
                           <div className="text-xs text-muted-foreground mb-2">{table.caption}</div>
                         )}
-                        {(hasStructuredPreview || table.markdown_preview) && (
+                        {(Array.isArray(table.headers_preview) || Array.isArray(table.rows_preview) || table.markdown_preview) && (
                           <details>
                             <summary className="text-xs cursor-pointer text-muted-foreground">
                               Show table preview
                             </summary>
-                            {hasStructuredPreview && (
-                              <div className="mt-2 border rounded-md bg-background overflow-hidden">
-                                <div className="max-h-64 overflow-auto">
-                                  <table className="min-w-full text-[11px] leading-5 border-collapse">
-                                    <thead className="bg-muted/50 sticky top-0 z-10">
-                                      <tr>
-                                        <th className="text-left align-top p-2 border-b border-r w-10">#</th>
-                                        {normalizedHeaders.map((header, idx) => (
-                                          <th key={`table-${table.id}-header-${idx}`} className="text-left align-top p-2 border-b border-r whitespace-pre-wrap">
-                                            {header}
-                                          </th>
-                                        ))}
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {normalizedRows.map((row, rowIdx) => (
-                                        <tr key={`table-${table.id}-row-${rowIdx}`} className="odd:bg-background even:bg-muted/20">
-                                          <td className="align-top p-2 border-b border-r text-muted-foreground">{rowIdx + 1}</td>
-                                          {row.map((cell, cellIdx) => (
-                                            <td
-                                              key={`table-${table.id}-row-${rowIdx}-cell-${cellIdx}`}
-                                              className="align-top p-2 border-b border-r whitespace-pre-wrap break-words min-w-[120px]"
-                                            >
-                                              {cell || '—'}
-                                            </td>
-                                          ))}
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                                {table.preview_truncated && (
-                                  <div className="px-2 py-1 text-[11px] text-muted-foreground border-t">
-                                    Showing first {normalizedRows.length} rows in preview.
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            {!hasStructuredPreview && table.markdown_preview && (
-                              <pre className="mt-2 text-[11px] leading-5 whitespace-pre-wrap break-words bg-background border rounded-md p-2">
-                                {table.markdown_preview}
-                              </pre>
-                            )}
+                            <StructuredTablePreview table={table} className="mt-2" />
                           </details>
                         )}
-                            </>
-                          );
-                        })()}
+                        </>
                       </Card>
                     ))}
                   </div>

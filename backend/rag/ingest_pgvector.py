@@ -28,6 +28,7 @@ from core.storage import (
     upload_paper_asset,
 )
 from .chunking import chunk_text_blocks, simple_chunk_blocks
+from .markdown_exporter import MarkdownExportConfig, export_pdf_to_markdown
 from .preview_assets import generate_and_store_paper_thumbnail
 from .pgvector_store import PgVectorStore
 from .section_extractor import annotate_blocks_with_sections
@@ -226,6 +227,49 @@ def _sync_thumbnail_asset(paper_id: int, thumbnail_path: Path | None) -> int:
     return 1 if asset is not None else 0
 
 
+def _sync_markdown_bundle_assets(
+    paper_id: int,
+    *,
+    markdown_path: str | Path | None,
+    manifest_path: str | Path | None,
+) -> Dict[str, int]:
+    if not object_storage_enabled():
+        return {"markdown": 0, "manifest": 0}
+
+    delete_paper_assets_by_role(paper_id, ["paper_markdown", "paper_markdown_manifest"])
+    uploaded = {"markdown": 0, "manifest": 0}
+
+    if markdown_path:
+        markdown_file = Path(markdown_path).expanduser()
+        if markdown_file.exists():
+            asset = upload_paper_asset(
+                paper_id,
+                markdown_file,
+                role="paper_markdown",
+                source_kind="derived_markdown",
+                original_filename=markdown_file.name,
+                mime_type="text/markdown",
+            )
+            if asset is not None:
+                uploaded["markdown"] = 1
+
+    if manifest_path:
+        manifest_file = Path(manifest_path).expanduser()
+        if manifest_file.exists():
+            asset = upload_paper_asset(
+                paper_id,
+                manifest_file,
+                role="paper_markdown_manifest",
+                source_kind="derived_manifest",
+                original_filename=manifest_file.name,
+                mime_type="application/json",
+            )
+            if asset is not None:
+                uploaded["manifest"] = 1
+
+    return uploaded
+
+
 async def ingest_single_paper(
     pdf_path: str,
     paper_id: int,
@@ -381,6 +425,44 @@ async def ingest_single_paper(
             logger.info("  Generated thumbnail (%s synced to object storage)", thumbnail_uploaded)
         except Exception as exc:
             logger.warning("  Thumbnail generation failed for paper %s: %s", paper_id, exc)
+
+        markdown_export_result: Optional[Dict[str, Any]] = None
+        markdown_asset_report: Dict[str, int] = {"markdown": 0, "manifest": 0}
+        try:
+            markdown_result = export_pdf_to_markdown(
+                pdf_path_obj,
+                paper_id=paper_id,
+                source_url=source_url,
+                metadata={"title": paper_title},
+                blocks=blocks,
+                config=MarkdownExportConfig(
+                    ensure_assets=False,
+                    asset_mode="copy",
+                    asset_path_mode="relative",
+                    include_frontmatter=True,
+                    include_page_markers=False,
+                    overwrite=True,
+                ),
+            )
+            markdown_export_result = {
+                "bundle_dir": str(markdown_result.bundle_dir),
+                "markdown_path": str(markdown_result.markdown_path),
+                "manifest_path": str(markdown_result.manifest_path),
+                "asset_counts": dict(markdown_result.asset_counts),
+            }
+            markdown_asset_report = _sync_markdown_bundle_assets(
+                paper_id,
+                markdown_path=markdown_result.markdown_path,
+                manifest_path=markdown_result.manifest_path,
+            )
+            logger.info(
+                "  Generated markdown bundle at %s (%s markdown, %s manifest synced to object storage)",
+                markdown_result.bundle_dir,
+                markdown_asset_report.get("markdown", 0),
+                markdown_asset_report.get("manifest", 0),
+            )
+        except Exception as exc:
+            logger.warning("  Markdown export failed for paper %s: %s", paper_id, exc)
         
         # Chunk the blocks
         logger.info("  Chunking blocks...")
@@ -426,6 +508,11 @@ async def ingest_single_paper(
             "num_equations": equation_report.get("num_equations", 0),
             "num_equation_chunks": len(equation_chunks),
             "thumbnail_uploaded": thumbnail_uploaded,
+            "markdown_bundle_dir": (markdown_export_result or {}).get("bundle_dir"),
+            "markdown_path": (markdown_export_result or {}).get("markdown_path"),
+            "markdown_asset_counts": (markdown_export_result or {}).get("asset_counts", {}),
+            "markdown_uploaded": markdown_asset_report.get("markdown", 0),
+            "markdown_manifest_uploaded": markdown_asset_report.get("manifest", 0),
         }
     
     except Exception as e:

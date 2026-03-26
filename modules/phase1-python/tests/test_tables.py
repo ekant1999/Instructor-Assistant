@@ -7,6 +7,14 @@ import pymupdf
 import pytest
 
 from ia_phase1.tables import (
+    _append_or_replace_table_record,
+    _find_nearest_caption_block,
+    _looks_like_false_positive_table,
+    _missing_explicit_table_caption_indices,
+    _merge_sparse_pre_numeric_text_columns,
+    _pick_headers_and_rows,
+    _repair_leading_text_fragment_columns,
+    _repair_headers_from_auxiliary_band,
     extract_and_store_paper_tables,
     load_paper_table_manifest,
     table_records_to_chunks,
@@ -115,6 +123,31 @@ def _build_caption_plus_prose_pdf(path: Path) -> None:
     doc.close()
 
 
+def _build_borderless_numeric_table_pdf(path: Path) -> None:
+    doc = pymupdf.open()
+    page = doc.new_page(width=595, height=842)
+    page.insert_textbox((72, 72, 520, 98), "Table 1. Long-context benchmark results.", fontsize=12)
+
+    x_positions = [90, 190, 280, 360, 440]
+    headers = ["Method", "1K", "2K", "4K", "8K"]
+    rows = [
+        ["Base", "72.1", "70.4", "68.0", "61.3"],
+        ["Memory", "79.8", "78.2", "75.1", "70.9"],
+        ["Memory+", "81.2", "80.1", "78.4", "74.0"],
+    ]
+    y = 126
+    for idx, text in enumerate(headers):
+        page.insert_text((x_positions[idx], y), text, fontsize=10)
+    y += 20
+    for row in rows:
+        for idx, text in enumerate(row):
+            page.insert_text((x_positions[idx], y), text, fontsize=10)
+        y += 18
+
+    doc.save(str(path))
+    doc.close()
+
+
 def test_extract_tables_uses_native_pymupdf_detection_by_default(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -128,9 +161,11 @@ def test_extract_tables_uses_native_pymupdf_detection_by_default(
 
     assert payload["num_tables"] == 1
     table = payload["tables"][0]
-    assert table["detection_strategy"] == "pymupdf_native"
+    assert table["detection_strategy"] in {"pymupdf_native", "pymupdf_lines_strict"}
     # Native PyMuPDF markdown omits the padded cells our fallback renderer adds.
     assert table["markdown"].startswith("|Model|PSNR|SSIM|")
+    assert table["headers"] == ["Model", "PSNR", "SSIM"]
+    assert table["rows"] == [["A", "30.1", "0.92"], ["B", "31.2", "0.94"]]
 
 
 def test_extract_tables_does_not_promote_caption_plus_prose_to_table_by_default(
@@ -147,6 +182,26 @@ def test_extract_tables_does_not_promote_caption_plus_prose_to_table_by_default(
     assert payload["num_tables"] == 0
 
 
+def test_extract_tables_auto_text_fallback_recovers_caption_backed_borderless_table(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pdf_path = tmp_path / "borderless_numeric_table.pdf"
+    _build_borderless_numeric_table_pdf(pdf_path)
+    monkeypatch.setenv("TABLE_OUTPUT_DIR", str(tmp_path / "tables"))
+    monkeypatch.delenv("TABLE_TEXT_FALLBACK_ENABLED", raising=False)
+    monkeypatch.delenv("TABLE_AUTO_TEXT_FALLBACK_ENABLED", raising=False)
+
+    payload = extract_and_store_paper_tables(pdf_path, paper_id=91, blocks=[])
+
+    assert payload["num_tables"] == 1
+    table = payload["tables"][0]
+    assert table["detection_strategy"] == "text_caption_fallback"
+    assert "Table 1." in table["caption"]
+    assert table["n_cols"] >= 5
+    assert table["n_rows"] >= 3
+
+
 def test_extract_tables_text_fallback_remains_opt_in(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -160,3 +215,269 @@ def test_extract_tables_text_fallback_remains_opt_in(
 
     assert payload["num_tables"] == 1
     assert payload["tables"][0]["detection_strategy"] == "text_caption_fallback"
+
+
+class _FakeHeader:
+    def __init__(self, names):
+        self.names = names
+
+
+class _FakeTable:
+    def __init__(self, header_names):
+        self.header = _FakeHeader(header_names)
+
+
+def test_pick_headers_and_rows_merges_units_and_continuation_columns() -> None:
+    matrix = [
+        ["Method", "", "Match", "RMSD", "Valid", "Unique"],
+        ["", "", "(%)", "(A ˚)", "(%)", "(%)"],
+        ["EDM (Hoogeb", "oom et al., 2022)", "–", "–", "91.9", "90.7"],
+        ["GeoLDM (Xu", "et al., 2023)", "–", "–", "93.8", "92.9"],
+    ]
+    headers, rows = _pick_headers_and_rows(matrix, _FakeTable(["Method", "", "Match", "RMSD", "Valid", "Unique"]))
+
+    assert headers == ["Method", "Match (%)", "RMSD (A ˚)", "Valid (%)", "Unique (%)"]
+    assert rows[0][0] == "EDM (Hoogeb oom et al., 2022)"
+    assert rows[1][0] == "GeoLDM (Xu et al., 2023)"
+
+
+def test_pick_headers_and_rows_trims_fragmented_prose_tail() -> None:
+    matrix = [
+        ["Method", "", "Match", "RMSD", "Valid", "Unique"],
+        ["", "", "(%)", "(A ˚)", "(%)", "(%)"],
+        ["EDM (Hoogeb", "oom et al., 2022)", "–", "–", "91.9", "90.7"],
+        ["UNITE-S (Ou", "rs)", "99.37", "0.039", "94.90", "99.71"],
+        ["pensive to", "obtain—less straig", "htforw", "ard, es", "pecial", "ly in"],
+    ]
+
+    headers, rows = _pick_headers_and_rows(matrix, _FakeTable(["Method", "", "Match", "RMSD", "Valid", "Unique"]))
+
+    assert headers == ["Method", "Match (%)", "RMSD (A ˚)", "Valid (%)", "Unique (%)"]
+    assert len(rows) == 2
+    assert rows[-1][0] == "UNITE-S (Ou rs)"
+
+
+def test_false_positive_table_detects_caption_leak_and_collapsed_single_column() -> None:
+    matrix = [
+        ["w/o TTVA"],
+        ["+forward"],
+        ["1m"],
+        ["Table 6. Ablation results on SemanticKitti."],
+    ]
+
+    is_false_positive, reasons = _looks_like_false_positive_table(
+        matrix,
+        n_cols=1,
+        row_count=4,
+        table_caption="Table 6. Ablation results on SemanticKitti.",
+        figure_caption=None,
+    )
+
+    assert is_false_positive is True
+    assert "collapsed_single_column" in reasons
+
+
+def test_missing_explicit_table_caption_indices_finds_unresolved_captions() -> None:
+    caption_blocks = [
+        {"text": "Table 1. Sequence setting."},
+        {"text": "Table 2. Monocular setting."},
+        {"text": "Not a table caption"},
+    ]
+    table_records = [
+        {"page_no": 7, "caption": "Table 1. Sequence setting."},
+        {"page_no": 8, "caption": "Table 2. Other page."},
+    ]
+
+    missing = _missing_explicit_table_caption_indices(caption_blocks, table_records, page_no=7)
+
+    assert missing == {1}
+
+
+def test_find_nearest_caption_block_prefers_horizontal_alignment_for_side_by_side_tables() -> None:
+    caption_blocks = [
+        {
+            "text": "Table 1. Left table.",
+            "bbox": {"x0": 58.0, "y0": 508.0, "x1": 296.0, "y1": 528.0},
+        },
+        {
+            "text": "Table 2. Right table.",
+            "bbox": {"x0": 317.0, "y0": 573.0, "x1": 554.0, "y1": 604.0},
+        },
+    ]
+    target_bbox = {"x0": 328.0, "y0": 391.0, "x1": 539.0, "y1": 550.0}
+
+    idx, block = _find_nearest_caption_block(caption_blocks, target_bbox)
+
+    assert idx == 1
+    assert block is not None
+    assert block["text"] == "Table 2. Right table."
+
+
+def test_repair_headers_from_auxiliary_band_expands_split_header_rows() -> None:
+    headers = ["", "Speedup vs. PEFT", "DoRA", "Speedu", "p vs. E", "ager"]
+    rows = [
+        ["Model", "RTX H200", "B200", "RTX", "H200", "B200"],
+        ["Qwen3.5-27B", "1.51× 1.57×", "1.57×", "1.22×", "1.21×", "1.23×"],
+    ]
+    auxiliary_candidates = [
+        {
+            "bbox": {"x0": 100.0, "y0": 80.0, "x1": 500.0, "y1": 110.0},
+            "matrix": [
+                ["", "Speedup vs. PEFT DoRA", "", "", "Speedup vs. Eager", "", ""],
+                ["Model", "RTX", "H200", "B200", "RTX", "H200", "B200"],
+            ],
+            "raw_row_count": 2,
+        }
+    ]
+
+    repaired_headers, repaired_rows = _repair_headers_from_auxiliary_band(
+        headers,
+        rows,
+        candidate_bbox={"x0": 100.0, "y0": 118.0, "x1": 500.0, "y1": 220.0},
+        auxiliary_header_candidates=auxiliary_candidates,
+    )
+
+    assert repaired_headers == [
+        "Model",
+        "Speedup vs. PEFT DoRA RTX",
+        "Speedup vs. PEFT DoRA H200",
+        "Speedup vs. PEFT DoRA B200",
+        "Speedup vs. Eager RTX",
+        "Speedup vs. Eager H200",
+        "Speedup vs. Eager B200",
+    ]
+    assert repaired_rows == [["Qwen3.5-27B", "1.51×", "1.57×", "1.57×", "1.22×", "1.21×", "1.23×"]]
+
+
+def test_repair_leading_text_fragment_columns_merges_split_method_prefix() -> None:
+    headers = ["", "", "", "", "RULER-MV", "RULER", "-VT", "RULER-CWE", "BABIL", "ong"]
+    rows = [
+        ["Me", "thod", "", "", "", "", "", "", "", ""],
+        ["", "", "", "", "16K 32K", "16K", "32K", "16K 32K", "16K", "32K"],
+        ["Sta", "ndard MDLM", "", "", "22.35 14.30", "52.56", "9.48", "44.20 17.82", "19.20", "6.8 0"],
+        ["Me", "mDLM (Train-On", "ly)", "", "25.48 15.20", "55.30", "10.35", "54.25 22.48", "21.00", "8.5 0"],
+    ]
+
+    repaired_headers, repaired_rows = _repair_leading_text_fragment_columns(headers, rows)
+
+    assert repaired_rows[0][0] == "Method"
+    assert repaired_rows[2][0] == "Standard MDLM"
+    assert repaired_rows[3][0] == "MemDLM (Train-Only)"
+
+
+def test_repair_leading_text_fragment_columns_does_not_absorb_next_header_prefix() -> None:
+    headers = ["M", "ethod", "T", "riviaQA", "PR-en"]
+    rows = [
+        ["S", "tandard MDLM", "", "55.29", "50.32"],
+        ["M", "emDLM (Trai", "n-Only)", "87.74", "54.36"],
+        ["M", "emDLM (Trai", "n & Inference)", "87.77", "54.69"],
+    ]
+
+    repaired_headers, repaired_rows = _repair_leading_text_fragment_columns(headers, rows)
+
+    assert repaired_headers[0] == "Method"
+    assert repaired_headers[1] == "T"
+    assert repaired_rows[0][0] == "Standard MDLM"
+
+
+def test_merge_sparse_pre_numeric_text_columns_merges_method_continuations_and_repairs_next_header() -> None:
+    headers = ["Method", "T", "riviaQA", "PR-en"]
+    rows = [
+        ["Standard MDLM", "", "55.29", "50.32"],
+        ["MemDLM (Trai", "n-Only)", "87.74", "54.36"],
+        ["MemDLM (Trai", "n & Inference)", "87.77", "54.69"],
+    ]
+
+    repaired_headers, repaired_rows = _merge_sparse_pre_numeric_text_columns(headers, rows)
+
+    assert repaired_headers == ["Method", "TriviaQA", "PR-en"]
+    assert repaired_rows[0][0] == "Standard MDLM"
+    assert repaired_rows[1][0] == "MemDLM (Train-Only)"
+    assert repaired_rows[2][0] == "MemDLM (Train & Inference)"
+
+
+def test_pick_headers_and_rows_trims_chart_scaffold_tail_after_real_data_rows() -> None:
+    matrix = [
+        ["Method", "TriviaQA", "PR-en", "PR-zh"],
+        ["Standard MDLM", "55.29", "50.32", "74.50"],
+        ["MemDLM (Train-Only)", "87.74", "54.36", "86.29"],
+        ["MemDLM (Train & Inference)", "87.77", "54.69", "87.38"],
+        ["", "", "Standard MDLM", ""],
+        ["", "Train Loss", "", "Eval Loss"],
+        ["", "1.8", "", "2.5"],
+        ["", "Training step", "", "Training step"],
+    ]
+
+    headers, rows = _pick_headers_and_rows(matrix, _FakeTable(["Method", "TriviaQA", "PR-en", "PR-zh"]))
+
+    assert headers == ["Method", "TriviaQA", "PR-en", "PR-zh"]
+    assert len(rows) == 3
+    assert rows[-1][0] == "MemDLM (Train & Inference)"
+
+
+def test_false_positive_table_rejects_figure_like_shallow_grid_without_caption() -> None:
+    matrix = [
+        [
+            "End-to-End Training for Unified To",
+            "kenization and Latent Denoising Reconstruction 0.0 0.7 0.8 1.0 Noising Scale Figure 4. UNITE’s Training dynamics",
+        ],
+        [
+            "3.2 End-to-End Training for UNITE",
+            "",
+        ],
+    ]
+    is_false_positive, reasons = _looks_like_false_positive_table(
+        matrix,
+        n_cols=2,
+        row_count=1,
+        table_caption=None,
+        figure_caption=None,
+    )
+
+    assert is_false_positive is True
+    assert "figure_like_content" in reasons or "shallow_without_table_caption" in reasons
+
+
+def test_false_positive_table_rejects_when_figure_caption_is_much_closer_than_table_caption() -> None:
+    matrix = [
+        ["0", "H200"],
+        ["", "B200"],
+        ["", "2%"],
+        ["", "Qwen3.5-27B"],
+    ]
+    is_false_positive, reasons = _looks_like_false_positive_table(
+        matrix,
+        n_cols=2,
+        row_count=4,
+        table_caption="Table 6: Speedup results.",
+        figure_caption="Figure 5: Dense (B@A) position.",
+        table_caption_gap=170.0,
+        figure_caption_gap=24.0,
+    )
+
+    assert is_false_positive is True
+    assert "figure_caption_closer_than_table_caption" in reasons
+
+
+def test_append_or_replace_table_record_prefers_better_same_caption_same_page() -> None:
+    records = [
+        {
+            "page_no": 15,
+            "caption": "Table 8: Model-level peak VRAM (GB).",
+            "headers": ["col_1", "col_2", "col_3"],
+            "rows": [["", "", ""], ["", "", ""]],
+            "detection_strategy": "pymupdf_lines_strict",
+        }
+    ]
+    improved = {
+        "page_no": 15,
+        "caption": "Table 8: Model-level peak VRAM (GB).",
+        "headers": ["Model", "RTX", "H200", "B200"],
+        "rows": [["Qwen", "10", "8", "7"], ["Gemma", "11", "9", "8"]],
+        "detection_strategy": "pymupdf_text_reconstructed",
+    }
+
+    _append_or_replace_table_record(records, improved)
+
+    assert len(records) == 1
+    assert records[0]["headers"] == ["Model", "RTX", "H200", "B200"]

@@ -10,6 +10,7 @@ Reusable Python modules extracted from the Instructor Assistant ingestion pipeli
 - `ia_phase1.tables`: structured table extraction + table chunk conversion.
 - `ia_phase1.figures`: embedded + vector figure extraction with section mapping.
 - `ia_phase1.equations`: display-equation extraction + equation chunk conversion.
+- `ia_phase1.markdown_export`: structured PDF-to-Markdown bundle export with figure/table/equation asset references.
 - `ia_phase1.youtube_transcript`: YouTube subtitle extraction + cleaned transcript text generation.
 - `ia_phase1.search_keyword`: keyword search utilities for SQLite-backed library data.
 - `ia_phase1.search_hybrid`: pgvector + PostgreSQL FTS hybrid retrieval helpers.
@@ -37,12 +38,14 @@ import asyncio
 from pathlib import Path
 
 from ia_phase1 import (
+    MarkdownExportConfig,
     annotate_blocks_with_sections,
     chunk_text_blocks,
     extract_and_store_paper_equations,
     extract_and_store_paper_figures,
     extract_and_store_paper_tables,
     extract_text_blocks,
+    export_pdf_to_markdown,
     resolve_any_to_pdf,
 )
 
@@ -61,6 +64,12 @@ async def run() -> None:
     table_manifest = extract_and_store_paper_tables(pdf_path, paper_id=1, blocks=blocks)
     equation_manifest = extract_and_store_paper_equations(pdf_path, paper_id=1, blocks=blocks)
     figure_manifest = extract_and_store_paper_figures(pdf_path, paper_id=1, blocks=blocks)
+    markdown_bundle = export_pdf_to_markdown(
+        pdf_path,
+        paper_id=1,
+        source_url="https://arxiv.org/abs/2501.00001",
+        config=MarkdownExportConfig(),
+    )
 
     print(title)
     print(section_report["strategy"], len(section_report["sections"]))
@@ -73,6 +82,7 @@ async def run() -> None:
         "figures:",
         figure_manifest["num_images"],
     )
+    print("markdown:", markdown_bundle.markdown_path)
 
 
 asyncio.run(run())
@@ -84,12 +94,14 @@ asyncio.run(run())
 - Default table output dir: `.ia_phase1_data/tables`
 - Default equation output dir: `.ia_phase1_data/equations`
 - Default figure output dir: `.ia_phase1_data/figures`
+- Default markdown bundle output dir: `.ia_phase1_data/markdown`
 
 Override with environment variables:
 
 - `TABLE_OUTPUT_DIR`
 - `EQUATION_OUTPUT_DIR`
 - `FIGURE_OUTPUT_DIR`
+- `MARKDOWN_OUTPUT_DIR`
 
 ## Feature-specific docs
 
@@ -99,6 +111,7 @@ Override with environment variables:
 - `features/tables/README.md`
 - `features/figures/README.md`
 - `features/equations/README.md`
+- `features/markdown_export/README.md`
 - `features/youtube-transcript/README.md`
 - `features/search/README.md`
 

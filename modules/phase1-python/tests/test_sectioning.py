@@ -89,6 +89,65 @@ def test_extract_arxiv_id_from_pdf_metadata(monkeypatch: pytest.MonkeyPatch) -> 
     assert sectioning._extract_arxiv_id_from_pdf_metadata(Path("/tmp/fake.pdf")) == "2602.22094v1"
 
 
+def test_is_reasonable_heading_title_rejects_url_and_digit_noise() -> None:
+    assert not sectioning._is_reasonable_heading_title("See https://github.com/example/project")
+    assert not sectioning._is_reasonable_heading_title("27,316 A100-GPU-hours 312 TFLOP/s (A100 BF16 peak)")
+    assert not sectioning._is_reasonable_heading_title("Our ImageNet")
+    assert sectioning._is_reasonable_heading_title("ImageNet-256 Results")
+
+
+def test_extract_numeric_heading_title_keeps_connector_words() -> None:
+    assert sectioning._extract_numeric_heading_title("3.1. From VAE to UNITE") == "From VAE to UNITE"
+    assert (
+        sectioning._extract_numeric_heading_title("5.2. Beyond Vision: Application to Domains Without Pretrained Encoders")
+        == "Beyond Vision: Application to Domains Without Pretrained Encoders"
+    )
+
+
+def test_strategy_score_penalizes_late_only_arxiv_outline() -> None:
+    arxiv_headings = [
+        sectioning.HeadingCandidate("Appendix", 1, "arxiv_source", 0.92, page_hint=15),
+        sectioning.HeadingCandidate("Architectural Details", 1, "arxiv_source", 0.92, page_hint=18),
+    ]
+    arxiv_spans = [
+        sectioning.SectionSpan(0, "Front Matter", "front_matter", 1, "fallback", 0.4, 0, 99, 1, 14),
+        sectioning.SectionSpan(1, "Appendix", "appendix", 1, "arxiv_source", 0.92, 100, 120, 15, 17),
+        sectioning.SectionSpan(2, "Architectural Details", "architectural_details", 1, "arxiv_source", 0.92, 121, 150, 18, 20),
+    ]
+    heuristic_headings = [
+        sectioning.HeadingCandidate("Abstract", 1, "heuristic", 0.8, page_hint=1),
+        sectioning.HeadingCandidate("Introduction", 1, "heuristic", 0.8, page_hint=1),
+        sectioning.HeadingCandidate("Related Work", 1, "heuristic", 0.8, page_hint=3),
+        sectioning.HeadingCandidate("Method", 1, "heuristic", 0.8, page_hint=4),
+        sectioning.HeadingCandidate("Experiments", 1, "heuristic", 0.8, page_hint=9),
+        sectioning.HeadingCandidate("Conclusion", 1, "heuristic", 0.8, page_hint=11),
+    ]
+    heuristic_spans = [
+        sectioning.SectionSpan(0, "Front Matter", "front_matter", 1, "fallback", 0.4, 0, 2, 1, 1),
+        sectioning.SectionSpan(1, "Abstract", "abstract", 1, "heuristic", 0.82, 3, 8, 1, 1),
+        sectioning.SectionSpan(2, "Introduction", "introduction", 1, "heuristic", 0.82, 9, 35, 1, 2),
+        sectioning.SectionSpan(3, "Related Work", "related_work", 1, "heuristic", 0.82, 36, 52, 3, 3),
+        sectioning.SectionSpan(4, "Method", "methodology", 1, "heuristic", 0.82, 53, 98, 4, 8),
+        sectioning.SectionSpan(5, "Experiments", "experiments", 1, "heuristic", 0.82, 99, 135, 9, 10),
+        sectioning.SectionSpan(6, "Conclusion", "conclusion", 1, "heuristic", 0.82, 136, 150, 11, 12),
+    ]
+    arxiv_score = sectioning._strategy_score(
+        "arxiv_source",
+        arxiv_headings,
+        arxiv_spans,
+        total_pages=20,
+        document_title_norm="end to end training for unified tokenization and latent denoising",
+    )
+    heuristic_score = sectioning._strategy_score(
+        "heuristic",
+        heuristic_headings,
+        heuristic_spans,
+        total_pages=20,
+        document_title_norm="end to end training for unified tokenization and latent denoising",
+    )
+    assert heuristic_score > arxiv_score
+
+
 def test_extract_heuristic_headings_detects_split_numbered_heading() -> None:
     blocks = [
         {

@@ -17,8 +17,8 @@ import {
   ApiPaperFigureInfo,
   ApiPaperIngestionInfo,
   ApiPaperIngestionSectionDetail,
-  ApiPaperTableInfo,
 } from '@/lib/api-types';
+import { StructuredTablePreview } from '@/library/StructuredTablePreview';
 import { Loader2 } from 'lucide-react';
 
 interface SearchResultContextPanelProps {
@@ -240,28 +240,6 @@ function resolveCanonicalFromMatch(
     return { canonical: normalizeCanonical(data.sections[0].canonical), reason: 'first_section' };
   }
   return { canonical: null, reason: 'none' };
-}
-
-function normalizeTablePreview(table: ApiPaperTableInfo): {
-  headers: string[];
-  rows: string[][];
-} {
-  const previewHeaders = Array.isArray(table.headers_preview) ? table.headers_preview : [];
-  const previewRows = Array.isArray(table.rows_preview) ? table.rows_preview : [];
-  const colCount = Math.max(
-    table.n_cols || 0,
-    previewHeaders.length,
-    ...previewRows.map((row) => row.length),
-  );
-  const headers = Array.from({ length: colCount }, (_, idx) => {
-    const value = previewHeaders[idx] || '';
-    return value.trim() || `col_${idx + 1}`;
-  });
-  const rows = previewRows.map((row) => {
-    if (row.length >= colCount) return row.slice(0, colCount);
-    return [...row, ...Array(colCount - row.length).fill('')];
-  });
-  return { headers, rows };
 }
 
 function canonicalLabel(canonical: string): string {
@@ -644,75 +622,21 @@ export function SearchResultContextPanel({
                   )}
                   {tablesInSection.length > 0 && (
                     <div className="space-y-2">
-                      {tablesInSection.map((table) => {
-                        const normalized = normalizeTablePreview(table);
-                        const hasStructuredPreview =
-                          normalized.headers.length > 0 && normalized.rows.length > 0;
-                        return (
-                          <Card key={`search-table-${table.id}`} className="p-2 bg-background">
-                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <Badge variant="outline">table {table.id}</Badge>
-                              <Badge variant="outline">p{table.page_no}</Badge>
-                              <Badge variant="secondary">
-                                {table.n_rows}x{table.n_cols}
-                              </Badge>
-                            </div>
-                            {table.caption ? (
-                              <div className="text-xs text-muted-foreground mb-2">{table.caption}</div>
-                            ) : null}
-                            {hasStructuredPreview ? (
-                              <div className="border rounded-md bg-background overflow-hidden">
-                                <div className="max-h-64 overflow-auto">
-                                  <table className="min-w-full text-[11px] leading-5 border-collapse">
-                                    <thead className="bg-muted/50 sticky top-0 z-10">
-                                      <tr>
-                                        <th className="text-left align-top p-2 border-b border-r w-10">#</th>
-                                        {normalized.headers.map((header, idx) => (
-                                          <th
-                                            key={`table-${table.id}-header-${idx}`}
-                                            className="text-left align-top p-2 border-b border-r whitespace-pre-wrap"
-                                          >
-                                            {header}
-                                          </th>
-                                        ))}
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {normalized.rows.map((row, rowIdx) => (
-                                        <tr
-                                          key={`table-${table.id}-row-${rowIdx}`}
-                                          className="odd:bg-background even:bg-muted/20"
-                                        >
-                                          <td className="align-top p-2 border-b border-r text-muted-foreground">
-                                            {rowIdx + 1}
-                                          </td>
-                                          {row.map((cell, cellIdx) => (
-                                            <td
-                                              key={`table-${table.id}-row-${rowIdx}-cell-${cellIdx}`}
-                                              className="align-top p-2 border-b border-r whitespace-pre-wrap break-words min-w-[120px]"
-                                            >
-                                              {cell || '—'}
-                                            </td>
-                                          ))}
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                                {table.preview_truncated && (
-                                  <div className="px-2 py-1 text-[11px] text-muted-foreground border-t">
-                                    Showing first {normalized.rows.length} rows in preview.
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="text-xs text-muted-foreground">
-                                Structured preview not available for this table.
-                              </div>
-                            )}
-                          </Card>
-                        );
-                      })}
+                      {tablesInSection.map((table) => (
+                        <Card key={`search-table-${table.id}`} className="p-2 bg-background">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <Badge variant="outline">table {table.id}</Badge>
+                            <Badge variant="outline">p{table.page_no}</Badge>
+                            <Badge variant="secondary">
+                              {table.n_rows}x{table.n_cols}
+                            </Badge>
+                          </div>
+                          {table.caption ? (
+                            <div className="text-xs text-muted-foreground mb-2">{table.caption}</div>
+                          ) : null}
+                          <StructuredTablePreview table={table} />
+                        </Card>
+                      ))}
                     </div>
                   )}
                 </Card>

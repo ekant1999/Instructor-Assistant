@@ -137,6 +137,316 @@ def _bbox_payload(value: Any) -> Dict[str, float]:
     return {"x0": 0.0, "y0": 0.0, "x1": 0.0, "y1": 0.0}
 
 
+def _bbox_width(bbox: Dict[str, float]) -> float:
+    return max(0.0, float(bbox.get("x1", 0.0)) - float(bbox.get("x0", 0.0)))
+
+
+def _bbox_height(bbox: Dict[str, float]) -> float:
+    return max(0.0, float(bbox.get("y1", 0.0)) - float(bbox.get("y0", 0.0)))
+
+
+def _bbox_center_x(bbox: Dict[str, float]) -> float:
+    return (float(bbox.get("x0", 0.0)) + float(bbox.get("x1", 0.0))) * 0.5
+
+
+def _bbox_centered_near_page_middle(bbox: Dict[str, float], *, page_width: float) -> bool:
+    if page_width <= 0.0:
+        return False
+    center_x = _bbox_center_x(bbox)
+    return abs(center_x - (page_width * 0.5)) <= page_width * 0.18
+
+
+def _block_line_count(block: Dict[str, Any]) -> int:
+    return len(block.get("lines") or [])
+
+
+def _block_text_span_count(block: Dict[str, Any]) -> int:
+    count = 0
+    for line in block.get("lines") or []:
+        for span in line.get("spans") or []:
+            text = _sanitize_extracted_text(span.get("text"))
+            if text.strip():
+                count += 1
+    return count
+
+
+def _block_text_preview(block: Dict[str, Any]) -> str:
+    parts: List[str] = []
+    for line in block.get("lines") or []:
+        joined = _join_line_spans(line.get("spans") or [])
+        if joined:
+            parts.append(joined)
+    return " ".join(parts).strip()
+
+
+def _is_margin_note_block(
+    block: Dict[str, Any],
+    *,
+    page_width: float,
+    page_height: float,
+) -> bool:
+    bbox = _bbox_payload(block.get("bbox", [0, 0, 0, 0]))
+    width = _bbox_width(bbox)
+    height = _bbox_height(bbox)
+    if width <= 0.0 or height <= 0.0 or page_width <= 0.0 or page_height <= 0.0:
+        return False
+    width_rel = width / page_width
+    height_rel = height / page_height
+    x0_rel = float(bbox["x0"]) / page_width
+    x1_rel = float(bbox["x1"]) / page_width
+    line_count = _block_line_count(block)
+    span_count = _block_text_span_count(block)
+
+    if width_rel <= 0.075 and (x0_rel <= 0.06 or x1_rel >= 0.94):
+        return True
+    if width_rel <= 0.12 and height_rel >= 0.25 and (x0_rel <= 0.08 or x1_rel >= 0.92):
+        return True
+    if width_rel <= 0.1 and line_count <= 2 and span_count <= 3 and (x0_rel <= 0.08 or x1_rel >= 0.92):
+        return True
+    return False
+
+
+def _is_full_width_block(block: Dict[str, Any], *, page_width: float) -> bool:
+    bbox = _bbox_payload(block.get("bbox", [0, 0, 0, 0]))
+    if page_width <= 0.0:
+        return True
+    width_rel = _bbox_width(bbox) / page_width
+    x0_rel = float(bbox["x0"]) / page_width
+    x1_rel = float(bbox["x1"]) / page_width
+    if width_rel >= 0.68:
+        return True
+    return x0_rel <= 0.16 and x1_rel >= 0.84
+
+
+def _raw_block_line_count(block: Dict[str, Any]) -> int:
+    lines = block.get("lines")
+    if not isinstance(lines, list):
+        return 0
+    return sum(1 for line in lines if _join_line_spans(line.get("spans", [])))
+
+
+def _raw_block_text(block: Dict[str, Any]) -> str:
+    lines = block.get("lines")
+    if not isinstance(lines, list):
+        return ""
+    parts: List[str] = []
+    for line in lines:
+        line_text = _join_line_spans(line.get("spans", []))
+        if line_text:
+            parts.append(line_text)
+    return _sanitize_extracted_text("\n".join(parts).strip())
+
+
+def _raw_block_max_font_size(block: Dict[str, Any]) -> float:
+    max_size = 0.0
+    lines = block.get("lines")
+    if not isinstance(lines, list):
+        return max_size
+    for line in lines:
+        spans = line.get("spans")
+        if not isinstance(spans, list):
+            continue
+        for span in spans:
+            try:
+                max_size = max(max_size, float(span.get("size", 0.0) or 0.0))
+            except (TypeError, ValueError):
+                continue
+    return max_size
+
+
+def _looks_like_first_page_preamble_anchor(
+    block: Dict[str, Any],
+    *,
+    bbox: Dict[str, float],
+    page_width: float,
+    page_height: float,
+) -> bool:
+    if page_width <= 0.0 or page_height <= 0.0:
+        return False
+
+    text = _raw_block_text(block)
+    if not text:
+        return False
+    compact = " ".join(text.split()).strip()
+    lowered = compact.lower()
+    line_count = _raw_block_line_count(block)
+    max_font = _raw_block_max_font_size(block)
+    width_rel = _bbox_width(bbox) / page_width
+    y0_rel = float(bbox["y0"]) / page_height
+    centered = _bbox_centered_near_page_middle(bbox, page_width=page_width)
+
+    if y0_rel > 0.72:
+        return False
+    if max_font <= 6.0 and line_count <= 2:
+        return False
+
+    if y0_rel <= 0.25 and max_font >= 13.0 and width_rel >= 0.28:
+        return True
+
+    if lowered.startswith("abstract") or lowered.startswith("keywords"):
+        return y0_rel <= 0.68
+
+    if centered and y0_rel <= 0.42 and line_count <= 6 and width_rel >= 0.30 and max_font >= 8.0:
+        return True
+
+    if centered and y0_rel <= 0.62 and line_count >= 4 and len(compact) >= 160 and width_rel >= 0.42 and max_font >= 8.0:
+        return True
+
+    if y0_rel <= 0.50 and width_rel >= 0.35 and re.search(r"\b(project page|keywords|university|institute|laborator(?:y|ies)|school|department|college|author|corresponding)\b", lowered):
+        return True
+
+    return False
+
+
+def _first_page_preamble_cutoff(
+    core: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]],
+    *,
+    page_width: float,
+    page_height: float,
+    page_no: int,
+) -> Optional[float]:
+    if page_no != 1 or not core or page_width <= 0.0 or page_height <= 0.0:
+        return None
+
+    anchors: List[float] = []
+    has_title_anchor = False
+    for _, block, bbox, _, _ in core:
+        if not _looks_like_first_page_preamble_anchor(block, bbox=bbox, page_width=page_width, page_height=page_height):
+            continue
+        anchors.append(float(bbox["y1"]))
+        if (
+            float(bbox["y0"]) / page_height <= 0.25
+            and _raw_block_max_font_size(block) >= 13.0
+            and (_bbox_width(bbox) / page_width) >= 0.28
+        ):
+            has_title_anchor = True
+
+    if not anchors or not has_title_anchor:
+        return None
+    return min(page_height * 0.74, max(anchors) + 16.0)
+
+
+def _order_text_blocks_for_page(
+    text_blocks: List[Dict[str, Any]],
+    *,
+    page_width: float,
+    page_height: float,
+    page_no: int,
+) -> List[Tuple[Dict[str, Any], str, str]]:
+    if not text_blocks:
+        return []
+
+    annotated: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]] = []
+    for original_index, block in enumerate(text_blocks):
+        bbox = _bbox_payload(block.get("bbox", [0, 0, 0, 0]))
+        is_margin = _is_margin_note_block(block, page_width=page_width, page_height=page_height)
+        is_full = _is_full_width_block(block, page_width=page_width)
+        annotated.append((original_index, block, bbox, is_margin, is_full))
+
+    core = [item for item in annotated if not item[3]]
+    margin = [item for item in annotated if item[3]]
+
+    mid_x = page_width * 0.5
+    left_candidates = [
+        item
+        for item in core
+        if not item[4] and _bbox_center_x(item[2]) <= page_width * 0.45 and _bbox_width(item[2]) <= page_width * 0.62
+    ]
+    right_candidates = [
+        item
+        for item in core
+        if not item[4] and _bbox_center_x(item[2]) >= page_width * 0.55 and _bbox_width(item[2]) <= page_width * 0.62
+    ]
+    has_two_columns = len(left_candidates) >= 2 and len(right_candidates) >= 2
+
+    if not has_two_columns:
+        ordered = sorted(core, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
+        ordered.extend(sorted(margin, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0])))
+        results: List[Tuple[Dict[str, Any], str, str]] = []
+        for _, block, bbox, is_margin, is_full in ordered:
+            role = "margin_note" if is_margin else ("full_width" if is_full else "single_column")
+            column_hint = "margin" if is_margin else "single"
+            results.append((block, role, column_hint))
+        return results
+
+    column_top = min(float(item[2]["y0"]) for item in left_candidates + right_candidates)
+    column_bottom = max(float(item[2]["y1"]) for item in left_candidates + right_candidates)
+    first_page_preamble_cutoff = _first_page_preamble_cutoff(
+        core,
+        page_width=page_width,
+        page_height=page_height,
+        page_no=page_no,
+    )
+
+    preamble: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]] = []
+    left: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]] = []
+    right: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]] = []
+    postamble: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]] = []
+
+    for item in core:
+        original_index, block, bbox, _, is_full = item
+        center_x = _bbox_center_x(bbox)
+        y0 = float(bbox["y0"])
+        is_centered_preamble = (
+            y0 < column_top - 8.0
+            and _bbox_centered_near_page_middle(bbox, page_width=page_width)
+            and _bbox_width(bbox) >= page_width * 0.18
+        )
+        is_centered_postamble = (
+            y0 > column_bottom + 8.0
+            and _bbox_centered_near_page_middle(bbox, page_width=page_width)
+            and _bbox_width(bbox) >= page_width * 0.18
+        )
+        if first_page_preamble_cutoff is not None and y0 <= first_page_preamble_cutoff:
+            preamble.append(item)
+            continue
+        if is_centered_preamble:
+            preamble.append(item)
+            continue
+        if is_centered_postamble:
+            postamble.append(item)
+            continue
+        if is_full:
+            if y0 < column_top - 8.0:
+                preamble.append(item)
+            elif y0 > column_bottom + 8.0:
+                postamble.append(item)
+            elif y0 <= column_top + 18.0:
+                preamble.append(item)
+            else:
+                postamble.append(item)
+            continue
+        if center_x <= mid_x:
+            left.append(item)
+        else:
+            right.append(item)
+
+    ordered = (
+        sorted(preamble, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
+        + sorted(left, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
+        + sorted(right, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
+        + sorted(postamble, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
+        + sorted(margin, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
+    )
+
+    results: List[Tuple[Dict[str, Any], str, str]] = []
+    for _, block, bbox, is_margin, is_full in ordered:
+        if is_margin:
+            role = "margin_note"
+            column_hint = "margin"
+        elif is_full:
+            role = "full_width"
+            column_hint = "full"
+        elif _bbox_center_x(bbox) <= mid_x:
+            role = "column_block"
+            column_hint = "left"
+        else:
+            role = "column_block"
+            column_hint = "right"
+        results.append((block, role, column_hint))
+    return results
+
+
 def _should_insert_span_space(previous: str, current: str, x_gap: float) -> bool:
     if not previous or not current:
         return False
@@ -292,12 +602,17 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
     try:
         for page_num in range(len(doc)):
             page = doc[page_num]
-            # Use MuPDF's sort order to stabilize block reading order across PDFs.
-            page_dict = page.get_text("dict", sort=True)
+            page_dict = page.get_text("dict", sort=False)
             text_blocks = [b for b in page_dict.get("blocks", []) if b.get("type") == 0]
+            ordered_blocks = _order_text_blocks_for_page(
+                text_blocks,
+                page_width=float(page.rect.width or 0.0),
+                page_height=float(page.rect.height or 0.0),
+                page_no=page_num + 1,
+            )
 
             block_idx = 0
-            for block in text_blocks:
+            for block, layout_role, column_hint in ordered_blocks:
                 lines = block.get("lines", [])
                 text_lines: List[str] = []
                 line_payloads: List[Dict[str, Any]] = []
@@ -367,6 +682,8 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
                             "min_font_size": round(min_font, 3),
                             "bold_ratio": round(bold_ratio, 3),
                             "font_names": sorted(set(span_fonts))[:6],
+                            "layout_role": layout_role,
+                            "column_hint": column_hint,
                             "lines": line_payloads,
                         },
                     }

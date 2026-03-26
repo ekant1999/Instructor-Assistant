@@ -10,12 +10,17 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import pymupdf
 
+from .equation_latex import extract_equation_latex
+from .math_markdown import normalize_math_delimiters
+
 logger = logging.getLogger(__name__)
 
 _EQUATION_NUMBER_RE = re.compile(r"\(\s*(\d+[A-Za-z]?)\s*\)\s*$")
-_MATH_SYMBOL_RE = re.compile(r"[=+\-*/^_<>≤≥≈≠∈∉∀∃∑∫√πλμσθΔΩαβγ]")
+_MATH_SYMBOL_RE = re.compile(r"[=+*/^_<>≤≥≈≠∈∉∀∃∑∫√πλμσθΔΩαβγ⊙∥]")
 _WORD_RE = re.compile(r"[A-Za-z]{3,}")
+_ANY_WORD_RE = re.compile(r"[A-Za-z]+")
 _CAPTION_NOISE_RE = re.compile(r"^\s*(figure|fig\.?|table|tab\.?|algorithm)\s*\d+\b", re.IGNORECASE)
+_DISPLAY_MATH_ENV_RE = re.compile(r"\\begin\{(?:equation|align\*?|gather\*?)\}")
 
 
 def _safe_int(value: Any, default: int = 0) -> int:
@@ -124,6 +129,16 @@ def _x_overlap_ratio(a: Optional[Dict[str, float]], b: Optional[Dict[str, float]
     return overlap / base
 
 
+def _horizontal_gap(a: Optional[Dict[str, float]], b: Optional[Dict[str, float]]) -> float:
+    if not a or not b:
+        return float("inf")
+    if float(a["x1"]) < float(b["x0"]):
+        return float(b["x0"]) - float(a["x1"])
+    if float(b["x1"]) < float(a["x0"]):
+        return float(a["x0"]) - float(b["x1"])
+    return 0.0
+
+
 def _default_equation_dir() -> Path:
     return (Path.cwd() / ".ia_phase1_data" / "equations").expanduser().resolve()
 
@@ -218,62 +233,102 @@ def _extract_equation_number(lines: List[str]) -> Optional[str]:
     return None
 
 
-def _looks_like_equation_candidate(
+def _compact_text(text: str) -> str:
+    return " ".join(str(text or "").replace("\x00", " ").split()).strip()
+
+
+def _looks_code_like(text: str) -> bool:
+    compact = _compact_text(text)
+    if not compact:
+        return False
+    lowered = compact.lower()
+    if lowered.startswith("#"):
+        return True
+    code_tokens = ("torch.", "return ", "def ", ".weight", "lambda ", "->", "dtype=", "shape=")
+    if any(token in lowered for token in code_tokens):
+        return True
+    if compact.count("_") >= 2 and compact.count("(") >= 1 and compact.count(")") >= 1 and compact.count("=") >= 1:
+        return True
+    if compact.count(".") >= 2 and compact.count("(") >= 1:
+        return True
+    return False
+
+
+def _line_signal(
     *,
-    text_lines: List[str],
+    text: str,
     bbox: Dict[str, float],
     page_width: float,
-) -> Tuple[bool, float, List[str], Optional[str]]:
-    compact = " ".join(text_lines).strip()
+) -> Dict[str, Any]:
+    compact = _compact_text(text)
     if not compact:
-        return False, 0.0, [], None
+        return {"accept": False, "strong": False, "score": 0.0, "flags": [], "equation_number": None, "number_only": False}
     if _CAPTION_NOISE_RE.match(compact):
-        return False, 0.0, ["caption_noise"], None
+        return {"accept": False, "strong": False, "score": 0.0, "flags": ["caption_noise"], "equation_number": None, "number_only": False}
 
-    min_chars = max(4, _safe_int(os.getenv("EQUATION_MIN_CHARS", "8"), 8))
-    if len(compact) < min_chars:
-        return False, 0.0, ["too_short"], None
-
-    equation_number = _extract_equation_number(text_lines)
+    equation_number = _extract_equation_number([compact])
+    number_only = _is_equation_number_only({"text": compact})
     symbol_count = len(_MATH_SYMBOL_RE.findall(compact))
     has_equals = "=" in compact
+    min_chars = max(4, _safe_int(os.getenv("EQUATION_MIN_CHARS", "8"), 8))
+    if len(compact) < min_chars:
+        if not number_only and not equation_number and not has_equals and symbol_count == 0:
+            return {"accept": False, "strong": False, "score": 0.0, "flags": ["too_short"], "equation_number": None, "number_only": False}
+
     digit_count = sum(1 for ch in compact if ch.isdigit())
-    word_count = len(_WORD_RE.findall(compact))
-    line_count = len(text_lines)
+    word_count = len(_ANY_WORD_RE.findall(compact))
     width_ratio = _bbox_width(bbox) / max(1.0, page_width)
     centered = abs(_center_x(bbox) - (page_width * 0.5)) / max(1.0, page_width) <= 0.20
     sentence_like = compact.count(". ") + compact.count(", ")
+    math_delimiters = int(bool(_DISPLAY_MATH_ENV_RE.search(compact))) + compact.count("$$") + compact.count("$ ")
+    code_like = _looks_code_like(compact)
+    lowered = compact.lower()
 
     score = 0.0
     flags: List[str] = []
 
+    if number_only:
+        score += 5.0
+        flags.append("equation_number_only")
     if equation_number:
-        score += 3.0
+        score += 2.8
         flags.append("equation_number")
     if has_equals:
-        score += 2.0
+        score += 2.2
         flags.append("has_equals")
     if symbol_count >= 2:
-        score += 1.2
+        score += 2.0
         flags.append("math_symbols")
+    elif symbol_count == 1:
+        score += 0.9
+        flags.append("single_math_symbol")
     if digit_count >= 1:
-        score += 0.8
-        flags.append("has_digits")
-    if 2 <= line_count <= 8:
-        score += 1.0
-        flags.append("multi_line")
-    if centered:
-        score += 0.7
-        flags.append("centered")
-    if width_ratio <= 0.9:
         score += 0.5
+        flags.append("has_digits")
+    if math_delimiters:
+        score += 1.5
+        flags.append("math_delimiters")
+    if centered:
+        score += 0.9
+        flags.append("centered")
+    if width_ratio <= 0.68:
+        score += 0.9
         flags.append("narrow")
-    if word_count <= 24:
-        score += 0.8
+    elif width_ratio <= 0.84:
+        score += 0.35
+        flags.append("narrow")
+    if word_count <= 8:
+        score += 0.9
         flags.append("limited_prose")
+    elif word_count <= 12:
+        score += 0.3
+        flags.append("moderate_prose")
+    if len(compact) <= 42:
+        score += 0.3
+        flags.append("short_line")
 
-    if word_count >= max(30, _safe_int(os.getenv("EQUATION_MAX_WORDS", "36"), 36)):
-        score -= 2.5
+    if word_count >= max(14, _safe_int(os.getenv("EQUATION_MAX_WORDS", "36"), 36)):
+        score -= 2.8
         flags.append("prose_heavy")
     if sentence_like >= 4 and not equation_number:
         score -= 1.0
@@ -284,9 +339,160 @@ def _looks_like_equation_candidate(
     if not has_equals and not equation_number and symbol_count < 3:
         score -= 1.5
         flags.append("weak_math_signal")
+    if code_like and not number_only:
+        score -= 2.8
+        flags.append("code_like")
+    if compact.endswith(":") and symbol_count == 0 and not equation_number:
+        score -= 1.6
+        flags.append("colon_intro")
+    if lowered.startswith("where ") and not equation_number:
+        score -= 3.2
+        flags.append("explanatory_context")
+    if re.match(r"^\d+\.\s", compact) and word_count >= 6 and not equation_number:
+        score -= 3.0
+        flags.append("numbered_prose")
+    if compact.startswith("(") and "," in compact and word_count >= 4 and not equation_number:
+        score -= 2.6
+        flags.append("parenthetical_prose")
+    if ("," in compact or ". " in compact) and word_count >= 10 and symbol_count <= 4 and not equation_number:
+        score -= 2.6
+        flags.append("inline_prose")
 
-    min_score = _safe_float(os.getenv("EQUATION_DETECTION_MIN_SCORE", "5.0"), 5.0)
-    return score >= min_score, round(score, 3), flags, equation_number
+    strong_threshold = _safe_float(os.getenv("EQUATION_LINE_STRONG_MIN_SCORE", "2.6"), 2.6)
+    support_threshold = _safe_float(os.getenv("EQUATION_LINE_SUPPORT_MIN_SCORE", "1.3"), 1.3)
+    rounded = round(score, 3)
+    return {
+        "accept": rounded >= support_threshold or number_only,
+        "strong": rounded >= strong_threshold or number_only,
+        "score": rounded,
+        "flags": flags,
+        "equation_number": equation_number,
+        "number_only": number_only,
+    }
+
+
+def _extract_page_line_entries(page_dict: Dict[str, Any]) -> List[Dict[str, Any]]:
+    entries: List[Dict[str, Any]] = []
+    for block_index, block in enumerate(page_dict.get("blocks", [])):
+        if block.get("type") != 0:
+            continue
+        for line_index, line in enumerate(block.get("lines", [])):
+            spans = line.get("spans")
+            spans_list = spans if isinstance(spans, list) else []
+            text = _join_spans(spans_list)
+            bbox = _bbox_from_tuple(line.get("bbox"))
+            if not text or not bbox:
+                continue
+            entries.append(
+                {
+                    "block_index": block_index,
+                    "line_index": line_index,
+                    "text": text,
+                    "bbox": bbox,
+                }
+            )
+    return entries
+
+
+def _candidate_group_is_valid(
+    *,
+    texts: List[str],
+    score: float,
+    equation_number: Optional[str],
+    flags: List[str],
+) -> bool:
+    if not texts:
+        return False
+    joined = _compact_text("\n".join(texts))
+    word_count = len(_ANY_WORD_RE.findall(joined))
+    symbol_count = len(_MATH_SYMBOL_RE.findall(joined))
+    if word_count >= 28 and not equation_number:
+        return False
+    if symbol_count == 0 and not equation_number:
+        return False
+    if len(texts) == 1 and not equation_number and word_count >= 9:
+        return False
+    if any(flag in {"inline_prose", "explanatory_context", "numbered_prose", "parenthetical_prose"} for flag in flags) and not equation_number:
+        return False
+    if "code_like" in flags and not equation_number:
+        return False
+    if _looks_code_like(joined) and not equation_number:
+        return False
+    if score < _safe_float(os.getenv("EQUATION_DETECTION_MIN_SCORE", "4.0"), 4.0):
+        return False
+    return True
+
+
+def _build_equation_candidates_from_lines(
+    *,
+    page_no: int,
+    page_width: float,
+    line_entries: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    candidates: List[Dict[str, Any]] = []
+    if not line_entries:
+        return candidates
+
+    gap_limit = max(0.0, _safe_float(os.getenv("EQUATION_LINE_GROUP_VERTICAL_GAP_PT", "26"), 26.0))
+    number_gap_limit = max(gap_limit, _safe_float(os.getenv("EQUATION_NUMBER_LINE_GAP_PT", "32"), 32.0))
+
+    i = 0
+    while i < len(line_entries):
+        line = line_entries[i]
+        signal = _line_signal(text=line["text"], bbox=line["bbox"], page_width=page_width)
+        if not signal["strong"]:
+            i += 1
+            continue
+
+        group = [line]
+        group_flags = list(signal["flags"])
+        total_score = _safe_float(signal["score"])
+        equation_number = signal["equation_number"]
+        current_bbox = _bbox_from_payload(line.get("bbox"))
+
+        j = i + 1
+        while j < len(line_entries):
+            next_line = line_entries[j]
+            next_bbox = _bbox_from_payload(next_line.get("bbox"))
+            gap = _vertical_gap(current_bbox, next_bbox)
+            next_signal = _line_signal(text=next_line["text"], bbox=next_line["bbox"], page_width=page_width)
+            if equation_number and not next_signal["number_only"]:
+                break
+            max_gap = number_gap_limit if next_signal["number_only"] else gap_limit
+            if gap > max_gap:
+                break
+            if not next_signal["accept"]:
+                break
+            group.append(next_line)
+            total_score += max(0.0, _safe_float(next_signal["score"]))
+            for flag in next_signal["flags"]:
+                if flag not in group_flags:
+                    group_flags.append(flag)
+            equation_number = equation_number or next_signal["equation_number"]
+            current_bbox = _bbox_union(current_bbox, next_bbox)
+            j += 1
+
+        texts = [str(item.get("text") or "").strip() for item in group if str(item.get("text") or "").strip()]
+        equation_number = equation_number or _extract_equation_number(texts)
+        if _candidate_group_is_valid(texts=texts, score=total_score, equation_number=equation_number, flags=group_flags):
+            candidate_text = normalize_math_delimiters("\n".join(texts).strip())
+            candidates.append(
+                {
+                    "page_no": page_no,
+                    "bbox": current_bbox,
+                    "lines": texts,
+                    "text": candidate_text,
+                    "score": round(total_score, 3),
+                    "flags": group_flags,
+                    "equation_number": equation_number,
+                }
+            )
+            i = j
+            continue
+
+        i += 1
+
+    return candidates
 
 
 def _is_equation_number_only(candidate: Dict[str, Any]) -> bool:
@@ -299,12 +505,95 @@ def _is_equation_number_only(candidate: Dict[str, Any]) -> bool:
     return len(normalized) <= 4 and normalized.startswith("(") and normalized.endswith(")")
 
 
+def _candidate_word_count(candidate: Dict[str, Any]) -> int:
+    return len(_ANY_WORD_RE.findall(str(candidate.get("text") or "")))
+
+
+def _candidate_math_symbol_count(candidate: Dict[str, Any]) -> int:
+    return len(_MATH_SYMBOL_RE.findall(str(candidate.get("text") or "")))
+
+
+def _is_aligned_equation_neighbor(
+    a_bbox: Optional[Dict[str, float]],
+    b_bbox: Optional[Dict[str, float]],
+) -> bool:
+    if not a_bbox or not b_bbox:
+        return False
+    x_overlap = _x_overlap_ratio(a_bbox, b_bbox)
+    if x_overlap >= 0.04:
+        return True
+    center_delta = abs(_center_x(a_bbox) - _center_x(b_bbox))
+    width_limit = max(_bbox_width(a_bbox), _bbox_width(b_bbox), 1.0) * 0.9
+    return center_delta <= width_limit
+
+
+def _is_same_row_equation_neighbor(
+    a_bbox: Optional[Dict[str, float]],
+    b_bbox: Optional[Dict[str, float]],
+) -> bool:
+    if not a_bbox or not b_bbox:
+        return False
+    center_y_delta = abs(_center_y(a_bbox) - _center_y(b_bbox))
+    if center_y_delta > max(10.0, min(_bbox_width(a_bbox), _bbox_width(b_bbox)) * 0.12):
+        return False
+    gap = _horizontal_gap(a_bbox, b_bbox)
+    return gap <= max(160.0, max(_bbox_width(a_bbox), _bbox_width(b_bbox)) * 0.75)
+
+
+def _should_merge_equation_candidates(prev: Dict[str, Any], candidate: Dict[str, Any]) -> bool:
+    prev_bbox = _bbox_from_payload(prev.get("bbox"))
+    cur_bbox = _bbox_from_payload(candidate.get("bbox"))
+    if int(prev.get("page_no") or 0) != int(candidate.get("page_no") or 0):
+        return False
+    if not prev_bbox or not cur_bbox:
+        return False
+
+    same_row = _is_same_row_equation_neighbor(prev_bbox, cur_bbox)
+    y_gap = float(cur_bbox["y0"]) - float(prev_bbox["y1"])
+    if y_gap < -4.0 and not same_row:
+        return False
+
+    aligned = _is_aligned_equation_neighbor(prev_bbox, cur_bbox)
+    prev_num_only = _is_equation_number_only(prev)
+    cur_num_only = _is_equation_number_only(candidate)
+    prev_eq_num = str(prev.get("equation_number") or "").strip() or None
+    cur_eq_num = str(candidate.get("equation_number") or "").strip() or None
+
+    number_gap_limit = max(20.0, _safe_float(os.getenv("EQUATION_NUMBER_LINE_GAP_PT", "32"), 32.0) + 6.0)
+    fragment_gap_limit = max(12.0, _safe_float(os.getenv("EQUATION_FRAGMENT_MERGE_GAP_PT", "28"), 28.0))
+
+    if cur_num_only:
+        if prev_eq_num and cur_eq_num and prev_eq_num != cur_eq_num:
+            return False
+        return (y_gap <= number_gap_limit and aligned) or same_row
+    if prev_num_only:
+        return False
+    if prev_eq_num and not cur_eq_num:
+        return False
+    if cur_eq_num and not prev_eq_num:
+        return (y_gap <= number_gap_limit and aligned) or same_row
+    if prev_eq_num and cur_eq_num and prev_eq_num != cur_eq_num:
+        return False
+
+    prev_words = _candidate_word_count(prev)
+    cur_words = _candidate_word_count(candidate)
+    combined_words = prev_words + cur_words
+    combined_symbols = _candidate_math_symbol_count(prev) + _candidate_math_symbol_count(candidate)
+
+    if combined_symbols < 2:
+        return False
+    if prev_words > 10 or cur_words > 10 or combined_words > 18:
+        return False
+    if same_row:
+        return True
+    if y_gap > fragment_gap_limit:
+        return False
+    return aligned
+
+
 def _merge_equation_candidates(candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     if len(candidates) <= 1:
-        return candidates
-
-    gap_limit = max(0.0, _safe_float(os.getenv("EQUATION_MERGE_VERTICAL_GAP_PT", "18"), 18.0))
-    overlap_min = min(1.0, max(0.0, _safe_float(os.getenv("EQUATION_MERGE_X_OVERLAP_RATIO", "0.35"), 0.35)))
+        return [candidate for candidate in candidates if not _is_equation_number_only(candidate)]
 
     ordered = sorted(
         candidates,
@@ -327,17 +616,7 @@ def _merge_equation_candidates(candidates: List[Dict[str, Any]]) -> List[Dict[st
             merged.append(candidate)
             continue
 
-        can_merge = False
-        if prev_bbox and cur_bbox:
-            y_gap = float(cur_bbox["y0"]) - float(prev_bbox["y1"])
-            x_overlap = _x_overlap_ratio(prev_bbox, cur_bbox)
-            number_tail = _is_equation_number_only(candidate)
-            if number_tail and y_gap <= 28.0:
-                can_merge = True
-            elif y_gap >= -2.0 and y_gap <= gap_limit and x_overlap >= overlap_min:
-                can_merge = True
-
-        if not can_merge:
+        if not _should_merge_equation_candidates(prev, candidate):
             merged.append(candidate)
             continue
 
@@ -349,9 +628,9 @@ def _merge_equation_candidates(candidates: List[Dict[str, Any]]) -> List[Dict[st
             cur_lines = []
         merged_lines = [str(line) for line in prev_lines + cur_lines if str(line).strip()]
         prev["lines"] = merged_lines
-        prev["text"] = "\n".join(merged_lines).strip()
+        prev["text"] = normalize_math_delimiters("\n".join(merged_lines).strip())
         prev["bbox"] = _bbox_union(prev_bbox, cur_bbox)
-        prev["score"] = max(_safe_float(prev.get("score")), _safe_float(candidate.get("score")))
+        prev["score"] = round(_safe_float(prev.get("score")) + _safe_float(candidate.get("score")), 3)
 
         prev_flags = [str(flag) for flag in (prev.get("flags") if isinstance(prev.get("flags"), list) else [])]
         cur_flags = [str(flag) for flag in (candidate.get("flags") if isinstance(candidate.get("flags"), list) else [])]
@@ -366,7 +645,12 @@ def _merge_equation_candidates(candidates: List[Dict[str, Any]]) -> List[Dict[st
             or ""
         ).strip() or None
 
-    return merged
+    filtered: List[Dict[str, Any]] = []
+    for candidate in merged:
+        if _is_equation_number_only(candidate):
+            continue
+        filtered.append(candidate)
+    return filtered
 
 
 def _group_blocks_by_page(blocks: Iterable[Dict[str, Any]]) -> Dict[int, List[Dict[str, Any]]]:
@@ -517,37 +801,16 @@ def extract_and_store_paper_equations(
             page = doc[page_index]
             page_no = page_index + 1
             page_dict = page.get_text("dict")
-            raw_text_blocks = [item for item in page_dict.get("blocks", []) if item.get("type") == 0]
             page_width = max(1.0, float(page.rect.width))
+            line_entries = _extract_page_line_entries(page_dict)
+            candidates = _build_equation_candidates_from_lines(
+                page_no=page_no,
+                page_width=page_width,
+                line_entries=line_entries,
+            )
+            candidates = _merge_equation_candidates(candidates)
 
-            candidates: List[Dict[str, Any]] = []
-            for raw_block in raw_text_blocks:
-                bbox = _bbox_from_tuple(raw_block.get("bbox"))
-                if not bbox:
-                    continue
-                text_lines = _extract_block_lines(raw_block)
-                if not text_lines:
-                    continue
-                ok, score, flags, equation_number = _looks_like_equation_candidate(
-                    text_lines=text_lines,
-                    bbox=bbox,
-                    page_width=page_width,
-                )
-                if not ok:
-                    continue
-                candidates.append(
-                    {
-                        "page_no": page_no,
-                        "bbox": bbox,
-                        "lines": text_lines,
-                        "text": "\n".join(text_lines).strip(),
-                        "score": score,
-                        "flags": flags,
-                        "equation_number": equation_number,
-                    }
-                )
-
-            for candidate in _merge_equation_candidates(candidates):
+            for candidate in candidates:
                 equation_id = len(equation_records) + 1
                 file_name = f"equation_{equation_id:04d}.png"
                 image_path = output_dir / file_name
@@ -576,6 +839,26 @@ def extract_and_store_paper_equations(
                     "url": f"/api/papers/{paper_id}/equations/{file_name}" if image_saved else None,
                     "json_file": f"equation_{equation_id:04d}.json",
                 }
+                latex_payload = extract_equation_latex(
+                    image_path if image_saved else None,
+                    fallback_text=record["text"],
+                    equation_number=str(record.get("equation_number") or "").strip() or None,
+                )
+                record["latex"] = latex_payload.get("latex")
+                record["latex_confidence"] = _safe_float(latex_payload.get("latex_confidence"), 0.0)
+                record["latex_source"] = latex_payload.get("latex_source")
+                record["latex_validation_flags"] = (
+                    latex_payload.get("latex_validation_flags")
+                    if isinstance(latex_payload.get("latex_validation_flags"), list)
+                    else []
+                )
+                record["render_mode"] = (
+                    "latex"
+                    if record.get("latex")
+                    else "image"
+                    if image_saved
+                    else "text"
+                )
 
                 per_equation_path = output_dir / record["json_file"]
                 with per_equation_path.open("w", encoding="utf-8") as handle:
@@ -671,6 +954,7 @@ def equation_records_to_chunks(
         equation_text = str(equation.get("text") or "").strip()
         if not equation_text:
             equation_text = "(Equation image extracted; exact symbol-level text unavailable.)"
+        equation_latex = str(equation.get("latex") or "").strip()
 
         section_canonical = str(equation.get("section_canonical") or "other").strip() or "other"
         section_title = str(equation.get("section_title") or "Document Body").strip() or "Document Body"
@@ -686,6 +970,8 @@ def equation_records_to_chunks(
 
         heading = f"Equation {equation_number}" if equation_number else f"Equation {equation_id}"
         parts = [heading, f"Section: {section_title}", equation_text]
+        if equation_latex:
+            parts.append(f"LaTeX: {equation_latex}")
         if context_snippet:
             parts.append(f"Nearby context: {context_snippet}")
         chunk_text = "\n\n".join(part for part in parts if part).strip()
@@ -717,6 +1003,9 @@ def equation_records_to_chunks(
             "equation_page_no": page_no,
             "equation_file_name": equation.get("file_name"),
             "equation_url": equation.get("url"),
+            "equation_latex": equation_latex or None,
+            "equation_latex_source": str(equation.get("latex_source") or "").strip() or None,
+            "equation_render_mode": str(equation.get("render_mode") or "").strip() or None,
             "equation_detection_score": _safe_float(equation.get("detection_score"), 0.0),
             "equation_detection_flags": equation.get("detection_flags") if isinstance(equation.get("detection_flags"), list) else [],
             "section_primary": section_canonical,
@@ -769,4 +1058,3 @@ def resolve_equation_file(paper_id: int, file_name: str) -> Path:
     if "/" in candidate or "\\" in candidate or ".." in candidate:
         raise ValueError("Invalid equation file name.")
     return _paper_equation_dir(paper_id) / candidate
-

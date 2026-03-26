@@ -73,6 +73,7 @@ _STANDALONE_HEADING_MARKER_RE = re.compile(
     r"^\s*(?:\d+(?:\.\d+){0,3}|[IVXLCDM]+)\.?\s*$",
     re.IGNORECASE,
 )
+_HEADING_CONNECTOR_WORDS = {"and", "&", "to", "for", "of", "in", "on", "with", "without", "via"}
 _CORE_SECTION_CANONICALS = {
     "abstract",
     "introduction",
@@ -495,6 +496,9 @@ def _extract_numeric_heading_title(text: str) -> str:
         cleaned = re.sub(r"[^A-Za-z0-9&()/-]+", "", token)
         if not cleaned:
             continue
+        if cleaned.lower() in _HEADING_CONNECTOR_WORDS and title_tokens:
+            title_tokens.append(token)
+            continue
         if cleaned[0].islower() and len(title_tokens) >= 2:
             break
         title_tokens.append(token)
@@ -529,10 +533,15 @@ def _is_reasonable_heading_title(title: str) -> bool:
     normalized = _normalize_text(cleaned)
     if not normalized:
         return False
+    lowered = cleaned.lower()
+    if any(marker in lowered for marker in ["http://", "https://", "www.", "github", "openreview", "arxiv.org", "doi.org"]):
+        return False
     if _HEADING_NOISE_RE.match(normalized):
         return False
     tokens = normalized.split()
     if not tokens:
+        return False
+    if tokens[0] in {"our", "this", "these", "those", "see"} and canonicalize_heading(cleaned) not in _CORE_SECTION_CANONICALS:
         return False
     if len(tokens) == 1 and len(tokens[0]) < 4:
         return False
@@ -540,6 +549,10 @@ def _is_reasonable_heading_title(title: str) -> bool:
         return False
     short_tokens = sum(1 for token in tokens if len(token) <= 1)
     if len(tokens) > 1 and short_tokens >= len(tokens) // 2:
+        return False
+    alnum = re.findall(r"[A-Za-z0-9]", cleaned)
+    digits = sum(1 for ch in alnum if ch.isdigit())
+    if alnum and digits / len(alnum) >= 0.28 and canonicalize_heading(cleaned) not in _CORE_SECTION_CANONICALS:
         return False
     return True
 
@@ -1501,6 +1514,17 @@ def _strategy_score(
         )
         if generic_long_slugs:
             score -= min(3.2, generic_long_slugs * 0.22)
+
+    if source_name == "arxiv_source" and non_front_spans and total_pages >= 8:
+        first_span = min(non_front_spans, key=lambda item: item.start_page)
+        has_early_core = any(
+            item.canonical in {"abstract", "introduction", "related_work", "methodology", "experiments", "results"}
+            for item in non_front_spans
+        )
+        if first_span.start_page > 3:
+            score -= min(6.0, (first_span.start_page - 3) * 0.6)
+        if not has_early_core:
+            score -= 3.0
 
     return score
 

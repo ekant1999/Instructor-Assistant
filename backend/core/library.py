@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import logging
+import shutil
 import threading
 
 from .database import get_conn
@@ -21,6 +22,35 @@ from .web import extract_web_document, chunk_web_text
 from .youtube_transcript import download_youtube_transcript, is_youtube_url
 
 logger = logging.getLogger(__name__)
+
+
+def _artifact_root(env_var: str, default_subdir: str) -> Path:
+    configured = os.getenv(env_var, "").strip()
+    if configured:
+        return Path(configured).expanduser().resolve()
+    return (Path.cwd() / ".ia_phase1_data" / default_subdir).expanduser().resolve()
+
+
+def _cleanup_local_paper_artifact_dirs(paper_id: int) -> List[str]:
+    artifact_dirs = [
+        _artifact_root("TABLE_OUTPUT_DIR", "tables") / str(int(paper_id)),
+        _artifact_root("EQUATION_OUTPUT_DIR", "equations") / str(int(paper_id)),
+        _artifact_root("FIGURE_OUTPUT_DIR", "figures") / str(int(paper_id)),
+        _artifact_root("THUMBNAIL_OUTPUT_DIR", "thumbnails") / str(int(paper_id)),
+        _artifact_root("MARKDOWN_OUTPUT_DIR", "markdown") / str(int(paper_id)),
+    ]
+    removed: List[str] = []
+    for artifact_dir in artifact_dirs:
+        if not artifact_dir.exists():
+            continue
+        try:
+            shutil.rmtree(artifact_dir)
+            removed.append(str(artifact_dir))
+        except FileNotFoundError:
+            continue
+        except Exception:
+            logger.exception("Failed to remove local artifact directory for paper %s: %s", paper_id, artifact_dir)
+    return removed
 
 
 async def add_paper(input_str: str, source_url: str | None = None, auto_index: bool = True) -> Dict[str, Any]:
@@ -209,8 +239,9 @@ def delete_paper(paper_id: int, detach_notes: bool = False) -> Dict[str, Any]:
         if not detach_notes:
             conn.execute("DELETE FROM notes WHERE paper_id=?", (paper_id,))
         conn.execute("COMMIT")
+    removed_artifact_dirs = _cleanup_local_paper_artifact_dirs(paper_id)
     bump_search_index_version("delete_paper")
-    return {"deleted": True}
+    return {"deleted": True, "artifact_dirs_removed": removed_artifact_dirs}
 
 
 def index_paper(paper_id: int) -> Dict[str, Any]:

@@ -34,6 +34,7 @@ print(manifest["num_tables"], len(table_chunks))
 - `TABLE_MIN_COLS`
 - `TABLE_MIN_AREA_PT`
 - `TABLE_TEXT_FALLBACK_ENABLED` (default `false`; opt-in caption-guided `strategy="text"` fallback)
+- `TABLE_AUTO_TEXT_FALLBACK_ENABLED` (default `true`; narrow caption-scoped auto fallback when native detection misses a captioned table)
 - `TABLE_DEDUP_IOU_THRESHOLD`
 
 ## Output

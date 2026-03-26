@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 
 from backend.core import database, storage
+from backend.rag import ingest_pgvector
 
 
 class _FakePutResult:
@@ -64,6 +66,10 @@ def _configure_temp_db(tmp_path: Path, monkeypatch) -> Path:
     db_path = tmp_path / "app.db"
     monkeypatch.setattr(database, "DB_PATH", db_path)
     database.init_db()
+    core_database = sys.modules.get("core.database")
+    if core_database is not None:
+        monkeypatch.setattr(core_database, "DB_PATH", db_path, raising=False)
+        core_database.init_db()
     return db_path
 
 
@@ -74,6 +80,9 @@ def _configure_minio(monkeypatch, client: _FakeMinioClient) -> None:
     monkeypatch.setenv("MINIO_BUCKET_LIBRARY", "library-docs")
     monkeypatch.setenv("MINIO_SECURE", "false")
     monkeypatch.setattr(storage, "_MINIO_CLIENT", client)
+    core_storage = sys.modules.get("core.storage")
+    if core_storage is not None:
+        monkeypatch.setattr(core_storage, "_MINIO_CLIENT", client, raising=False)
 
 
 def test_upload_primary_pdf_asset_inserts_asset_row(tmp_path: Path, monkeypatch) -> None:
@@ -319,3 +328,47 @@ def test_restore_primary_pdf_to_path_writes_object_backed_pdf(tmp_path: Path, mo
 
     assert restored == destination.resolve()
     assert destination.read_bytes() == pdf_bytes
+
+
+def test_sync_markdown_bundle_assets_uploads_markdown_and_manifest(tmp_path: Path, monkeypatch) -> None:
+    _configure_temp_db(tmp_path, monkeypatch)
+    client = _FakeMinioClient()
+    _configure_minio(monkeypatch, client)
+
+    pdf_path = tmp_path / "paper.pdf"
+    pdf_path.write_bytes(b"%PDF-1.4 paper")
+    markdown_path = tmp_path / "paper.md"
+    markdown_path.write_text("# Paper\n\nBody", encoding="utf-8")
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text('{"paper_id": 5}', encoding="utf-8")
+
+    with database.get_conn() as conn:
+        cursor = conn.execute(
+            "INSERT INTO papers(title, source_url, pdf_path) VALUES(?,?,?)",
+            ("Markdown Paper", "https://example.test/markdown", str(pdf_path)),
+        )
+        paper_id = int(cursor.lastrowid)
+        conn.commit()
+
+    uploaded = ingest_pgvector._sync_markdown_bundle_assets(
+        paper_id,
+        markdown_path=markdown_path,
+        manifest_path=manifest_path,
+    )
+
+    assert uploaded == {"markdown": 1, "manifest": 1}
+
+    markdown_asset = storage.get_paper_asset(
+        paper_id,
+        role="paper_markdown",
+        original_filename="paper.md",
+    )
+    manifest_asset = storage.get_paper_asset(
+        paper_id,
+        role="paper_markdown_manifest",
+        original_filename="manifest.json",
+    )
+    assert markdown_asset is not None
+    assert manifest_asset is not None
+    assert storage.object_asset_exists(markdown_asset) is True
+    assert storage.object_asset_exists(manifest_asset) is True

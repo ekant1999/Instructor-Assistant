@@ -8,6 +8,9 @@ Modules:
 - tables: extract structured tables and convert them to table chunks.
 - figures: extract embedded/vector figures with section mapping.
 - equations: detect/display equations and convert them to equation chunks.
+- equation_latex: text-to-LaTeX helpers for equation markdown output.
+- math_markdown: reusable math/LaTeX delimiter normalization helpers.
+- markdown_export: compose a structured markdown bundle with asset references.
 - youtube_transcript: download and normalize YouTube subtitles to transcript text.
 - search_keyword: SQLite FTS/LIKE search helpers.
 - search_hybrid: pgvector + PostgreSQL FTS hybrid ranking helpers.
@@ -22,6 +25,7 @@ from .equations import (
     load_paper_equation_manifest,
     resolve_equation_file,
 )
+from .equation_latex import extract_equation_latex, fallback_text_to_latex, validate_equation_latex
 from .figures import (
     extract_and_store_paper_figures,
     load_paper_figure_manifest,
@@ -77,8 +81,16 @@ from .search_keyword import (
 from .tables import (
     extract_and_store_paper_tables,
     load_paper_table_manifest,
+    resolve_table_file,
     table_records_to_chunks,
 )
+from .markdown_export import (
+    MarkdownExportConfig,
+    MarkdownExportResult,
+    export_pdf_to_markdown,
+    render_markdown_document,
+)
+from .math_markdown import normalize_math_delimiters
 from .youtube_transcript import (
     download_youtube_transcript,
     extract_youtube_video_id,
@@ -98,12 +110,21 @@ __all__ = [
     "load_paper_equation_manifest",
     "equation_records_to_chunks",
     "resolve_equation_file",
+    "extract_equation_latex",
+    "fallback_text_to_latex",
+    "validate_equation_latex",
     "extract_and_store_paper_tables",
     "load_paper_table_manifest",
+    "resolve_table_file",
     "table_records_to_chunks",
     "extract_and_store_paper_figures",
     "load_paper_figure_manifest",
     "resolve_figure_file",
+    "MarkdownExportConfig",
+    "MarkdownExportResult",
+    "export_pdf_to_markdown",
+    "render_markdown_document",
+    "normalize_math_delimiters",
     "SearchType",
     "configure_connection_factory",
     "search_papers",
