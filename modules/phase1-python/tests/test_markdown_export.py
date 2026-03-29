@@ -168,6 +168,7 @@ def test_export_pdf_to_markdown_writes_bundle_and_positions_assets(
     markdown = result.markdown_path.read_text(encoding="utf-8")
     assert "title: \"Exported Sample\"" in markdown
     assert "![Figure 1](assets/figures/page_001_img_001.png)" in markdown
+    assert "![Figure 1](assets/figures/page_001_img_001.png)\n\n_Figure 1: Pipeline figure_" in markdown
     assert "_compose_with_dispatch" not in markdown
     assert markdown.count("Pipeline figure") == 1
     assert "_Figure 1: Figure 1: Pipeline figure_" not in markdown

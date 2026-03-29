@@ -407,6 +407,8 @@ def _render_asset_event(event: Dict[str, Any], *, config: MarkdownExportConfig) 
         if markdown_path:
             lines.append(f"![{alt}]({markdown_path})")
         if caption:
+            if markdown_path:
+                lines.append("")
             if figure_number:
                 lines.append(f"_Figure {figure_number}: {caption}_")
             else:
