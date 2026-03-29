@@ -60,6 +60,64 @@ print(result.manifest_path)
 print(result.asset_counts)
 ```
 
+## Command-line usage
+
+A thin CLI wrapper lives at:
+
+- `backend/scripts/export_pdf_to_markdown.py`
+
+Example:
+
+```bash
+backend/.webenv/bin/python backend/scripts/export_pdf_to_markdown.py \
+  --pdf-source path/to/paper.pdf \
+  --source-url https://arxiv.org/abs/2501.00001 \
+  --json
+```
+
+`--pdf-source` accepts:
+
+- a local PDF path
+- a raw PDF URL, for example `https://arxiv.org/pdf/1706.03762.pdf`
+- an arXiv abstract URL, for example `https://arxiv.org/abs/1706.03762`
+- a DOI, for example `10.48550/arXiv.1706.03762`
+
+`--paper-id` is optional. If omitted, the CLI derives a stable local id from the resolved PDF content and uses that id for folder naming under `--output-root`.
+
+To place all generated artifacts under one root:
+
+```bash
+backend/.webenv/bin/python backend/scripts/export_pdf_to_markdown.py \
+  --pdf-source https://arxiv.org/abs/1706.03762 \
+  --output-root /tmp/paper_export
+```
+
+DOI example:
+
+```bash
+backend/.webenv/bin/python backend/scripts/export_pdf_to_markdown.py \
+  --pdf-source 10.48550/arXiv.1706.03762 \
+  --output-root /tmp/paper_export
+```
+
+That creates:
+
+- `/tmp/paper_export/pdfs/<paper_id>/...`
+- `/tmp/paper_export/tables/<paper_id>/...`
+- `/tmp/paper_export/equations/<paper_id>/...`
+- `/tmp/paper_export/figures/<paper_id>/...`
+- `/tmp/paper_export/markdown/<paper_id>/...`
+
+Useful flags:
+
+- `--output-dir`
+- `--output-root`
+- `--no-frontmatter`
+- `--include-page-markers`
+- `--no-ensure-assets`
+- `--asset-mode reference`
+- `--asset-path-mode absolute`
+
 ## Bundle layout
 
 Default output root:

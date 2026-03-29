@@ -4,6 +4,7 @@ Phase 1 reusable ingestion modules.
 Modules:
 - parser: resolve URLs/DOIs to PDFs and extract PDF text blocks.
 - sectioning: annotate PDF blocks with canonical section metadata.
+- section_overview: generate section-wise overview paragraphs from annotated PDF blocks.
 - chunking: build embedding-ready text chunks from blocks.
 - tables: extract structured tables and convert them to table chunks.
 - figures: extract embedded/vector figures with section mapping.
@@ -33,6 +34,13 @@ from .figures import (
 )
 from .parser import describe_google_drive_source, extract_pages, extract_text_blocks, resolve_any_to_pdf
 from .sectioning import annotate_blocks_with_sections, canonicalize_heading
+from .section_overview import (
+    SectionOverviewConfig,
+    SectionOverviewItem,
+    SectionOverviewResult,
+    build_section_overview,
+    render_section_overview_markdown,
+)
 from .search_context import (
     build_match_snippet,
     lexical_hits,
@@ -104,6 +112,11 @@ __all__ = [
     "extract_text_blocks",
     "annotate_blocks_with_sections",
     "canonicalize_heading",
+    "SectionOverviewConfig",
+    "SectionOverviewItem",
+    "SectionOverviewResult",
+    "build_section_overview",
+    "render_section_overview_markdown",
     "chunk_text_blocks",
     "simple_chunk_blocks",
     "extract_and_store_paper_equations",
