@@ -176,3 +176,17 @@ The exporter also respects the output locations of the upstream asset modules:
 ## Tests
 
 - `modules/phase1-python/tests/test_markdown_export.py`
+
+## Screenshots of the PDF, Markdown file and Markdown Preview
+
+Original PDF
+![PDF screenshot](../screenshots/pdf.jpeg)
+<br><br>
+
+Converted markdown file
+![Raw .md screenshot](../screenshots/md.jpeg)
+<br><br>
+
+Preview of converted markdown file
+![.md preview screenshot](../screenshots/overview.jpeg)
+<br><br>
