@@ -141,3 +141,10 @@ Each `SectionOverviewItem` includes:
 ## Tests
 
 - `modules/phase1-python/tests/test_section_overview.py`
+
+## Screenshots of Section overview result markdown
+Overview of [https://arxiv.org/abs/2603.22241](https://arxiv.org/abs/2603.22241)
+<br><br>
+![Section overview screenshot](../screenshots/section-overview.jpeg)
+<br><br>
+
