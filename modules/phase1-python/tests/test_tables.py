@@ -8,13 +8,18 @@ import pytest
 
 from ia_phase1.tables import (
     _append_or_replace_table_record,
+    _build_caption_guided_text_candidates,
+    _caption_block_match_score,
     _find_nearest_caption_block,
+    _looks_like_explicit_table_caption,
     _looks_like_false_positive_table,
+    _materialize_table_record,
     _missing_explicit_table_caption_indices,
     _merge_sparse_pre_numeric_text_columns,
     _pick_headers_and_rows,
     _repair_leading_text_fragment_columns,
     _repair_headers_from_auxiliary_band,
+    _resolve_candidate_caption_binding,
     extract_and_store_paper_tables,
     load_paper_table_manifest,
     table_records_to_chunks,
@@ -202,6 +207,105 @@ def test_extract_tables_auto_text_fallback_recovers_caption_backed_borderless_ta
     assert table["n_rows"] >= 3
 
 
+def test_caption_guided_candidates_merge_native_row_fragments_for_above_caption_tables() -> None:
+    caption_blocks = [
+        {
+            "text": "Table 5: Detailed dataset statistics.",
+            "bbox": {"x0": 72.0, "y0": 220.0, "x1": 523.0, "y1": 244.0},
+        }
+    ]
+    lines_tables = [
+        _FakeExtractTable((72.0, 110.0, 523.0, 130.0), [["Dataset", "Task", "Description", "Train", "Test", "Metric"]]),
+        _FakeExtractTable((72.0, 150.0, 523.0, 170.0), [["NQ", "QA", "Open-domain", "79168", "3610", "EM"]]),
+        _FakeExtractTable((72.0, 190.0, 523.0, 210.0), [["FEVER", "Fact", "Verification", "145449", "19998", "Acc"]]),
+    ]
+    page = _FakeCaptionGuidedPage(
+        text_blocks=[
+            {
+                "type": 0,
+                "bbox": (72.0, 220.0, 523.0, 244.0),
+                "lines": [{"spans": [{"text": "Table 5: Detailed dataset statistics."}]}],
+            }
+        ],
+        lines_tables=lines_tables,
+        text_tables=[],
+    )
+
+    candidates = _build_caption_guided_text_candidates(
+        page,
+        caption_blocks,
+        min_area=1000.0,
+        min_cols=2,
+        caption_indices={0},
+    )
+
+    assert len(candidates) == 1
+    candidate = candidates[0]
+    assert candidate["detection_strategy"] == "caption_guided_native"
+    assert candidate["raw_row_count"] == 3
+    assert candidate["bbox"]["y1"] <= caption_blocks[0]["bbox"]["y0"]
+
+
+def test_caption_guided_candidates_do_not_steal_previous_same_column_table_body() -> None:
+    caption_blocks = [
+        {
+            "text": "Table 1: First table.",
+            "bbox": {"x0": 108.0, "y0": 70.0, "x1": 505.0, "y1": 126.0},
+        },
+        {
+            "text": "Table 2: Second table.",
+            "bbox": {"x0": 108.0, "y0": 223.0, "x1": 505.0, "y1": 257.0},
+        },
+    ]
+    above_candidate = _FakeExtractTable(
+        (114.0, 136.0, 498.0, 209.0),
+        [["Method", "1K", "2K"], ["Base", "72.1", "70.4"], ["Memory", "79.8", "78.2"]],
+    )
+    below_candidate = _FakeExtractTable(
+        (108.0, 267.0, 504.0, 520.0),
+        [["Method", "16K", "32K"], ["Base", "52.5", "9.4"], ["MemDLM", "55.3", "10.3"]],
+    )
+
+    def find_tables_fn(*, strategy, clip):
+        if strategy != "text" or clip is None:
+            return []
+        _, y0, _, y1 = clip
+        if y1 <= 223.0:
+            return [above_candidate]
+        if y0 >= 257.0:
+            return [below_candidate]
+        return []
+
+    page = _FakeCaptionGuidedPage(
+        text_blocks=[
+            {
+                "type": 0,
+                "bbox": (108.0, 70.0, 505.0, 126.0),
+                "lines": [{"spans": [{"text": "Table 1: First table."}]}],
+            },
+            {
+                "type": 0,
+                "bbox": (108.0, 223.0, 505.0, 257.0),
+                "lines": [{"spans": [{"text": "Table 2: Second table."}]}],
+            },
+        ],
+        find_tables_fn=find_tables_fn,
+    )
+
+    candidates = _build_caption_guided_text_candidates(
+        page,
+        caption_blocks,
+        min_area=1000.0,
+        min_cols=2,
+        caption_indices={1},
+    )
+
+    assert len(candidates) == 1
+    candidate = candidates[0]
+    assert candidate["seed_caption_id"] == 1
+    assert candidate["bbox"]["y0"] >= caption_blocks[1]["bbox"]["y1"]
+
+
 def test_extract_tables_text_fallback_remains_opt_in(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -225,6 +329,52 @@ class _FakeHeader:
 class _FakeTable:
     def __init__(self, header_names):
         self.header = _FakeHeader(header_names)
+
+
+class _FakeExtractTable:
+    def __init__(self, bbox, rows):
+        self.bbox = bbox
+        self._rows = rows
+        self.header = _FakeHeader(rows[0] if rows else [])
+
+    def extract(self):
+        return self._rows
+
+
+class _FakeFinder:
+    def __init__(self, tables):
+        self.tables = tables
+
+
+class _FakeRect:
+    def __init__(self, x0, y0, x1, y1):
+        self.x0 = x0
+        self.y0 = y0
+        self.x1 = x1
+        self.y1 = y1
+
+
+class _FakeCaptionGuidedPage:
+    def __init__(self, *, text_blocks, lines_tables=None, text_tables=None, width=595.0, height=842.0, find_tables_fn=None):
+        self.rect = _FakeRect(0.0, 0.0, width, height)
+        self._text_blocks = text_blocks
+        self._lines_tables = list(lines_tables or [])
+        self._text_tables = list(text_tables or [])
+        self._find_tables_fn = find_tables_fn
+
+    def get_text(self, mode):
+        assert mode == "dict"
+        return {"blocks": self._text_blocks}
+
+    def find_tables(self, *, strategy, clip=None):
+        if self._find_tables_fn is not None:
+            tables = self._find_tables_fn(strategy=strategy, clip=clip)
+            return _FakeFinder(tables)
+        if strategy == "lines":
+            return _FakeFinder(self._lines_tables)
+        if strategy == "text":
+            return _FakeFinder(self._text_tables)
+        return _FakeFinder([])
 
 
 def test_pick_headers_and_rows_merges_units_and_continuation_columns() -> None:
@@ -311,6 +461,103 @@ def test_find_nearest_caption_block_prefers_horizontal_alignment_for_side_by_sid
     assert idx == 1
     assert block is not None
     assert block["text"] == "Table 2. Right table."
+
+
+def test_resolve_candidate_caption_binding_rebinds_misaligned_text_fallback_candidate() -> None:
+    caption_blocks = [
+        {
+            "text": "Table 5. Dataset statistics.",
+            "bbox": {"x0": 70.0, "y0": 223.0, "x1": 525.0, "y1": 245.0},
+        },
+        {
+            "text": "Table 6. Hyperparameters.",
+            "bbox": {"x0": 305.0, "y0": 590.0, "x1": 524.0, "y1": 613.0},
+        },
+    ]
+    candidate_bbox = {"x0": 312.0, "y0": 336.0, "x1": 525.0, "y1": 576.0}
+
+    seed_score = _caption_block_match_score(caption_blocks[0]["bbox"], candidate_bbox)
+    nearest_score = _caption_block_match_score(caption_blocks[1]["bbox"], candidate_bbox)
+
+    assert nearest_score < seed_score
+
+    idx, block = _resolve_candidate_caption_binding(
+        caption_blocks=caption_blocks,
+        candidate_bbox=candidate_bbox,
+        detection_strategy="text_caption_fallback",
+        seed_caption_index=0,
+    )
+
+    assert idx == 1
+    assert block is caption_blocks[1]
+
+
+def test_looks_like_explicit_table_caption_rejects_prose_mentions() -> None:
+    assert _looks_like_explicit_table_caption("Table 6. Hyperparameter settings.") is True
+    assert _looks_like_explicit_table_caption("Table 3 shows the write-back construction process.") is False
+
+
+def test_materialize_table_record_rebinds_caption_after_reconstruction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    caption_blocks = [
+        {
+            "text": "Table 5. Dataset statistics.",
+            "bbox": {"x0": 70.0, "y0": 223.0, "x1": 525.0, "y1": 245.0},
+        },
+        {
+            "text": "Table 6. Hyperparameters.",
+            "bbox": {"x0": 305.0, "y0": 590.0, "x1": 524.0, "y1": 613.0},
+        },
+    ]
+    candidate = {
+        "bbox": {"x0": 70.0, "y0": 90.0, "x1": 525.0, "y1": 208.0},
+        "matrix": [["A", "B"], ["1", "2"]],
+        "table_obj": None,
+        "detection_strategy": "pymupdf_native",
+    }
+    reconstructed = {
+        "bbox": {"x0": 312.0, "y0": 336.0, "x1": 525.0, "y1": 576.0},
+        "matrix": [["Hyperparameter", "Value"], ["Retriever", "E5-base-v2"]],
+        "table_obj": None,
+        "detection_strategy": "pymupdf_text_reconstructed",
+    }
+
+    monkeypatch.setattr("ia_phase1.tables._candidate_needs_text_reconstruction", lambda **kwargs: True)
+    monkeypatch.setattr("ia_phase1.tables._reconstruct_candidate_from_text", lambda *args, **kwargs: reconstructed)
+    monkeypatch.setattr("ia_phase1.tables._repair_headers_from_auxiliary_band", lambda headers, rows, **kwargs: (headers, rows))
+    monkeypatch.setattr("ia_phase1.tables._looks_like_false_positive_table", lambda *args, **kwargs: (False, []))
+    monkeypatch.setattr(
+        "ia_phase1.tables._infer_section_for_table",
+        lambda *args, **kwargs: {
+            "section_canonical": "other",
+            "section_title": "Document Body",
+            "section_source": "fallback",
+            "section_confidence": 0.0,
+        },
+    )
+    monkeypatch.setattr("ia_phase1.tables._render_table_markdown", lambda *args, **kwargs: "markdown")
+    monkeypatch.setattr("ia_phase1.tables._to_csv_text", lambda *args, **kwargs: "csv")
+
+    record = _materialize_table_record(
+        page=None,
+        page_no=12,
+        paper_id=118,
+        candidate=candidate,
+        page_kept_bboxes=[],
+        table_caption_blocks=caption_blocks,
+        figure_caption_blocks=[],
+        auxiliary_header_candidates=[],
+        page_bounds={"x0": 0.0, "y0": 0.0, "x1": 595.0, "y1": 842.0},
+        page_blocks_for_page=[],
+        min_area=0.0,
+        min_cols=2,
+        min_rows=1,
+        dedup_iou_threshold=0.9,
+    )
+
+    assert record is not None
+    assert record["caption"] == "Table 6. Hyperparameters."
 
 
 def test_repair_headers_from_auxiliary_band_expands_split_header_rows() -> None:

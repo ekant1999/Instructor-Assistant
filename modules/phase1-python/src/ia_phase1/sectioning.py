@@ -528,6 +528,17 @@ def _looks_like_heading_phrase(text: str) -> bool:
     return title_case_tokens >= max(2, len(tokens) - 2)
 
 
+def _looks_like_sentenceish_prose(text: str) -> bool:
+    lowered = str(text or "").lower()
+    if re.search(r"[.!?]\s", str(text or "")):
+        return True
+    stopwords = re.findall(
+        r"\b(the|and|that|with|from|this|these|our|their|which|while|using|without|into|through|because|however|although)\b",
+        lowered,
+    )
+    return len(stopwords) >= 3
+
+
 def _is_reasonable_heading_title(title: str) -> bool:
     cleaned = _clean_heading_title(title)
     normalized = _normalize_text(cleaned)
@@ -1055,6 +1066,186 @@ def _estimate_body_font(blocks: List[Dict[str, Any]]) -> float:
     return sorted_fonts[len(sorted_fonts) // 2]
 
 
+def _heading_level_from_line(line: str) -> int:
+    compact = " ".join(str(line or "").split()).strip()
+    if not compact:
+        return 1
+    match = _NUMERIC_HEADING_RE.match(compact)
+    if match:
+        return min(3, match.group("num").count(".") + 1)
+    match = _ROMAN_HEADING_RE.match(compact)
+    if match:
+        return 1
+    return 1
+
+
+def _extract_local_heading_anchors(blocks: List[Dict[str, Any]]) -> List[HeadingCandidate]:
+    if not blocks:
+        return []
+
+    body_font = _estimate_body_font(blocks)
+    anchors: List[HeadingCandidate] = []
+    seen: set[Tuple[int, str]] = set()
+
+    for idx, block in enumerate(blocks):
+        raw_text = str(block.get("text") or "").replace("\x00", "").strip()
+        if not raw_text:
+            continue
+        line = _block_first_line(block)
+        raw_lines = [" ".join(part.split()) for part in raw_text.splitlines() if " ".join(part.split())]
+        if not line:
+            continue
+        compact_line = " ".join(line.split()).strip()
+        if not compact_line:
+            continue
+
+        metadata = block.get("metadata")
+        meta = metadata if isinstance(metadata, dict) else {}
+        line_count = int(_safe_float(meta.get("line_count"), 1))
+        max_font = _safe_float(meta.get("max_font_size"), 0.0)
+        bold_ratio = _safe_float(meta.get("bold_ratio"), 0.0)
+        char_count = int(_safe_float(meta.get("char_count"), len(raw_text)))
+
+        candidate_title = ""
+        level = 1
+        lowered = compact_line.lower()
+
+        if lowered.startswith("abstract"):
+            candidate_title = "Abstract"
+        elif lowered.startswith("references"):
+            candidate_title = "References"
+        else:
+            numeric_title = _extract_numeric_heading_title(compact_line)
+            if numeric_title:
+                candidate_title = numeric_title
+                level = _heading_level_from_line(compact_line)
+            else:
+                roman_title = _extract_roman_heading_title(compact_line)
+                if roman_title:
+                    candidate_title = roman_title
+                    level = 1
+                else:
+                    if _is_standalone_heading_marker(compact_line):
+                        inline_heading_line = raw_lines[1] if len(raw_lines) >= 2 else ""
+                        if (
+                            inline_heading_line
+                            and not _looks_like_sentenceish_prose(inline_heading_line)
+                            and (_looks_like_heading_phrase(inline_heading_line) or _is_reasonable_heading_title(inline_heading_line))
+                        ):
+                            candidate_title = _clean_heading_title(inline_heading_line)
+                            level = 1
+                        elif idx + 1 < len(blocks):
+                            next_line = _block_first_line(blocks[idx + 1])
+                            if (
+                                next_line
+                                and not _looks_like_sentenceish_prose(next_line)
+                                and (_looks_like_heading_phrase(next_line) or _is_reasonable_heading_title(next_line))
+                            ):
+                                candidate_title = _clean_heading_title(next_line)
+                                level = 1
+                    if candidate_title:
+                        pass
+                    else:
+                        words = compact_line.split()
+                        title_case_words = sum(1 for token in words if token[:1].isupper() or _is_upper_token(token))
+                        font_prominent = body_font > 0 and max_font >= (body_font + 0.9)
+                        if (
+                            1 <= len(words) <= 12
+                            and title_case_words >= max(2, len(words) - 1)
+                            and line_count <= 2
+                            and char_count <= 140
+                            and (font_prominent or bold_ratio >= 0.4)
+                            and not lowered.startswith(("figure", "table", "algorithm", "arxiv:", "http://", "https://"))
+                        ):
+                            candidate_title = _clean_heading_title(compact_line)
+                            level = 1
+
+        candidate_title = _clean_heading_title(candidate_title)
+        if not candidate_title:
+            continue
+        if not _is_reasonable_heading_title(candidate_title):
+            continue
+        title_lower = candidate_title.lower()
+        if title_lower.startswith(("we ", "our ", "this ", "these ", "those ")):
+            continue
+        if _looks_like_sentenceish_prose(candidate_title):
+            continue
+
+        key = (idx, _normalize_text(candidate_title))
+        if key in seen:
+            continue
+        seen.add(key)
+        anchors.append(
+            HeadingCandidate(
+                title=candidate_title,
+                level=level,
+                source="local_anchor",
+                confidence=0.86,
+                block_hint=idx,
+                page_hint=int(block.get("page_no") or 1),
+            )
+        )
+
+    return anchors
+
+
+def _local_anchor_match_score(
+    heading: HeadingCandidate,
+    anchor: HeadingCandidate,
+) -> float:
+    heading_norm = _normalize_text(heading.title)
+    anchor_norm = _normalize_text(anchor.title)
+    if not heading_norm or not anchor_norm:
+        return 0.0
+
+    score = SequenceMatcher(None, heading_norm, anchor_norm).ratio()
+    heading_canonical = canonicalize_heading(heading.title)
+    anchor_canonical = canonicalize_heading(anchor.title)
+    if heading_canonical == anchor_canonical:
+        score += 0.35
+    if heading_norm == anchor_norm:
+        score += 0.45
+    elif heading_norm in anchor_norm or anchor_norm in heading_norm:
+        score += 0.18
+
+    if heading.page_hint is not None and anchor.page_hint is not None:
+        page_dist = abs(int(heading.page_hint) - int(anchor.page_hint))
+        if page_dist == 0:
+            score += 0.2
+        elif page_dist == 1:
+            score += 0.1
+        elif page_dist >= 3:
+            score -= min(0.25, 0.05 * (page_dist - 2))
+
+    if heading.level == anchor.level:
+        score += 0.06
+    elif heading.level == 1 and anchor.level == 2:
+        score -= 0.08
+
+    return score
+
+
+def _find_local_anchor_for_heading(
+    heading: HeadingCandidate,
+    anchors: List[HeadingCandidate],
+    *,
+    search_start: int,
+) -> Optional[Tuple[int, float]]:
+    best_idx = -1
+    best_score = -1.0
+    for anchor in anchors:
+        block_hint = anchor.block_hint
+        if block_hint is None or block_hint < search_start:
+            continue
+        score = _local_anchor_match_score(heading, anchor)
+        if score > best_score:
+            best_score = score
+            best_idx = block_hint
+    if best_idx < 0 or best_score < 1.02:
+        return None
+    return best_idx, best_score
+
+
 def _block_heading_shape_score(block: Dict[str, Any], body_font: float, first_line: str) -> float:
     metadata = block.get("metadata")
     meta = metadata if isinstance(metadata, dict) else {}
@@ -1156,6 +1347,7 @@ def _align_headings_to_spans(
     first_lines = [_block_first_line(block) for block in blocks]
     normalized_first_lines = [_normalize_text(line) for line in first_lines]
     body_font = _estimate_body_font(blocks)
+    local_anchors = _extract_local_heading_anchors(blocks)
 
     page_ranges: Dict[int, Tuple[int, int]] = {}
     for idx, block in enumerate(blocks):
@@ -1182,6 +1374,10 @@ def _align_headings_to_spans(
             best_idx = heading.block_hint
             best_score = 1.3
         else:
+            anchor_match = _find_local_anchor_for_heading(heading, local_anchors, search_start=search_start)
+            if anchor_match is not None:
+                best_idx, best_score = anchor_match
+
             scan_start = search_start
             scan_end = len(blocks) - 1
             if heading.page_hint is not None and heading.page_hint in page_ranges:
@@ -1219,25 +1415,22 @@ def _align_headings_to_spans(
                     if end_idx is not None:
                         scan_end = min(scan_end, end_idx)
 
-            if scan_start >= len(blocks):
-                continue
-            scan_end = min(scan_end, len(blocks) - 1)
-            if scan_end < scan_start:
-                continue
-
-            for idx in range(scan_start, scan_end + 1):
-                score = _heading_block_score(
-                    heading=heading,
-                    heading_norm=heading_norm,
-                    block=blocks[idx],
-                    block_norm=normalized_blocks[idx],
-                    first_line=first_lines[idx],
-                    first_line_norm=normalized_first_lines[idx],
-                    body_font=body_font,
-                )
-                if score > best_score:
-                    best_score = score
-                    best_idx = idx
+            if scan_start < len(blocks):
+                scan_end = min(scan_end, len(blocks) - 1)
+                if scan_end >= scan_start:
+                    for idx in range(scan_start, scan_end + 1):
+                        score = _heading_block_score(
+                            heading=heading,
+                            heading_norm=heading_norm,
+                            block=blocks[idx],
+                            block_norm=normalized_blocks[idx],
+                            first_line=first_lines[idx],
+                            first_line_norm=normalized_first_lines[idx],
+                            body_font=body_font,
+                        )
+                        if score > best_score:
+                            best_score = score
+                            best_idx = idx
 
         min_score = _heading_min_score(heading.source)
 

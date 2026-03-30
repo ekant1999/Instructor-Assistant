@@ -133,12 +133,19 @@ def _x_overlap_ratio(a: Optional[Dict[str, float]], b: Optional[Dict[str, float]
     return overlap / base
 
 
-def _merge_table_candidates(candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _merge_table_candidates(
+    candidates: List[Dict[str, Any]],
+    *,
+    gap_limit: Optional[float] = None,
+    overlap_min: Optional[float] = None,
+) -> List[Dict[str, Any]]:
     if len(candidates) <= 1:
         return candidates
 
-    gap_limit = max(0.0, _safe_float(os.getenv("TABLE_MERGE_VERTICAL_GAP_PT", "14"), 14.0))
-    overlap_min = min(1.0, max(0.0, _safe_float(os.getenv("TABLE_MERGE_X_OVERLAP_RATIO", "0.9"), 0.9)))
+    if gap_limit is None:
+        gap_limit = max(0.0, _safe_float(os.getenv("TABLE_MERGE_VERTICAL_GAP_PT", "14"), 14.0))
+    if overlap_min is None:
+        overlap_min = min(1.0, max(0.0, _safe_float(os.getenv("TABLE_MERGE_X_OVERLAP_RATIO", "0.9"), 0.9)))
 
     ordered = sorted(candidates, key=lambda item: float(item["bbox"]["y0"]) if item.get("bbox") else 0.0)
     merged: List[Dict[str, Any]] = []
@@ -206,7 +213,15 @@ def _extract_page_text_blocks(page: Any) -> List[Dict[str, Any]]:
 
 
 def _collect_caption_blocks(page: Any, pattern: re.Pattern[str]) -> List[Dict[str, Any]]:
-    return [item for item in _extract_page_text_blocks(page) if pattern.search(item.get("text") or "")]
+    items: List[Dict[str, Any]] = []
+    for item in _extract_page_text_blocks(page):
+        text = str(item.get("text") or "")
+        if not pattern.search(text):
+            continue
+        if pattern is _TABLE_CAPTION_RE and not _looks_like_explicit_table_caption(text):
+            continue
+        items.append(item)
+    return items
 
 
 def _find_nearest_caption_block(
@@ -226,29 +241,82 @@ def _find_nearest_caption_block(
         bbox = block.get("bbox")
         if not bbox:
             continue
-        block_top = float(bbox["y0"])
-        block_bottom = float(bbox["y1"])
-        x_overlap = _x_overlap_ratio(bbox, target_bbox)
-        target_center_x = (float(target_bbox["x0"]) + float(target_bbox["x1"])) * 0.5
-        block_center_x = (float(bbox["x0"]) + float(bbox["x1"])) * 0.5
-        center_distance = abs(target_center_x - block_center_x)
-        if block_bottom <= target_top + 4.0:
-            distance = target_top - block_bottom
-            penalty = 0.0
-        elif block_top >= target_bottom - 4.0:
-            distance = block_top - target_bottom
-            penalty = 12.0
-        else:
-            distance = 0.0
-            penalty = 20.0
-        score = distance + penalty
-        score += (1.0 - x_overlap) * 90.0
-        score += center_distance / 10.0
+        score = _caption_block_match_score(bbox, target_bbox)
         if score < best_score:
             best_score = score
             best_idx = idx
             best_block = block
     return best_idx, best_block
+
+
+def _caption_block_match_score(
+    caption_bbox: Optional[Dict[str, float]],
+    target_bbox: Optional[Dict[str, float]],
+) -> float:
+    if not caption_bbox or not target_bbox:
+        return float("inf")
+
+    target_top = float(target_bbox["y0"])
+    target_bottom = float(target_bbox["y1"])
+    block_top = float(caption_bbox["y0"])
+    block_bottom = float(caption_bbox["y1"])
+    x_overlap = _x_overlap_ratio(caption_bbox, target_bbox)
+    target_center_x = (float(target_bbox["x0"]) + float(target_bbox["x1"])) * 0.5
+    block_center_x = (float(caption_bbox["x0"]) + float(caption_bbox["x1"])) * 0.5
+    center_distance = abs(target_center_x - block_center_x)
+
+    if block_bottom <= target_top + 4.0:
+        distance = target_top - block_bottom
+        penalty = 0.0
+    elif block_top >= target_bottom - 4.0:
+        distance = block_top - target_bottom
+        penalty = 12.0
+    else:
+        distance = 0.0
+        penalty = 20.0
+
+    caption_width = max(1e-6, float(caption_bbox["x1"]) - float(caption_bbox["x0"]))
+    target_width = max(1e-6, float(target_bbox["x1"]) - float(target_bbox["x0"]))
+    width_ratio = target_width / caption_width
+
+    score = distance + penalty
+    score += (1.0 - x_overlap) * 90.0
+    score += center_distance / 10.0
+    if width_ratio < 0.58 and center_distance > caption_width * 0.18:
+        score += 55.0
+    return score
+
+
+def _resolve_candidate_caption_binding(
+    *,
+    caption_blocks: List[Dict[str, Any]],
+    candidate_bbox: Optional[Dict[str, float]],
+    detection_strategy: str,
+    seed_caption_index: Any,
+) -> Tuple[Optional[int], Optional[Dict[str, Any]]]:
+    nearest_index, nearest_block = _find_nearest_caption_block(caption_blocks, candidate_bbox)
+    if not (
+        detection_strategy == "text_caption_fallback"
+        and isinstance(seed_caption_index, int)
+        and 0 <= seed_caption_index < len(caption_blocks)
+    ):
+        return nearest_index, nearest_block
+
+    seed_block = caption_blocks[seed_caption_index]
+    seed_bbox = seed_block.get("bbox")
+    seed_score = _caption_block_match_score(seed_bbox, candidate_bbox)
+    nearest_score = _caption_block_match_score(
+        nearest_block.get("bbox") if nearest_block else None,
+        candidate_bbox,
+    )
+
+    if nearest_block is None:
+        return seed_caption_index, seed_block
+    if nearest_index == seed_caption_index:
+        return seed_caption_index, seed_block
+    if nearest_score + 18.0 < seed_score:
+        return nearest_index, nearest_block
+    return seed_caption_index, seed_block
 
 
 def _looks_like_sentenceish_prose(text: str) -> bool:
@@ -377,6 +445,8 @@ def _score_text_fallback_candidate(
     area_ratio = _rect_area(bbox) / page_area
     row_count = int(candidate.get("raw_row_count") or 0)
     col_count = int(candidate.get("n_cols") or 0)
+    strategy = str(candidate.get("detection_strategy") or "")
+    is_above_caption = float(bbox["y1"]) <= float(caption_bbox["y0"]) + 4.0
 
     score = 0.0
     score += x_overlap * 3.0
@@ -384,6 +454,10 @@ def _score_text_fallback_candidate(
     score -= max(0.0, area_ratio - 0.35) * 2.2
     score += min(1.0, row_count / 18.0) * 0.35
     score += min(1.0, col_count / 10.0) * 0.25
+    if strategy == "caption_guided_native":
+        score += 0.3
+    if is_above_caption:
+        score += 0.2
     return score
 
 
@@ -403,6 +477,14 @@ def _build_caption_guided_text_candidates(
     max_below = max(24.0, _safe_float(os.getenv("TABLE_TEXT_FALLBACK_MAX_BELOW_PT", "260"), 260.0))
     min_clip_height = max(20.0, _safe_float(os.getenv("TABLE_TEXT_FALLBACK_MIN_CLIP_HEIGHT_PT", "48"), 48.0))
     max_candidates_per_caption = max(1, _safe_int(os.getenv("TABLE_TEXT_FALLBACK_MAX_CANDIDATES_PER_CAPTION", "1"), 1))
+    caption_native_merge_gap = max(
+        12.0,
+        _safe_float(os.getenv("TABLE_CAPTION_GUIDED_NATIVE_MERGE_GAP_PT", "28"), 28.0),
+    )
+    caption_native_overlap = min(
+        1.0,
+        max(0.0, _safe_float(os.getenv("TABLE_CAPTION_GUIDED_NATIVE_MERGE_X_OVERLAP_RATIO", "0.82"), 0.82)),
+    )
 
     page_bounds = _page_bbox(page)
     clip_x0 = min(page_bounds["x1"], max(page_bounds["x0"], page_bounds["x0"] + x_margin))
@@ -427,10 +509,17 @@ def _build_caption_guided_text_candidates(
 
         above_bottom = float(caption_bbox["y0"]) - 2.0
         above_floor = float(page_bounds["y0"]) + 2.0
+        same_column_prev = False
         if prev_caption_bbox:
             above_floor = max(above_floor, float(prev_caption_bbox["y1"]) + 2.0)
+            same_column_prev = _x_overlap_ratio(prev_caption_bbox, caption_bbox) >= 0.6
         above_top = max(above_floor, above_bottom - max_above)
-        if above_bottom - above_top >= min_clip_height:
+        allow_above_clip = not (
+            prev_caption_bbox
+            and same_column_prev
+            and (float(caption_bbox["y0"]) - float(prev_caption_bbox["y1"])) <= (max_above + 24.0)
+        )
+        if allow_above_clip and above_bottom - above_top >= min_clip_height:
             clip_bboxes.append({"x0": clip_x0, "y0": above_top, "x1": clip_x1, "y1": above_bottom})
 
         below_top = float(caption_bbox["y1"]) + 2.0
@@ -446,6 +535,29 @@ def _build_caption_guided_text_candidates(
             clip_rect = _bbox_to_rect_tuple(clip_bbox)
             if not clip_rect:
                 continue
+            try:
+                native_finder = page.find_tables(strategy="lines", clip=clip_rect)
+            except Exception:
+                native_finder = None
+            native_tables = getattr(native_finder, "tables", None) or []
+            if native_tables:
+                native_candidates = _build_candidates_from_table_objects(
+                    native_tables,
+                    min_area=min_area,
+                    min_cols=min_cols,
+                    detection_strategy="caption_guided_native",
+                    seed_caption=caption_text,
+                    seed_caption_id=idx,
+                    seed_caption_bbox=caption_bbox,
+                    clip_bbox=clip_bbox,
+                )
+                caption_candidates.extend(
+                    _merge_table_candidates(
+                        native_candidates,
+                        gap_limit=caption_native_merge_gap,
+                        overlap_min=caption_native_overlap,
+                    )
+                )
             try:
                 finder = page.find_tables(strategy="text", clip=clip_rect)
             except Exception:
@@ -1370,7 +1482,15 @@ def _looks_like_explicit_table_caption(text: str) -> bool:
     compact = " ".join(str(text or "").split()).strip()
     if not compact:
         return False
-    return bool(re.match(r"^table\s+\d+[A-Za-z]?\s*[:.]\s+\S", compact, flags=re.IGNORECASE))
+    if re.match(r"^table\s+\d+[A-Za-z]?\s*[:.]\s+\S", compact, flags=re.IGNORECASE):
+        return True
+    match = re.match(r"^(table\s+\d+[A-Za-z]?)\s+([A-Za-z]+)\b", compact, flags=re.IGNORECASE)
+    if not match:
+        return False
+    next_word = str(match.group(2) or "").lower()
+    if next_word in {"shows", "show", "presents", "present", "summarizes", "summarize", "reports", "report", "lists", "list", "compares", "compare"}:
+        return False
+    return len(compact.split()) <= 18
 
 
 def _table_record_quality(record: Dict[str, Any]) -> float:
@@ -1707,15 +1827,12 @@ def _materialize_table_record(
             return None
 
     seed_caption_index = candidate.get("seed_caption_id")
-    if (
-        detection_strategy == "text_caption_fallback"
-        and isinstance(seed_caption_index, int)
-        and 0 <= seed_caption_index < len(table_caption_blocks)
-    ):
-        caption_index = seed_caption_index
-        caption_block = table_caption_blocks[seed_caption_index]
-    else:
-        caption_index, caption_block = _find_nearest_caption_block(table_caption_blocks, bbox)
+    caption_index, caption_block = _resolve_candidate_caption_binding(
+        caption_blocks=table_caption_blocks,
+        candidate_bbox=bbox,
+        detection_strategy=detection_strategy,
+        seed_caption_index=seed_caption_index,
+    )
     caption = str(caption_block.get("text") or "").strip() if caption_block else _find_table_caption(page, bbox)
     if detection_strategy == "text_caption_fallback" and not caption and seed_caption_text:
         caption = seed_caption_text[:260]
@@ -1755,6 +1872,15 @@ def _materialize_table_record(
             n_cols = len(headers) if headers else len(matrix[0])
             matrix_row_count = len(matrix)
             row_count = len(rows)
+            caption_index, caption_block = _resolve_candidate_caption_binding(
+                caption_blocks=table_caption_blocks,
+                candidate_bbox=bbox,
+                detection_strategy=detection_strategy,
+                seed_caption_index=candidate.get("seed_caption_id"),
+            )
+            caption = str(caption_block.get("text") or "").strip() if caption_block else _find_table_caption(page, bbox)
+            if detection_strategy == "text_caption_fallback" and not caption and seed_caption_text:
+                caption = seed_caption_text[:260]
 
     headers, rows = _repair_headers_from_auxiliary_band(
         headers,

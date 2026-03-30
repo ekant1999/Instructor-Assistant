@@ -793,3 +793,76 @@ def test_strategy_score_penalizes_pathological_abstract_overreach() -> None:
         document_title_norm="petri net relaxation for infeasibility explanation and sequential task planning",
     )
     assert healthy_score > pathological_score
+
+
+def test_align_headings_prefers_local_heading_anchor_even_if_source_page_hint_is_late() -> None:
+    blocks = [
+        {
+            "text": "Abstract",
+            "page_no": 1,
+            "block_index": 0,
+            "bbox": {"x0": 60, "y0": 80, "x1": 180, "y1": 102},
+            "metadata": {"first_line": "Abstract", "line_count": 1, "char_count": 8, "max_font_size": 12.0, "avg_font_size": 12.0, "bold_ratio": 0.4},
+        },
+        {
+            "text": "This is abstract body text.",
+            "page_no": 1,
+            "block_index": 1,
+            "bbox": {"x0": 60, "y0": 120, "x1": 520, "y1": 180},
+            "metadata": {"first_line": "This is abstract body text.", "line_count": 3, "char_count": 110, "max_font_size": 10.0, "avg_font_size": 10.0, "bold_ratio": 0.0},
+        },
+        {
+            "text": "1 Introduction",
+            "page_no": 1,
+            "block_index": 2,
+            "bbox": {"x0": 60, "y0": 220, "x1": 250, "y1": 244},
+            "metadata": {"first_line": "1 Introduction", "line_count": 1, "char_count": 14, "max_font_size": 12.3, "avg_font_size": 12.3, "bold_ratio": 0.42},
+        },
+        {
+            "text": "Introductory body paragraph with enough prose to look like normal text.",
+            "page_no": 1,
+            "block_index": 3,
+            "bbox": {"x0": 60, "y0": 258, "x1": 520, "y1": 316},
+            "metadata": {"first_line": "Introductory body paragraph with enough prose to look like normal text.", "line_count": 3, "char_count": 150, "max_font_size": 10.0, "avg_font_size": 10.0, "bold_ratio": 0.0},
+        },
+        {
+            "text": "2 Related Works",
+            "page_no": 2,
+            "block_index": 0,
+            "bbox": {"x0": 60, "y0": 82, "x1": 260, "y1": 106},
+            "metadata": {"first_line": "2 Related Works", "line_count": 1, "char_count": 15, "max_font_size": 12.2, "avg_font_size": 12.2, "bold_ratio": 0.4},
+        },
+    ]
+    headings = [
+        sectioning.HeadingCandidate("Abstract", 1, "arxiv_source", 0.95, page_hint=1),
+        sectioning.HeadingCandidate("Introduction", 1, "arxiv_source", 0.92, page_hint=2),
+        sectioning.HeadingCandidate("Related Works", 1, "arxiv_source", 0.92, page_hint=2),
+    ]
+
+    spans = sectioning._align_headings_to_spans(headings, blocks)
+    intro_span = next(span for span in spans if span.canonical == "introduction")
+    assert intro_span.start_idx == 2
+
+
+def test_extract_local_heading_anchors_rejects_numbered_contribution_sentences() -> None:
+    blocks = [
+        {
+            "text": "1. We propose a new framework for retrieval augmentation.",
+            "page_no": 2,
+            "block_index": 0,
+            "bbox": {"x0": 60, "y0": 120, "x1": 520, "y1": 160},
+            "metadata": {"first_line": "1. We propose a new framework for retrieval augmentation.", "line_count": 2, "char_count": 112, "max_font_size": 10.0, "avg_font_size": 10.0, "bold_ratio": 0.0},
+        },
+        {
+            "text": "2 Related Works",
+            "page_no": 2,
+            "block_index": 1,
+            "bbox": {"x0": 60, "y0": 190, "x1": 250, "y1": 214},
+            "metadata": {"first_line": "2 Related Works", "line_count": 1, "char_count": 15, "max_font_size": 12.2, "avg_font_size": 12.2, "bold_ratio": 0.42},
+        },
+    ]
+
+    anchors = sectioning._extract_local_heading_anchors(blocks)
+    titles = [anchor.title for anchor in anchors]
+    assert "We propose a new framework for retrieval augmentation" not in titles
+    assert "Related Works" in titles
