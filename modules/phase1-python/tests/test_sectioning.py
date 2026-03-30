@@ -514,7 +514,7 @@ def test_align_headings_prefers_heading_anchor_over_page_start_body_match() -> N
     spans = sectioning._align_headings_to_spans(headings, blocks)
     assert len(spans) >= 2
     problem_span = next(span for span in spans if span.canonical == "problem_definition")
-    background_span = next(span for span in spans if span.canonical == "background")
+    background_span = next(span for span in spans if span.canonical == "preliminaries")
 
     assert problem_span.start_idx == 0
     # Crucial check: anchor should be the heading block, not page-start prose block.

@@ -102,6 +102,51 @@ def _build_first_page_preamble_pdf(path: Path) -> None:
     doc.close()
 
 
+def _build_single_column_equation_noise_pdf(path: Path) -> None:
+    doc = pymupdf.open()
+    page = doc.new_page(width=595, height=842)
+    page.insert_textbox((54, 84, 260, 104), "3.2. On-Policy Trajectory Sampling", fontsize=11)
+    page.insert_textbox(
+        (54, 112, 540, 196),
+        "A fundamental limitation of the SFT initialization is the distribution shift problem. "
+        "The student policy accumulates errors and drifts into unfamiliar states where its behavior is undefined. " * 2,
+        fontsize=10,
+    )
+    page.insert_textbox(
+        (54, 200, 540, 286),
+        "To address this, the method switches to dynamic on-policy sampling and collects trajectories "
+        "from the student's own induced state distribution. This converts failure states into trainable examples. " * 2,
+        fontsize=10,
+    )
+    page.insert_textbox((270, 318, 542, 346), "q_t(a) = pi_tea(a|s_t). (4)", fontsize=10)
+    page.insert_textbox((54, 360, 240, 380), "3.3. Dense Teacher Supervision", fontsize=11)
+    page.insert_textbox(
+        (54, 388, 540, 470),
+        "Instead of relying on sparse outcome rewards, a frozen teacher provides dense token-level supervision "
+        "for every student-visited state. This immediately accelerates convergence and teaches recovery behavior. " * 2,
+        fontsize=10,
+    )
+    page.insert_textbox((294, 790, 304, 804), "6", fontsize=9, align=1)
+    doc.save(str(path))
+    doc.close()
+
+
+def _build_two_column_with_inflow_full_width_pdf(path: Path) -> None:
+    doc = pymupdf.open()
+    page = doc.new_page(width=595, height=842)
+    page.insert_textbox((72, 104, 270, 220), "Left column upper paragraph should be read first and stay above the bridge block. " * 3, fontsize=10)
+    page.insert_textbox((320, 104, 520, 220), "Right column upper paragraph should still follow the left upper paragraph. " * 3, fontsize=10)
+    page.insert_textbox(
+        (72, 236, 520, 340),
+        "This full-width bridge paragraph belongs in the middle of the page body and should appear before the lower column segments. " * 2,
+        fontsize=10,
+    )
+    page.insert_textbox((72, 372, 270, 500), "Left column lower paragraph should come after the full-width bridge. " * 3, fontsize=10)
+    page.insert_textbox((320, 372, 520, 500), "Right column lower paragraph should come last within the body flow. " * 3, fontsize=10)
+    doc.save(str(path))
+    doc.close()
+
+
 def test_extract_text_blocks_orders_two_column_pages_and_pushes_margin_notes_last(
     tmp_path: Path,
 ) -> None:
@@ -135,6 +180,42 @@ def test_extract_text_blocks_keeps_first_page_preamble_before_visual_labels(
     label_pos = next(i for i, text in enumerate(texts) if text.startswith("Standard MDLM"))
 
     assert title_pos < author_pos < abstract_block_pos < label_pos
+
+
+def test_extract_text_blocks_does_not_false_positive_one_column_pages_from_headings_and_equations(
+    tmp_path: Path,
+) -> None:
+    pdf_path = tmp_path / "single_column_equation_noise.pdf"
+    _build_single_column_equation_noise_pdf(pdf_path)
+
+    blocks = parser.extract_text_blocks(pdf_path)
+    texts = [" ".join(str(block.get("text") or "").split()) for block in blocks]
+
+    heading_32 = next(i for i, text in enumerate(texts) if text.startswith("3.2. On-Policy Trajectory Sampling"))
+    para_32_a = next(i for i, text in enumerate(texts) if text.startswith("A fundamental limitation of the SFT initialization"))
+    para_32_b = next(i for i, text in enumerate(texts) if text.startswith("To address this, the method switches to dynamic on-policy sampling"))
+    heading_33 = next(i for i, text in enumerate(texts) if text.startswith("3.3. Dense Teacher Supervision"))
+    para_33 = next(i for i, text in enumerate(texts) if text.startswith("Instead of relying on sparse outcome rewards"))
+
+    assert heading_32 < para_32_a < para_32_b < heading_33 < para_33
+
+
+def test_extract_text_blocks_keeps_mid_page_full_width_prose_in_flow_on_two_column_pages(
+    tmp_path: Path,
+) -> None:
+    pdf_path = tmp_path / "two_column_inflow_full_width.pdf"
+    _build_two_column_with_inflow_full_width_pdf(pdf_path)
+
+    blocks = parser.extract_text_blocks(pdf_path)
+    texts = [" ".join(str(block.get("text") or "").split()) for block in blocks]
+
+    left_upper = next(i for i, text in enumerate(texts) if text.startswith("Left column upper paragraph"))
+    right_upper = next(i for i, text in enumerate(texts) if text.startswith("Right column upper paragraph"))
+    bridge = next(i for i, text in enumerate(texts) if text.startswith("This full-width bridge paragraph"))
+    left_lower = next(i for i, text in enumerate(texts) if text.startswith("Left column lower paragraph"))
+    right_lower = next(i for i, text in enumerate(texts) if text.startswith("Right column lower paragraph"))
+
+    assert left_upper < right_upper < bridge < left_lower < right_lower
 
 
 @pytest.mark.asyncio

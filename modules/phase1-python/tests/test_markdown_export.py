@@ -1750,7 +1750,7 @@ def test_export_pdf_to_markdown_uses_conservative_fallback_for_heading_explosion
     monkeypatch.setattr(markdown_export_module, "_ensure_section_metadata", lambda blocks, pdf_path, source_url: None)
     audit_calls = {"count": 0}
 
-    def fake_audit(markdown: str, *, metadata: dict):
+    def fake_audit(markdown: str, *, metadata: dict, blocks=None):
         audit_calls["count"] += 1
         if audit_calls["count"] == 1:
             return MarkdownRenderAudit(
@@ -1811,7 +1811,7 @@ def test_export_pdf_to_markdown_uses_conservative_fallback_for_heading_explosion
     assert result.audit.conservative_recommended is False
     assert markdown.count("## Hyperparameters") == 0
     assert "$$\nx = y + z\n$$" not in markdown
-    assert "> Equation 1 JSON: `assets/equations/equation_0001.json`" in markdown
+    assert "> Equation 1 JSON: `assets/equations/equation_0001.json`" not in markdown
     assert audit_rendered_markdown(markdown, metadata={"title": "Conservative Fallback", "page_count": 2}).issue_count == 0
 
 
@@ -1901,7 +1901,7 @@ def test_export_pdf_to_markdown_keeps_numeric_subsections_in_conservative_mode(
     monkeypatch.setattr(markdown_export_module, "_ensure_section_metadata", lambda blocks, pdf_path, source_url: None)
     audit_calls = {"count": 0}
 
-    def fake_audit(markdown: str, *, metadata: dict):
+    def fake_audit(markdown: str, *, metadata: dict, blocks=None):
         audit_calls["count"] += 1
         if audit_calls["count"] == 1:
             return MarkdownRenderAudit(
@@ -1935,6 +1935,293 @@ def test_export_pdf_to_markdown_keeps_numeric_subsections_in_conservative_mode(
     assert "## Hyperparameters" not in markdown
     assert "### Utility Gate" in markdown
     assert "\n4.2\nUtility Gate\n" not in markdown
+
+
+def test_export_pdf_to_markdown_keeps_known_top_level_headings_in_conservative_mode(
+    sample_pdf: Path,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    paper_id = 126
+    blocks = [
+        {
+            "text": "Introduction",
+            "page_no": 1,
+            "block_index": 0,
+            "bbox": {"x0": 40.0, "y0": 70.0, "x1": 150.0, "y1": 86.0},
+            "metadata": {
+                "section_canonical": "introduction",
+                "section_title": "Introduction",
+                "section_level": 2,
+                "max_font_size": 12.0,
+            },
+        },
+        {
+            "text": "Intro paragraph.",
+            "page_no": 1,
+            "block_index": 1,
+            "bbox": {"x0": 40.0, "y0": 96.0, "x1": 220.0, "y1": 126.0},
+            "metadata": {
+                "section_canonical": "introduction",
+                "section_title": "Introduction",
+                "section_level": 2,
+            },
+        },
+        {
+            "text": "2. Related works",
+            "page_no": 2,
+            "block_index": 0,
+            "bbox": {"x0": 40.0, "y0": 70.0, "x1": 170.0, "y1": 86.0},
+            "metadata": {
+                "section_canonical": "related_work",
+                "section_title": "Related works",
+                "section_level": 1,
+                "max_font_size": 11.9,
+            },
+        },
+        {
+            "text": "Related work paragraph.",
+            "page_no": 2,
+            "block_index": 1,
+            "bbox": {"x0": 40.0, "y0": 96.0, "x1": 240.0, "y1": 126.0},
+            "metadata": {
+                "section_canonical": "other",
+                "section_title": "Document Body",
+                "section_level": 2,
+            },
+        },
+    ]
+
+    monkeypatch.setenv("TABLE_OUTPUT_DIR", str(tmp_path / "tables"))
+    monkeypatch.setenv("FIGURE_OUTPUT_DIR", str(tmp_path / "figures"))
+    monkeypatch.setenv("EQUATION_OUTPUT_DIR", str(tmp_path / "equations"))
+    monkeypatch.setattr(markdown_export_module, "_ensure_section_metadata", lambda blocks, pdf_path, source_url: None)
+    audit_calls = {"count": 0}
+
+    def fake_audit(markdown: str, *, metadata: dict, blocks=None):
+        audit_calls["count"] += 1
+        if audit_calls["count"] == 1:
+            return MarkdownRenderAudit(
+                conservative_recommended=True,
+                issue_count=1,
+                issues=["force conservative"],
+            )
+        return MarkdownRenderAudit()
+
+    monkeypatch.setattr(markdown_export_module, "audit_rendered_markdown", fake_audit)
+
+    for kind in ("tables", "figures", "equations"):
+        path = tmp_path / kind / str(paper_id)
+        path.mkdir(parents=True, exist_ok=True)
+    (tmp_path / "tables" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_tables": 0, "tables": []}, ensure_ascii=False), encoding="utf-8")
+    (tmp_path / "figures" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_images": 0, "images": []}, ensure_ascii=False), encoding="utf-8")
+    (tmp_path / "equations" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_equations": 0, "equations": []}, ensure_ascii=False), encoding="utf-8")
+
+    result = export_pdf_to_markdown(
+        sample_pdf,
+        paper_id=paper_id,
+        output_dir=tmp_path / "markdown_conservative_related_work",
+        blocks=blocks,
+        metadata={"title": "Conservative Related Works"},
+        config=MarkdownExportConfig(ensure_assets=False),
+    )
+
+    markdown = result.markdown
+    assert result.render_mode == "conservative"
+    assert "## Related works" in markdown
+    assert "Related work paragraph." in markdown
+
+
+def test_export_pdf_to_markdown_keeps_preliminaries_heading_in_conservative_mode(
+    sample_pdf: Path,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    paper_id = 128
+    blocks = [
+        {
+            "text": "1 Introduction",
+            "page_no": 1,
+            "block_index": 0,
+            "bbox": {"x0": 40.0, "y0": 70.0, "x1": 160.0, "y1": 86.0},
+            "metadata": {
+                "section_canonical": "introduction",
+                "section_title": "Introduction",
+                "section_level": 2,
+                "max_font_size": 12.0,
+            },
+        },
+        {
+            "text": "Intro paragraph.",
+            "page_no": 1,
+            "block_index": 1,
+            "bbox": {"x0": 40.0, "y0": 96.0, "x1": 220.0, "y1": 126.0},
+            "metadata": {
+                "section_canonical": "introduction",
+                "section_title": "Introduction",
+                "section_level": 2,
+            },
+        },
+        {
+            "text": "2 Preliminaries",
+            "page_no": 2,
+            "block_index": 0,
+            "bbox": {"x0": 40.0, "y0": 70.0, "x1": 180.0, "y1": 86.0},
+            "metadata": {
+                "section_canonical": "preliminaries",
+                "section_title": "Preliminaries",
+                "section_level": 2,
+                "max_font_size": 12.0,
+            },
+        },
+        {
+            "text": "Preliminaries paragraph.",
+            "page_no": 2,
+            "block_index": 1,
+            "bbox": {"x0": 40.0, "y0": 96.0, "x1": 240.0, "y1": 126.0},
+            "metadata": {
+                "section_canonical": "preliminaries",
+                "section_title": "Preliminaries",
+                "section_level": 2,
+            },
+        },
+    ]
+
+    monkeypatch.setenv("TABLE_OUTPUT_DIR", str(tmp_path / "tables"))
+    monkeypatch.setenv("FIGURE_OUTPUT_DIR", str(tmp_path / "figures"))
+    monkeypatch.setenv("EQUATION_OUTPUT_DIR", str(tmp_path / "equations"))
+    monkeypatch.setattr(markdown_export_module, "_ensure_section_metadata", lambda blocks, pdf_path, source_url: None)
+    audit_calls = {"count": 0}
+
+    def fake_audit(markdown: str, *, metadata: dict, blocks=None):
+        audit_calls["count"] += 1
+        if audit_calls["count"] == 1:
+            return MarkdownRenderAudit(
+                conservative_recommended=True,
+                issue_count=1,
+                issues=["force conservative"],
+            )
+        return MarkdownRenderAudit()
+
+    monkeypatch.setattr(markdown_export_module, "audit_rendered_markdown", fake_audit)
+
+    for kind in ("tables", "figures", "equations"):
+        path = tmp_path / kind / str(paper_id)
+        path.mkdir(parents=True, exist_ok=True)
+    (tmp_path / "tables" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_tables": 0, "tables": []}, ensure_ascii=False), encoding="utf-8")
+    (tmp_path / "figures" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_images": 0, "images": []}, ensure_ascii=False), encoding="utf-8")
+    (tmp_path / "equations" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_equations": 0, "equations": []}, ensure_ascii=False), encoding="utf-8")
+
+    result = export_pdf_to_markdown(
+        sample_pdf,
+        paper_id=paper_id,
+        output_dir=tmp_path / "markdown_conservative_preliminaries",
+        blocks=blocks,
+        metadata={"title": "Conservative Preliminaries"},
+        config=MarkdownExportConfig(ensure_assets=False),
+    )
+
+    markdown = result.markdown
+    assert result.render_mode == "conservative"
+    assert "## Preliminaries" in markdown
+    assert "Preliminaries paragraph." in markdown
+
+
+def test_export_pdf_to_markdown_suppresses_prompt_internal_references_heading_in_conservative_mode(
+    sample_pdf: Path,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    paper_id = 127
+    blocks = [
+        {
+            "text": "G\nPrompt Templates",
+            "page_no": 10,
+            "block_index": 0,
+            "bbox": {"x0": 40.0, "y0": 70.0, "x1": 170.0, "y1": 96.0},
+            "metadata": {
+                "section_canonical": "prompt_templates",
+                "section_title": "Prompt Templates",
+                "section_level": 2,
+                "line_count": 2,
+                "char_count": 18,
+                "max_font_size": 11.9,
+            },
+        },
+        {
+            "text": "Extractive evidence.",
+            "page_no": 10,
+            "block_index": 1,
+            "bbox": {"x0": 40.0, "y0": 110.0, "x1": 200.0, "y1": 126.0},
+            "metadata": {
+                "section_canonical": "prompt_templates",
+                "section_title": "Prompt Templates",
+                "section_level": 2,
+            },
+        },
+        {
+            "text": "References",
+            "page_no": 10,
+            "block_index": 2,
+            "bbox": {"x0": 40.0, "y0": 136.0, "x1": 140.0, "y1": 152.0},
+            "metadata": {
+                "section_canonical": "references",
+                "section_title": "References",
+                "section_level": 2,
+                "max_font_size": 11.9,
+            },
+        },
+        {
+            "text": "[Doc 1] Example evidence block.",
+            "page_no": 10,
+            "block_index": 3,
+            "bbox": {"x0": 40.0, "y0": 162.0, "x1": 260.0, "y1": 188.0},
+            "metadata": {
+                "section_canonical": "references",
+                "section_title": "References",
+                "section_level": 2,
+            },
+        },
+    ]
+
+    monkeypatch.setenv("TABLE_OUTPUT_DIR", str(tmp_path / "tables"))
+    monkeypatch.setenv("FIGURE_OUTPUT_DIR", str(tmp_path / "figures"))
+    monkeypatch.setenv("EQUATION_OUTPUT_DIR", str(tmp_path / "equations"))
+    monkeypatch.setattr(markdown_export_module, "_ensure_section_metadata", lambda blocks, pdf_path, source_url: None)
+    audit_calls = {"count": 0}
+
+    def fake_audit(markdown: str, *, metadata: dict, blocks=None):
+        audit_calls["count"] += 1
+        if audit_calls["count"] == 1:
+            return MarkdownRenderAudit(
+                conservative_recommended=True,
+                issue_count=1,
+                issues=["force conservative"],
+            )
+        return MarkdownRenderAudit()
+
+    monkeypatch.setattr(markdown_export_module, "audit_rendered_markdown", fake_audit)
+
+    for kind in ("tables", "figures", "equations"):
+        path = tmp_path / kind / str(paper_id)
+        path.mkdir(parents=True, exist_ok=True)
+    (tmp_path / "tables" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_tables": 0, "tables": []}, ensure_ascii=False), encoding="utf-8")
+    (tmp_path / "figures" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_images": 0, "images": []}, ensure_ascii=False), encoding="utf-8")
+    (tmp_path / "equations" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_equations": 0, "equations": []}, ensure_ascii=False), encoding="utf-8")
+
+    result = export_pdf_to_markdown(
+        sample_pdf,
+        paper_id=paper_id,
+        output_dir=tmp_path / "markdown_conservative_prompt_refs",
+        blocks=blocks,
+        metadata={"title": "Conservative Prompt References"},
+        config=MarkdownExportConfig(ensure_assets=False),
+    )
+
+    markdown = result.markdown
+    assert result.render_mode == "conservative"
+    assert "## Prompt Templates" in markdown
+    assert "## References" not in markdown
 
 
 def test_infer_document_title_skips_margin_note_arxiv_header() -> None:
@@ -2000,6 +2287,219 @@ def test_parse_structural_heading_block_accepts_multiline_appendix_heading() -> 
     assert parsed["level"] == 2
 
 
+def test_parse_structural_heading_block_rejects_numeric_axis_titles() -> None:
+    parsed = markdown_export_module._parse_structural_heading_block(
+        "0.5",
+        block={"metadata": {"line_count": 1, "char_count": 3, "max_font_size": 10.5}},
+    )
+
+    assert parsed is None
+    assert (
+        markdown_export_module._should_emit_section_heading(
+            section_canonical="results",
+            section_title="15",
+            section_level=2,
+            conservative_mode=False,
+        )
+        is False
+    )
+
+
+def test_parse_structural_heading_block_accepts_numbered_subheadings() -> None:
+    parsed_method = markdown_export_module._parse_structural_heading_block(
+        "3.1. 3D Reconstruction with Segmentation Forcing",
+        block={"metadata": {"line_count": 1, "char_count": 44, "max_font_size": 11.0, "section_canonical": "methodology"}},
+    )
+    parsed_results = markdown_export_module._parse_structural_heading_block(
+        "4.1. Main results",
+        block={"metadata": {"line_count": 1, "char_count": 17, "max_font_size": 11.0, "section_canonical": "experiments"}},
+    )
+
+    assert parsed_method is not None
+    assert parsed_method["level"] == 3
+    assert parsed_method["title"] == "3D Reconstruction with Segmentation Forcing"
+    assert parsed_method["canonical"] == "methodology"
+
+    assert parsed_results is not None
+    assert parsed_results["level"] == 3
+    assert parsed_results["title"] == "Main results"
+    assert parsed_results["canonical"] == "results"
+
+
+def test_conservative_top_level_heading_candidate_requires_title_canonical_alignment() -> None:
+    assert (
+        markdown_export_module._is_conservative_top_level_heading_candidate(
+            {
+                "title": "Distiller",
+                "canonical": "related_work",
+                "level": 2,
+                "number": "",
+                "confidence": 0.95,
+            }
+        )
+        is False
+    )
+
+
+def test_export_pdf_to_markdown_keeps_split_numbered_subheadings_in_conservative_mode(
+    sample_pdf: Path,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    paper_id = 129
+    blocks = [
+        {
+            "text": "4 Method",
+            "page_no": 1,
+            "block_index": 0,
+            "bbox": {"x0": 40.0, "y0": 70.0, "x1": 140.0, "y1": 86.0},
+            "metadata": {
+                "section_canonical": "methodology",
+                "section_title": "Method",
+                "section_level": 2,
+                "max_font_size": 12.0,
+            },
+        },
+        {
+            "text": "Method paragraph.",
+            "page_no": 1,
+            "block_index": 1,
+            "bbox": {"x0": 40.0, "y0": 96.0, "x1": 220.0, "y1": 126.0},
+            "metadata": {
+                "section_canonical": "methodology",
+                "section_title": "Method",
+                "section_level": 2,
+            },
+        },
+        {
+            "text": "4.1",
+            "page_no": 1,
+            "block_index": 2,
+            "bbox": {"x0": 40.0, "y0": 136.0, "x1": 70.0, "y1": 152.0},
+            "metadata": {
+                "section_canonical": "single_frame_3d_reconstruction_with_learned_priors",
+                "section_title": "Single-Frame 3D Reconstruction with Learned Priors",
+                "section_level": 3,
+                "line_count": 1,
+                "char_count": 3,
+                "max_font_size": 10.9,
+            },
+        },
+        {
+            "text": "Single-Frame 3D Reconstruction with Learned Priors",
+            "page_no": 1,
+            "block_index": 3,
+            "bbox": {"x0": 82.0, "y0": 136.0, "x1": 330.0, "y1": 152.0},
+            "metadata": {
+                "section_canonical": "single_frame_3d_reconstruction_with_learned_priors",
+                "section_title": "Single-Frame 3D Reconstruction with Learned Priors",
+                "section_level": 3,
+                "line_count": 1,
+                "char_count": 51,
+                "max_font_size": 10.9,
+            },
+        },
+        {
+            "text": "Subheading paragraph.",
+            "page_no": 1,
+            "block_index": 4,
+            "bbox": {"x0": 40.0, "y0": 160.0, "x1": 260.0, "y1": 190.0},
+            "metadata": {
+                "section_canonical": "single_frame_3d_reconstruction_with_learned_priors",
+                "section_title": "Single-Frame 3D Reconstruction with Learned Priors",
+                "section_level": 3,
+            },
+        },
+    ]
+
+    monkeypatch.setenv("TABLE_OUTPUT_DIR", str(tmp_path / "tables"))
+    monkeypatch.setenv("FIGURE_OUTPUT_DIR", str(tmp_path / "figures"))
+    monkeypatch.setenv("EQUATION_OUTPUT_DIR", str(tmp_path / "equations"))
+    monkeypatch.setattr(markdown_export_module, "_ensure_section_metadata", lambda blocks, pdf_path, source_url: None)
+    audit_calls = {"count": 0}
+
+    def fake_audit(markdown: str, *, metadata: dict, blocks=None):
+        audit_calls["count"] += 1
+        if audit_calls["count"] == 1:
+            return MarkdownRenderAudit(
+                conservative_recommended=True,
+                issue_count=1,
+                issues=["force conservative"],
+            )
+        return MarkdownRenderAudit()
+
+    monkeypatch.setattr(markdown_export_module, "audit_rendered_markdown", fake_audit)
+
+    for kind in ("tables", "figures", "equations"):
+        path = tmp_path / kind / str(paper_id)
+        path.mkdir(parents=True, exist_ok=True)
+    (tmp_path / "tables" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_tables": 0, "tables": []}, ensure_ascii=False), encoding="utf-8")
+    (tmp_path / "figures" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_images": 0, "images": []}, ensure_ascii=False), encoding="utf-8")
+    (tmp_path / "equations" / str(paper_id) / "manifest.json").write_text(json.dumps({"paper_id": paper_id, "num_equations": 0, "equations": []}, ensure_ascii=False), encoding="utf-8")
+
+    result = export_pdf_to_markdown(
+        sample_pdf,
+        paper_id=paper_id,
+        output_dir=tmp_path / "markdown_conservative_split_subheading",
+        blocks=blocks,
+        metadata={"title": "Conservative Split Subheading"},
+        config=MarkdownExportConfig(ensure_assets=False),
+    )
+
+    markdown = result.markdown
+    assert result.render_mode == "conservative"
+    assert "### Single-Frame 3D Reconstruction with Learned Priors" in markdown
+    assert "\n4.1\n" not in markdown
+    assert "Subheading paragraph." in markdown
+
+
+def test_algorithmic_scaffold_detection_catches_input_output_lines() -> None:
+    assert (
+        markdown_export_module._looks_like_algorithmic_scaffold_text(
+            "Input: Student Policy πθ Output: Optimized Policy πθ*"
+        )
+        is True
+    )
+
+
+def test_rendered_table_owned_noise_block_detects_caption_and_rows() -> None:
+    render_state = {
+        "tables_by_page": {
+            2: [
+                {
+                    "bbox": {"x0": 80.0, "y0": 220.0, "x1": 420.0, "y1": 320.0},
+                    "caption": "Table 2: Main Results on LIBERO.",
+                }
+            ]
+        }
+    }
+    caption_block = {
+        "page_no": 2,
+        "bbox": {"x0": 90.0, "y0": 184.0, "x1": 410.0, "y1": 210.0},
+    }
+    row_block = {
+        "page_no": 2,
+        "bbox": {"x0": 100.0, "y0": 248.0, "x1": 395.0, "y1": 278.0},
+    }
+
+    assert (
+        markdown_export_module._is_rendered_table_owned_noise_block(
+            caption_block,
+            text="Table 2: Main Results on LIBERO.",
+            render_state=render_state,
+        )
+        is True
+    )
+    assert (
+        markdown_export_module._is_rendered_table_owned_noise_block(
+            row_block,
+            text="Method Success Rate Steps",
+            render_state=render_state,
+        )
+        is True
+    )
+
+
 def test_equation_record_is_not_renderable_for_prompt_template_fragments() -> None:
     assert (
         markdown_export_module._equation_record_is_renderable(
@@ -2024,6 +2524,16 @@ def test_equation_record_is_not_renderable_for_prompt_template_fragments() -> No
     assert (
         markdown_export_module._equation_record_is_renderable(
             {
+                "section_canonical": "methodology",
+                "section_title": "Methodology",
+                "text": "q XSD6qiBKJLoGb2iN0tbL9a79TFvzVnZzCH6A+vzB/S9kG4=</latexit> (x t|x 0)",
+            }
+        )
+        is False
+    )
+    assert (
+        markdown_export_module._equation_record_is_renderable(
+            {
                 "section_canonical": "appendix",
                 "section_title": "Representative Write-Back Examples",
                 "text": "Utility scores: s rag = 1.0, s nr = 0.0, ∆ = 1.0",
@@ -2031,6 +2541,39 @@ def test_equation_record_is_not_renderable_for_prompt_template_fragments() -> No
         )
         is False
     )
+
+
+def test_equation_record_is_not_conservatively_renderable_for_low_quality_fallbacks() -> None:
+    assert (
+        markdown_export_module._equation_record_is_conservatively_renderable(
+            {
+                "equation_number": "",
+                "latex_source": "text_fallback",
+                "latex_confidence": 0.46,
+                "text": "L MDLM(θ) = E t∼U(0,1),x 0",
+            }
+        )
+        is False
+    )
+    assert (
+        markdown_export_module._equation_record_is_conservatively_renderable(
+            {
+                "equation_number": "3",
+                "latex_source": "text_fallback",
+                "latex_confidence": 0.46,
+                "latex": "L static = E x 0,x t∼q(·|x 0) [− log p \\\\theta(x 0|x t)] .\\n\\\\tag{3}",
+                "text": "L static = E x 0,x t∼q(·|x 0) [− log p θ(x 0|x t)] .",
+            }
+        )
+        is True
+    )
+
+
+def test_equation_residue_text_is_skipped() -> None:
+    assert markdown_export_module._looks_like_equation_residue_text('"') is True
+    assert markdown_export_module._looks_like_equation_residue_text("\\#") is True
+    assert markdown_export_module._looks_like_equation_residue_text("|s|") is True
+    assert markdown_export_module._looks_like_equation_residue_text("Clean narrative text.") is False
 
 
 def test_export_pdf_to_markdown_keeps_appendix_letter_headings_in_conservative_mode(
@@ -2097,7 +2640,7 @@ def test_export_pdf_to_markdown_keeps_appendix_letter_headings_in_conservative_m
 
     audit_calls = {"count": 0}
 
-    def fake_audit(markdown: str, *, metadata: dict):
+    def fake_audit(markdown: str, *, metadata: dict, blocks=None):
         audit_calls["count"] += 1
         if audit_calls["count"] == 1:
             return MarkdownRenderAudit(conservative_recommended=True, issue_count=1, issues=["force conservative"])
@@ -2125,6 +2668,277 @@ def test_export_pdf_to_markdown_keeps_appendix_letter_headings_in_conservative_m
     assert result.render_mode == "conservative"
     assert "## Datasets" in markdown
     assert "\nA Datasets\n" not in markdown
+
+
+def test_normalize_markdown_document_model_splits_late_reference_runs() -> None:
+    model = markdown_export_module.MarkdownDocumentModel(
+        sections=[
+            markdown_export_module.MarkdownSectionNode(
+                canonical="conclusion",
+                title="Conclusion",
+                level=2,
+                page_start=8,
+                page_end=10,
+                elements=[
+                    markdown_export_module.MarkdownParagraphNode(text="Closing discussion paragraph.", page_no=8),
+                    markdown_export_module.MarkdownParagraphNode(
+                        text="Akari Asai, Zeqiu Wu, Yizhong Wang, Avirup Sil, and Hannaneh Hajishirzi. 2023. Self-rag: Learning to retrieve, generate, and critique through self-reflection. In The Twelfth International Conference on Learning Representations.",
+                        page_no=9,
+                    ),
+                    markdown_export_module.MarkdownParagraphNode(
+                        text="Sebastian Borgeaud, Arthur Mensch, Jordan Hoffmann, Trevor Cai, Eliza Rutherford, Katie Millican, George Bm Van Den Driessche, Jean-Baptiste Lespiau, Bogdan Damoc, Aidan Clark, and 1 others. 2022. Improving language models by retrieving from trillions of tokens. In International conference on machine learning, pages 2206–2240. PMLR.",
+                        page_no=9,
+                    ),
+                    markdown_export_module.MarkdownParagraphNode(
+                        text="Christopher Clark, Kenton Lee, Ming-Wei Chang, Tom Kwiatkowski, Michael Collins, and Kristina Toutanova. 2019. Boolq: Exploring the surprising difficulty of natural yes/no questions. In Proceedings of the 2019 conference of the North American chapter of the association for computational linguistics.",
+                        page_no=10,
+                    ),
+                ],
+            )
+        ]
+    )
+
+    markdown_export_module._normalize_markdown_document_model(model)
+
+    assert len(model.sections) == 2
+    assert model.sections[0].canonical == "conclusion"
+    assert model.sections[1].canonical == "references"
+    assert model.sections[1].title == "References"
+
+
+def test_normalize_markdown_document_model_splits_reference_runs_for_early_start_late_end_sections() -> None:
+    model = markdown_export_module.MarkdownDocumentModel(
+        sections=[
+            markdown_export_module.MarkdownSectionNode(
+                canonical="conclusion",
+                title="Conclusion",
+                level=2,
+                page_start=4,
+                page_end=12,
+                elements=[
+                    markdown_export_module.MarkdownParagraphNode(text="Closing discussion paragraph.", page_no=4),
+                    markdown_export_module.MarkdownParagraphNode(text="Intermediate narrative text.", page_no=7),
+                    markdown_export_module.MarkdownParagraphNode(
+                        text="[1] Akari Asai, Zeqiu Wu, Yizhong Wang, Avirup Sil, and Hannaneh Hajishirzi. 2023. Self-rag: Learning to retrieve, generate, and critique through self-reflection. In The Twelfth International Conference on Learning Representations.",
+                        page_no=11,
+                    ),
+                    markdown_export_module.MarkdownParagraphNode(
+                        text="[2] Sebastian Borgeaud, Arthur Mensch, Jordan Hoffmann, Trevor Cai, Eliza Rutherford, Katie Millican, George Bm Van Den Driessche, Jean-Baptiste Lespiau, Bogdan Damoc, Aidan Clark, and 1 others. 2022. Improving language models by retrieving from trillions of tokens. In International conference on machine learning, pages 2206–2240. PMLR.",
+                        page_no=11,
+                    ),
+                    markdown_export_module.MarkdownParagraphNode(
+                        text="[3] Christopher Clark, Kenton Lee, Ming-Wei Chang, Tom Kwiatkowski, Michael Collins, and Kristina Toutanova. 2019. Boolq: Exploring the surprising difficulty of natural yes/no questions. In Proceedings of the 2019 conference of the North American chapter of the association for computational linguistics.",
+                        page_no=12,
+                    ),
+                ],
+            )
+        ]
+    )
+
+    markdown_export_module._normalize_markdown_document_model(model)
+
+    assert len(model.sections) == 2
+    assert model.sections[0].title == "Conclusion"
+    assert model.sections[1].title == "References"
+
+
+def test_normalize_markdown_document_model_absorbs_running_header_asset_sections() -> None:
+    model = markdown_export_module.MarkdownDocumentModel(
+        sections=[
+            markdown_export_module.MarkdownSectionNode(
+                canonical="introduction",
+                title="Introduction",
+                level=2,
+                page_start=1,
+                page_end=1,
+                elements=[
+                    markdown_export_module.MarkdownParagraphNode(text="Opening introduction paragraph with enough prose to count as narrative text.", page_no=1),
+                    markdown_export_module.MarkdownAssetNode(kind="figure", record={"page_no": 1}, page_no=1),
+                ],
+            ),
+            markdown_export_module.MarkdownSectionNode(
+                canonical="introduction",
+                title="Khan et al",
+                level=2,
+                page_start=2,
+                page_end=2,
+                elements=[
+                    markdown_export_module.MarkdownAssetNode(kind="figure", record={"page_no": 2}, page_no=2),
+                ],
+            ),
+            markdown_export_module.MarkdownSectionNode(
+                canonical="introduction",
+                title="Introduction",
+                level=2,
+                page_start=2,
+                page_end=2,
+                elements=[
+                    markdown_export_module.MarkdownParagraphNode(text="Second introduction paragraph.", page_no=2),
+                ],
+            ),
+            markdown_export_module.MarkdownSectionNode(
+                canonical="appendix",
+                title="KB Training",
+                level=2,
+                page_start=3,
+                page_end=3,
+                elements=[],
+            ),
+        ]
+    )
+
+    markdown_export_module._normalize_markdown_document_model(model)
+
+    assert [section.title for section in model.sections] == ["Introduction"]
+    assert len(model.sections[0].elements) == 4
+
+
+def test_build_markdown_document_model_does_not_promote_figure_label_blocks_to_headings() -> None:
+    blocks = [
+        {
+            "text": "4 Experiments",
+            "page_no": 1,
+            "block_index": 0,
+            "bbox": {"x0": 20.0, "y0": 20.0, "x1": 160.0, "y1": 34.0},
+            "metadata": {
+                "section_canonical": "experiments",
+                "section_title": "Experiments",
+                "section_level": 2,
+                "max_font_size": 13.0,
+            },
+        },
+        {
+            "text": "Score",
+            "page_no": 1,
+            "block_index": 1,
+            "bbox": {"x0": 55.0, "y0": 95.0, "x1": 95.0, "y1": 106.0},
+            "metadata": {
+                "section_canonical": "experiments",
+                "section_title": "Experiments",
+                "section_level": 1,
+                "max_font_size": 11.0,
+            },
+        },
+        {
+            "text": "Narrative text after the chart explains the observed result in ordinary prose.",
+            "page_no": 1,
+            "block_index": 2,
+            "bbox": {"x0": 20.0, "y0": 150.0, "x1": 220.0, "y1": 175.0},
+            "metadata": {
+                "section_canonical": "experiments",
+                "section_title": "Experiments",
+                "section_level": 1,
+            },
+        },
+    ]
+    bundled_assets = {
+        "figures": [
+            {
+                "id": 1,
+                "page_no": 1,
+                "file_name": "page_001_vec_001.png",
+                "figure_caption": "Figure 1: Chart caption",
+                "figure_number": "1",
+                "figure_type": "vector",
+                "section_canonical": "experiments",
+                "section_title": "Experiments",
+                "bbox": {"x0": 20.0, "y0": 70.0, "x1": 200.0, "y1": 140.0},
+            }
+        ],
+        "tables": [],
+        "equations": [],
+    }
+    metadata = {"title": "Sample Paper", "paper_id": 1, "num_figures": 1, "num_tables": 0, "num_equations": 0}
+
+    model = markdown_export_module._build_markdown_document_model(
+        blocks=deepcopy(blocks),
+        bundled_assets=bundled_assets,
+        metadata=metadata,
+        config=MarkdownExportConfig(ensure_assets=False),
+        conservative_mode=True,
+    )
+
+    assert [section.title for section in model.sections] == ["Experiments"]
+    assert not any(
+        isinstance(element, markdown_export_module.MarkdownSubheadingNode) and element.title == "Score"
+        for element in model.sections[0].elements
+    )
+
+
+def test_build_markdown_document_model_switches_top_level_section_before_later_subheading() -> None:
+    blocks = [
+        {
+            "text": "5 Experiments",
+            "page_no": 1,
+            "block_index": 0,
+            "bbox": {"x0": 20.0, "y0": 20.0, "x1": 180.0, "y1": 34.0},
+            "metadata": {
+                "section_canonical": "experiments",
+                "section_title": "Experiments",
+                "section_level": 2,
+                "max_font_size": 13.0,
+            },
+        },
+        {
+            "text": "Experimental setup paragraph.",
+            "page_no": 1,
+            "block_index": 1,
+            "bbox": {"x0": 20.0, "y0": 40.0, "x1": 220.0, "y1": 60.0},
+            "metadata": {
+                "section_canonical": "experiments",
+                "section_title": "Experiments",
+                "section_level": 1,
+            },
+        },
+        {
+            "text": "6 Results",
+            "page_no": 1,
+            "block_index": 2,
+            "bbox": {"x0": 20.0, "y0": 90.0, "x1": 160.0, "y1": 104.0},
+            "metadata": {
+                "section_canonical": "results",
+                "section_title": "Results",
+                "section_level": 2,
+                "max_font_size": 13.0,
+            },
+        },
+        {
+            "text": "6.1 RQ1: Overall Performance",
+            "page_no": 1,
+            "block_index": 3,
+            "bbox": {"x0": 24.0, "y0": 110.0, "x1": 220.0, "y1": 122.0},
+            "metadata": {
+                "section_canonical": "results",
+                "section_title": "Results",
+                "section_level": 2,
+                "max_font_size": 12.0,
+            },
+        },
+        {
+            "text": "Results paragraph.",
+            "page_no": 1,
+            "block_index": 4,
+            "bbox": {"x0": 20.0, "y0": 126.0, "x1": 220.0, "y1": 150.0},
+            "metadata": {
+                "section_canonical": "results",
+                "section_title": "Results",
+                "section_level": 1,
+            },
+        },
+    ]
+    model = markdown_export_module._build_markdown_document_model(
+        blocks=deepcopy(blocks),
+        bundled_assets={"figures": [], "tables": [], "equations": []},
+        metadata={"title": "Sample Paper", "paper_id": 1},
+        config=MarkdownExportConfig(ensure_assets=False),
+        conservative_mode=True,
+    )
+
+    assert [section.title for section in model.sections] == ["Experiments", "Results"]
+    assert any(
+        isinstance(element, markdown_export_module.MarkdownSubheadingNode) and element.title == "RQ1: Overall Performance"
+        for element in model.sections[1].elements
+    )
 
 
 def test_export_pdf_to_markdown_keeps_explicit_appendix_heading_authoritative_for_same_page_text(
@@ -2329,6 +3143,117 @@ def test_asset_heading_section_prefers_nearest_structural_heading() -> None:
 
     assert markdown_export_module._asset_heading_section(above_record, page_entries) == ("appendix", "Datasets", 2)
     assert markdown_export_module._asset_heading_section(below_record, page_entries) == ("appendix", "Hyperparameters", 2)
+
+
+def test_ensure_section_metadata_reannotates_inconsistent_preannotated_blocks(monkeypatch) -> None:
+    blocks = [
+        {
+            "text": "2.1. Problem Formulation",
+            "page_no": 3,
+            "block_index": 0,
+            "bbox": {"x0": 54.0, "y0": 100.0, "x1": 220.0, "y1": 120.0},
+            "metadata": {
+                "section_canonical": "introduction",
+                "section_title": "Introduction",
+                "section_level": 2,
+            },
+        },
+        {
+            "text": "We formalize the alignment problem as a sequential decision process with task-level supervision and delayed rewards. " * 2,
+            "page_no": 3,
+            "block_index": 1,
+            "bbox": {"x0": 54.0, "y0": 128.0, "x1": 540.0, "y1": 190.0},
+            "metadata": {
+                "section_canonical": "introduction",
+                "section_title": "Introduction",
+                "section_level": 2,
+            },
+        },
+        {
+            "text": "3. Methodology",
+            "page_no": 4,
+            "block_index": 2,
+            "bbox": {"x0": 54.0, "y0": 200.0, "x1": 180.0, "y1": 220.0},
+            "metadata": {
+                "section_canonical": "related_work",
+                "section_title": "Related Work",
+                "section_level": 2,
+            },
+        },
+    ]
+
+    def fake_annotate_blocks_with_sections(*, blocks, pdf_path, source_url):
+        blocks[0]["metadata"].update({"section_canonical": "methodology", "section_title": "Problem Formulation", "section_level": 3})
+        blocks[1]["metadata"].update({"section_canonical": "methodology", "section_title": "Problem Formulation", "section_level": 3})
+        blocks[2]["metadata"].update({"section_canonical": "methodology", "section_title": "Methodology", "section_level": 2})
+        return {
+            "strategy": "heuristic",
+            "candidate_headings": 2,
+            "matched_headings": 2,
+            "sections": [{"title": "Problem Formulation"}, {"title": "Methodology"}],
+        }
+
+    monkeypatch.setattr(markdown_export_module, "annotate_blocks_with_sections", fake_annotate_blocks_with_sections)
+    report = markdown_export_module._ensure_section_metadata(
+        blocks,
+        pdf_path=Path("/tmp/fake.pdf"),
+        source_url=None,
+    )
+
+    assert report["strategy"] == "heuristic"
+    assert report["fallback_from"] == "preannotated"
+    assert "validation_issues" in report
+    assert blocks[0]["metadata"]["section_title"] == "Problem Formulation"
+    assert blocks[2]["metadata"]["section_title"] == "Methodology"
+
+
+def test_audit_rendered_markdown_flags_consecutive_subheadings_when_blocks_show_intervening_prose() -> None:
+    markdown = "\n".join(
+        [
+            "## Methodology",
+            "",
+            "### Dataset",
+            "",
+            "### Hyperparameters",
+            "",
+            "### Analysis",
+            "",
+            "Deferred prose appears too late.",
+            "",
+        ]
+    )
+    blocks = [
+        {
+            "text": "A. Dataset",
+            "page_no": 12,
+            "bbox": {"x0": 54.0, "y0": 100.0, "x1": 180.0, "y1": 118.0},
+        },
+        {
+            "text": "This prose block should have appeared between the appendix headings instead of after the entire run. " * 2,
+            "page_no": 12,
+            "bbox": {"x0": 54.0, "y0": 124.0, "x1": 540.0, "y1": 188.0},
+        },
+        {
+            "text": "B. Hyperparameters",
+            "page_no": 12,
+            "bbox": {"x0": 54.0, "y0": 210.0, "x1": 220.0, "y1": 228.0},
+        },
+        {
+            "text": "Another prose block is geometrically between Hyperparameters and Analysis on the page. " * 2,
+            "page_no": 12,
+            "bbox": {"x0": 54.0, "y0": 236.0, "x1": 540.0, "y1": 290.0},
+        },
+        {
+            "text": "C. Analysis",
+            "page_no": 12,
+            "bbox": {"x0": 54.0, "y0": 318.0, "x1": 180.0, "y1": 336.0},
+        },
+    ]
+
+    audit = audit_rendered_markdown(markdown, metadata={"page_count": 12}, blocks=blocks)
+
+    assert audit.conservative_recommended is True
+    assert any("consecutive heading runs missing prose" in issue for issue in audit.issues)
 
 
 def test_asset_sort_order_uses_geometry_when_caption_block_order_is_late() -> None:

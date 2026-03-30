@@ -254,6 +254,146 @@ def _raw_block_max_font_size(block: Dict[str, Any]) -> float:
     return max_size
 
 
+_HEADING_BLOCK_RE = re.compile(
+    r"^\s*(?:\d+(?:\.\d+){0,3}|[A-Z]|[IVXLCDM]+)\.?\s+[A-Za-z]",
+    re.IGNORECASE,
+)
+_PAGE_NUMBER_RE = re.compile(r"^\s*(?:\d{1,4}|[ivxlcdm]{1,8})\s*$", re.IGNORECASE)
+_STOPWORD_RE = re.compile(
+    r"\b(the|and|that|with|from|this|these|our|their|which|while|using|without|into|through|because|however|although|where|when|during|under|across|between|provides|introduces|leverages|approach|method|model|policy)\b",
+    re.IGNORECASE,
+)
+
+
+def _looks_like_page_number_block(
+    block: Dict[str, Any],
+    *,
+    bbox: Dict[str, float],
+    page_width: float,
+    page_height: float,
+) -> bool:
+    text = _raw_block_text(block).strip()
+    if not text or not _PAGE_NUMBER_RE.fullmatch(text):
+        return False
+    if page_width <= 0.0 or page_height <= 0.0:
+        return False
+    width_rel = _bbox_width(bbox) / page_width
+    height_rel = _bbox_height(bbox) / page_height
+    y0_rel = float(bbox["y0"]) / page_height
+    centered = abs(_bbox_center_x(bbox) - (page_width * 0.5)) <= page_width * 0.08
+    return width_rel <= 0.08 and height_rel <= 0.04 and y0_rel >= 0.82 and centered
+
+
+def _looks_like_standalone_subsection_heading(block: Dict[str, Any], *, bbox: Dict[str, float]) -> bool:
+    text = " ".join(_raw_block_text(block).split()).strip()
+    if not text:
+        return False
+    if not _HEADING_BLOCK_RE.match(text):
+        return False
+    if len(text) > 120:
+        return False
+    if _raw_block_line_count(block) > 2:
+        return False
+    return _bbox_height(bbox) <= 32.0
+
+
+def _looks_like_tiny_symbol_or_math_fragment(block: Dict[str, Any]) -> bool:
+    text = " ".join(_raw_block_text(block).split()).strip()
+    if not text:
+        return False
+    if len(text) > 24:
+        return False
+    alpha_words = len(re.findall(r"[A-Za-z]{2,}", text))
+    digit_count = len(re.findall(r"\d", text))
+    math_chars = len(re.findall(r"[=+\-*/^_<>∥∑∫πθαβγλμστωφψρ()\[\]{}|]", text))
+    if alpha_words == 0 and (digit_count > 0 or math_chars > 0):
+        return True
+    return math_chars >= 3 and alpha_words <= 1
+
+
+def _looks_like_equation_only_block(block: Dict[str, Any]) -> bool:
+    text = _raw_block_text(block)
+    compact = " ".join(text.split()).strip()
+    if not compact:
+        return False
+    line_count = _raw_block_line_count(block)
+    stopwords = len(_STOPWORD_RE.findall(compact))
+    alpha_words = len(re.findall(r"[A-Za-z]{2,}", compact))
+    math_chars = len(re.findall(r"[=+\-*/^_<>∥∑∫πθαβγλμστωφψρ()\[\]{}|]", compact))
+    equation_num = bool(re.search(r"\(\d+\)\s*$", compact))
+    if line_count <= 3 and equation_num and stopwords == 0:
+        return True
+    if stopwords == 0 and math_chars >= max(4, alpha_words * 2) and line_count <= 4:
+        return True
+    return False
+
+
+def _looks_like_paragraph_body_block(
+    block: Dict[str, Any],
+    *,
+    bbox: Dict[str, float],
+    page_width: float,
+    page_height: float,
+) -> bool:
+    compact = " ".join(_raw_block_text(block).split()).strip()
+    if len(compact) < 70:
+        return False
+    if _raw_block_line_count(block) < 2:
+        return False
+    if _looks_like_page_number_block(block, bbox=bbox, page_width=page_width, page_height=page_height):
+        return False
+    if _looks_like_equation_only_block(block):
+        return False
+    if _looks_like_standalone_subsection_heading(block, bbox=bbox):
+        return False
+    if _looks_like_tiny_symbol_or_math_fragment(block):
+        return False
+    stopwords = len(_STOPWORD_RE.findall(compact))
+    sentence_punct = bool(re.search(r"[.!?;:]\s", compact))
+    return stopwords >= 2 or sentence_punct
+
+
+def _looks_like_short_visual_label(block: Dict[str, Any], *, bbox: Dict[str, float], page_width: float) -> bool:
+    compact = " ".join(_raw_block_text(block).split()).strip()
+    if not compact or len(compact) > 48:
+        return False
+    if _raw_block_line_count(block) > 3:
+        return False
+    width_rel = _bbox_width(bbox) / max(page_width, 1.0)
+    word_count = len(re.findall(r"[A-Za-z]{2,}", compact))
+    stopwords = len(_STOPWORD_RE.findall(compact))
+    if width_rel > 0.34:
+        return False
+    if stopwords >= 2:
+        return False
+    return word_count <= 6
+
+
+def _page_prefers_single_column(
+    core: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]],
+    *,
+    page_width: float,
+    page_height: float,
+) -> bool:
+    full_width_prose = [
+        item
+        for item in core
+        if item[4]
+        and _looks_like_paragraph_body_block(item[1], bbox=item[2], page_width=page_width, page_height=page_height)
+    ]
+    narrow_prose = [
+        item
+        for item in core
+        if not item[4]
+        and _looks_like_paragraph_body_block(item[1], bbox=item[2], page_width=page_width, page_height=page_height)
+    ]
+    if len(full_width_prose) < 2:
+        return False
+    full_chars = sum(len(_raw_block_text(item[1])) for item in full_width_prose)
+    narrow_chars = sum(len(_raw_block_text(item[1])) for item in narrow_prose)
+    return len(full_width_prose) >= len(narrow_prose) or full_chars >= max(240, int(narrow_chars * 1.35))
+
+
 def _looks_like_first_page_preamble_anchor(
     block: Dict[str, Any],
     *,
@@ -350,14 +490,36 @@ def _order_text_blocks_for_page(
     left_candidates = [
         item
         for item in core
-        if not item[4] and _bbox_center_x(item[2]) <= page_width * 0.45 and _bbox_width(item[2]) <= page_width * 0.62
+        if (
+            not item[4]
+            and _bbox_center_x(item[2]) <= page_width * 0.45
+            and _bbox_width(item[2]) <= page_width * 0.62
+            and _looks_like_paragraph_body_block(
+                item[1],
+                bbox=item[2],
+                page_width=page_width,
+                page_height=page_height,
+            )
+        )
     ]
     right_candidates = [
         item
         for item in core
-        if not item[4] and _bbox_center_x(item[2]) >= page_width * 0.55 and _bbox_width(item[2]) <= page_width * 0.62
+        if (
+            not item[4]
+            and _bbox_center_x(item[2]) >= page_width * 0.55
+            and _bbox_width(item[2]) <= page_width * 0.62
+            and _looks_like_paragraph_body_block(
+                item[1],
+                bbox=item[2],
+                page_width=page_width,
+                page_height=page_height,
+            )
+        )
     ]
     has_two_columns = len(left_candidates) >= 2 and len(right_candidates) >= 2
+    if has_two_columns and _page_prefers_single_column(core, page_width=page_width, page_height=page_height):
+        has_two_columns = False
 
     if not has_two_columns:
         ordered = sorted(core, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
@@ -381,6 +543,7 @@ def _order_text_blocks_for_page(
     preamble: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]] = []
     left: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]] = []
     right: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]] = []
+    in_flow_full: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]] = []
     postamble: List[Tuple[int, Dict[str, Any], Dict[str, float], bool, bool]] = []
 
     for item in core:
@@ -414,20 +577,34 @@ def _order_text_blocks_for_page(
             elif y0 <= column_top + 18.0:
                 preamble.append(item)
             else:
-                postamble.append(item)
+                in_flow_full.append(item)
             continue
         if center_x <= mid_x:
             left.append(item)
         else:
             right.append(item)
 
-    ordered = (
-        sorted(preamble, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
-        + sorted(left, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
-        + sorted(right, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
-        + sorted(postamble, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
-        + sorted(margin, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
-    )
+    ordered = list(sorted(preamble, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0])))
+    left_sorted = sorted(left, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
+    right_sorted = sorted(right, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
+    in_flow_full_sorted = sorted(in_flow_full, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0]))
+
+    left_idx = 0
+    right_idx = 0
+    for full_item in in_flow_full_sorted:
+        full_y0 = float(full_item[2]["y0"])
+        while left_idx < len(left_sorted) and float(left_sorted[left_idx][2]["y0"]) < full_y0:
+            ordered.append(left_sorted[left_idx])
+            left_idx += 1
+        while right_idx < len(right_sorted) and float(right_sorted[right_idx][2]["y0"]) < full_y0:
+            ordered.append(right_sorted[right_idx])
+            right_idx += 1
+        ordered.append(full_item)
+
+    ordered.extend(left_sorted[left_idx:])
+    ordered.extend(right_sorted[right_idx:])
+    ordered.extend(sorted(postamble, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0])))
+    ordered.extend(sorted(margin, key=lambda item: (float(item[2]["y0"]), float(item[2]["x0"]), item[0])))
 
     results: List[Tuple[Dict[str, Any], str, str]] = []
     for _, block, bbox, is_margin, is_full in ordered:

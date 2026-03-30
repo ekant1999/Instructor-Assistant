@@ -87,7 +87,11 @@ def export_pdf_to_markdown(
         metadata=final_metadata,
         config=config,
     )
-    audit = audit_rendered_markdown(markdown, metadata=final_metadata) if config.quality_audit_enabled else None
+    audit = (
+        audit_rendered_markdown(markdown, metadata=final_metadata, blocks=working_blocks)
+        if config.quality_audit_enabled
+        else None
+    )
     render_mode = "normal"
     if audit and audit.conservative_recommended and config.conservative_fallback:
         markdown = render_markdown_document(
@@ -98,7 +102,7 @@ def export_pdf_to_markdown(
             conservative_mode=True,
         )
         render_mode = "conservative"
-        audit = audit_rendered_markdown(markdown, metadata=final_metadata)
+        audit = audit_rendered_markdown(markdown, metadata=final_metadata, blocks=working_blocks)
 
     markdown_path = bundle_dir / "paper.md"
     markdown_path.write_text(markdown, encoding="utf-8")
@@ -199,14 +203,40 @@ def _build_markdown_document_model(
                 idx += 1
                 continue
 
-            merged_heading = None if conservative_mode else _parse_split_structural_heading(events, idx)
+            merged_heading = _parse_split_structural_heading(events, idx)
             structural_heading = merged_heading or (None if conservative_mode else _parse_structural_heading_block(text, block=block))
             if conservative_mode:
                 conservative_heading = _parse_structural_heading_block(text, block=block)
-                if current_section is not None and _is_conservative_subheading_candidate(conservative_heading, current_section=current_section):
+                structural_heading = None
+                if current_section is not None and _is_conservative_subheading_candidate(
+                    merged_heading, current_section=current_section
+                ):
+                    structural_heading = merged_heading
+                elif _is_conservative_top_level_heading_candidate(merged_heading):
+                    structural_heading = merged_heading
+                elif current_section is not None and _is_conservative_subheading_candidate(
+                    conservative_heading, current_section=current_section
+                ):
                     structural_heading = conservative_heading
                 elif _is_conservative_top_level_heading_candidate(conservative_heading):
                     structural_heading = conservative_heading
+            if _block_is_heading_noise_candidate(
+                block,
+                text=text,
+                bundled_assets=render_assets,
+                render_state=render_state,
+            ):
+                structural_heading = None
+            if (
+                structural_heading
+                and current_section is not None
+                and (
+                    current_section.canonical in {"prompt_templates", "representative_write_back_examples"}
+                    or _normalize_heading_line(current_section.title) in {"prompt templates", "representative write back examples"}
+                )
+                and str(structural_heading.get("canonical") or "") == "references"
+            ):
+                structural_heading = None
             if block_section_canonical == "front_matter" or _should_preserve_front_matter_block(block, text=text):
                 structural_heading = None
             if structural_heading:
@@ -232,6 +262,38 @@ def _build_markdown_document_model(
                         page_no=page_no,
                     )
                     current_section_explicit = False
+                event_section_canonical = str(event.get("section_canonical") or "other").strip() or "other"
+                event_section_title = str(event.get("section_title") or "Document Body").strip() or "Document Body"
+                event_section_level = max(2, _safe_int(event.get("section_level"), 2))
+                if (
+                    current_section is not None
+                    and event_section_canonical not in {"front_matter", "other"}
+                    and event_section_level <= 2
+                    and (
+                        current_section.canonical != event_section_canonical
+                        or _normalize_heading_line(current_section.title) != _normalize_heading_line(event_section_title)
+                    )
+                    and _should_emit_section_heading(
+                        section_canonical=event_section_canonical,
+                        section_title=event_section_title,
+                        section_level=event_section_level,
+                        conservative_mode=conservative_mode,
+                    )
+                ):
+                    current_section = _ensure_model_section(
+                        model,
+                        canonical=event_section_canonical,
+                        title=event_section_title,
+                        level=event_section_level,
+                        page_no=page_no,
+                    )
+                    current_subheading = None
+                    current_section_explicit = False
+                if current_section is not None and _normalize_heading_line(current_section.title) == _normalize_heading_line(
+                    structural_heading["title"]
+                ):
+                    idx += 2 if merged_heading else 1
+                    continue
                 subheading_key = (structural_heading["title"], int(structural_heading["level"]))
                 if current_subheading != subheading_key:
                     current_section.elements.append(
@@ -285,6 +347,7 @@ def _build_markdown_document_model(
                 current_section_explicit=current_section_explicit,
                 event_section_canonical=event_section_canonical,
                 event_section_title=event_section_title,
+                rendered_text=rendered_text,
             ) and (
                 event_section_canonical != "front_matter"
                 and (
@@ -343,6 +406,41 @@ def _build_markdown_document_model(
 
     _normalize_markdown_document_model(model)
     return model
+
+
+def _block_is_heading_noise_candidate(
+    block: Dict[str, Any],
+    *,
+    text: str,
+    bundled_assets: Dict[str, Any],
+    render_state: Dict[str, Any],
+) -> bool:
+    compact = " ".join(str(text or "").split()).strip()
+    if not compact:
+        return True
+    if _is_page_furniture_block(block, text=compact, render_state=render_state):
+        return True
+    if _is_early_page_figure_owned_block(block, text=compact, render_state=render_state):
+        return True
+    if _is_figure_label_noise_block(block, text=compact, render_state=render_state):
+        return True
+    if _is_inferred_table_region_block(block, text=compact, render_state=render_state):
+        return True
+    if _is_table_scaffold_page_block(block, text=compact, render_state=render_state):
+        return True
+    if _is_rendered_table_owned_noise_block(block, text=compact, render_state=render_state):
+        return True
+    if _looks_like_algorithmic_scaffold_text(compact):
+        return True
+    if _looks_like_equation_residue_text(compact):
+        return True
+    for figure in bundled_assets.get("figures", []):
+        if isinstance(figure, dict) and _matches_rendered_figure_caption_block(block, figure):
+            return True
+    for table in bundled_assets.get("tables", []):
+        if isinstance(table, dict) and _matches_rendered_table_caption_block(block, table):
+            return True
+    return False
 
 
 def _render_markdown_document_model(
@@ -450,9 +548,25 @@ def _should_hold_current_text_section(
     current_section_explicit: bool,
     event_section_canonical: str,
     event_section_title: str,
+    rendered_text: str,
 ) -> bool:
     if event_section_canonical == "front_matter":
         return False
+    if (
+        event_section_canonical == "references"
+        and current_section.canonical != "references"
+        and _normalize_heading_line(event_section_title) == "references"
+        and not _looks_like_reference_entry_paragraph(rendered_text)
+    ):
+        return True
+    if (
+        (
+            current_section.canonical in {"prompt_templates", "representative_write_back_examples"}
+            or _normalize_heading_line(current_section.title) in {"prompt templates", "representative write back examples"}
+        )
+        and event_section_canonical == "references"
+    ):
+        return True
     if _asset_event_matches_current_context(
         current_section=current_section,
         current_subheading=current_subheading,
@@ -472,6 +586,8 @@ def _asset_event_matches_current_context(
 ) -> bool:
     event_title_norm = _normalize_heading_line(event_section_title)
     section_title_norm = _normalize_heading_line(current_section.title)
+    if event_section_canonical == "references" and current_section.canonical != "references" and event_title_norm == "references":
+        return True
     if current_section.canonical == event_section_canonical and section_title_norm == event_title_norm:
         return True
     if current_subheading is not None and _normalize_heading_line(str(current_subheading[0])) == event_title_norm:
@@ -480,6 +596,8 @@ def _asset_event_matches_current_context(
 
 
 def _normalize_markdown_document_model(model: MarkdownDocumentModel) -> None:
+    _split_reference_runs(model)
+    model.sections = _prune_and_absorb_weak_sections(model.sections)
     merged_sections: List[MarkdownSectionNode] = []
     for section in model.sections:
         if merged_sections and _section_nodes_should_merge(merged_sections[-1], section):
@@ -494,16 +612,168 @@ def _normalize_markdown_document_model(model: MarkdownDocumentModel) -> None:
     model.sections = merged_sections
 
 
+def _prune_and_absorb_weak_sections(sections: List[MarkdownSectionNode]) -> List[MarkdownSectionNode]:
+    pruned: List[MarkdownSectionNode] = []
+    for section in sections:
+        if not section.elements:
+            continue
+        if pruned and _section_is_weak_bridge_section(section, previous=pruned[-1]):
+            previous = pruned[-1]
+            previous.page_end = max(previous.page_end, section.page_end)
+            previous.elements.extend(section.elements)
+            continue
+        pruned.append(section)
+    return pruned
+
+
+def _section_is_weak_bridge_section(section: MarkdownSectionNode, *, previous: MarkdownSectionNode) -> bool:
+    if not section.elements:
+        return True
+    if not _looks_like_page_furniture_section_title(section.title):
+        return False
+    if previous.level != section.level:
+        return False
+    if previous.canonical != section.canonical:
+        return False
+    return not _section_has_meaningful_prose(section)
+
+
+def _section_has_meaningful_prose(section: MarkdownSectionNode) -> bool:
+    for element in section.elements:
+        if not isinstance(element, MarkdownParagraphNode):
+            continue
+        compact = " ".join(str(element.text or "").split()).strip()
+        if len(compact) < 60:
+            continue
+        if _looks_like_reference_entry_paragraph(compact):
+            continue
+        if _looks_like_sentenceish_prose(compact):
+            return True
+    return False
+
+
+def _looks_like_page_furniture_section_title(title: str) -> bool:
+    compact = " ".join(str(title or "").split()).strip()
+    if not compact:
+        return True
+    lowered = compact.lower()
+    if "et al" in lowered:
+        return True
+    if compact.endswith(".") and len(compact.split()) <= 4 and not _looks_like_sentenceish_prose(compact):
+        return True
+    return False
+
+
+def _split_reference_runs(model: MarkdownDocumentModel) -> None:
+    if not model.sections or any(section.canonical == "references" for section in model.sections):
+        return
+
+    max_page = max((section.page_end for section in model.sections), default=0)
+    rewritten: List[MarkdownSectionNode] = []
+    for section in model.sections:
+        split_idx = _reference_run_start_index(section, max_page=max_page)
+        if split_idx is None:
+            rewritten.append(section)
+            continue
+
+        narrative = section.elements[:split_idx]
+        references = section.elements[split_idx:]
+        if narrative:
+            section.elements = narrative
+            section.page_end = max(section.page_start, max(_element_page_no(item) for item in narrative))
+            rewritten.append(section)
+
+        ref_page_start = _element_page_no(references[0]) if references else section.page_end
+        ref_page_end = max(ref_page_start, max((_element_page_no(item) for item in references), default=ref_page_start))
+        rewritten.append(
+            MarkdownSectionNode(
+                canonical="references",
+                title="References",
+                level=2,
+                page_start=ref_page_start,
+                page_end=ref_page_end,
+                elements=list(references),
+            )
+        )
+
+    model.sections = rewritten
+
+
+def _reference_run_start_index(section: MarkdownSectionNode, *, max_page: int) -> Optional[int]:
+    if section.canonical in {"references", "front_matter", "related_work"}:
+        return None
+    if _normalize_heading_line(section.title) in {"prompt templates", "representative write back examples"}:
+        return None
+    if section.page_end <= 0 or max_page <= 0:
+        return None
+    if section.page_end < max(2, int(max_page * 0.55)):
+        return None
+
+    consecutive = 0
+    run_start: Optional[int] = None
+    for idx, element in enumerate(section.elements):
+        text = element.text if isinstance(element, MarkdownParagraphNode) else ""
+        if _looks_like_reference_entry_paragraph(text):
+            consecutive += 1
+            if run_start is None:
+                run_start = idx
+            if consecutive >= 3:
+                return run_start
+            continue
+        if isinstance(element, MarkdownParagraphNode) and text and text.isdigit():
+            continue
+        consecutive = 0
+        run_start = None
+    return None
+
+
+def _looks_like_reference_entry_paragraph(text: str) -> bool:
+    compact = " ".join(str(text or "").split()).strip()
+    if len(compact) < 40:
+        return False
+    lowered = compact.lower()
+    if re.match(r"^\[\d+\]", compact):
+        return True
+    if re.search(r"\b(?:in|proceedings|conference|journal|transactions|workshop|arxiv|preprint|findings|pp\.|pages|doi)\b", lowered):
+        author_like = len(re.findall(r"\b[A-Z][a-z]+(?:[-'][A-Z]?[a-z]+)?\b", compact)) >= 3
+        year_like = bool(re.search(r"\b(?:19|20)\d{2}[a-z]?\b", compact))
+        if author_like and year_like:
+            return True
+    return False
+
+
 def _section_nodes_should_merge(left: MarkdownSectionNode, right: MarkdownSectionNode) -> bool:
     if left.level != right.level:
-        return False
+        return _section_matches_trailing_subheading(left, right)
     left_title = _normalize_heading_line(left.title)
     right_title = _normalize_heading_line(right.title)
     if not left_title or left_title != right_title:
+        return _section_matches_trailing_subheading(left, right)
+    return True
+
+
+def _section_matches_trailing_subheading(left: MarkdownSectionNode, right: MarkdownSectionNode) -> bool:
+    if left.level != 2 or right.level != 2:
         return False
-    if left.canonical == right.canonical:
-        return True
-    return left.level == 2 and left.page_end == right.page_start
+    right_title = _normalize_heading_line(right.title)
+    if not right_title:
+        return False
+    trailing_subheading: Optional[MarkdownSubheadingNode] = None
+    for element in reversed(left.elements):
+        if isinstance(element, MarkdownSubheadingNode):
+            trailing_subheading = element
+            break
+        if isinstance(element, MarkdownParagraphNode) and element.text.strip():
+            break
+    if trailing_subheading is None:
+        return False
+    if _normalize_heading_line(trailing_subheading.title) != right_title:
+        return False
+    left_canonical = str(left.canonical or "").strip()
+    right_canonical = str(right.canonical or "").strip()
+    if right_canonical not in {left_canonical, "other"} and canonicalize_heading(right.title) != right_canonical:
+        return False
+    return left.page_end <= right.page_start
 
 
 def _dedupe_section_elements(section: MarkdownSectionNode) -> None:
@@ -619,7 +889,8 @@ def _parse_split_structural_heading(events: List[Dict[str, Any]], idx: int) -> O
     if current_bbox and next_bbox:
         if _vertical_gap(current_bbox, next_bbox) > 48.0:
             return None
-        if _x_overlap_ratio(current_bbox, next_bbox) < 0.05:
+        same_line_gap = _bbox_coord(next_bbox, "x0") - _bbox_coord(current_bbox, "x1")
+        if _x_overlap_ratio(current_bbox, next_bbox) < 0.05 and same_line_gap > 40.0:
             return None
 
     combined = f"{current_text.rstrip('.')} {next_text}".strip()
@@ -963,6 +1234,8 @@ def _render_asset_event(
             lines.append(f"> {_table_caption_line(record)}")
         return lines or [f"<!-- missing table asset for page {record.get('page_no')} -->"]
     if kind == "equation":
+        if conservative_mode and not _equation_record_is_conservatively_renderable(record):
+            return []
         eq_id = record.get("equation_number") or record.get("id") or ""
         latex = str(record.get("latex") or "").strip()
         json_path = str(record.get("markdown_json_path") or "").strip()
@@ -1163,8 +1436,31 @@ def _table_caption_key(caption: str) -> str:
 
 
 _STRUCTURAL_HEADING_RE = re.compile(
-    r"^\s*(?P<num>(?:[A-Z](?:\.\d+){0,3}|\d+(?:\.\d+){0,3}|[IVXLCDM]+))\.?\s+(?P<title>[A-Z].{0,180})\s*$"
+    r"^\s*(?P<num>(?:[A-Z](?:\.\d+){0,3}|\d+(?:\.\d+){0,3}|[IVXLCDM]+))\.?\s+(?P<title>[A-Z0-9].{0,180})\s*$"
 )
+
+
+def _looks_like_numeric_or_axis_heading(text: str) -> bool:
+    compact = " ".join(str(text or "").split()).strip()
+    if not compact:
+        return False
+    if re.fullmatch(r"[-+]?\.?\d+(?:\.\d+)?(?:[%kKmM]|e[-+]?\d+)?", compact):
+        return True
+    if re.fullmatch(r"[-+]?\.?\d+(?:\.\d+)?\s*(?:x|y|z|t|s|ms|mm|cm|m|px|pt|k|K|M|%)", compact):
+        return True
+    tokens = compact.split()
+    if 1 <= len(tokens) <= 2 and all(
+        re.fullmatch(r"[-+]?\.?\d+(?:\.\d+)?(?:[%kKmM]|e[-+]?\d+)?", token) for token in tokens
+    ):
+        return True
+    return False
+
+
+def _title_matches_section_canonical(title: str, canonical: str) -> bool:
+    canonical_value = str(canonical or "").strip()
+    if canonical_value in {"", "front_matter", "other", "appendix"}:
+        return True
+    return canonicalize_heading(title) == canonical_value
 
 
 def _parse_structural_heading_block(text: str, *, block: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
@@ -1188,7 +1484,8 @@ def _parse_structural_heading_block(text: str, *, block: Optional[Dict[str, Any]
         return None
     if _looks_like_placeholder_heading(compact) or _looks_like_equationish_text(compact):
         return None
-    if _looks_like_table_scaffold_text(compact) or _looks_like_visual_label_text(compact):
+    numbered_match = _STRUCTURAL_HEADING_RE.match(compact)
+    if (not numbered_match and _looks_like_table_scaffold_text(compact)) or _looks_like_visual_label_text(compact):
         return None
 
     metadata = block.get("metadata") if isinstance(block, dict) and isinstance(block.get("metadata"), dict) else {}
@@ -1201,7 +1498,8 @@ def _parse_structural_heading_block(text: str, *, block: Optional[Dict[str, Any]
 
     number = ""
     title = ""
-    match = _STRUCTURAL_HEADING_RE.match(compact)
+    match = numbered_match
+    numbered_heading = bool(match)
     if match:
         number = str(match.group("num") or "").strip()
         title = str(match.group("title") or "").strip(" .:-")
@@ -1217,11 +1515,18 @@ def _parse_structural_heading_block(text: str, *, block: Optional[Dict[str, Any]
 
     if not title:
         return None
-    if not _looks_like_heading_phrase(title):
+    if _looks_like_numeric_or_axis_heading(title):
+        return None
+    title_is_heading = _looks_like_heading_phrase(title)
+    if numbered_heading and not title_is_heading:
+        title_is_heading = _looks_like_numbered_subheading_title(title)
+    if _looks_like_table_scaffold_text(compact) and not (numbered_heading and title_is_heading):
+        return None
+    if not title_is_heading:
         return None
     if re.search(r"\b(university|institute|laborator(?:y|ies)|school|department|college|technologies|labs?)\b", title.lower()):
         return None
-    if _looks_like_sentenceish_prose(compact) and max_font_size < 12.0:
+    if _looks_like_sentenceish_prose(compact) and max_font_size < 12.0 and not numbered_heading:
         return None
     if len(title.split()) > 16:
         return None
@@ -1229,6 +1534,10 @@ def _parse_structural_heading_block(text: str, *, block: Optional[Dict[str, Any]
     canonical = canonicalize_heading(title)
     if not canonical or canonical == "other":
         canonical = canonicalize_heading(compact)
+    if (not canonical or canonical == "other" or canonical not in KNOWN_CANONICALS) and numbered_heading:
+        section_canonical = str(metadata.get("section_canonical") or "").strip()
+        if section_canonical and section_canonical not in {"front_matter", "other"}:
+            canonical = section_canonical
     if re.fullmatch(r"[A-Z]", number):
         canonical = "appendix"
 
@@ -1245,7 +1554,7 @@ def _parse_structural_heading_block(text: str, *, block: Optional[Dict[str, Any]
         confidence += 0.25
     elif max_font_size >= 10.5:
         confidence += 0.15
-    if _looks_like_heading_phrase(title):
+    if title_is_heading:
         confidence += 0.2
     section_canonical = str(metadata.get("section_canonical") or "").strip()
     section_title = str(metadata.get("section_title") or "").strip()
@@ -1305,6 +1614,9 @@ def _looks_like_heading_phrase(text: str) -> bool:
     compact = " ".join(str(text or "").split()).strip()
     if not compact:
         return False
+    canonical = canonicalize_heading(compact)
+    if canonical in KNOWN_CANONICALS and canonical not in {"front_matter", "other"}:
+        return True
     if compact.endswith("."):
         return False
     tokens = re.findall(r"[A-Za-z][A-Za-z'’.-]*|\d+[A-Za-z]?", compact)
@@ -1342,6 +1654,30 @@ def _looks_like_heading_phrase(text: str) -> bool:
     return (capitalized / max(1, len(substantive))) >= 0.55
 
 
+def _looks_like_numbered_subheading_title(text: str) -> bool:
+    compact = " ".join(str(text or "").split()).strip()
+    if not compact or compact.endswith("."):
+        return False
+    if _looks_like_placeholder_heading(compact) or _looks_like_equationish_text(compact):
+        return False
+    if _looks_like_table_scaffold_text(compact):
+        return False
+    tokens = re.findall(r"[A-Za-z0-9][A-Za-z0-9'’.-]*", compact)
+    if not 1 <= len(tokens) <= 12:
+        return False
+    if len(tokens) <= 4:
+        return True
+    significant = [
+        token
+        for token in tokens
+        if token.lower() not in {"a", "an", "and", "as", "at", "by", "for", "from", "in", "of", "on", "or", "the", "to", "under", "using", "via", "with", "without"}
+    ]
+    if not significant:
+        return False
+    titleish = sum(1 for token in significant if token[:1].isupper() or token[:1].isdigit())
+    return (titleish / max(1, len(significant))) >= 0.35
+
+
 def _should_emit_section_heading(
     *,
     section_canonical: str,
@@ -1355,7 +1691,11 @@ def _should_emit_section_heading(
         return False
     if _looks_like_placeholder_heading(title) or _looks_like_equationish_text(title):
         return False
+    if _looks_like_numeric_or_axis_heading(title):
+        return False
     if _looks_like_sentenceish_prose(title) and len(title.split()) > 6:
+        return False
+    if section_level <= 2 and canonical not in {"appendix"} and not _title_matches_section_canonical(title, canonical):
         return False
     if conservative_mode:
         if section_level <= 2 and canonical not in KNOWN_CANONICALS:
@@ -1394,10 +1734,14 @@ def _is_conservative_top_level_heading_candidate(
     number = str(parsed.get("number") or "").strip()
     title = str(parsed.get("title") or "").strip()
     canonical = str(parsed.get("canonical") or "").strip()
-    if not title or not _looks_like_heading_phrase(title):
+    if not title:
         return False
     if float(parsed.get("confidence") or 0.0) < 0.78:
         return False
+    if _looks_like_numeric_or_axis_heading(title):
+        return False
+    if canonical in KNOWN_CANONICALS and canonical not in {"front_matter", "other"}:
+        return _looks_like_heading_phrase(title) and _title_matches_section_canonical(title, canonical)
     return canonical == "appendix" and bool(re.fullmatch(r"[A-Z]", number))
 
 
@@ -1473,8 +1817,17 @@ def _ensure_section_metadata(blocks: List[Dict[str, Any]], *, pdf_path: Path, so
             annotated_blocks += 1
     total_blocks = len([block for block in blocks if isinstance(block, dict)])
     report: Dict[str, Any]
-    if annotated_blocks < max(1, len([block for block in blocks if isinstance(block, dict)]) // 2):
+    should_reannotate = annotated_blocks < max(1, len([block for block in blocks if isinstance(block, dict)]) // 2)
+    preannotated_issues: List[str] = []
+    if not should_reannotate:
+        preannotated_issues = _validate_preannotated_section_metadata(blocks)
+        should_reannotate = bool(preannotated_issues)
+
+    if should_reannotate:
         report = annotate_blocks_with_sections(blocks=blocks, pdf_path=pdf_path, source_url=source_url)
+        if preannotated_issues:
+            report["fallback_from"] = "preannotated"
+            report["validation_issues"] = preannotated_issues[:12]
     else:
         report = {
             "strategy": "preannotated",
@@ -1488,6 +1841,115 @@ def _ensure_section_metadata(blocks: List[Dict[str, Any]], *, pdf_path: Path, so
     report.setdefault("annotated_blocks", annotated_blocks)
     report.setdefault("total_blocks", total_blocks)
     return report
+
+
+def _validate_preannotated_section_metadata(blocks: List[Dict[str, Any]]) -> List[str]:
+    heading_count = 0
+    title_mismatches = 0
+    canonical_mismatches = 0
+    suspicious_sequences = 0
+    issues: List[str] = []
+    recent_headings: List[Tuple[int, Dict[str, Any], Dict[str, Any], Dict[str, Any]]] = []
+
+    for idx, block in enumerate(blocks):
+        if not isinstance(block, dict):
+            continue
+        text = " ".join(str(block.get("text") or "").split()).strip()
+        if not text:
+            continue
+        parsed = _parse_structural_heading_block(text, block=block)
+        if not parsed:
+            recent_headings.clear()
+            continue
+
+        heading_count += 1
+        metadata = block.get("metadata") if isinstance(block.get("metadata"), dict) else {}
+        meta_title = _normalize_heading_line(str(metadata.get("section_title") or ""))
+        meta_canonical = str(metadata.get("section_canonical") or "").strip()
+        parsed_title = _normalize_heading_line(str(parsed.get("title") or ""))
+        parsed_canonical = str(parsed.get("canonical") or "").strip()
+
+        if meta_title and meta_title != parsed_title:
+            title_mismatches += 1
+        if (
+            meta_canonical
+            and parsed_canonical in KNOWN_CANONICALS
+            and parsed_canonical not in {"front_matter", "other"}
+            and meta_canonical != parsed_canonical
+        ):
+            canonical_mismatches += 1
+
+        recent_headings.append((idx, block, metadata, parsed))
+        if len(recent_headings) > 3:
+            recent_headings.pop(0)
+        if len(recent_headings) == 3 and _preannotated_heading_sequence_is_suspicious(recent_headings, blocks):
+            suspicious_sequences += 1
+
+    if heading_count >= 2 and title_mismatches >= max(1, int(round(heading_count * 0.25))):
+        issues.append(f"preannotated heading-title mismatches ({title_mismatches}/{heading_count})")
+    if heading_count >= 2 and canonical_mismatches >= max(1, int(round(heading_count * 0.2))):
+        issues.append(f"preannotated heading-canonical mismatches ({canonical_mismatches}/{heading_count})")
+    if suspicious_sequences:
+        issues.append(f"preannotated consecutive-heading sequences with missing prose ({suspicious_sequences})")
+    return issues
+
+
+def _preannotated_heading_sequence_is_suspicious(
+    heading_sequence: List[Tuple[int, Dict[str, Any], Dict[str, Any], Dict[str, Any]]],
+    blocks: List[Dict[str, Any]],
+) -> bool:
+    if len(heading_sequence) < 3:
+        return False
+    levels = [int(item[3].get("level") or 0) for item in heading_sequence]
+    if any(level < 3 for level in levels):
+        return False
+    if len(set(levels)) != 1:
+        return False
+
+    first_idx = heading_sequence[0][0]
+    last_idx = heading_sequence[-1][0]
+    between_blocks = [block for block in blocks[first_idx + 1 : last_idx] if isinstance(block, dict)]
+    if any(_block_is_meaningful_prose(block) for block in between_blocks):
+        return False
+
+    first_block = heading_sequence[0][1]
+    last_block = heading_sequence[-1][1]
+    first_page = _safe_int(first_block.get("page_no"), 0)
+    last_page = _safe_int(last_block.get("page_no"), 0)
+    if first_page <= 0 or first_page != last_page:
+        return False
+
+    first_bbox = first_block.get("bbox") if isinstance(first_block.get("bbox"), dict) else {}
+    last_bbox = last_block.get("bbox") if isinstance(last_block.get("bbox"), dict) else {}
+    y0 = _bbox_coord(first_bbox, "y0")
+    y1 = _bbox_coord(last_bbox, "y1")
+    if y1 <= y0:
+        return False
+
+    for block in blocks:
+        if not isinstance(block, dict):
+            continue
+        if _safe_int(block.get("page_no"), 0) != first_page:
+            continue
+        bbox = block.get("bbox") if isinstance(block.get("bbox"), dict) else {}
+        block_y0 = _bbox_coord(bbox, "y0")
+        block_y1 = _bbox_coord(bbox, "y1")
+        if block_y0 + 1.0 < y0 or block_y1 - 1.0 > y1:
+            continue
+        if _block_is_meaningful_prose(block):
+            return True
+    return False
+
+
+def _block_is_meaningful_prose(block: Dict[str, Any]) -> bool:
+    text = " ".join(str(block.get("text") or "").split()).strip()
+    if len(text) < 60:
+        return False
+    if _parse_structural_heading_block(text, block=block):
+        return False
+    if _looks_like_equationish_text(text):
+        return False
+    return _looks_like_sentenceish_prose(text)
 
 
 def _build_metadata(
@@ -1642,6 +2104,21 @@ def _build_render_state(
         if str(figure.get("figure_type") or "") == "vector" and str(figure.get("figure_caption") or "").strip():
             figure_page_stats[page_no]["vector_with_caption"] += 1
 
+    tables_by_page: Dict[int, List[Dict[str, Any]]] = defaultdict(list)
+    for table in bundled_assets.get("tables", []):
+        if not isinstance(table, dict):
+            continue
+        page_no = _safe_int(table.get("page_no"), 0)
+        bbox = table.get("bbox") if isinstance(table.get("bbox"), dict) else None
+        if page_no <= 0 or not bbox:
+            continue
+        tables_by_page[page_no].append(
+            {
+                "bbox": bbox,
+                "caption": str(table.get("caption") or "").strip(),
+            }
+        )
+
     table_regions = _infer_table_regions(blocks)
     return {
         "page_bounds": _page_bounds_for_blocks(blocks),
@@ -1649,6 +2126,7 @@ def _build_render_state(
         "document_title_norm": _normalize_heading_line(str(metadata.get("title") or "")),
         "figure_page_stats": figure_page_stats,
         "figure_bboxes_by_page": figure_bboxes_by_page,
+        "tables_by_page": tables_by_page,
         "table_regions": table_regions,
         "table_pages": _table_pages(table_regions=table_regions, bundled_assets=bundled_assets),
     }
@@ -1794,6 +2272,8 @@ def _equation_record_is_renderable(record: Dict[str, Any]) -> bool:
         return False
     if _looks_like_prompt_template_fragment(candidate):
         return False
+    if _looks_like_corrupted_equation_text(candidate):
+        return False
 
     lines = [line.strip() for line in candidate.splitlines() if line.strip()]
     if len(lines) >= 3 and all(re.fullmatch(r"[A-Za-z]\s*=\s*\d+(?:\.\d+)?", line) for line in lines):
@@ -1801,6 +2281,8 @@ def _equation_record_is_renderable(record: Dict[str, Any]) -> bool:
 
     word_count = len(re.findall(r"[A-Za-z]{2,}", candidate))
     math_token_count = len(re.findall(r"[=+\-*/^_<>∥∑∫\\()\[\]{}]", candidate))
+    if not equation_number and len(candidate) < 14 and math_token_count < 4:
+        return False
     if word_count >= 10 and math_token_count < 6:
         return False
     for line in lines:
@@ -1812,6 +2294,60 @@ def _equation_record_is_renderable(record: Dict[str, Any]) -> bool:
             return False
 
     return True
+
+
+def _equation_record_is_conservatively_renderable(record: Dict[str, Any]) -> bool:
+    if not _equation_record_is_renderable(record):
+        return False
+
+    candidate = str(record.get("latex") or record.get("text") or "").strip()
+    equation_number = str(record.get("equation_number") or "").strip()
+    latex_source = str(record.get("latex_source") or "").strip().lower()
+    latex_confidence = _safe_float(record.get("latex_confidence"), 0.0)
+    math_token_count = len(re.findall(r"[=+\-*/^_<>∥∑∫\\()\[\]{}]", candidate))
+
+    if not equation_number:
+        return False
+    if latex_source in {"", "unavailable"}:
+        return False
+    if len(candidate) < 20:
+        return False
+    if latex_source == "text_fallback" and latex_confidence < 0.5:
+        if math_token_count < 6:
+            return False
+        if "=" not in candidate and "\\tag{" not in candidate:
+            return False
+    return True
+
+
+def _looks_like_corrupted_equation_text(text: str) -> bool:
+    compact = " ".join(str(text or "").split()).strip()
+    if not compact:
+        return False
+    lowered = compact.lower()
+    if "</latexit>" in lowered or "<latexit>" in lowered:
+        return True
+    suspicious_tokens = re.findall(r"[A-Za-z0-9+/=]{18,}", compact)
+    if suspicious_tokens:
+        return True
+    if re.search(r"[A-Za-z0-9+/=]{12,}</latexit>", compact):
+        return True
+    return False
+
+
+def _looks_like_equation_residue_text(text: str) -> bool:
+    compact = " ".join(str(text or "").split()).strip()
+    if not compact:
+        return False
+    if compact in {'"', "'", "`", "#", "\\#"}:
+        return True
+    if re.fullmatch(r"[|\\#\"'`~^_=+\-*/()\[\]{}<>⊙∆∈∉×·,. ]{1,24}", compact):
+        return True
+    math_token_count = len(re.findall(r"[=+\-*/^_<>∥∑∫\\|()\[\]{}⊙∆∈∉×·]", compact))
+    word_count = len(re.findall(r"[A-Za-z]{2,}", compact))
+    if len(compact) <= 18 and math_token_count >= 1 and word_count <= 1:
+        return True
+    return False
 
 
 def _looks_like_prompt_template_fragment(text: str) -> bool:
@@ -2101,6 +2637,42 @@ def _matches_rendered_table_caption_block(block: Dict[str, Any], table: Dict[str
     return _x_overlap_ratio(block_bbox, table_bbox) >= 0.2 and _vertical_gap(block_bbox, table_bbox) <= 90.0
 
 
+def _is_rendered_table_owned_noise_block(block: Dict[str, Any], *, text: str, render_state: Dict[str, Any]) -> bool:
+    page_no = _safe_int(block.get("page_no"), 0)
+    bbox = block.get("bbox") if isinstance(block.get("bbox"), dict) else {}
+    if page_no <= 0 or not bbox:
+        return False
+
+    compact = " ".join(str(text or "").split()).strip()
+    if not compact:
+        return False
+    center = _bbox_center(bbox)
+    for table in render_state.get("tables_by_page", {}).get(page_no, []):
+        table_bbox = table.get("bbox") if isinstance(table.get("bbox"), dict) else {}
+        if not table_bbox:
+            continue
+        expanded = _expand_bbox(table_bbox, margin_x=26.0, margin_y=110.0)
+        if _looks_like_table_caption(compact):
+            block_key = _table_caption_key(compact)
+            table_key = _table_caption_key(str(table.get("caption") or ""))
+            if block_key and table_key and block_key == table_key:
+                if _x_overlap_ratio(bbox, table_bbox) >= 0.1 and _vertical_gap(bbox, table_bbox) <= 180.0:
+                    return True
+        looks_tableish = _looks_like_table_scaffold_text(compact)
+        if not looks_tableish:
+            words = compact.split()
+            if 2 <= len(words) <= 8 and not _looks_like_sentenceish_prose(compact):
+                capitalized = sum(1 for word in words if word[:1].isupper() or any(ch.isdigit() for ch in word))
+                looks_tableish = capitalized >= max(2, len(words) - 1)
+        if not looks_tableish:
+            continue
+        if _point_in_bbox(center, expanded):
+            return True
+        if _rect_overlap(bbox, _expand_bbox(table_bbox, margin_x=12.0, margin_y=18.0)) > 0:
+            return True
+    return False
+
+
 def _should_skip_block_text(block: Dict[str, Any], *, bundled_assets: Dict[str, Any], render_state: Dict[str, Any]) -> bool:
     text = str(block.get("text") or "").strip()
     if not text:
@@ -2113,6 +2685,8 @@ def _should_skip_block_text(block: Dict[str, Any], *, bundled_assets: Dict[str, 
     if _is_front_matter_narrative_block(block, text=text, render_state=render_state):
         return False
     if ("http://" in text or "https://" in text) and line_count <= 2 and char_count <= 180 and not _looks_like_sentenceish_prose(text):
+        return True
+    if _looks_like_equation_residue_text(text):
         return True
     if _looks_like_placeholder_heading(text):
         return True
@@ -2129,6 +2703,8 @@ def _should_skip_block_text(block: Dict[str, Any], *, bundled_assets: Dict[str, 
     if _is_inferred_table_region_block(block, text=text, render_state=render_state):
         return True
     if _is_table_scaffold_page_block(block, text=text, render_state=render_state):
+        return True
+    if _is_rendered_table_owned_noise_block(block, text=text, render_state=render_state):
         return True
     for figure in bundled_assets.get("figures", []):
         if isinstance(figure, dict) and _matches_rendered_figure_caption_block(block, figure):
@@ -2468,6 +3044,16 @@ def _looks_like_algorithmic_scaffold_text(text: str) -> bool:
     lowered = compact.lower()
     if not compact:
         return False
+    if re.search(r"\binput:\b", lowered) or re.search(r"\boutput:\b", lowered):
+        if len(compact) <= 220:
+            return True
+    if re.match(r"^(input|output|initialize|initialise|procedure|function|repeat|until|step\s+\d+):", lowered):
+        return True
+    if re.match(r"^(input|output|initialize|initialise|procedure|function|repeat|until)\b", lowered):
+        if len(compact) <= 140 and not _looks_like_sentenceish_prose(compact):
+            return True
+    if compact.count("Input:") + compact.count("Output:") >= 2:
+        return True
     if _looks_like_sentenceish_prose(compact) and len(compact) >= 80:
         return False
     if compact.startswith("Algorithm ") and len(compact) <= 120:
