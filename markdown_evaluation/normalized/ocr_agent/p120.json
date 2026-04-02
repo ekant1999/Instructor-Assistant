@@ -182,10 +182,24 @@
   ],
   "figures": [
     {
+      "number": 1,
+      "caption": "We introduce a method to recover high-fidelity 3D geometry and appearance from sparse-view static videos. By leveraging “virtual viewpoints” induced by opportunistic object motion, our method jointly optimizes object pose and geometry through a motion-aware appearance representation to capture detailed surface structure.",
+      "normalized_caption": "we introduce a method to recover high fidelity 3d geometry and appearance from sparse view static videos by leveraging virtual viewpoints induced by opportunistic object motion our method jointly optimizes object pose and geometry through a motion aware appearance representation to capture detailed surface structure",
+      "line_no": 29,
+      "kind": "figure"
+    },
+    {
       "number": 3,
       "caption": "(c)-(f) summarizes the differences between the standard 3DGS appearance model and our motion-aware factorized appearance model. By sharing SH coefficients across all foreground primitives and only optimizing per-Gaussian albedo, our model remains highly expressive yet robust to sparse supervision.",
       "normalized_caption": "c f summarizes the differences between the standard 3dgs appearance model and our motion aware factorized appearance model by sharing sh coefficients across all foreground primitives and only optimizing per gaussian albedo our model remains highly expressive yet robust to sparse supervision",
       "line_no": 263,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
+      "caption": "Surface normals and mesh models recovered from real-world datasets.",
+      "normalized_caption": "surface normals and mesh models recovered from real world datasets",
+      "line_no": 327,
       "kind": "figure"
     },
     {
@@ -224,10 +238,45 @@
       "kind": "figure"
     },
     {
+      "number": 10,
+      "caption": "Additional Novel View Synthesis Results. Our appearance model improves the fidelity of novel view synthesis on different objects. The ottoman (the second row) remains challenging due to its limited surface-normal variation.",
+      "normalized_caption": "additional novel view synthesis results our appearance model improves the fidelity of novel view synthesis on different objects the ottoman the second row remains challenging due to its limited surface normal variation",
+      "line_no": 690,
+      "kind": "figure"
+    },
+    {
       "number": 18,
       "caption": "shows additional qualitative results of the reconstructed surface geometry on real-world datasets. Our method recovers fine-grained geometric details across objects with diverse shapes and material properties.",
       "normalized_caption": "shows additional qualitative results of the reconstructed surface geometry on real world datasets our method recovers fine grained geometric details across objects with diverse shapes and material properties",
       "line_no": 712,
+      "kind": "figure"
+    },
+    {
+      "number": 14,
+      "caption": "Visualization of specular and diffuse components. In the second column of the specular components, we show the results with increased brightness for better visibility. Our method successfully decomposes the object appearance into specular and diffuse components, except for the challenging case of the ottoman.",
+      "normalized_caption": "visualization of specular and diffuse components in the second column of the specular components we show the results with increased brightness for better visibility our method successfully decomposes the object appearance into specular and diffuse components except for the challenging case of the ottoman",
+      "line_no": 740,
+      "kind": "figure"
+    },
+    {
+      "number": 15,
+      "caption": "Qualitative comparison with per-Gaussian SH. In particular, our full model yields sharper reconstructions of fine surface details (e.g., the wrinkles on the bunny).",
+      "normalized_caption": "qualitative comparison with per gaussian sh in particular our full model yields sharper reconstructions of fine surface details e g the wrinkles on the bunny",
+      "line_no": 764,
+      "kind": "figure"
+    },
+    {
+      "number": 17,
+      "caption": "Effectiveness of segmentation mask refinement. We compare our full method with a variant without mask refinement (“w/o Mask Refinement”), where the per-Gaussian mask values are fixed during optimization. Refining the mask values jointly with geometry and appearance is essential for converging to the true fine-scale geometry.",
+      "normalized_caption": "effectiveness of segmentation mask refinement we compare our full method with a variant without mask refinement w o mask refinement where the per gaussian mask values are fixed during optimization refining the mask values jointly with geometry and appearance is essential for converging to the true fine scale geometry",
+      "line_no": 780,
+      "kind": "figure"
+    },
+    {
+      "number": 18,
+      "caption": "Surface normals and mesh models recovered from real-world datasets.",
+      "normalized_caption": "surface normals and mesh models recovered from real world datasets",
+      "line_no": 792,
       "kind": "figure"
     }
   ],
@@ -279,9 +328,9 @@
     "heading_count": 9,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 7,
+    "figure_caption_count": 14,
     "table_caption_count": 6,
-    "duplicate_figure_caption_count": 0,
+    "duplicate_figure_caption_count": 4,
     "duplicate_table_caption_count": 1,
     "empty_section_count": 1,
     "consecutive_heading_run_count": 1,

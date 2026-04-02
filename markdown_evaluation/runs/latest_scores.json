@@ -238,10 +238,10 @@
         "consecutive_heading_run_count": 1,
         "max_consecutive_heading_run": 3
       },
-      "heading_precision": 0.11764705882352941,
-      "heading_recall": 0.08695652173913043,
-      "heading_f1": 0.09999999999999999,
-      "heading_order_score": 0.08695652173913043,
+      "heading_precision": 0.7058823529411765,
+      "heading_recall": 0.5217391304347826,
+      "heading_f1": 0.6,
+      "heading_order_score": 0.5217391304347826,
       "gold_heading_count": 23,
       "pred_heading_count": 17,
       "anchor_count": 23,
@@ -314,20 +314,20 @@
       "elapsed_ms": 16373.451,
       "intrinsic_metrics": {
         "heading_count": 15,
-        "duplicate_heading_count": 0,
+        "duplicate_heading_count": 1,
         "suspicious_heading_count": 0,
-        "figure_caption_count": 2,
+        "figure_caption_count": 3,
         "table_caption_count": 11,
-        "duplicate_figure_caption_count": 0,
+        "duplicate_figure_caption_count": 1,
         "duplicate_table_caption_count": 1,
         "empty_section_count": 3,
         "consecutive_heading_run_count": 2,
         "max_consecutive_heading_run": 3
       },
-      "heading_precision": 0.2,
-      "heading_recall": 0.11538461538461539,
-      "heading_f1": 0.14634146341463417,
-      "heading_order_score": 0.07692307692307693,
+      "heading_precision": 0.7333333333333333,
+      "heading_recall": 0.4230769230769231,
+      "heading_f1": 0.5365853658536585,
+      "heading_order_score": 0.4230769230769231,
       "gold_heading_count": 26,
       "pred_heading_count": 15,
       "anchor_count": 27,
@@ -576,10 +576,10 @@
         "consecutive_heading_run_count": 3,
         "max_consecutive_heading_run": 2
       },
-      "heading_precision": 0.045454545454545456,
-      "heading_recall": 0.05,
-      "heading_f1": 0.04761904761904762,
-      "heading_order_score": 0.05,
+      "heading_precision": 0.8181818181818182,
+      "heading_recall": 0.9,
+      "heading_f1": 0.8571428571428572,
+      "heading_order_score": 0.9,
       "gold_heading_count": 20,
       "pred_heading_count": 22,
       "anchor_count": 18,
@@ -611,9 +611,9 @@
         "heading_count": 25,
         "duplicate_heading_count": 0,
         "suspicious_heading_count": 0,
-        "figure_caption_count": 3,
+        "figure_caption_count": 21,
         "table_caption_count": 5,
-        "duplicate_figure_caption_count": 0,
+        "duplicate_figure_caption_count": 3,
         "duplicate_table_caption_count": 0,
         "empty_section_count": 3,
         "consecutive_heading_run_count": 3,
@@ -630,7 +630,7 @@
       "anchor_assignment_accuracy": 0.76,
       "anchor_wrong_section_count": 0,
       "anchor_miss_count": 6,
-      "figure_recall": 0.16666666666666666,
+      "figure_recall": 1.0,
       "table_recall": 1.0,
       "gold_figure_count": 18,
       "gold_table_count": 5
@@ -654,9 +654,9 @@
         "heading_count": 9,
         "duplicate_heading_count": 0,
         "suspicious_heading_count": 0,
-        "figure_caption_count": 7,
+        "figure_caption_count": 14,
         "table_caption_count": 6,
-        "duplicate_figure_caption_count": 0,
+        "duplicate_figure_caption_count": 4,
         "duplicate_table_caption_count": 1,
         "empty_section_count": 1,
         "consecutive_heading_run_count": 1,
@@ -673,86 +673,610 @@
       "anchor_assignment_accuracy": 0.0,
       "anchor_wrong_section_count": 23,
       "anchor_miss_count": 2,
-      "figure_recall": 0.3888888888888889,
+      "figure_recall": 0.5555555555555556,
       "table_recall": 1.0,
       "gold_figure_count": 18,
+      "gold_table_count": 5
+    },
+    {
+      "doc_id": "a001",
+      "system": "ia_phase1",
+      "title": "CMPE 286 - LAB - 1",
+      "layout_type": "one_column",
+      "doc_tags": [
+        "born_digital",
+        "non_academic",
+        "student_assignment",
+        "screenshot_heavy",
+        "network_analysis_report"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 2331.907,
+      "intrinsic_metrics": {
+        "heading_count": 5,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 0,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 0,
+        "consecutive_heading_run_count": 0,
+        "max_consecutive_heading_run": 0
+      },
+      "heading_precision": 0.0,
+      "heading_recall": 0.0,
+      "heading_f1": 0.0,
+      "heading_order_score": 0.0,
+      "gold_heading_count": 8,
+      "pred_heading_count": 5,
+      "anchor_count": 7,
+      "anchor_recall": 0.5714285714285714,
+      "anchor_assignment_accuracy": 0.0,
+      "anchor_wrong_section_count": 4,
+      "anchor_miss_count": 3,
+      "figure_recall": 0.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 0,
+      "gold_table_count": 0
+    },
+    {
+      "doc_id": "a001",
+      "system": "ocr_agent",
+      "title": "a001",
+      "layout_type": "one_column",
+      "doc_tags": [
+        "born_digital",
+        "non_academic",
+        "student_assignment",
+        "screenshot_heavy",
+        "network_analysis_report"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 2330.764,
+      "intrinsic_metrics": {
+        "heading_count": 6,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 0,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 0,
+        "consecutive_heading_run_count": 0,
+        "max_consecutive_heading_run": 0
+      },
+      "heading_precision": 0.0,
+      "heading_recall": 0.0,
+      "heading_f1": 0.0,
+      "heading_order_score": 0.0,
+      "gold_heading_count": 8,
+      "pred_heading_count": 6,
+      "anchor_count": 7,
+      "anchor_recall": 0.5714285714285714,
+      "anchor_assignment_accuracy": 0.0,
+      "anchor_wrong_section_count": 4,
+      "anchor_miss_count": 3,
+      "figure_recall": 0.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 0,
+      "gold_table_count": 0
+    },
+    {
+      "doc_id": "a002",
+      "system": "ia_phase1",
+      "title": "Performing CRUD operations in DynamoDB using AWS Lambda",
+      "layout_type": "one_column",
+      "doc_tags": [
+        "born_digital",
+        "non_academic",
+        "student_assignment",
+        "code_heavy",
+        "screenshot_heavy",
+        "cloud_report"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 3583.458,
+      "intrinsic_metrics": {
+        "heading_count": 6,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 0,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 0,
+        "consecutive_heading_run_count": 0,
+        "max_consecutive_heading_run": 0
+      },
+      "heading_precision": 0.0,
+      "heading_recall": 0.0,
+      "heading_f1": 0.0,
+      "heading_order_score": 0.0,
+      "gold_heading_count": 5,
+      "pred_heading_count": 6,
+      "anchor_count": 8,
+      "anchor_recall": 0.625,
+      "anchor_assignment_accuracy": 0.0,
+      "anchor_wrong_section_count": 5,
+      "anchor_miss_count": 3,
+      "figure_recall": 0.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 0,
+      "gold_table_count": 0
+    },
+    {
+      "doc_id": "a002",
+      "system": "ocr_agent",
+      "title": "a002",
+      "layout_type": "one_column",
+      "doc_tags": [
+        "born_digital",
+        "non_academic",
+        "student_assignment",
+        "code_heavy",
+        "screenshot_heavy",
+        "cloud_report"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 2052.421,
+      "intrinsic_metrics": {
+        "heading_count": 10,
+        "duplicate_heading_count": 1,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 0,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 1,
+        "consecutive_heading_run_count": 1,
+        "max_consecutive_heading_run": 2
+      },
+      "heading_precision": 0.0,
+      "heading_recall": 0.0,
+      "heading_f1": 0.0,
+      "heading_order_score": 0.0,
+      "gold_heading_count": 5,
+      "pred_heading_count": 10,
+      "anchor_count": 8,
+      "anchor_recall": 0.75,
+      "anchor_assignment_accuracy": 0.0,
+      "anchor_wrong_section_count": 6,
+      "anchor_miss_count": 2,
+      "figure_recall": 0.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 0,
+      "gold_table_count": 0
+    },
+    {
+      "doc_id": "a003",
+      "system": "ia_phase1",
+      "title": "Assignment 2: Classification - Customer Churn Prediction Using Classification",
+      "layout_type": "one_column",
+      "doc_tags": [
+        "born_digital",
+        "non_academic",
+        "student_assignment",
+        "instruction_sheet",
+        "short_document"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 166.866,
+      "intrinsic_metrics": {
+        "heading_count": 4,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 0,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 0,
+        "consecutive_heading_run_count": 0,
+        "max_consecutive_heading_run": 0
+      },
+      "heading_precision": 1.0,
+      "heading_recall": 0.4,
+      "heading_f1": 0.5714285714285715,
+      "heading_order_score": 0.4,
+      "gold_heading_count": 10,
+      "pred_heading_count": 4,
+      "anchor_count": 8,
+      "anchor_recall": 0.375,
+      "anchor_assignment_accuracy": 0.25,
+      "anchor_wrong_section_count": 1,
+      "anchor_miss_count": 5,
+      "figure_recall": 0.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 0,
+      "gold_table_count": 0
+    },
+    {
+      "doc_id": "a003",
+      "system": "ocr_agent",
+      "title": "a003",
+      "layout_type": "one_column",
+      "doc_tags": [
+        "born_digital",
+        "non_academic",
+        "student_assignment",
+        "instruction_sheet",
+        "short_document"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 82.183,
+      "intrinsic_metrics": {
+        "heading_count": 6,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 0,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 0,
+        "consecutive_heading_run_count": 0,
+        "max_consecutive_heading_run": 0
+      },
+      "heading_precision": 0.8333333333333334,
+      "heading_recall": 0.5,
+      "heading_f1": 0.625,
+      "heading_order_score": 0.5,
+      "gold_heading_count": 10,
+      "pred_heading_count": 6,
+      "anchor_count": 8,
+      "anchor_recall": 0.75,
+      "anchor_assignment_accuracy": 0.125,
+      "anchor_wrong_section_count": 5,
+      "anchor_miss_count": 2,
+      "figure_recall": 0.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 0,
+      "gold_table_count": 0
+    },
+    {
+      "doc_id": "p179",
+      "system": "ia_phase1",
+      "title": "A ROS 2 Wrapper for Florence-2: Multi-Mode Local Vision-Language Inference for Robotic Systems",
+      "layout_type": "two_column",
+      "doc_tags": [
+        "born_digital",
+        "academic_paper",
+        "short_paper",
+        "figure_heavy",
+        "table_heavy",
+        "robotics_paper"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 2411.796,
+      "intrinsic_metrics": {
+        "heading_count": 12,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 1,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 0,
+        "consecutive_heading_run_count": 0,
+        "max_consecutive_heading_run": 0
+      },
+      "heading_precision": 0.75,
+      "heading_recall": 0.5625,
+      "heading_f1": 0.6428571428571429,
+      "heading_order_score": 0.5,
+      "gold_heading_count": 16,
+      "pred_heading_count": 12,
+      "anchor_count": 13,
+      "anchor_recall": 1.0,
+      "anchor_assignment_accuracy": 0.5384615384615384,
+      "anchor_wrong_section_count": 6,
+      "anchor_miss_count": 0,
+      "figure_recall": 1.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 1,
+      "gold_table_count": 2
+    },
+    {
+      "doc_id": "p179",
+      "system": "ocr_agent",
+      "title": "p179",
+      "layout_type": "two_column",
+      "doc_tags": [
+        "born_digital",
+        "academic_paper",
+        "short_paper",
+        "figure_heavy",
+        "table_heavy",
+        "robotics_paper"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 700.136,
+      "intrinsic_metrics": {
+        "heading_count": 16,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 0,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 3,
+        "consecutive_heading_run_count": 3,
+        "max_consecutive_heading_run": 2
+      },
+      "heading_precision": 0.875,
+      "heading_recall": 0.875,
+      "heading_f1": 0.875,
+      "heading_order_score": 0.875,
+      "gold_heading_count": 16,
+      "pred_heading_count": 16,
+      "anchor_count": 13,
+      "anchor_recall": 0.9230769230769231,
+      "anchor_assignment_accuracy": 0.0,
+      "anchor_wrong_section_count": 12,
+      "anchor_miss_count": 1,
+      "figure_recall": 0.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 1,
+      "gold_table_count": 2
+    },
+    {
+      "doc_id": "p186",
+      "system": "ia_phase1",
+      "title": "From Validity to Inter-Subjectivity: An Argument for Reliability Signals in Search Environments",
+      "layout_type": "one_column",
+      "doc_tags": [
+        "born_digital",
+        "academic_paper",
+        "short_paper",
+        "non_experimental_paper",
+        "single_column"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 1252.716,
+      "intrinsic_metrics": {
+        "heading_count": 4,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 0,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 0,
+        "consecutive_heading_run_count": 0,
+        "max_consecutive_heading_run": 0
+      },
+      "heading_precision": 1.0,
+      "heading_recall": 0.8,
+      "heading_f1": 0.888888888888889,
+      "heading_order_score": 0.8,
+      "gold_heading_count": 5,
+      "pred_heading_count": 4,
+      "anchor_count": 8,
+      "anchor_recall": 1.0,
+      "anchor_assignment_accuracy": 0.75,
+      "anchor_wrong_section_count": 2,
+      "anchor_miss_count": 0,
+      "figure_recall": 0.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 0,
+      "gold_table_count": 0
+    },
+    {
+      "doc_id": "p186",
+      "system": "ocr_agent",
+      "title": "p186",
+      "layout_type": "one_column",
+      "doc_tags": [
+        "born_digital",
+        "academic_paper",
+        "short_paper",
+        "non_experimental_paper",
+        "single_column"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 678.421,
+      "intrinsic_metrics": {
+        "heading_count": 3,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 0,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 2,
+        "consecutive_heading_run_count": 1,
+        "max_consecutive_heading_run": 3
+      },
+      "heading_precision": 0.6666666666666666,
+      "heading_recall": 0.4,
+      "heading_f1": 0.5,
+      "heading_order_score": 0.4,
+      "gold_heading_count": 5,
+      "pred_heading_count": 3,
+      "anchor_count": 8,
+      "anchor_recall": 0.625,
+      "anchor_assignment_accuracy": 0.0,
+      "anchor_wrong_section_count": 5,
+      "anchor_miss_count": 3,
+      "figure_recall": 0.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 0,
+      "gold_table_count": 0
+    },
+    {
+      "doc_id": "p213",
+      "system": "ia_phase1",
+      "title": "Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO",
+      "layout_type": "two_column",
+      "doc_tags": [
+        "born_digital",
+        "academic_paper",
+        "equation_heavy",
+        "figure_heavy",
+        "table_heavy",
+        "robotics_paper",
+        "reinforcement_learning"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 4954.271,
+      "intrinsic_metrics": {
+        "heading_count": 8,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 3,
+        "table_caption_count": 0,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 0,
+        "consecutive_heading_run_count": 0,
+        "max_consecutive_heading_run": 0
+      },
+      "heading_precision": 1.0,
+      "heading_recall": 0.32,
+      "heading_f1": 0.48484848484848486,
+      "heading_order_score": 0.32,
+      "gold_heading_count": 25,
+      "pred_heading_count": 8,
+      "anchor_count": 21,
+      "anchor_recall": 0.8095238095238095,
+      "anchor_assignment_accuracy": 0.23809523809523808,
+      "anchor_wrong_section_count": 12,
+      "anchor_miss_count": 4,
+      "figure_recall": 1.0,
+      "table_recall": 0.0,
+      "gold_figure_count": 3,
+      "gold_table_count": 5
+    },
+    {
+      "doc_id": "p213",
+      "system": "ocr_agent",
+      "title": "p213",
+      "layout_type": "two_column",
+      "doc_tags": [
+        "born_digital",
+        "academic_paper",
+        "equation_heavy",
+        "figure_heavy",
+        "table_heavy",
+        "robotics_paper",
+        "reinforcement_learning"
+      ],
+      "status": "success",
+      "gold_available": true,
+      "elapsed_ms": 1899.146,
+      "intrinsic_metrics": {
+        "heading_count": 23,
+        "duplicate_heading_count": 0,
+        "suspicious_heading_count": 0,
+        "figure_caption_count": 2,
+        "table_caption_count": 2,
+        "duplicate_figure_caption_count": 0,
+        "duplicate_table_caption_count": 0,
+        "empty_section_count": 2,
+        "consecutive_heading_run_count": 2,
+        "max_consecutive_heading_run": 2
+      },
+      "heading_precision": 0.9565217391304348,
+      "heading_recall": 0.88,
+      "heading_f1": 0.9166666666666666,
+      "heading_order_score": 0.88,
+      "gold_heading_count": 25,
+      "pred_heading_count": 23,
+      "anchor_count": 21,
+      "anchor_recall": 0.7619047619047619,
+      "anchor_assignment_accuracy": 0.0,
+      "anchor_wrong_section_count": 16,
+      "anchor_miss_count": 5,
+      "figure_recall": 0.6666666666666666,
+      "table_recall": 0.4,
+      "gold_figure_count": 3,
       "gold_table_count": 5
     }
   ],
   "summary": {
     "systems": {
       "ia_phase1": {
-        "document_count": 8,
-        "gold_document_count": 8,
-        "success_count": 8,
+        "document_count": 14,
+        "gold_document_count": 14,
+        "success_count": 14,
         "failure_count": 0,
         "metrics": {
-          "heading_precision": 0.9078629032258065,
-          "heading_recall": 0.9397775571348942,
-          "heading_f1": 0.91760793061219,
-          "heading_order_score": 0.9397775571348942,
-          "anchor_recall": 0.7675330634438581,
-          "anchor_assignment_accuracy": 0.7195527800812659,
-          "figure_recall": 0.8682692307692309,
-          "table_recall": 1.0
+          "heading_precision": 0.7866359447004608,
+          "heading_recall": 0.6857657469342254,
+          "heading_f1": 0.7092061809229006,
+          "heading_order_score": 0.6813014612199397,
+          "anchor_recall": 0.7515154920359463,
+          "anchor_assignment_accuracy": 0.5380699298004931,
+          "figure_recall": 0.6985347985347986,
+          "table_recall": 0.5714285714285714
         },
         "operational": {
-          "elapsed_ms": 2942.847875
+          "elapsed_ms": 2731.6997857142856
         },
         "intrinsic": {
-          "duplicate_heading_count": 0.125,
-          "suspicious_heading_count": 0.125,
-          "empty_section_count": 2.875,
-          "consecutive_heading_run_count": 2.25,
-          "duplicate_figure_caption_count": 0.75,
-          "duplicate_table_caption_count": 1.375
+          "duplicate_heading_count": 0.07142857142857142,
+          "suspicious_heading_count": 0.07142857142857142,
+          "empty_section_count": 1.6428571428571428,
+          "consecutive_heading_run_count": 1.2857142857142858,
+          "duplicate_figure_caption_count": 0.6428571428571429,
+          "duplicate_table_caption_count": 0.7857142857142857
         }
       },
       "ocr_agent": {
-        "document_count": 8,
-        "gold_document_count": 8,
-        "success_count": 8,
+        "document_count": 14,
+        "gold_document_count": 14,
+        "success_count": 14,
         "failure_count": 0,
         "metrics": {
-          "heading_precision": 0.15719325609031493,
-          "heading_recall": 0.09942142362944709,
-          "heading_f1": 0.11341961617876253,
-          "heading_order_score": 0.09461373132175478,
-          "anchor_recall": 0.7097908295546975,
-          "anchor_assignment_accuracy": 0.04533222552337995,
-          "figure_recall": 0.5242812742812742,
-          "table_recall": 0.9711538461538461
+          "heading_precision": 0.46309740628794344,
+          "heading_recall": 0.3602033075302526,
+          "heading_f1": 0.3945565220042572,
+          "heading_order_score": 0.3602033075302526,
+          "anchor_recall": 0.718552635203417,
+          "anchor_assignment_accuracy": 0.03483270029907425,
+          "figure_recall": 0.3591131091131091,
+          "table_recall": 0.5835164835164834
         },
         "operational": {
-          "elapsed_ms": 5737.07675
+          "elapsed_ms": 3831.406071428572
         },
         "intrinsic": {
-          "duplicate_heading_count": 1.0,
+          "duplicate_heading_count": 0.7142857142857143,
           "suspicious_heading_count": 0.0,
-          "empty_section_count": 3.5,
-          "consecutive_heading_run_count": 1.875,
-          "duplicate_figure_caption_count": 0.375,
-          "duplicate_table_caption_count": 3.5
+          "empty_section_count": 2.5714285714285716,
+          "consecutive_heading_run_count": 1.5714285714285714,
+          "duplicate_figure_caption_count": 0.5714285714285714,
+          "duplicate_table_caption_count": 2.0
         }
       }
     },
     "category_breakdown": {
       "academic_paper": {
         "ia_phase1": {
-          "document_count": 8,
-          "heading_f1": 0.91760793061219,
-          "anchor_assignment_accuracy": 0.7195527800812659,
-          "elapsed_ms": 2942.847875,
-          "duplicate_heading_count": 0.125,
-          "empty_section_count": 2.875
+          "document_count": 11,
+          "heading_f1": 0.850677996499276,
+          "anchor_assignment_accuracy": 0.662089001564264,
+          "elapsed_ms": 2923.7787272727273,
+          "duplicate_heading_count": 0.09090909090909091,
+          "empty_section_count": 2.090909090909091
         },
         "ocr_agent": {
-          "document_count": 8,
-          "heading_f1": 0.11341961617876253,
-          "anchor_assignment_accuracy": 0.04533222552337995,
-          "elapsed_ms": 5737.07675,
-          "duplicate_heading_count": 1.0,
-          "empty_section_count": 3.5
+          "document_count": 11,
+          "heading_f1": 0.4453446643690546,
+          "anchor_assignment_accuracy": 0.03296889128973087,
+          "elapsed_ms": 4470.392454545455,
+          "duplicate_heading_count": 0.8181818181818182,
+          "empty_section_count": 3.1818181818181817
         }
       },
       "algorithm_heavy": {
@@ -766,7 +1290,7 @@
         },
         "ocr_agent": {
           "document_count": 1,
-          "heading_f1": 0.04761904761904762,
+          "heading_f1": 0.8571428571428572,
           "anchor_assignment_accuracy": 0.0,
           "elapsed_ms": 3307.967,
           "duplicate_heading_count": 0.0,
@@ -784,101 +1308,317 @@
         },
         "ocr_agent": {
           "document_count": 5,
-          "heading_f1": 0.12636353077816492,
+          "heading_f1": 0.3044123112659698,
           "anchor_assignment_accuracy": 0.053483941789788866,
           "elapsed_ms": 7774.498600000001,
-          "duplicate_heading_count": 0.0,
+          "duplicate_heading_count": 0.2,
           "empty_section_count": 2.0
         }
       },
       "born_digital": {
         "ia_phase1": {
-          "document_count": 8,
-          "heading_f1": 0.91760793061219,
-          "anchor_assignment_accuracy": 0.7195527800812659,
-          "elapsed_ms": 2942.847875,
-          "duplicate_heading_count": 0.125,
-          "empty_section_count": 2.875
+          "document_count": 14,
+          "heading_f1": 0.7092061809229006,
+          "anchor_assignment_accuracy": 0.5380699298004931,
+          "elapsed_ms": 2731.6997857142856,
+          "duplicate_heading_count": 0.07142857142857142,
+          "empty_section_count": 1.6428571428571428
         },
         "ocr_agent": {
-          "document_count": 8,
-          "heading_f1": 0.11341961617876253,
-          "anchor_assignment_accuracy": 0.04533222552337995,
-          "elapsed_ms": 5737.07675,
+          "document_count": 14,
+          "heading_f1": 0.3945565220042572,
+          "anchor_assignment_accuracy": 0.03483270029907425,
+          "elapsed_ms": 3831.406071428572,
+          "duplicate_heading_count": 0.7142857142857143,
+          "empty_section_count": 2.5714285714285716
+        }
+      },
+      "cloud_report": {
+        "ia_phase1": {
+          "document_count": 1,
+          "heading_f1": 0.0,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 3583.458,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 1,
+          "heading_f1": 0.0,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 2052.421,
           "duplicate_heading_count": 1.0,
-          "empty_section_count": 3.5
+          "empty_section_count": 1.0
+        }
+      },
+      "code_heavy": {
+        "ia_phase1": {
+          "document_count": 1,
+          "heading_f1": 0.0,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 3583.458,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 1,
+          "heading_f1": 0.0,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 2052.421,
+          "duplicate_heading_count": 1.0,
+          "empty_section_count": 1.0
         }
       },
       "equation_heavy": {
         "ia_phase1": {
-          "document_count": 4,
-          "heading_f1": 0.9028399746995572,
-          "anchor_assignment_accuracy": 0.7405610290093048,
-          "elapsed_ms": 834.87,
-          "duplicate_heading_count": 0.25,
-          "empty_section_count": 3.5
+          "document_count": 5,
+          "heading_f1": 0.8192416767293427,
+          "anchor_assignment_accuracy": 0.6400678708264914,
+          "elapsed_ms": 1658.7502,
+          "duplicate_heading_count": 0.2,
+          "empty_section_count": 2.8
         },
         "ocr_agent": {
-          "document_count": 4,
-          "heading_f1": 0.07470899470899471,
-          "anchor_assignment_accuracy": 0.032430213464696225,
-          "elapsed_ms": 3306.65525,
-          "duplicate_heading_count": 2.0,
-          "empty_section_count": 5.0
+          "document_count": 5,
+          "heading_f1": 0.40500529100529103,
+          "anchor_assignment_accuracy": 0.02594417077175698,
+          "elapsed_ms": 3025.1534,
+          "duplicate_heading_count": 1.6,
+          "empty_section_count": 4.4
         }
       },
       "figure_heavy": {
         "ia_phase1": {
-          "document_count": 5,
-          "heading_f1": 0.8939791405924071,
-          "anchor_assignment_accuracy": 0.7127403868273434,
-          "elapsed_ms": 4321.04,
+          "document_count": 7,
+          "heading_f1": 0.7996573329525233,
+          "anchor_assignment_accuracy": 0.6200369586704991,
+          "elapsed_ms": 4138.752428571429,
           "duplicate_heading_count": 0.0,
-          "empty_section_count": 4.0
+          "empty_section_count": 2.857142857142857
         },
         "ocr_agent": {
-          "document_count": 5,
-          "heading_f1": 0.11717834559297975,
-          "anchor_assignment_accuracy": 0.06563500911326998,
-          "elapsed_ms": 7630.3156,
-          "duplicate_heading_count": 1.6,
-          "empty_section_count": 4.8
+          "document_count": 7,
+          "heading_f1": 0.4668288995815128,
+          "anchor_assignment_accuracy": 0.04688214936662142,
+          "elapsed_ms": 5821.551428571429,
+          "duplicate_heading_count": 1.2857142857142858,
+          "empty_section_count": 4.142857142857143
+        }
+      },
+      "instruction_sheet": {
+        "ia_phase1": {
+          "document_count": 1,
+          "heading_f1": 0.5714285714285715,
+          "anchor_assignment_accuracy": 0.25,
+          "elapsed_ms": 166.866,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 1,
+          "heading_f1": 0.625,
+          "anchor_assignment_accuracy": 0.125,
+          "elapsed_ms": 82.183,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        }
+      },
+      "network_analysis_report": {
+        "ia_phase1": {
+          "document_count": 1,
+          "heading_f1": 0.0,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 2331.907,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 1,
+          "heading_f1": 0.0,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 2330.764,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        }
+      },
+      "non_academic": {
+        "ia_phase1": {
+          "document_count": 3,
+          "heading_f1": 0.1904761904761905,
+          "anchor_assignment_accuracy": 0.08333333333333333,
+          "elapsed_ms": 2027.4103333333333,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 3,
+          "heading_f1": 0.20833333333333334,
+          "anchor_assignment_accuracy": 0.041666666666666664,
+          "elapsed_ms": 1488.456,
+          "duplicate_heading_count": 0.3333333333333333,
+          "empty_section_count": 0.3333333333333333
+        }
+      },
+      "non_experimental_paper": {
+        "ia_phase1": {
+          "document_count": 1,
+          "heading_f1": 0.888888888888889,
+          "anchor_assignment_accuracy": 0.75,
+          "elapsed_ms": 1252.716,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 1,
+          "heading_f1": 0.5,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 678.421,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 2.0
+        }
+      },
+      "reinforcement_learning": {
+        "ia_phase1": {
+          "document_count": 1,
+          "heading_f1": 0.48484848484848486,
+          "anchor_assignment_accuracy": 0.23809523809523808,
+          "elapsed_ms": 4954.271,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 1,
+          "heading_f1": 0.9166666666666666,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 1899.146,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 2.0
+        }
+      },
+      "robotics_paper": {
+        "ia_phase1": {
+          "document_count": 2,
+          "heading_f1": 0.5638528138528138,
+          "anchor_assignment_accuracy": 0.38827838827838823,
+          "elapsed_ms": 3683.0334999999995,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 2,
+          "heading_f1": 0.8958333333333333,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 1299.641,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 2.5
+        }
+      },
+      "screenshot_heavy": {
+        "ia_phase1": {
+          "document_count": 2,
+          "heading_f1": 0.0,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 2957.6825,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 2,
+          "heading_f1": 0.0,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 2191.5924999999997,
+          "duplicate_heading_count": 0.5,
+          "empty_section_count": 0.5
+        }
+      },
+      "short_document": {
+        "ia_phase1": {
+          "document_count": 1,
+          "heading_f1": 0.5714285714285715,
+          "anchor_assignment_accuracy": 0.25,
+          "elapsed_ms": 166.866,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 1,
+          "heading_f1": 0.625,
+          "anchor_assignment_accuracy": 0.125,
+          "elapsed_ms": 82.183,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
         }
       },
       "short_paper": {
         "ia_phase1": {
+          "document_count": 3,
+          "heading_f1": 0.8439153439153438,
+          "anchor_assignment_accuracy": 0.6961538461538462,
+          "elapsed_ms": 1480.3293333333331,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 3,
+          "heading_f1": 0.5096153846153846,
+          "anchor_assignment_accuracy": 0.0,
+          "elapsed_ms": 1012.1473333333333,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 1.6666666666666667
+        }
+      },
+      "single_column": {
+        "ia_phase1": {
           "document_count": 1,
-          "heading_f1": 1.0,
-          "anchor_assignment_accuracy": 0.8,
-          "elapsed_ms": 776.476,
+          "heading_f1": 0.888888888888889,
+          "anchor_assignment_accuracy": 0.75,
+          "elapsed_ms": 1252.716,
           "duplicate_heading_count": 0.0,
           "empty_section_count": 0.0
         },
         "ocr_agent": {
           "document_count": 1,
-          "heading_f1": 0.15384615384615383,
+          "heading_f1": 0.5,
           "anchor_assignment_accuracy": 0.0,
-          "elapsed_ms": 1657.885,
+          "elapsed_ms": 678.421,
+          "duplicate_heading_count": 0.0,
+          "empty_section_count": 2.0
+        }
+      },
+      "student_assignment": {
+        "ia_phase1": {
+          "document_count": 3,
+          "heading_f1": 0.1904761904761905,
+          "anchor_assignment_accuracy": 0.08333333333333333,
+          "elapsed_ms": 2027.4103333333333,
           "duplicate_heading_count": 0.0,
           "empty_section_count": 0.0
+        },
+        "ocr_agent": {
+          "document_count": 3,
+          "heading_f1": 0.20833333333333334,
+          "anchor_assignment_accuracy": 0.041666666666666664,
+          "elapsed_ms": 1488.456,
+          "duplicate_heading_count": 0.3333333333333333,
+          "empty_section_count": 0.3333333333333333
         }
       },
       "table_heavy": {
         "ia_phase1": {
-          "document_count": 3,
-          "heading_f1": 0.8881003584229391,
-          "anchor_assignment_accuracy": 0.5387890100533779,
-          "elapsed_ms": 4504.851,
-          "duplicate_heading_count": 0.3333333333333333,
-          "empty_section_count": 3.0
+          "document_count": 5,
+          "heading_f1": 0.7584013405948891,
+          "anchor_assignment_accuracy": 0.47858476134338207,
+          "elapsed_ms": 4176.124,
+          "duplicate_heading_count": 0.2,
+          "empty_section_count": 1.8
         },
         "ocr_agent": {
-          "document_count": 3,
-          "heading_f1": 0.15822493224932252,
-          "anchor_assignment_accuracy": 0.07464714935979304,
-          "elapsed_ms": 7410.513666666667,
-          "duplicate_heading_count": 0.0,
-          "empty_section_count": 2.3333333333333335
+          "document_count": 5,
+          "heading_f1": 0.5313170731707316,
+          "anchor_assignment_accuracy": 0.04478828961587582,
+          "elapsed_ms": 4966.1646,
+          "duplicate_heading_count": 0.2,
+          "empty_section_count": 2.4
         }
       }
     }

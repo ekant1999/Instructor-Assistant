@@ -30,21 +30,21 @@
     {
       "level": 3,
       "text": "2. Related Work",
-      "normalized_text": "2 related work",
+      "normalized_text": "related work",
       "line_no": 57,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3. Unifying Tokenization & Latent Denoising",
-      "normalized_text": "3 unifying tokenization latent denoising",
+      "normalized_text": "unifying tokenization latent denoising",
       "line_no": 91,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3.1. From VAE to UNITE",
-      "normalized_text": "3 1 from vae to unite",
+      "normalized_text": "from vae to unite",
       "line_no": 97,
       "suspicious": false
     },
@@ -58,14 +58,14 @@
     {
       "level": 3,
       "text": "3.3. Understanding UNITE’s Training Dynamics",
-      "normalized_text": "3 3 understanding unite s training dynamics",
+      "normalized_text": "understanding unite s training dynamics",
       "line_no": 155,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4. Analyzing UNITE’s Generative Encoder",
-      "normalized_text": "4 analyzing unite s generative encoder",
+      "normalized_text": "analyzing unite s generative encoder",
       "line_no": 175,
       "suspicious": false
     },
@@ -79,14 +79,14 @@
     {
       "level": 3,
       "text": "6. Conclusion",
-      "normalized_text": "6 conclusion",
+      "normalized_text": "conclusion",
       "line_no": 329,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "7. Discussions",
-      "normalized_text": "7 discussions",
+      "normalized_text": "discussions",
       "line_no": 337,
       "suspicious": false
     },
@@ -107,21 +107,21 @@
     {
       "level": 3,
       "text": "A. Reconstruction Fidelity Details",
-      "normalized_text": "a reconstruction fidelity details",
+      "normalized_text": "reconstruction fidelity details",
       "line_no": 595,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "B. Evaluation Protocol",
-      "normalized_text": "b evaluation protocol",
+      "normalized_text": "evaluation protocol",
       "line_no": 609,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "C. Additional Results",
-      "normalized_text": "c additional results",
+      "normalized_text": "additional results",
       "line_no": 647,
       "suspicious": false
     }
@@ -165,7 +165,7 @@
     },
     {
       "heading_text": "2. Related Work",
-      "normalized_heading_text": "2 related work",
+      "normalized_heading_text": "related work",
       "level": 3,
       "line_start": 57,
       "line_end": 90,
@@ -177,7 +177,7 @@
     },
     {
       "heading_text": "3. Unifying Tokenization & Latent Denoising",
-      "normalized_heading_text": "3 unifying tokenization latent denoising",
+      "normalized_heading_text": "unifying tokenization latent denoising",
       "level": 3,
       "line_start": 91,
       "line_end": 96,
@@ -189,7 +189,7 @@
     },
     {
       "heading_text": "3.1. From VAE to UNITE",
-      "normalized_heading_text": "3 1 from vae to unite",
+      "normalized_heading_text": "from vae to unite",
       "level": 3,
       "line_start": 97,
       "line_end": 112,
@@ -213,7 +213,7 @@
     },
     {
       "heading_text": "3.3. Understanding UNITE’s Training Dynamics",
-      "normalized_heading_text": "3 3 understanding unite s training dynamics",
+      "normalized_heading_text": "understanding unite s training dynamics",
       "level": 3,
       "line_start": 155,
       "line_end": 174,
@@ -225,7 +225,7 @@
     },
     {
       "heading_text": "4. Analyzing UNITE’s Generative Encoder",
-      "normalized_heading_text": "4 analyzing unite s generative encoder",
+      "normalized_heading_text": "analyzing unite s generative encoder",
       "level": 3,
       "line_start": 175,
       "line_end": 196,
@@ -249,7 +249,7 @@
     },
     {
       "heading_text": "6. Conclusion",
-      "normalized_heading_text": "6 conclusion",
+      "normalized_heading_text": "conclusion",
       "level": 3,
       "line_start": 329,
       "line_end": 336,
@@ -261,7 +261,7 @@
     },
     {
       "heading_text": "7. Discussions",
-      "normalized_heading_text": "7 discussions",
+      "normalized_heading_text": "discussions",
       "level": 3,
       "line_start": 337,
       "line_end": 364,
@@ -297,7 +297,7 @@
     },
     {
       "heading_text": "A. Reconstruction Fidelity Details",
-      "normalized_heading_text": "a reconstruction fidelity details",
+      "normalized_heading_text": "reconstruction fidelity details",
       "level": 3,
       "line_start": 595,
       "line_end": 608,
@@ -309,7 +309,7 @@
     },
     {
       "heading_text": "B. Evaluation Protocol",
-      "normalized_heading_text": "b evaluation protocol",
+      "normalized_heading_text": "evaluation protocol",
       "level": 3,
       "line_start": 609,
       "line_end": 646,
@@ -321,7 +321,7 @@
     },
     {
       "heading_text": "C. Additional Results",
-      "normalized_heading_text": "c additional results",
+      "normalized_heading_text": "additional results",
       "level": 3,
       "line_start": 647,
       "line_end": 719,

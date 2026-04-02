@@ -1,0 +1,575 @@
+{
+  "paper_id": 937020923872,
+  "generated_at": "2026-04-02T21:12:07.365126+00:00",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401213v1.pdf",
+  "markdown_file": "paper.md",
+  "metadata": {
+    "title": "Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO",
+    "paper_id": 937020923872,
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401213v1.pdf",
+    "generated_at": "2026-04-02T21:12:07.270486+00:00",
+    "num_figures": 3,
+    "num_tables": 0,
+    "num_equations": 21,
+    "page_count": 8
+  },
+  "config": {
+    "asset_mode": "copy",
+    "asset_path_mode": "relative",
+    "include_frontmatter": true,
+    "include_page_markers": false,
+    "prefer_equation_latex": true,
+    "include_equation_fallback_assets": true,
+    "ensure_assets": true,
+    "overwrite": true,
+    "quality_audit_enabled": true,
+    "conservative_fallback": true,
+    "conservative_equations_as_assets_only": true
+  },
+  "render_mode": "conservative",
+  "quality_audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": [],
+    "suspicious_headings": [],
+    "heading_counts": {
+      "abstract": 1,
+      "conclusion": 1,
+      "discussion": 1,
+      "introduction": 1,
+      "method": 1,
+      "references": 1,
+      "related work": 1,
+      "results": 1
+    },
+    "total_headings": 8
+  },
+  "asset_counts": {
+    "figures": 3,
+    "tables": 0,
+    "equations": 21
+  },
+  "sectioning": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 8,
+    "matched_headings": 9,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 1
+      },
+      {
+        "index": 1,
+        "title": "Abstract",
+        "canonical": "abstract",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 2,
+        "end_block_index": 14
+      },
+      {
+        "index": 2,
+        "title": "Introduction",
+        "canonical": "introduction",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.108,
+        "start_page": 1,
+        "end_page": 2,
+        "start_block_index": 15,
+        "end_block_index": 38
+      },
+      {
+        "index": 3,
+        "title": "Related Work",
+        "canonical": "related_work",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.097,
+        "start_page": 2,
+        "end_page": 3,
+        "start_block_index": 39,
+        "end_block_index": 46
+      },
+      {
+        "index": 4,
+        "title": "Method",
+        "canonical": "methodology",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.097,
+        "start_page": 3,
+        "end_page": 5,
+        "start_block_index": 47,
+        "end_block_index": 133
+      },
+      {
+        "index": 5,
+        "title": "Results",
+        "canonical": "results",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.1,
+        "start_page": 5,
+        "end_page": 7,
+        "start_block_index": 134,
+        "end_block_index": 180
+      },
+      {
+        "index": 6,
+        "title": "Discussion",
+        "canonical": "discussion",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.106,
+        "start_page": 7,
+        "end_page": 7,
+        "start_block_index": 181,
+        "end_block_index": 190
+      },
+      {
+        "index": 7,
+        "title": "Conclusion",
+        "canonical": "conclusion",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.106,
+        "start_page": 7,
+        "end_page": 7,
+        "start_block_index": 191,
+        "end_block_index": 192
+      },
+      {
+        "index": 8,
+        "title": "References",
+        "canonical": "references",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.076,
+        "start_page": 7,
+        "end_page": 8,
+        "start_block_index": 193,
+        "end_block_index": 217
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 218
+  },
+  "sections": [
+    {
+      "section_index": 0,
+      "section_canonical": "front_matter",
+      "section_title": "Front Matter",
+      "page_no": 1
+    },
+    {
+      "section_index": 1,
+      "section_canonical": "abstract",
+      "section_title": "Abstract",
+      "page_no": 1
+    },
+    {
+      "section_index": 2,
+      "section_canonical": "appendix",
+      "section_title": "I NTRODUCTION",
+      "page_no": 1
+    },
+    {
+      "section_index": 2,
+      "section_canonical": "introduction",
+      "section_title": "Introduction",
+      "page_no": 1
+    },
+    {
+      "section_index": 3,
+      "section_canonical": "related_work",
+      "section_title": "R ELATED W ORK",
+      "page_no": 2
+    },
+    {
+      "section_index": 3,
+      "section_canonical": "appendix",
+      "section_title": "MTSP and Algorithmic Approaches",
+      "page_no": 2
+    },
+    {
+      "section_index": 4,
+      "section_canonical": "methodology",
+      "section_title": "M ETHOD",
+      "page_no": 3
+    },
+    {
+      "section_index": 4,
+      "section_canonical": "appendix",
+      "section_title": "Training Environment",
+      "page_no": 3
+    },
+    {
+      "section_index": 5,
+      "section_canonical": "results",
+      "section_title": "R ESULTS",
+      "page_no": 5
+    },
+    {
+      "section_index": 5,
+      "section_canonical": "appendix",
+      "section_title": "Evaluation Metrics",
+      "page_no": 5
+    },
+    {
+      "section_index": 6,
+      "section_canonical": "appendix",
+      "section_title": "D ISCUSSION",
+      "page_no": 7
+    },
+    {
+      "section_index": 6,
+      "section_canonical": "discussion",
+      "section_title": "Discussion",
+      "page_no": 7
+    },
+    {
+      "section_index": 7,
+      "section_canonical": "conclusion",
+      "section_title": "C ONCLUSION",
+      "page_no": 7
+    },
+    {
+      "section_index": 8,
+      "section_canonical": "appendix",
+      "section_title": "EFERENCES",
+      "page_no": 7
+    },
+    {
+      "section_index": 8,
+      "section_canonical": "references",
+      "section_title": "References",
+      "page_no": 7
+    }
+  ],
+  "assets": {
+    "figures": [
+      {
+        "id": 1,
+        "page_no": 1,
+        "file_name": "page_001_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "1",
+        "figure_body": "An illustrative plan for a collaborative robot fleet with different specializations, such as flying, walking, or driving. During the mission the drone and the legged robot find new tasks and replan to minimize mission time.",
+        "figure_caption": "Fig. 1: An illustrative plan for a collaborative robot fleet with different specializations, such as flying, walking, or driving. During the mission the drone and the legged robot find new tasks and replan to minimize mission time.",
+        "section_canonical": "introduction",
+        "markdown_path": "assets/figures/page_001_vec_001.png"
+      },
+      {
+        "id": 2,
+        "page_no": 4,
+        "file_name": "page_004_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "2",
+        "figure_body": "This figure illustrates the complete workflow, highlighting both the execution (green) and training (yellow) phases. The execution block details the network architectures and the placement of the replanning step. The training block shows the MAPPO update sequence. The colored arrows differentiate data flow, specifying whether it applies to all agents, a single agent, or represents aggregated data for training. Furthermore, the environment is visualized as",
+        "figure_caption": "Fig. 2: This figure illustrates the complete workflow, highlighting both the execution (green) and training (yellow) phases. The execution block details the network architectures and the placement of the replanning step. The training block shows the MAPPO update sequence. The colored arrows differentiate data flow, specifying whether it applies to all agents, a single agent, or represents aggregated data for training. Furthermore, the environment is visualized as a grid, including the agents and",
+        "section_canonical": "methodology",
+        "markdown_path": "assets/figures/page_004_vec_001.png"
+      },
+      {
+        "id": 3,
+        "page_no": 6,
+        "file_name": "page_006_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "3",
+        "figure_body": "RL inference and training time measurements compared to the inference time of the ES approach with respect to the trained policies by number of solved targets.",
+        "figure_caption": "Fig. 3: RL inference and training time measurements compared to the inference time of the ES approach with respect to the trained policies by number of solved targets.",
+        "section_canonical": "appendix",
+        "markdown_path": "assets/figures/page_006_vec_001.png"
+      }
+    ],
+    "tables": [],
+    "equations": [
+      {
+        "id": 1,
+        "page_no": 2,
+        "file_name": "equation_0001.png",
+        "json_file": "equation_0001.json",
+        "section_canonical": "appendix",
+        "latex": "\\begin{aligned}\n1 https://github.com/leggedrobotics/multi_ \\\\\nrobot_global_planner\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0001.png",
+        "markdown_json_path": "assets/equations/equation_0001.json"
+      },
+      {
+        "id": 2,
+        "page_no": 3,
+        "equation_number": "4",
+        "file_name": "equation_0002.png",
+        "json_file": "equation_0002.json",
+        "section_canonical": "methodology",
+        "latex": "o goalT ype = [h t 1, ..., h tM]\n\\tag{4}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0002.png",
+        "markdown_json_path": "assets/equations/equation_0002.json"
+      },
+      {
+        "id": 3,
+        "page_no": 3,
+        "equation_number": "5",
+        "file_name": "equation_0003.png",
+        "json_file": "equation_0003.json",
+        "section_canonical": "appendix",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0003.png",
+        "markdown_json_path": "assets/equations/equation_0003.json"
+      },
+      {
+        "id": 4,
+        "page_no": 3,
+        "equation_number": "1",
+        "file_name": "equation_0004.png",
+        "json_file": "equation_0004.json",
+        "section_canonical": "appendix",
+        "latex": "h qi(t) =\n\\tag{1}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0004.png",
+        "markdown_json_path": "assets/equations/equation_0004.json"
+      },
+      {
+        "id": 5,
+        "page_no": 3,
+        "file_name": "equation_0005.png",
+        "json_file": "equation_0005.json",
+        "section_canonical": "appendix",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0005.png",
+        "markdown_json_path": "assets/equations/equation_0005.json"
+      },
+      {
+        "id": 6,
+        "page_no": 3,
+        "file_name": "equation_0006.png",
+        "json_file": "equation_0006.json",
+        "section_canonical": "appendix",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0006.png",
+        "markdown_json_path": "assets/equations/equation_0006.json"
+      },
+      {
+        "id": 7,
+        "page_no": 4,
+        "equation_number": "8",
+        "file_name": "equation_0007.png",
+        "json_file": "equation_0007.json",
+        "section_canonical": "methodology",
+        "latex": "The target reward (TR) function is shown in Equation (8)\n\\tag{8}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0007.png",
+        "markdown_json_path": "assets/equations/equation_0007.json"
+      },
+      {
+        "id": 8,
+        "page_no": 4,
+        "file_name": "equation_0008.png",
+        "json_file": "equation_0008.json",
+        "section_canonical": "methodology",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0008.png",
+        "markdown_json_path": "assets/equations/equation_0008.json"
+      },
+      {
+        "id": 9,
+        "page_no": 4,
+        "file_name": "equation_0009.png",
+        "json_file": "equation_0009.json",
+        "section_canonical": "methodology",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0009.png",
+        "markdown_json_path": "assets/equations/equation_0009.json"
+      },
+      {
+        "id": 10,
+        "page_no": 4,
+        "equation_number": "9",
+        "file_name": "equation_0010.png",
+        "json_file": "equation_0010.json",
+        "section_canonical": "methodology",
+        "latex": "\\begin{aligned}\nif (\\\\lVert r t \\\\rVert2 = 0) ∧ (|S qi ∩ S t| = 0) \\\\\n=\n\\end{aligned}\n\\tag{9}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0010.png",
+        "markdown_json_path": "assets/equations/equation_0010.json"
+      },
+      {
+        "id": 11,
+        "page_no": 4,
+        "file_name": "equation_0011.png",
+        "json_file": "equation_0011.json",
+        "section_canonical": "methodology",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0011.png",
+        "markdown_json_path": "assets/equations/equation_0011.json"
+      },
+      {
+        "id": 12,
+        "page_no": 4,
+        "equation_number": "10",
+        "file_name": "equation_0012.png",
+        "json_file": "equation_0012.json",
+        "section_canonical": "methodology",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0012.png",
+        "markdown_json_path": "assets/equations/equation_0012.json"
+      },
+      {
+        "id": 13,
+        "page_no": 4,
+        "file_name": "equation_0013.png",
+        "json_file": "equation_0013.json",
+        "section_canonical": "methodology",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0013.png",
+        "markdown_json_path": "assets/equations/equation_0013.json"
+      },
+      {
+        "id": 14,
+        "page_no": 4,
+        "equation_number": "13",
+        "file_name": "equation_0014.png",
+        "json_file": "equation_0014.json",
+        "section_canonical": "methodology",
+        "latex": "= w · r qi\n\\tag{13}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0014.png",
+        "markdown_json_path": "assets/equations/equation_0014.json"
+      },
+      {
+        "id": 15,
+        "page_no": 5,
+        "file_name": "equation_0015.png",
+        "json_file": "equation_0015.json",
+        "section_canonical": "appendix",
+        "latex": "\\begin{aligned}\n16’384 / 30’720 \\\\\n16’384 / 26’880 \\\\\n16’384 / 24576 \\\\\n572 / 1271 \\\\\n572 / 2034 \\\\\n1668 / 3814 \\\\\n16 / 32 \\\\\n16 / 28 \\\\\n16 / 32\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0015.png",
+        "markdown_json_path": "assets/equations/equation_0015.json"
+      },
+      {
+        "id": 16,
+        "page_no": 5,
+        "equation_number": "14",
+        "file_name": "equation_0016.png",
+        "json_file": "equation_0016.json",
+        "section_canonical": "appendix",
+        "latex": "M success = K solved\n\\tag{14}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0016.png",
+        "markdown_json_path": "assets/equations/equation_0016.json"
+      },
+      {
+        "id": 17,
+        "page_no": 6,
+        "equation_number": "15",
+        "file_name": "equation_0017.png",
+        "json_file": "equation_0017.json",
+        "section_canonical": "appendix",
+        "latex": "M st = T max − T solved\n\\tag{15}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0017.png",
+        "markdown_json_path": "assets/equations/equation_0017.json"
+      },
+      {
+        "id": 18,
+        "page_no": 6,
+        "file_name": "equation_0018.png",
+        "json_file": "equation_0018.json",
+        "section_canonical": "appendix",
+        "latex": "M tte =",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0018.png",
+        "markdown_json_path": "assets/equations/equation_0018.json"
+      },
+      {
+        "id": 19,
+        "page_no": 6,
+        "file_name": "equation_0019.png",
+        "json_file": "equation_0019.json",
+        "section_canonical": "appendix",
+        "latex": "j=1",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0019.png",
+        "markdown_json_path": "assets/equations/equation_0019.json"
+      },
+      {
+        "id": 20,
+        "page_no": 6,
+        "file_name": "equation_0020.png",
+        "json_file": "equation_0020.json",
+        "section_canonical": "appendix",
+        "latex": "\\begin{aligned}\n\\\\pi 5 \\\\\n\\\\pi 6 \\\\\n\\\\pi 7\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0020.png",
+        "markdown_json_path": "assets/equations/equation_0020.json"
+      },
+      {
+        "id": 21,
+        "page_no": 8,
+        "file_name": "equation_0021.png",
+        "json_file": "equation_0021.json",
+        "section_canonical": "references",
+        "latex": "http://dx.doi.org/10.1109/LRA.2019.2903261",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0021.png",
+        "markdown_json_path": "assets/equations/equation_0021.json"
+      }
+    ]
+  }
+}

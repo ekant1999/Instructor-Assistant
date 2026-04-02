@@ -79,14 +79,14 @@
     {
       "level": 3,
       "text": "1. Module Interface & Compose Semantics",
-      "normalized_text": "1 module interface compose semantics",
+      "normalized_text": "module interface compose semantics",
       "line_no": 906,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "2. Norm Policy",
-      "normalized_text": "2 norm policy",
+      "normalized_text": "norm policy",
       "line_no": 912,
       "suspicious": false
     }
@@ -214,7 +214,7 @@
     },
     {
       "heading_text": "1. Module Interface & Compose Semantics",
-      "normalized_heading_text": "1 module interface compose semantics",
+      "normalized_heading_text": "module interface compose semantics",
       "level": 3,
       "line_start": 906,
       "line_end": 911,
@@ -226,7 +226,7 @@
     },
     {
       "heading_text": "2. Norm Policy",
-      "normalized_heading_text": "2 norm policy",
+      "normalized_heading_text": "norm policy",
       "level": 3,
       "line_start": 912,
       "line_end": 1239,

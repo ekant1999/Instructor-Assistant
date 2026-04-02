@@ -30,7 +30,7 @@
     {
       "level": 3,
       "text": "1. Introduction",
-      "normalized_text": "1 introduction",
+      "normalized_text": "introduction",
       "line_no": 13,
       "suspicious": false
     },
@@ -44,42 +44,42 @@
     {
       "level": 3,
       "text": "2. Related works",
-      "normalized_text": "2 related works",
+      "normalized_text": "related works",
       "line_no": 51,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3. Method",
-      "normalized_text": "3 method",
+      "normalized_text": "method",
       "line_no": 67,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3.2. Novel-View Rendering",
-      "normalized_text": "3 2 novel view rendering",
+      "normalized_text": "novel view rendering",
       "line_no": 142,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3.3. OccAny Inference",
-      "normalized_text": "3 3 occany inference",
+      "normalized_text": "occany inference",
       "line_no": 182,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3.4. Training Losses",
-      "normalized_text": "3 4 training losses",
+      "normalized_text": "training losses",
       "line_no": 202,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4. Experiments",
-      "normalized_text": "4 experiments",
+      "normalized_text": "experiments",
       "line_no": 262,
       "suspicious": false
     },
@@ -100,14 +100,14 @@
     {
       "level": 3,
       "text": "B. Supplementary Studies",
-      "normalized_text": "b supplementary studies",
+      "normalized_text": "supplementary studies",
       "line_no": 684,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "C. Qualitative Examples",
-      "normalized_text": "c qualitative examples",
+      "normalized_text": "qualitative examples",
       "line_no": 774,
       "suspicious": false
     }
@@ -151,7 +151,7 @@
     },
     {
       "heading_text": "1. Introduction",
-      "normalized_heading_text": "1 introduction",
+      "normalized_heading_text": "introduction",
       "level": 3,
       "line_start": 13,
       "line_end": 16,
@@ -175,7 +175,7 @@
     },
     {
       "heading_text": "2. Related works",
-      "normalized_heading_text": "2 related works",
+      "normalized_heading_text": "related works",
       "level": 3,
       "line_start": 51,
       "line_end": 66,
@@ -187,7 +187,7 @@
     },
     {
       "heading_text": "3. Method",
-      "normalized_heading_text": "3 method",
+      "normalized_heading_text": "method",
       "level": 3,
       "line_start": 67,
       "line_end": 141,
@@ -199,7 +199,7 @@
     },
     {
       "heading_text": "3.2. Novel-View Rendering",
-      "normalized_heading_text": "3 2 novel view rendering",
+      "normalized_heading_text": "novel view rendering",
       "level": 3,
       "line_start": 142,
       "line_end": 181,
@@ -211,7 +211,7 @@
     },
     {
       "heading_text": "3.3. OccAny Inference",
-      "normalized_heading_text": "3 3 occany inference",
+      "normalized_heading_text": "occany inference",
       "level": 3,
       "line_start": 182,
       "line_end": 201,
@@ -223,7 +223,7 @@
     },
     {
       "heading_text": "3.4. Training Losses",
-      "normalized_heading_text": "3 4 training losses",
+      "normalized_heading_text": "training losses",
       "level": 3,
       "line_start": 202,
       "line_end": 261,
@@ -235,7 +235,7 @@
     },
     {
       "heading_text": "4. Experiments",
-      "normalized_heading_text": "4 experiments",
+      "normalized_heading_text": "experiments",
       "level": 3,
       "line_start": 262,
       "line_end": 364,
@@ -271,7 +271,7 @@
     },
     {
       "heading_text": "B. Supplementary Studies",
-      "normalized_heading_text": "b supplementary studies",
+      "normalized_heading_text": "supplementary studies",
       "level": 3,
       "line_start": 684,
       "line_end": 773,
@@ -283,7 +283,7 @@
     },
     {
       "heading_text": "C. Qualitative Examples",
-      "normalized_heading_text": "c qualitative examples",
+      "normalized_heading_text": "qualitative examples",
       "level": 3,
       "line_start": 774,
       "line_end": 820,
@@ -295,6 +295,13 @@
     }
   ],
   "figures": [
+    {
+      "number": 2,
+      "caption": "illustrates OccAny training process, which consists of two stages: 3D Reconstruction and Novel View Rendering.",
+      "normalized_caption": "illustrates occany training process which consists of two stages 3d reconstruction and novel view rendering",
+      "line_no": 92,
+      "kind": "figure"
+    },
     {
       "number": 2,
       "caption": "OccAny Training is done in two stages: (i) 3D Reconstruction infers 3D scene using Nrec reconstruction frames and (ii) Novel-View Rendering renders geometry of Nrnd new views having camera poses {Tj}Nrnd j=1 . Segmentation Forcing with SAM2 features helps regularize and improve geometry prediction. The scene memory M is dynamically updated during reconstruction, while during rendering, the final scene memory output from the reconstruction stage is used without updating",
@@ -391,11 +398,11 @@
   ],
   "intrinsic_metrics": {
     "heading_count": 15,
-    "duplicate_heading_count": 0,
+    "duplicate_heading_count": 1,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 2,
+    "figure_caption_count": 3,
     "table_caption_count": 11,
-    "duplicate_figure_caption_count": 0,
+    "duplicate_figure_caption_count": 1,
     "duplicate_table_caption_count": 1,
     "empty_section_count": 3,
     "consecutive_heading_run_count": 2,

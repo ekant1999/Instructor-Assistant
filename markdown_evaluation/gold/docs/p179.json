@@ -1,0 +1,185 @@
+{
+  "doc_id": "p179",
+  "title": "A ROS 2 Wrapper for Florence-2: Multi-Mode Local Vision-Language Inference for Robotic Systems",
+  "validated": true,
+  "layout_type": "two_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "short_paper",
+    "figure_heavy",
+    "table_heavy",
+    "robotics_paper"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract"
+    },
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "Related Work"
+    },
+    {
+      "level": 2,
+      "text": "System Design and ROS 2 Architecture"
+    },
+    {
+      "level": 3,
+      "text": "Overall Node Architecture"
+    },
+    {
+      "level": 3,
+      "text": "Interaction Modes"
+    },
+    {
+      "level": 3,
+      "text": "ROS 2 Interfaces and Message Design"
+    },
+    {
+      "level": 3,
+      "text": "Task Abstraction"
+    },
+    {
+      "level": 2,
+      "text": "Implementation and Deployment"
+    },
+    {
+      "level": 2,
+      "text": "Experimental Validation"
+    },
+    {
+      "level": 3,
+      "text": "Experimental Setup"
+    },
+    {
+      "level": 3,
+      "text": "Functional Validation Across ROS 2 Modes"
+    },
+    {
+      "level": 3,
+      "text": "Performance Observations on Different GPUs"
+    },
+    {
+      "level": 2,
+      "text": "Limitations and Future Work"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "This article presents a ROS 2 wrapper for Florence-2 that exposes the model through three complementary interaction modes",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "Recent progress in foundation models has broadened the range of perception and reasoning capabilities that can be brought into robotic systems",
+      "expected_section": "Introduction",
+      "position": "start"
+    },
+    {
+      "text": "The most relevant literature for this article lies at the intersection of three lines of work",
+      "expected_section": "Related Work",
+      "position": "start"
+    },
+    {
+      "text": "The wrapper is centred on a single ROS 2 inference node that encapsulates model loading, image reception, prompt construction, inference, post-processing and publication of outputs",
+      "expected_section": "Overall Node Architecture",
+      "position": "start"
+    },
+    {
+      "text": "A key design choice in the wrapper is the exposure of three complementary interaction modes",
+      "expected_section": "Interaction Modes",
+      "position": "start"
+    },
+    {
+      "text": "The wrapper exposes a small but expressive ROS 2 interface surface",
+      "expected_section": "ROS 2 Interfaces and Message Design",
+      "position": "start"
+    },
+    {
+      "text": "Florence-2 unifies multiple perception capabilities through prompt-based task tokens",
+      "expected_section": "Task Abstraction",
+      "position": "start"
+    },
+    {
+      "text": "The software is organised into two packages",
+      "expected_section": "Implementation and Deployment",
+      "position": "start"
+    },
+    {
+      "text": "The purpose of the evaluation is not to benchmark Florence-2 as a vision model against unrelated perception articles, but to validate the wrapper as a ROS 2 software component",
+      "expected_section": "Experimental Setup",
+      "position": "start"
+    },
+    {
+      "text": "The wrapper was functionally validated in its three supported modes",
+      "expected_section": "Functional Validation Across ROS 2 Modes",
+      "position": "start"
+    },
+    {
+      "text": "In addition to functional validation, we are also reporting end-to-end throughput measurements for the wrapper under continuous image processing",
+      "expected_section": "Performance Observations on Different GPUs",
+      "position": "start"
+    },
+    {
+      "text": "The current implementation has several limitations",
+      "expected_section": "Limitations and Future Work",
+      "position": "start"
+    },
+    {
+      "text": "This article has presented a ROS 2 wrapper for Florence-2 aimed at practical local deployment in robotic systems",
+      "expected_section": "Conclusion",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "architecture",
+        "proposed",
+        "florence",
+        "ros",
+        "wrapper",
+        "node",
+        "interfaces"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "main",
+        "ros",
+        "interfaces",
+        "exposed",
+        "wrapper"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "performance",
+        "different",
+        "graphic",
+        "cards",
+        "object",
+        "detection"
+      ]
+    }
+  ],
+  "notes": "Manually validated against markdown_evaluation/pdfs/260401179v1.pdf on 2026-04-02 using pdftotext -layout and rendered-page inspection. Gold headings/anchors/assets were taken from the PDF itself, not benchmark outputs."
+}

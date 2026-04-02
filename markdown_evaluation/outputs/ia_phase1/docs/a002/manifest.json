@@ -1,0 +1,336 @@
+{
+  "paper_id": 404815770581,
+  "generated_at": "2026-04-02T18:13:25.652305+00:00",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment2.pdf",
+  "markdown_file": "paper.md",
+  "metadata": {
+    "title": "Performing CRUD operations in DynamoDB using AWS Lambda",
+    "paper_id": 404815770581,
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment2.pdf",
+    "generated_at": "2026-04-02T18:13:25.641077+00:00",
+    "num_figures": 0,
+    "num_tables": 0,
+    "num_equations": 7,
+    "page_count": 8
+  },
+  "config": {
+    "asset_mode": "copy",
+    "asset_path_mode": "relative",
+    "include_frontmatter": true,
+    "include_page_markers": false,
+    "prefer_equation_latex": true,
+    "include_equation_fallback_assets": true,
+    "ensure_assets": true,
+    "overwrite": true,
+    "quality_audit_enabled": true,
+    "conservative_fallback": true,
+    "conservative_equations_as_assets_only": true
+  },
+  "render_mode": "normal",
+  "quality_audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": [],
+    "suspicious_headings": [],
+    "heading_counts": {
+      "adding records post": 1,
+      "api gateway api gateway": 1,
+      "challenges": 1,
+      "dynamodb dynamodb": 1,
+      "lambda aws lambda": 1,
+      "learnings": 1
+    },
+    "total_headings": 6
+  },
+  "asset_counts": {
+    "figures": 0,
+    "tables": 0,
+    "equations": 7
+  },
+  "sectioning": {
+    "strategy": "heuristic",
+    "candidate_headings": 9,
+    "matched_headings": 10,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 2
+      },
+      {
+        "index": 1,
+        "title": "Lambda: AWS Lambda",
+        "canonical": "lambda_aws_lambda",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 3,
+        "end_block_index": 3
+      },
+      {
+        "index": 2,
+        "title": "DynamoDB: DynamoDB",
+        "canonical": "dynamodb_dynamodb",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 4,
+        "end_block_index": 4
+      },
+      {
+        "index": 3,
+        "title": "API Gateway: API Gateway",
+        "canonical": "api_gateway_api_gateway",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 3,
+        "start_block_index": 5,
+        "end_block_index": 49
+      },
+      {
+        "index": 4,
+        "title": "Adding records (POST)",
+        "canonical": "adding_records_post",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 3,
+        "end_page": 3,
+        "start_block_index": 50,
+        "end_block_index": 50
+      },
+      {
+        "index": 5,
+        "title": "Fetching record",
+        "canonical": "fetching_record",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 4,
+        "end_page": 4,
+        "start_block_index": 51,
+        "end_block_index": 51
+      },
+      {
+        "index": 6,
+        "title": "Updating the",
+        "canonical": "updating_the",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 5,
+        "end_page": 6,
+        "start_block_index": 52,
+        "end_block_index": 53
+      },
+      {
+        "index": 7,
+        "title": "Edge Case - Trying to",
+        "canonical": "edge_case_trying_to",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 7,
+        "end_page": 8,
+        "start_block_index": 54,
+        "end_block_index": 56
+      },
+      {
+        "index": 8,
+        "title": "Challenges",
+        "canonical": "challenges",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 8,
+        "end_page": 8,
+        "start_block_index": 57,
+        "end_block_index": 66
+      },
+      {
+        "index": 9,
+        "title": "Learnings",
+        "canonical": "learnings",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 8,
+        "end_page": 8,
+        "start_block_index": 67,
+        "end_block_index": 75
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 76
+  },
+  "sections": [
+    {
+      "section_index": 0,
+      "section_canonical": "front_matter",
+      "section_title": "Front Matter",
+      "page_no": 1
+    },
+    {
+      "section_index": 1,
+      "section_canonical": "lambda_aws_lambda",
+      "section_title": "Lambda: AWS Lambda",
+      "page_no": 1
+    },
+    {
+      "section_index": 2,
+      "section_canonical": "dynamodb_dynamodb",
+      "section_title": "DynamoDB: DynamoDB",
+      "page_no": 1
+    },
+    {
+      "section_index": 3,
+      "section_canonical": "api_gateway_api_gateway",
+      "section_title": "API Gateway: API Gateway",
+      "page_no": 1
+    },
+    {
+      "section_index": 4,
+      "section_canonical": "adding_records_post",
+      "section_title": "Adding records (POST)",
+      "page_no": 3
+    },
+    {
+      "section_index": 5,
+      "section_canonical": "fetching_record",
+      "section_title": "Fetching record",
+      "page_no": 4
+    },
+    {
+      "section_index": 6,
+      "section_canonical": "updating_the",
+      "section_title": "Updating the",
+      "page_no": 5
+    },
+    {
+      "section_index": 7,
+      "section_canonical": "edge_case_trying_to",
+      "section_title": "Edge Case - Trying to",
+      "page_no": 7
+    },
+    {
+      "section_index": 8,
+      "section_canonical": "challenges",
+      "section_title": "Challenges",
+      "page_no": 8
+    },
+    {
+      "section_index": 9,
+      "section_canonical": "learnings",
+      "section_title": "Learnings",
+      "page_no": 8
+    }
+  ],
+  "assets": {
+    "figures": [],
+    "tables": [],
+    "equations": [
+      {
+        "id": 1,
+        "page_no": 1,
+        "file_name": "equation_0001.png",
+        "json_file": "equation_0001.json",
+        "section_canonical": "api_gateway_api_gateway",
+        "latex": "student_table = dynamodb.Table('StudentRecords')",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0001.png",
+        "markdown_json_path": "assets/equations/equation_0001.json"
+      },
+      {
+        "id": 2,
+        "page_no": 1,
+        "file_name": "equation_0002.png",
+        "json_file": "equation_0002.json",
+        "section_canonical": "api_gateway_api_gateway",
+        "latex": "if event['httpMethod'] == 'POST':",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0002.png",
+        "markdown_json_path": "assets/equations/equation_0002.json"
+      },
+      {
+        "id": 3,
+        "page_no": 1,
+        "file_name": "equation_0003.png",
+        "json_file": "equation_0003.json",
+        "section_canonical": "api_gateway_api_gateway",
+        "latex": "elif event['httpMethod'] == 'GET':",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0003.png",
+        "markdown_json_path": "assets/equations/equation_0003.json"
+      },
+      {
+        "id": 4,
+        "page_no": 2,
+        "file_name": "equation_0004.png",
+        "json_file": "equation_0004.json",
+        "section_canonical": "api_gateway_api_gateway",
+        "latex": "elif event['httpMethod'] == 'PUT':",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0004.png",
+        "markdown_json_path": "assets/equations/equation_0004.json"
+      },
+      {
+        "id": 5,
+        "page_no": 2,
+        "file_name": "equation_0005.png",
+        "json_file": "equation_0005.json",
+        "section_canonical": "api_gateway_api_gateway",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0005.png",
+        "markdown_json_path": "assets/equations/equation_0005.json"
+      },
+      {
+        "id": 6,
+        "page_no": 2,
+        "file_name": "equation_0006.png",
+        "json_file": "equation_0006.json",
+        "section_canonical": "api_gateway_api_gateway",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0006.png",
+        "markdown_json_path": "assets/equations/equation_0006.json"
+      },
+      {
+        "id": 7,
+        "page_no": 2,
+        "file_name": "equation_0007.png",
+        "json_file": "equation_0007.json",
+        "section_canonical": "api_gateway_api_gateway",
+        "latex": "elif event['httpMethod'] == 'DELETE':",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0007.png",
+        "markdown_json_path": "assets/equations/equation_0007.json"
+      }
+    ]
+  }
+}

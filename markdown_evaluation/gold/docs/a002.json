@@ -1,0 +1,81 @@
+{
+  "doc_id": "a002",
+  "title": "Performing CRUD operations in DynamoDB using AWS Lambda",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "non_academic",
+    "student_assignment",
+    "code_heavy",
+    "screenshot_heavy",
+    "cloud_report"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "AWS Services used"
+    },
+    {
+      "level": 2,
+      "text": "Lambda function Code"
+    },
+    {
+      "level": 3,
+      "text": "lambda_function.py"
+    },
+    {
+      "level": 2,
+      "text": "Screenshots"
+    },
+    {
+      "level": 2,
+      "text": "Challenges and Learnings"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "In this assignment I have created a lambda function in AWS which gets triggered by the API gateway to perform the CRUD operations",
+      "expected_section": "AWS Services used",
+      "position": "start"
+    },
+    {
+      "text": "AWS Lambda is a serverless function which is event-driven and does not need pre-provisioned servers to execute the code",
+      "expected_section": "AWS Services used",
+      "position": "middle"
+    },
+    {
+      "text": "DynamoDB is a serverless NoSQL database which is highly scalable and can handle a varied amount of traffic",
+      "expected_section": "AWS Services used",
+      "position": "middle"
+    },
+    {
+      "text": "dynamodb = boto3.resource('dynamodb')",
+      "expected_section": "lambda_function.py",
+      "position": "start"
+    },
+    {
+      "text": "return { 'statusCode': 200, 'body': json.dumps('Student record added successfully') }",
+      "expected_section": "lambda_function.py",
+      "position": "middle"
+    },
+    {
+      "text": "Adding records (POST)",
+      "expected_section": "Screenshots",
+      "position": "start"
+    },
+    {
+      "text": "While creating the APIs, I turned on the 'Lambda Proxy Integration' in the 'Integration request' option",
+      "expected_section": "Challenges and Learnings",
+      "position": "middle"
+    },
+    {
+      "text": "I learnt how to set up and configure the AWS Lambda to trigger based on REST API calls and perform CRUD operations on DynamoDB",
+      "expected_section": "Challenges and Learnings",
+      "position": "end"
+    }
+  ],
+  "figures": [],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/Assignment2.pdf on 2026-04-02 using pdftotext -layout and rendered-page inspection. Screenshots are labeled as prose bullets rather than numbered figure captions, so figure/table gold is empty."
+}

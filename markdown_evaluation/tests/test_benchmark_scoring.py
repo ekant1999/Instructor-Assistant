@@ -52,6 +52,20 @@ def test_normalize_markdown_document_accepts_fig_abbreviation():
     assert normalized["figures"][0]["number"] == 1
 
 
+def test_normalize_markdown_document_strips_outline_prefixes_for_heading_match():
+    normalized = normalize_markdown_document(
+        markdown="# Doc\n\n### I. INTRODUCTION\n\nBody.\n\n### A. Overall Node Architecture\n\nMore body.\n",
+        doc_id="pPrefix",
+        system="ocr_agent",
+    )
+
+    assert [heading["normalized_text"] for heading in normalized["headings"]] == [
+        "doc",
+        "introduction",
+        "overall node architecture",
+    ]
+
+
 def test_score_normalized_doc_scores_anchor_assignment():
     normalized = normalize_markdown_document(markdown=SAMPLE_MD, doc_id="pX", system="ia_phase1")
     gold = {

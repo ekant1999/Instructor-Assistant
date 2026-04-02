@@ -1,0 +1,312 @@
+{
+  "doc_id": "p213",
+  "title": "Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO",
+  "validated": true,
+  "layout_type": "two_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "equation_heavy",
+    "figure_heavy",
+    "table_heavy",
+    "robotics_paper",
+    "reinforcement_learning"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract"
+    },
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 3,
+      "text": "Challenges of Multi-Robot Planning"
+    },
+    {
+      "level": 2,
+      "text": "Related Work"
+    },
+    {
+      "level": 3,
+      "text": "MTSP and Algorithmic Approaches"
+    },
+    {
+      "level": 3,
+      "text": "Learning Collaborative Strategies"
+    },
+    {
+      "level": 2,
+      "text": "Method"
+    },
+    {
+      "level": 3,
+      "text": "Training Environment"
+    },
+    {
+      "level": 3,
+      "text": "Observations"
+    },
+    {
+      "level": 3,
+      "text": "Rewards"
+    },
+    {
+      "level": 3,
+      "text": "Learning Architecture"
+    },
+    {
+      "level": 3,
+      "text": "Training Strategy"
+    },
+    {
+      "level": 3,
+      "text": "Implementation"
+    },
+    {
+      "level": 2,
+      "text": "Results"
+    },
+    {
+      "level": 3,
+      "text": "Evaluation Metrics"
+    },
+    {
+      "level": 3,
+      "text": "Policy vs. Optimal Solution"
+    },
+    {
+      "level": 3,
+      "text": "Comparison of Inference Time"
+    },
+    {
+      "level": 3,
+      "text": "Replanning Capability"
+    },
+    {
+      "level": 2,
+      "text": "Discussion"
+    },
+    {
+      "level": 3,
+      "text": "Policy Performance"
+    },
+    {
+      "level": 3,
+      "text": "Inference Time"
+    },
+    {
+      "level": 3,
+      "text": "Replanning"
+    },
+    {
+      "level": 3,
+      "text": "Limitations"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "In this work, we present a collaborative planning strategy based on Multi-Agent Proximal Policy Optimization (MAPPO)",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "Unmanned surface exploration may require not only different locomotion techniques to overcome harsh terrain but also a variety of scientific equipment",
+      "expected_section": "Introduction",
+      "position": "start"
+    },
+    {
+      "text": "As this becomes more complicated for more robots and tasks, especially under the communication delays and constraints of planetary missions, manual planning needs to be replaced by an algorithm",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "Besides finding an efficient path, the algorithm also needs to allocate a subset of tasks and determine a specific execution order for each robot",
+      "expected_section": "Challenges of Multi-Robot Planning",
+      "position": "start"
+    },
+    {
+      "text": "A well-known formulation of path planning problems that includes target allocation is the MTSP",
+      "expected_section": "MTSP and Algorithmic Approaches",
+      "position": "start"
+    },
+    {
+      "text": "To include the full range of subproblems (target allocation, scheduling, and replanning), the problem can be framed within the context of a collaborative game-theoretic approach",
+      "expected_section": "Learning Collaborative Strategies",
+      "position": "start"
+    },
+    {
+      "text": "To learn a strategy that solves the planning problem, we construct a virtual environment containing agents and targets",
+      "expected_section": "Method",
+      "position": "start"
+    },
+    {
+      "text": "The training environment is modeled as a discrete 2D grid",
+      "expected_section": "Training Environment",
+      "position": "start"
+    },
+    {
+      "text": "First, the positions of the targets and all agents are included in the observation of an agent",
+      "expected_section": "Observations",
+      "position": "start"
+    },
+    {
+      "text": "To help the agents navigate towards the sparsely distributed targets, an attraction reward (AR) is introduced",
+      "expected_section": "Rewards",
+      "position": "start"
+    },
+    {
+      "text": "we use the MAPPO algorithm due to its proven performance in cooperative multi-agent settings",
+      "expected_section": "Learning Architecture",
+      "position": "start"
+    },
+    {
+      "text": "To overcome this initial difficulty, the training is divided into two parts, the so-called bootstrap and refinement",
+      "expected_section": "Training Strategy",
+      "position": "middle"
+    },
+    {
+      "text": "Our pipeline was implemented using the JaxMARL framework",
+      "expected_section": "Implementation",
+      "position": "start"
+    },
+    {
+      "text": "The main results were obtained by training three agents with two different skills acting on a 32x32 map",
+      "expected_section": "Results",
+      "position": "start"
+    },
+    {
+      "text": "The success rate represents the number of solved environments Ksolved versus the total number of simulated environments Ksims",
+      "expected_section": "Evaluation Metrics",
+      "position": "middle"
+    },
+    {
+      "text": "we compare its performance to optimal solutions found via exhaustive search (ES) in Table IV",
+      "expected_section": "Policy vs. Optimal Solution",
+      "position": "start"
+    },
+    {
+      "text": "A notable advantage of a learning-based method is that the inference time remains constant and is independent of the problem's initial conditions",
+      "expected_section": "Comparison of Inference Time",
+      "position": "start"
+    },
+    {
+      "text": "Having a short and constant inference time for the network opens the possibility of performing online replanning on newly discovered targets",
+      "expected_section": "Replanning Capability",
+      "position": "start"
+    },
+    {
+      "text": "The learned policies achieved up to 86% optimal solution quality with respect to the solve time and up to 92% with respect to the total team effort",
+      "expected_section": "Policy Performance",
+      "position": "middle"
+    },
+    {
+      "text": "The main limitation of this approach is the fixed observation size of the current architecture",
+      "expected_section": "Limitations",
+      "position": "start"
+    },
+    {
+      "text": "This work explored a reinforcement learning approach to the multi-agent global path planning and scheduling problem",
+      "expected_section": "Conclusion",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "illustrative",
+        "plan",
+        "collaborative",
+        "robot",
+        "fleet",
+        "replan"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "complete",
+        "workflow",
+        "execution",
+        "training",
+        "phases",
+        "mappo"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "rl",
+        "inference",
+        "training",
+        "time",
+        "es",
+        "policies"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "activated",
+        "rewards",
+        "training",
+        "attraction",
+        "reward"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "modified",
+        "mappo",
+        "training",
+        "parameters"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "reward",
+        "weights",
+        "baseline",
+        "policy"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "performance",
+        "comparison",
+        "three",
+        "policies",
+        "optimal",
+        "solutions"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "baseline",
+        "policy",
+        "trained",
+        "new",
+        "targets",
+        "episode"
+      ]
+    }
+  ],
+  "notes": "Manually validated against markdown_evaluation/pdfs/260401213v1.pdf on 2026-04-02 using pdftotext -layout and rendered-page inspection. Headings, section anchors, and asset numbers were curated from the PDF itself, not benchmark-generated markdown."
+}

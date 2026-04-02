@@ -26,6 +26,10 @@ _HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 _SUSPICIOUS_HEADING_RE = re.compile(r"^(?:\d+(?:[.]\d+)*|[A-Z]|[ivxlcdm]+|[\W_]+)$", re.I)
 _PAGE_MODE_RE = re.compile(r"^\s*<!--\s*page\s+\d+\s+mode:", re.I)
 _ASSET_LINE_RE = re.compile(r"^\s*(?:!\[.*\]\(.*\)|>\s*(?:Table|Equation)\s+JSON:|\[OCR unavailable.*\])")
+_NUMBERED_HEADING_PREFIX_RE = re.compile(
+    r"^(?:(?:\d+(?:\.\d+)*|[A-Z]|[IVXLCDM]+)\s*[.)]\s+)+",
+    re.I,
+)
 
 
 def _strip_frontmatter(markdown: str) -> str:
@@ -37,6 +41,13 @@ def _clean_heading_text(text: str) -> str:
     text = text.rstrip("# ").strip()
     text = re.sub(r"^[*_`]+|[*_`]+$", "", text)
     return collapse_ws(text)
+
+
+def _normalize_heading_for_match(text: str) -> str:
+    cleaned = _clean_heading_text(text)
+    cleaned = _NUMBERED_HEADING_PREFIX_RE.sub("", cleaned)
+    normalized = normalize_match_text(cleaned)
+    return normalized
 
 
 def _strip_inline_markup(line: str) -> str:
@@ -87,7 +98,7 @@ def _extract_headings(lines: Sequence[str]) -> List[Dict[str, Any]]:
             {
                 "level": len(match.group(1)),
                 "text": text,
-                "normalized_text": normalize_match_text(text),
+                "normalized_text": _normalize_heading_for_match(text),
                 "line_no": line_no,
                 "suspicious": bool(_SUSPICIOUS_HEADING_RE.match(text)),
             }

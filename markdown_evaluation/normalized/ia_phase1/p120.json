@@ -486,10 +486,66 @@
   ],
   "figures": [
     {
+      "number": 1,
+      "caption": "We introduce a method to recover high-fidelity 3D geometry and appearance from sparse-view static videos. By leveraging “virtual viewpoints” induced by opportunistic object motion, our method jointly optimizes object pose and geometry through a motion-aware appearance representation to capture detailed surface structure.",
+      "normalized_caption": "we introduce a method to recover high fidelity 3d geometry and appearance from sparse view static videos by leveraging virtual viewpoints induced by opportunistic object motion our method jointly optimizes object pose and geometry through a motion aware appearance representation to capture detailed surface structure",
+      "line_no": 13,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "Method Overview. Given sparse multi-view videos and an initial set of canonical",
+      "normalized_caption": "method overview given sparse multi view videos and an initial set of canonical",
+      "line_no": 70,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "Motion-Aware Appearance Modeling. (a) For moving objects, specular",
+      "normalized_caption": "motion aware appearance modeling a for moving objects specular",
+      "line_no": 143,
+      "kind": "figure"
+    },
+    {
       "number": 3,
       "caption": "(c)-(f) summarizes the differences between the standard 3DGS",
       "normalized_caption": "c f summarizes the differences between the standard 3dgs",
       "line_no": 161,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "Visualization of recovered surface normals. The error maps on the",
+      "normalized_caption": "visualization of recovered surface normals the error maps on the",
+      "line_no": 211,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
+      "caption": "Novel view Synthesis. Our appearance model significantly improves the",
+      "normalized_caption": "novel view synthesis our appearance model significantly improves the",
+      "line_no": 216,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
+      "caption": "Surface normals and mesh models recovered from real-world datasets.",
+      "normalized_caption": "surface normals and mesh models recovered from real world datasets",
+      "line_no": 221,
+      "kind": "figure"
+    },
+    {
+      "number": 7,
+      "caption": "Visualization of alternating estimation progress. We show the recovered",
+      "normalized_caption": "visualization of alternating estimation progress we show the recovered",
+      "line_no": 228,
+      "kind": "figure"
+    },
+    {
+      "number": 8,
+      "caption": "Results on in-the-wild capture. Our method reconstructs faithful appearance",
+      "normalized_caption": "results on in the wild capture our method reconstructs faithful appearance",
+      "line_no": 440,
       "kind": "figure"
     },
     {
@@ -500,10 +556,80 @@
       "kind": "figure"
     },
     {
+      "number": 9,
+      "caption": "Additional Visualization of Recovered Surface Normals. Our recovered",
+      "normalized_caption": "additional visualization of recovered surface normals our recovered",
+      "line_no": 474,
+      "kind": "figure"
+    },
+    {
+      "number": 10,
+      "caption": "Additional Novel View Synthesis Results. Our appearance model im-",
+      "normalized_caption": "additional novel view synthesis results our appearance model im",
+      "line_no": 486,
+      "kind": "figure"
+    },
+    {
+      "number": 11,
+      "caption": "Qualitative comparison with DG-Mesh [21]. While DG-Mesh supports",
+      "normalized_caption": "qualitative comparison with dg mesh 21 while dg mesh supports",
+      "line_no": 496,
+      "kind": "figure"
+    },
+    {
       "number": 18,
       "caption": "shows additional qualitative results of the reconstructed surface geom-",
       "normalized_caption": "shows additional qualitative results of the reconstructed surface geom",
       "line_no": 505,
+      "kind": "figure"
+    },
+    {
+      "number": 12,
+      "caption": "Effectiveness of diffuse and specular components for surface normal",
+      "normalized_caption": "effectiveness of diffuse and specular components for surface normal",
+      "line_no": 509,
+      "kind": "figure"
+    },
+    {
+      "number": 13,
+      "caption": "Effectiveness of diffuse and specular components for novel view",
+      "normalized_caption": "effectiveness of diffuse and specular components for novel view",
+      "line_no": 516,
+      "kind": "figure"
+    },
+    {
+      "number": 14,
+      "caption": "Visualization of specular and diffuse components. In the second column",
+      "normalized_caption": "visualization of specular and diffuse components in the second column",
+      "line_no": 527,
+      "kind": "figure"
+    },
+    {
+      "number": 15,
+      "caption": "Qualitative comparison with per-Gaussian SH. In particular, our full",
+      "normalized_caption": "qualitative comparison with per gaussian sh in particular our full",
+      "line_no": 550,
+      "kind": "figure"
+    },
+    {
+      "number": 16,
+      "caption": "Comparison with our method without alternating estimation (“w/o",
+      "normalized_caption": "comparison with our method without alternating estimation w o",
+      "line_no": 558,
+      "kind": "figure"
+    },
+    {
+      "number": 17,
+      "caption": "Effectiveness of segmentation mask refinement. We compare our full",
+      "normalized_caption": "effectiveness of segmentation mask refinement we compare our full",
+      "line_no": 564,
+      "kind": "figure"
+    },
+    {
+      "number": 18,
+      "caption": "Surface normals and mesh models recovered from real-world datasets.",
+      "normalized_caption": "surface normals and mesh models recovered from real world datasets",
+      "line_no": 574,
       "kind": "figure"
     }
   ],
@@ -548,9 +674,9 @@
     "heading_count": 25,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 3,
+    "figure_caption_count": 21,
     "table_caption_count": 5,
-    "duplicate_figure_caption_count": 0,
+    "duplicate_figure_caption_count": 3,
     "duplicate_table_caption_count": 0,
     "empty_section_count": 3,
     "consecutive_heading_run_count": 3,

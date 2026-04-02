@@ -1,0 +1,535 @@
+# p213
+
+<!-- document_mode: hybrid_paper -->
+
+<!-- page 1 mode: ocr -->
+
+<!-- OCR page 1 -->
+
+![OCR Page 1](p213_page_1.png)
+
+---
+
+<!-- page 2 mode: hybrid_paper -->
+
+allocate a subset of tasks and determine a specific execution order for each robot. Since multiple robots can interact and collaborate, the algorithm additionally needs to schedule the robots appropriately to avoid potential conflicts or exploit synergies between them.
+
+In a space exploration mission, not all the information is known a priori, and new regions of interest, terrain changes, or robot failures lead to unexpected situations. Hence, a fully autonomous robot team should be able to replan and adapt on site according to the available and incoming information.
+
+Especially for exploration on another planet, this prevents unnecessary communication delays and idle times while extending the available time for scientific investigation. Due to limited computational resources, such an algorithm also has to adhere to the tight real-time constraints posed by space systems.
+
+Prior work has framed the problem in different ways, e.g., as a multi-traveling salesman problem (MTSP), and taken first steps towards learning-based solutions. Nevertheless, existing methods are limited to assigning agents to targets based on individual path costs and then scheduling them in a separate step, making it difficult to handle both aspects within a single solver. In contrast, our work introduces a fully learning-based method that unifies path planning, task allocation, and scheduling for heterogeneous multi-robot teams. The main contributions can be summarized as follows.
+
+• A MAPPO-based reinforcement learning framework for cooperative multi-agent path planning, task allocation, and scheduling.
+
+• Benchmark against an optimal exhaustive search baseline, demonstrating competitive performance with improved scalability.
+
+• Validation of fast replanning in dynamic environments, highlighting applicability to space exploration missions.
+
+• Open-source release of the learning framework.1
+
+The remainder of this paper is structured as follows. In Section III, our method is thoroughly explained, including a formal description of the problem and the training strategy.
+
+The implementation and results on performance and replanning capabilities are presented in Section IV, and finally the limitations of the method and recommendations for future work are discussed in Section V.
+
+### II. RELATED WORK
+
+### A. MTSP and Algorithmic Approaches
+
+A well-known formulation of path planning problems that includes target allocation is the MTSP, where its numerous variations are listed in [6]. Exact methods to solve the MTSP include constraint programming [7] and integer programming algorithms [8]. The problem can also be extended to require collision-free paths, such as in [9], where Ma et al. present a conflict-based min-cost-flow algorithm on a time-expanded graph, or in [10], where Turpin et al. show how to decouple the target assignment and scheduling problem to solve those
+
+1https://github.com/leggedrobotics/multi_ robot_global_planner
+
+parts sequentially. In general, exact methods are able to find a globally optimal solution. However, they tend to scale poorly with the number of agents and targets and therefore result in long computation times, which can go up to hours, as stated in [6]. This issue makes it hard to perform continuous replanning on constrained computational resources, such as on a space exploration rover.
+
+The state-of-the-art methods in the literature to solve MTSP problems are metaheuristic algorithms, such as NSGA-II [11] or particle-swarm optimization techniques, e.g., ant colony optimization [12] or the artificial bee colony algorithm [13,14]. Metaheuristic algorithms are popular because they can be implemented in a computationally efficient way. However, they do not guarantee finding an optimal solution in finite time or even a valid solution at all. Since the problem still scales with the number of agents and targets, a trade-off between computation time and solution quality is inevitable. Jiang et al. address this using their multiagent planning framework, which consists of two different algorithms that exhibit the trade-offs between plan quality and computational efficiency [15].
+
+Recent work tries to investigate the capabilities of learning-based approaches, where the scaling problem shifts from runtime to training time, enabling the efficient use of computational resources in advance and having almost constant inference times. This can be particularly interesting for space applications that require real-time computation.
+
+The standard MTSP is solved using a reinforcement learning approach in [16] and [17], where the problem is separated into two stages. The first stage is a graph neural network that learns how to allocate targets to agents, and the second stage consists of a standard single-traveling salesman problem solver that is also used to supervise the network learning process. This method has been shown to outperform metaheuristic methods in solution quality from small-scale problems up to tens of agents and hundreds of cities. However, to the best of our knowledge, there are no full learningbased approaches trying to extend the MTSP to a case with collaborative tasks, which would include appropriate scheduling of the robots.
+
+### B. Learning Collaborative Strategies
+
+To include the full range of subproblems (target allocation, scheduling, and replanning), the problem can be framed within the context of a collaborative game-theoretic approach. In this context, rather than seeking the optimal solution in a large search space, the focus shifts to identifying a general strategy that can be learned empirically and followed consistently by the agents. This motivates the question of whether learning-based methods can be employed to learn such strategies and to what extent they approach optimality.
+
+An unsupervised approach to multi-agent path planning is presented in [18] (PRIMAL) and extended in [19] (PRIMALc). The proposed algorithms learn a decentralized strategy to navigate towards targets while avoiding collisions.
+
+This concept was also explored in the context of socially aware navigation for multi-robot teams [20].
+
+---
+
+<!-- page 3 mode: hybrid_paper -->
+
+They demonstrated how robots can be trained to navigate efficiently in a crowded environment while ensuring safety and comfort for humans around the robots. The learning architecture consists of a spatial-temporal graph neural network that can compute an embedding expressing the human-robot and robot-robot interactions, and an underlying multi-agent proximal policy optimization (MAPPO) algorithm ( [21,22]) that learns how to compute the actions for each robot. According to [21], MAPPO has been demonstrated in different baseline environments such as the multi-agent particle-world environments (MPE), the StarCraft multi-agent challenge, Google Research Football and the Hanabi challenge. It is therefore a competitive baseline in cooperative multi-agent learning and provides a promising foundation for applying to the target allocation and scheduling problem in an exploration task.
+
+### III. METHOD
+
+To learn a strategy that solves the planning problem, we construct a virtual environment containing agents and targets.
+
+Agents have the freedom to choose their actions at each step with the goal of solving all targets.
+
+### A. Training Environment
+
+The training environment is modeled as a discrete 2D grid (Figure 2) on which the agents q ∈Q, |Q| = N can move using one of the actions A = {up, down, left, right, stay}.
+
+Each target t ∈T , |T | = M requires a set of skills S ∈ P(S), where P(S) is the power set of all the skills sets.
+
+The targets must be solved by either one of the required skills (OR type) or by all of them (AND type). Each agent provides a set of skills that can be used to solve a target. A target t ∈TS(j) is solved if, for a time step j, all the required skills of the target are in the same position as the target itself.
+
+Agents complete an environment if the number of unsolved targets is zero, that is, |TU(j)| = 0. Furthermore, the action space stays the same throughout the map, even at the border.
+
+If an agent attempts to move beyond the boundaries of the map, it will be reverted to the last valid cell it occupied, and the invalid action will be ignored.
+
+### B. Observations
+
+First, the positions of the targets and all agents are included in the observation of an agent as shown in Equation (2). The symbol p ∈N2 0 denotes an absolute position on the grid and rt q ∈Z2 is the relative position between an agent q and a target t. The subscripts i and k are the indices of the agents and targets, and N = |Q| and M = |T | are the number of agents or targets, respectively.
+
+( rt q if t ∈TU(j) [0, 0] if t ∈TS(j) (1)
+
+g(rt q) =
+
+opos qi = [pqi, ..., pqN, g(rt1 qi), ..., g(rtM qi )] (2)
+
+To indicate that a target is solved, its relative position is automatically set to zero by the function g(rt) in Equation (1) for all agents. The observation structure is kept agent-specific, denoted by the subscript qi, always having the position of
+
+the current agent in the first entry of the array. Enforcing this structure allows the actor network to associate the observing agent with its position.
+
+In order to solve the targets efficiently, agents need information about the skill sets of the other agents and the skill demands of each target. Since multiple skills can be associated with an agent or a target, the observations in Equation (3) are encoded as skill sets written as Sqi or Stk.
+
+In practice, skill sets are enumerated and assigned to integer values by a predetermined function f(S) : P(S) →N0.
+
+oskill qi = [f(Sqi), ..., f(SqN), f(St1), ..., f(StM)] (3)
+
+Finally, targets must be distinguished by their type (AND or OR type) to indicate whether collaboration is necessary.
+
+In Equation (4), the types h are encoded as 1 (AND type) or 0 (OR type).
+
+ogoalT ype = [ht1, ..., htM] (4)
+
+The complete observation for an agent qi is a concatenation of the previously mentioned observations and can be written as:
+
+oqi = [opos qi , oskill qi , ogoalT ype] (5)
+
+Note that the observation of an agent depends on the number of agents and targets that exist in the environment.
+
+Although this design choice prevents variation in numbers during training, it eliminates the need for a separate encoding algorithm or network to handle dynamically sized observations.
+
+### C. Rewards
+
+In the following, the different reward terms used in the training are discussed. To help the agents navigate towards the sparsely distributed targets, an attraction reward (AR) is introduced, which is spread around a target with an increasing value towards the center. The agent receives this reward at each time step, if the target is unsolved and the agent has at least one matching skill with the target, which can be expressed as the condition P = (t ∈TU(j))∧(|Sqi∩St|) > 0.
+
+The reward function for one target is shown in Equation (6), where rt is the relative distance from agent qi to target t and CAR is a constant parameter that determines the spread of the attraction reward. The attraction reward in Equation (7) is averaged over all the targets to be solved in the environment and normalized with respect to the maximum number of steps Tmax.
+
+( exp(−CAR · ∥rt∥2) if P 0 otherwise (6)
+
+hqi(t) =
+
+X
+
+rAR qi = 1
+
+t∈T hqi(t) (7)
+
+M · Tmax
+
+Once a target is reached and solved, there is a fixed payout for all agents, regardless of whether they contributed to solving the target. This prevents competition among agents.
+
+---
+
+<!-- page 4 mode: hybrid_paper -->
+
+**Add new targets to
+observation buffers**
+
+| Dense |
+|---|
+| GRU |
+| Dense |
+| Dense |
+|  |
+
+![Table 1](p213_assets/tables/p213_page_4_table_1.png)
+
+**Table 2 (Page 4)**
+
+| Dense |
+|---|
+| GRU |
+| Dense |
+| Dense |
+|  |
+
+![Table 2](p213_assets/tables/p213_page_4_table_2.png)
+
+Minibatches
+
+Collect
+
+MAPPO
+
+Fig. 2: This figure illustrates the complete workflow, highlighting both the execution (green) and training (yellow) phases. The execution block details the network architectures and the placement of the replanning step. The training block shows the MAPPO update sequence. The colored arrows differentiate data flow, specifying whether it applies to all agents, a single agent, or represents aggregated data for training. Furthermore, the environment is visualized as a grid, including the agents and targets with their provided or required skills (colored dots). The targets are marked with a green square, which can have a black border indicating a collaborative target (AND type).
+
+The target reward (TR) function is shown in Equation (8) where j refers to the current time step. If all the targets are solved, the collected rewards sum up to 1.
+
+( 1
+
+M if t ∈TU(j −1) ∧t ∈TS(j) 0 otherwise (8)
+
+rT R qi =
+
+To give more importance to skills, a fixed penalty (WC) is added if agents step on a target that does not have a common skill, as shown in Equation (9).
+
+( −1 if (∥rt∥2 = 0) ∧(|Sqi ∩St| = 0) 0 otherwise (9) To ensure efficient completion of targets, specifically minimizing the number of required steps, agents are subjected to a nominal cost per movement (SC), which can be formalized as shown in Equation (10). The action that leads to the current state is written as u(j −1).
+
+rW C qi = X
+
+t∈TU
+
+( 0 if u(j −1) = stay −1 otherwise (10)
+
+rSC qi =
+
+In addition to a minimal number of steps, agents are expected to complete the targets in a minimum time frame,
+
+Trajectories
+
+Collect
+
+Single agent Training update Agent team
+
+which is introduced as shown in Equation (11). The solvetime cost (TC) decreases with the number of solved goals and is normalized by the number of total targets M and the maximum number of steps Tmax in the episode. It follows that if the agents solve all the targets during an episode, the cost vanishes.
+
+rT C qi = |TU(j)|
+
+M · Tmax (11)
+
+Finally, the terminal bonus incentivizes agents to complete an environment further by rewarding them for solving all targets, as shown in Equation (12).
+
+( 1 if (TS(j −1) ⊂T ) ∧(T ⊆TS(j)) 0 otherwise (12)
+
+rT B qi =
+
+The complete reward for an agent computed at each time step is shown in Equation (13) where each reward term is weighted by a constant parameter w ∈R, which allows the relative influence of the rewards to be adjusted in training.
+
+rqi = [rAR qi , rT R qi , rW C qi , rSC qi , rT C qi , rT B qi ]⊤
+
+w = [wAR, wT R, wW C, wSC, wT C, wT B]
+
+rfull qi = w · rqi (13)
+
+---
+
+<!-- page 5 mode: hybrid_paper -->
+
+Training AR TR WC SC TC BR
+
+Bootstrap ✓ ✓ ✓ × × ×
+
+Refinement ✓ ✓ ✓ ✓ ✓ ✓
+
+TABLE I: Activated rewards during training. AR: Attraction Reward, TR:
+
+Target Reward, WC: Wrong Target Cost, SC: Step Cost, TC: Solve Time Cost, BR: Bonus Reward
+
+### D. Learning Architecture
+
+As stated in Section II-B, we use the MAPPO algorithm [21,22], due to its proven performance in cooperative multiagent settings. We follow Lowe et al. [22], using an actorcritic structure for the MAPPO networks. The actor and critic networks have a gated recurrent unit (GRU), wrapped by dense layers, as shown in Figure 2. The critic learns a joint value function in a centralized way by taking a concatenation of all the agent observations. On the other hand, the actor execution is decentralized and outputs a probability distribution over the action space. In our case, the actor learns a strategy for an agent with arbitrary skills that can be applied to any agent on the team.
+
+### E. Training Strategy
+
+The step and solve time costs are initially discouraging.
+
+This can create an exploration bottleneck early in training, where agents fail to discover rewarding behaviors and instead converge to a degenerate policy that minimizes penalty by remaining stationary. To overcome this initial difficulty, the training is divided into two parts, the so-called bootstrap and refinement. In bootstrap, agents learn how to navigate to targets based on their skills. In refinement, they learn how to solve the targets efficiently. The rewards are activated as listed in Table I.
+
+During refinement training, the attraction reward is maintained to help agents finalize their navigation strategy. Its significantly lower value, compared to other reward terms, is designed to mitigate its effect towards the end of training.
+
+In all training runs, the initial positions and the skill sets for the agents and targets, as well as the target types, are randomized. However, to ensure that an environment is solvable, the agent team is always given at least one of each required skill.
+
+### F. Implementation
+
+Our pipeline was implemented using the JaxMARL framework [23], which provides baseline training algorithms and template environments for multi-agent reinforcement learning. The number of environment steps, the number of minibatches, the number of parallel environments, and the total training steps were manually tuned with respect to the quality of the solution and the GPU hardware constraints.
+
+The parameters used for the different policies (with varying numbers of targets) are listed in Table II. The reward weights for the policies are shown in Table III. Depending on which training phase, the weights were set to zero according to the activation rules in Table I.
+
+Π5T Π6T Π7T
+
+nENV 16’384 / 30’720 16’384 / 26’880 16’384 / 24576
+
+nST EP S 128 128 128
+
+nT RAIN 572 / 1271 572 / 2034 1668 / 3814
+
+nMINI 16 / 32 16 / 28 16 / 32
+
+Seed 2 / 4 2 2
+
+TABLE II: Modified MAPPO training parameters in top-down order are environments trained in parallel / max steps per environment, epochs / batch size / random generator seed.
+
+CAR wAR wT R wW C wSC wT C wT B
+
+Π5T 0.0075 1.0 1.0 0.25 0.3 0.5 0.2
+
+Π6T 0.0075 1.0 1.0 0.25 0.3 0.5 0.2
+
+Π7T 0.04 1.0 1.0 0.25 0.3 0.5 0.2
+
+TABLE III: Reward weights for the baseline policy.
+
+### IV. RESULTS
+
+The main results were obtained by training three agents with two different skills acting on a 32x32 map. Agents had two possible skills, implying three possible skill sets. Targets requiring both skills could be of type AND or OR.
+
+To analyze how well the method scales with the number of targets, we evaluated three different policies, Π5T , Π6T , Π7T , with agents solving five to seven targets. Due to the fixed observation size, as mentioned in Section III-B, the three policies had to be trained separately. During training, actions were sampled from a weighted probability distribution computed by the actor network to allow for a certain amount of exploration. For the evaluation, the action with the maximal probability was applied at each time step.
+
+The actor-critic networks, with approximately 245’000 kernel parameters, were trained on an Nvidia GeForce RTX
+
+4090 GPU. Inference times for the trained network and the
+
+baseline were measured on a MacBook Pro with an i5 @
+
+2.3 GHz with 8GB of RAM.
+
+### A. Evaluation Metrics
+
+We introduce a set of metrics to quantify the overall performance of our method. In the results, the metrics will be averaged over a series of randomly generated environments to obtain a statistical evaluation and marked with a bar M accordingly.
+
+1) Success Rate: The success rate represents the number
+
+of solved environments Ksolved versus the total number of simulated environments Ksims. In solved environments, all targets were solved.
+
+Msuccess = Ksolved
+
+Ksims (14)
+
+2) Solve Time: Tsolved is the number of time steps until
+
+the agents have solved all the targets, and Tmax is equal to the maximum number of environment steps nST EP S as listed in Table II. Therefore, the difference in the metric Mst represents how much time is left before the environment is
+
+---
+
+<!-- page 6 mode: hybrid_paper -->
+
+Π5T Π6T Π7T
+
+MRL st 
+
+MRL tte 
+
+MES2 tte 0.92 0.91 0.84
+
+TABLE IV: Performance comparison between three policies with a different number of targets, and the optimal solutions ES1 w.r.t. solve time (st) and ES2 w.r.t. the total team effort (tte). Optimal performance would be represented by a value of 1.
+
+marked as unsolved. We use the difference to allow for a relative comparison with the baseline algorithm.
+
+Mst = Tmax −Tsolved (15)
+
+3) Total Team Effort: The total team effort is defined as
+
+the sum of all agent movements. Similarly to the solve time, we define the metric Mtte as the negative counterpart, which is the sum of movements that agents have left after all targets were solved. The function rstep was defined in Section III-A and evaluates to 1 for each moving action at time step j.
+
+
+
+
+
+Tsolved X
+
+Mtte = X
+
+j=1 |rstep qi (j)|
+
+Tmax −
+
+ (16)
+
+q∈A
+
+### B. Policy vs. Optimal Solution
+
+Although our multi-agent reinforcement learning (RL) policy is trained for a multi-objective goal, we compare its performance to optimal solutions found via exhaustive search (ES) in Table IV. This approach provides a quantitative benchmark, demonstrating how closely our policy’s performance on each metric approaches its theoretical bestcase scenario. We compute two sets of optimal solutions, optimizing ES1 with respect to Mst and ES2 with respect to Mtte. For each policy, we averaged the metrics over 100 different simulated environments.
+
+The success rate for all policies is greater than 90%, which shows that most environments are solved. Furthermore, the three trained policies achieve greater optimality with respect to total team effort (92%, 91%, 84%) than with respect to the solve time (86%, 81%, 73%). This indicates that the chosen reward weights led to a policy that favors team effort over solving the targets in minimal time. Furthermore, the numbers reveal a decreasing performance across all metrics as the number of targets increases, which is consistent with the problem’s growing complexity.
+
+### C. Comparison of Inference Time
+
+A notable advantage of a learning-based method is that the inference time remains constant and is independent of the problem’s initial conditions. This is because a single forward pass through the network has a time complexity of O(1).
+
+This property enables real-time operation in a resourceconstrained environment. In contrast, exact methods, such as the ES approach, exhibit an inference time that scales exponentially with the number of agents, targets, or skills.
+
+Furthermore, the inference time of these methods varies significantly based on the initial conditions.
+
+In Figure 3, we show a comparison between the inference times for the ES approach, our policy at runtime, and the corresponding training time for a varying number of targets.
+
+The inference time for the RL policy was measured by running a simulation to its limit, which in our case is 128 steps, i.e., forward passes. For both approaches, the time was averaged over 10 simulations.
+
+The graph reveals an exponential increase of approximately 1.5 orders of magnitude for the ES solving time, whereas the RL training time grows at around 0.25 orders of magnitude. However, the RL training time is orders of magnitude beyond the ES solving time.
+
+log(t), t: Measured Time in Seconds
+
+104
+
+103
+
+102
+
+101
+
+100
+
+π5 π6 π7
+
+Policy by Number of Targets
+
+Fig. 3: RL inference and training time measurements compared to the inference time of the ES approach with respect to the trained policies by number of solved targets.
+
+### D. Replanning Capability
+
+Having a short and constant inference time for the network opens the possibility of performing online replanning on newly discovered targets. As described in Section III-B, the observation size is fixed and the number of targets cannot be changed for a pretrained network. Thus, we use the observation as a buffer, where new incoming targets replace those that have already been solved.
+
+For this experiment, we used Π5T as a baseline and an additional policy Π5T 5R that was trained such that the agents had to solve the five initial targets and an additional five replanned targets in an episode. The new targets were randomly generated with different positions, skill sets and goal types and were added to the observation as soon as one of the initial targets had been solved. All training parameters and reward weights were kept the same, as was the training strategy.
+
+Both policies were simulated over 1000 environments to solve five initial and five additional targets.
+
+As listed in Table V, the results for both policies are very similar, showing that explicitly training with newly incoming targets does not improve performance. Note that the success rate Msuccess in Table V is lower compared to the results shown in Section IV-B, because an episode was only marked
+
+---
+
+<!-- page 7 mode: hybrid_paper -->
+
+**Table 1 (Page 7)**
+
+| 84.2% | 85.70±20.1 |
+|---|---|
+
+![Table 1](p213_assets/tables/p213_page_7_table_1.png)
+
+Msuccess Mst Mtte
+
+Π5T 5R 84.1 % 85.73 ± 20.9 220.0 ± 81.3
+
+TABLE V: Baseline policy Π5T versus a policy Π5T 5R that was trained including the possibility of obtaining new targets during an episode. Simulated over 1000 random (seed=10) environments with an episode length of 128.
+
+as successful if the agents could solve 10 targets instead of five, while the maximum duration of the episode was still 128.
+
+### V. DISCUSSION
+
+### A. Policy Performance
+
+In Section IV-B, we compared our method against two optimal solutions obtained by ES. The learned policies achieved up to 86% optimal solution quality with respect to the solve time and up to 92% with respect to the total team effort. These results demonstrate that a reinforcement learning policy can approximate near-optimal performance with significantly lower computational cost at runtime. The higher optimality with respect to total team effort compared to solve time indicates that the chosen reward weights biased the policies toward minimizing overall effort rather than completion time. In addition, performance across all metrics decreases as the number of targets increases, reflecting the growing complexity of the problem.
+
+Still, the final success rate leaves room for improvement.
+
+Training with a longer episode length could have helped to explore more edge cases and increase performance. However, GPU memory limitations imposed a trade-off between episode length (i.e., exploration horizon) and the number of environments that could be trained in parallel.
+
+As is common in reinforcement learning, reward tuning was a central challenge. When increasing the number of targets, we observed that the previously tuned parameters remained applicable only up to a certain number, beyond which re-adjustment of the weights is necessary. For example, the intensity of the attraction reward needed to be reduced when training with more targets to prevent mutual cancellation of target rewards due to excessive overlap.
+
+### B. Inference Time
+
+When the RL method is deployed on real hardware, the inference time of a fixed-size network remains constant for an increasing number of targets. This property can prove advantageous when designing real-time embedded systems. In contrast, exact methods scale exponentially with the number of agents, targets, or skills and are highly sensitive to initial conditions. However, the findings in Figure 3 also show that the inherent complexity of the problem is not eliminated, but instead is shifted and condensed to the training phase.
+
+Training times and computational demands scale rapidly with the number of targets, agents, and skills, slowing down policy development. Moreover, the corresponding scaling rate in
+
+Section IV-C is likely higher, since the performance decreased when additional targets were introduced (Table IV), suggesting that the training was not fully exploited.
+
+### C. Replanning
+
+By using the observation as a buffer and replacing solved targets with new ones, our method demonstrated its ability to perform online replanning. In real-world missions, this could be applied iteratively, rather than calculating a complete solution upfront. Plans would be generated for shorter horizons and dynamically adjusted as agents observe new targets. Such an iterative process reduces the number of forward passes, thereby improving the method’s computational efficiency.
+
+### D. Limitations
+
+The main limitation of this approach is the fixed observation size of the current architecture, which limits the number of targets as well as the team size, thus restricting scalability. The work of Wang et al. [20], which used a graph neural network to learn an embedding for social awareness in a multi-robot team, offers a possible starting point for computing observations that are independent of the number of entities. Another idea is presented by Hafner et al. in DreamerV3 [24], where they showed how to extend an actorcritic approach with an additional auto-encoder to learn a world model representation given an instantaneous partial observation of the agent.
+
+### VI. CONCLUSION
+
+This work explored a reinforcement learning approach to the multi-agent global path planning and scheduling problem, where agents learn an emergent strategy for team coordination and scheduling to efficiently solve a set of targets on a grid. Using a MAPPO-based centralized training framework, we derived decentralized policies that achieved near-optimal solution quality.
+
+We observed that with a learning-based method, the complexity of the problem is shifted from runtime to training time. This property can be especially interesting for real-time systems with limited onboard compute, as inference requires only constant-time forward passes. Furthermore, the policy demonstrated the ability to online replanning by using the observation as a buffer for newly incoming targets.
+
+Looking forward, a key step toward generalization and scalability is to design an observation structure that is independent of the number of agents and targets. Such representations would enable the discovery of a general policy applicable to different team sizes, numbers of targets, and skill compositions.
+
+### REFERENCES
+
+[1] P. Arm, H. Kolvenbach, and M. Hutter, “Comparison of legged singlerobot and multi-robot planetary analog exploration systems,” in IAC
+
+2023 Conference Proceedings. International Astronautical Federation,
+
+2023, p. 78381.
+
+[2] J. Balaram, M. M. Aung, and M. P. Golombek, “The ingenuity helicopter on the perseverance rover,” Space Science Reviews, vol.
+
+217, 2021.
+
+---
+
+<!-- page 8 mode: hybrid_paper -->
+
+[3] P. Arm, G. Waibel, J. Preisig, T. Tuna, R. Zhou, V. Bickel, G. Ligeza,
+
+T. Miki, F. Kehl, H. Kolvenbach, and M. Hutter, “Scientific exploration
+
+of challenging planetary analog environments with a team of legged robots,” Science Robotics, vol. 8, 2023.
+
+[4] J. R. S´ anchez-Ib´ a˜ nez, C. J. P´ erez-Del-pulgar, and A. Garc´ ıa-Cerezo, “Path planning for autonomous mobile robots: A review,” Sensors, vol. 21, 2021.
+
+[5] J. Richter, H. Kolvenbach, G. Valsecchi, and M. Hutter, “Multiobjective global path planning for lunar exploration with a quadruped robot,” 2023.
+
+[6] O. Cheikhrouhou and I. Khoufi, “A comprehensive survey on the multiple traveling salesman problem: Applications, approaches and taxonomy,” 2021.
+
+[7] M. Vali and K. Salimifard, “A constraint programming approach for solving multiple traveling salesman problem,” 2017.
+
+[8] K. Sundar and S. Rathinam, “Algorithms for heterogeneous, multiple depot, multiple unmanned vehicle path planning problems,” J. Intell.
+
+Robotics Syst., vol. 88, no. 2–4, p. 513–526, 2017.
+
+[9] H. Ma and S. Koenig, “Optimal target assignment and path finding for teams of agents,” 2016.
+
+[10] M. Turpin, N. Michael, and V. Kumar, “Concurrent assignment and planning of trajectories for large teams of interchangeable robots,” in 2013 IEEE International Conference on Robotics and Automation.
+
+IEEE, 2013, pp. 842–848.
+
+[11] Y. Shuai, S. Yunfeng, and Z. Kai, “An effective method for solving multiple travelling salesman problem based on nsga-ii,” Systems Science and Control Engineering, vol. 7, pp. 121–129, 2019.
+
+[12] A. K. Pamosoaji and D. B. Setyohadi, “Novel graph model for solving collision-free multiple-vehicle traveling salesman problem using ant colony optimization,” Algorithms, vol. 13, 2020.
+
+[13] X. Dong, Q. Lin, M. Xu, and Y. Cai, “Artificial bee colony algorithm with generating neighbourhood solution for large scale coloured traveling salesman problem,” IET Intelligent Transport Systems, vol. 13, pp. 1483–1491, 2019.
+
+[14] V. Pandiri and A. Singh, “A swarm intelligence approach for the colored traveling salesman problem,” Applied Intelligence, vol. 48, pp. 4412–4428, 2018.
+
+[15] Y. Jiang, H. Yedidsion, S. Zhang, G. Sharon, and P. Stone, “Multi-robot planning with conflicts and synergies,” Autonomous Robots, vol. 43, 2019.
+
+[16] Y. Hu, Y. Yao, and W. S. Lee, “A reinforcement learning approach for optimizing multiple traveling salesman problems over graphs,” Knowledge-Based Systems, vol. 204, 2020.
+
+[17] Y. Guo, Z. Ren, and C. Wang, “imtsp: Solving min-max multiple traveling salesman problem with imperative learning,” 2024.
+
+[18] G. Sartoretti, J. Kerr, Y. Shi, G. Wagner, T. K. S. Kumar,
+
+S. Koenig, and H. Choset, “Primal: Pathfinding via reinforcement
+
+and imitation multi-agent learning,” IEEE Robotics and Automation Letters, vol. 4, no. 3, p. 2378–2385, Jul. 2019. [Online]. Available:
+
+http://dx.doi.org/10.1109/LRA.2019.2903261
+
+[19] Zhiyaoa and Sartoretti, “Deep reinforcement learning based multiagent pathfinding,” 2020.
+
+[20] W. Wang, L. Mao, R. Wang, and B.-C. Min, “Multi-robot cooperative socially-aware navigation using multi-agent reinforcement learning,” 2023.
+
+[21] C. Yu, A. Velu, E. Vinitsky, J. Gao, Y. Wang, A. Bayen, and
+
+Y. Wu, “The surprising effectiveness of ppo in cooperative, multi-
+
+agent games,” 2021.
+
+[22] R. Lowe, Y. Wu, A. Tamar, J. Harb, P. Abbeel, and I. Mordatch, “Multi-agent actor-critic for mixed cooperative-competitive environments,” 2017.
+
+[23] A. Rutherford, B. Ellis, M. Gallici, J. Cook, A. Lupu, G. Ingvarsson,
+
+T. Willi, A. Khan, C. S. de Witt, A. Souly, S. Bandyopadhyay,
+
+M. Samvelyan, M. Jiang, R. T. Lange, S. Whiteson, B. Lacerda,
+
+N. Hawes, T. Rocktaschel, C. Lu, and J. N. Foerster, “Jaxmarl: Multi-
+
+agent rl environments in jax,” arXiv preprint arXiv:2311.10090, 2023.
+
+[24] D. Hafner, J. Pasukonis, J. Ba, and T. Lillicrap, “Mastering diverse domains through world models,” arXiv preprint arXiv:2301.04104, 2023.
+
+---

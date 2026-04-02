@@ -1,0 +1,159 @@
+{
+  "doc_id": "a003",
+  "system": "ocr_agent",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment3.pdf",
+  "title": "a003",
+  "status": "success",
+  "markdown_line_count": 75,
+  "headings": [
+    {
+      "level": 1,
+      "text": "a003",
+      "normalized_text": "a003",
+      "line_no": 1,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Kaggle: Customer Personality Analysis",
+      "normalized_text": "kaggle customer personality analysis",
+      "line_no": 25,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "1. Data Preprocessing:",
+      "normalized_text": "data preprocessing",
+      "line_no": 35,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "2. Train a Classification Model:",
+      "normalized_text": "train a classification model",
+      "line_no": 47,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "3. Model Evaluation:",
+      "normalized_text": "model evaluation",
+      "line_no": 55,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "4. Analysis:",
+      "normalized_text": "analysis",
+      "line_no": 63,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "a003",
+      "normalized_heading_text": "a003",
+      "level": 1,
+      "line_start": 1,
+      "line_end": 24,
+      "prose_text": "Assignment 2: Classification - Customer Churn Prediction Using Classification\nIn this assignment, you will build a classification model to predict customer churn. Churn prediction is essential for businesses to identify customers at risk of leaving and take action to retain them.\nKaggle: Telco Customer Churn Dataset\n• Link: Telco Customer Churn Dataset on Kaggle\n• Description: This dataset contains customer data from a telecommunications company, including information about services, account status, and whether the customer churned.\nIt’s one of the most popular datasets for customer churn prediction and works well for classification problems.\n• Features: Customer tenure, monthly charges, contract type, payment method, and churn label (Yes/No).",
+      "full_text": "<!-- document_mode: simple_text -->\n<!-- page 1 mode: simple_text -->\nAssignment 2: Classification - Customer Churn Prediction Using Classification\nObjective:\nIn this assignment, you will build a classification model to predict customer churn. Churn prediction is essential for businesses to identify customers at risk of leaving and take action to retain them.\nDataset:\nKaggle: Telco Customer Churn Dataset\n• Link: Telco Customer Churn Dataset on Kaggle\n• Description: This dataset contains customer data from a telecommunications company, including information about services, account status, and whether the customer churned.\nIt’s one of the most popular datasets for customer churn prediction and works well for classification problems.\n• Features: Customer tenure, monthly charges, contract type, payment method, and churn label (Yes/No).",
+      "word_count": 101,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Kaggle: Customer Personality Analysis",
+      "normalized_heading_text": "kaggle customer personality analysis",
+      "level": 3,
+      "line_start": 25,
+      "line_end": 34,
+      "prose_text": "• Link: Customer Personality Analysis on Kaggle\n• Description: This dataset helps classify customers based on various demographics, purchase behavior, and marketing campaign data. It’s a good fit for a classification task where you can predict which customers will respond to marketing campaigns or predict churn based on customer behavior.\n• Features: Includes customer attributes like income, education level, marital status, number of purchases, and complaint counts.",
+      "full_text": "• Link: Customer Personality Analysis on Kaggle\n• Description: This dataset helps classify customers based on various demographics, purchase behavior, and marketing campaign data. It’s a good fit for a classification task where you can predict which customers will respond to marketing campaigns or predict churn based on customer behavior.\n• Features: Includes customer attributes like income, education level, marital status, number of purchases, and complaint counts.\nInstructions:",
+      "word_count": 62,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "1. Data Preprocessing:",
+      "normalized_heading_text": "data preprocessing",
+      "level": 3,
+      "line_start": 35,
+      "line_end": 46,
+      "prose_text": "o Load the dataset using Pandas.\no Convert any categorical variables (e.g., ContractType) into numerical values using\no Handle any missing data and scale the features if necessary.\no Split the data into training and test sets (e.g., 80% training, 20% testing).",
+      "full_text": "o Load the dataset using Pandas.\no Convert any categorical variables (e.g., ContractType) into numerical values using\none-hot encoding.\no Handle any missing data and scale the features if necessary.\no Split the data into training and test sets (e.g., 80% training, 20% testing).",
+      "word_count": 34,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "2. Train a Classification Model:",
+      "normalized_heading_text": "train a classification model",
+      "level": 3,
+      "line_start": 47,
+      "line_end": 54,
+      "prose_text": "o Choose a classification algorithm (e.g., Logistic Regression, Decision Tree, or\no Train the model to predict whether a customer will churn (Churn column).",
+      "full_text": "o Choose a classification algorithm (e.g., Logistic Regression, Decision Tree, or\nRandom Forest).\no Train the model to predict whether a customer will churn (Churn column).",
+      "word_count": 19,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "3. Model Evaluation:",
+      "normalized_heading_text": "model evaluation",
+      "level": 3,
+      "line_start": 55,
+      "line_end": 62,
+      "prose_text": "o Evaluate the model using metrics such as accuracy, precision, recall, F1-score,\nand the confusion matrix.\no Plot a ROC curve and calculate the AUC score to assess model performance.",
+      "full_text": "o Evaluate the model using metrics such as accuracy, precision, recall, F1-score,\nand the confusion matrix.\no Plot a ROC curve and calculate the AUC score to assess model performance.",
+      "word_count": 27,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "4. Analysis:",
+      "normalized_heading_text": "analysis",
+      "level": 3,
+      "line_start": 63,
+      "line_end": 75,
+      "prose_text": "o Write a short analysis explaining how well your model performed. Which features\nwere most important in predicting churn? Did the model produce any false positives or false negatives?\n• Jupyter notebook (.ipynb file) with your code, comments, and explanations.\n• A short report (1-2 pages) discussing model performance, feature importance, and any recommendations for improving customer retention.",
+      "full_text": "o Write a short analysis explaining how well your model performed. Which features\nwere most important in predicting churn? Did the model produce any false positives or false negatives?\nSubmission:\n• Jupyter notebook (.ipynb file) with your code, comments, and explanations.\n• A short report (1-2 pages) discussing model performance, feature importance, and any recommendations for improving customer retention.\n---",
+      "word_count": 52,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [],
+  "tables": [],
+  "intrinsic_metrics": {
+    "heading_count": 6,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 0,
+    "table_caption_count": 0,
+    "duplicate_figure_caption_count": 0,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 0,
+    "consecutive_heading_run_count": 0,
+    "max_consecutive_heading_run": 0
+  },
+  "run_metadata": {
+    "doc_id": "a003",
+    "system": "ocr_agent",
+    "title": "Assignment 2: Classification - Customer Churn Prediction Using Classification",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment3.pdf",
+    "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a003/a003.pdf",
+    "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a003",
+    "ocr_backend": "dummy",
+    "use_pdf_page_ocr": false,
+    "document_mode": "simple_text",
+    "asset_counts": {
+      "figures": 0,
+      "tables": 0,
+      "page_images": 0
+    },
+    "elapsed_ms": 82.183,
+    "status": "success",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a003/paper.md"
+  }
+}

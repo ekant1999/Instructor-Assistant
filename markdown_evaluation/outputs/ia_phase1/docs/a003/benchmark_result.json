@@ -1,0 +1,103 @@
+{
+  "doc_id": "a003",
+  "system": "ia_phase1",
+  "paper_id": 355052400973,
+  "title": "Assignment 2: Classification - Customer Churn Prediction Using Classification",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment3.pdf",
+  "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a003",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a003/paper.md",
+  "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a003/manifest.json",
+  "asset_counts": {
+    "figures": 0,
+    "tables": 0,
+    "equations": 0
+  },
+  "metadata": {
+    "title": "Assignment 2: Classification - Customer Churn Prediction Using Classification",
+    "paper_id": "355052400973",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment3.pdf",
+    "generated_at": "2026-04-02T18:13:25.813319+00:00",
+    "num_figures": "0",
+    "num_tables": "0",
+    "num_equations": "0",
+    "page_count": "1"
+  },
+  "render_mode": "normal",
+  "sectioning_strategy": "heuristic",
+  "sectioning_report": {
+    "strategy": "heuristic",
+    "candidate_headings": 4,
+    "matched_headings": 5,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 8
+      },
+      {
+        "index": 1,
+        "title": "Data Preprocessing",
+        "canonical": "data_preprocessing",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 9,
+        "end_block_index": 12
+      },
+      {
+        "index": 2,
+        "title": "Train a Classification Model",
+        "canonical": "train_a_classification_model",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 13,
+        "end_block_index": 16
+      },
+      {
+        "index": 3,
+        "title": "Model Evaluation",
+        "canonical": "experiments",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 17,
+        "end_block_index": 20
+      },
+      {
+        "index": 4,
+        "title": "Analysis",
+        "canonical": "analysis",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 21,
+        "end_block_index": 26
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 27
+  },
+  "audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": []
+  },
+  "elapsed_ms": 166.866,
+  "status": "success"
+}

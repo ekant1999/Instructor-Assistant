@@ -1,0 +1,87 @@
+{
+  "doc_id": "a001",
+  "title": "CMPE 286 - LAB - 1",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "non_academic",
+    "student_assignment",
+    "screenshot_heavy",
+    "network_analysis_report"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Part 1: Installation"
+    },
+    {
+      "level": 2,
+      "text": "Part 2"
+    },
+    {
+      "level": 2,
+      "text": "Part 3: Identify HTTP Requests and Responses"
+    },
+    {
+      "level": 2,
+      "text": "Part 4: Custom Columns"
+    },
+    {
+      "level": 2,
+      "text": "Part 5: Advanced Analysis"
+    },
+    {
+      "level": 2,
+      "text": "Part 6: Delay and Jitter"
+    },
+    {
+      "level": 2,
+      "text": "Part 7: TCP 3-Way Handshake and Packet Timing"
+    },
+    {
+      "level": 2,
+      "text": "Final Observations"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "Normal browsing instantly produces DNS lookups, then TCP/TLS or UDP/QUIC connections, followed by application data",
+      "expected_section": "Part 2",
+      "position": "middle"
+    },
+    {
+      "text": "Click on a packet and expand the Hypertext Transfer Protocol section to see details of the request",
+      "expected_section": "Part 3: Identify HTTP Requests and Responses",
+      "position": "middle"
+    },
+    {
+      "text": "Hosts selected: 1. Harvard.edu 2. Mit.edu 3. Utexas.edu 4. www.ust.hk 5. Ethz.ch",
+      "expected_section": "Part 6: Delay and Jitter",
+      "position": "start"
+    },
+    {
+      "text": "U.S. destinations generally have lower RTTs than overseas ones; transoceanic links produce the largest hop-to-hop increases in traceroute",
+      "expected_section": "Part 6: Delay and Jitter",
+      "position": "end"
+    },
+    {
+      "text": "Time between SYN and SYN, ACK: 0.025380",
+      "expected_section": "Part 7: TCP 3-Way Handshake and Packet Timing",
+      "position": "middle"
+    },
+    {
+      "text": "The capture shows a contemporary web stack where encryption and UDP-based transports are first-class",
+      "expected_section": "Final Observations",
+      "position": "start"
+    },
+    {
+      "text": "Custom columns for ports and HTTP fields, plus simple coloring rules, significantly speed up triage",
+      "expected_section": "Final Observations",
+      "position": "end"
+    }
+  ],
+  "figures": [],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/Assignment1.pdf on 2026-04-02 using pdftotext -layout and visual inspection of rendered pages. Screenshots are unnumbered in the source PDF, so gold figures/tables are intentionally empty."
+}

@@ -1,0 +1,19 @@
+{
+  "doc_id": "p179",
+  "system": "ocr_agent",
+  "title": "A ROS 2 Wrapper for Florence-2: Multi-Mode Local Vision-Language Inference for Robotic Systems",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401179v1.pdf",
+  "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p179/p179.pdf",
+  "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p179",
+  "ocr_backend": "dummy",
+  "use_pdf_page_ocr": false,
+  "document_mode": "hybrid_paper",
+  "asset_counts": {
+    "figures": 1,
+    "tables": 0,
+    "page_images": 0
+  },
+  "elapsed_ms": 700.136,
+  "status": "success",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p179/paper.md"
+}

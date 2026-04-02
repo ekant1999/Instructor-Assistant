@@ -1,0 +1,163 @@
+{
+  "doc_id": "a001",
+  "system": "ia_phase1",
+  "paper_id": 565476836086,
+  "title": "CMPE 286 - LAB - 1",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment1.pdf",
+  "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a001",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a001/paper.md",
+  "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a001/manifest.json",
+  "asset_counts": {
+    "figures": 0,
+    "tables": 0,
+    "equations": 0
+  },
+  "metadata": {
+    "title": "CMPE 286 - LAB - 1",
+    "paper_id": "565476836086",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment1.pdf",
+    "generated_at": "2026-04-02T18:13:22.052851+00:00",
+    "num_figures": "0",
+    "num_tables": "0",
+    "num_equations": "0",
+    "page_count": "18"
+  },
+  "render_mode": "normal",
+  "sectioning_strategy": "heuristic",
+  "sectioning_report": {
+    "strategy": "heuristic",
+    "candidate_headings": 9,
+    "matched_headings": 10,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 9,
+        "start_block_index": 0,
+        "end_block_index": 23
+      },
+      {
+        "index": 1,
+        "title": "Harvard.edu",
+        "canonical": "harvard_edu",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 9,
+        "end_page": 17,
+        "start_block_index": 24,
+        "end_block_index": 39
+      },
+      {
+        "index": 2,
+        "title": "st Entry SYN",
+        "canonical": "st_entry_syn",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 17,
+        "end_page": 17,
+        "start_block_index": 40,
+        "end_block_index": 40
+      },
+      {
+        "index": 3,
+        "title": "nd Entry: SYN, ACK",
+        "canonical": "nd_entry_syn_ack",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 17,
+        "end_page": 17,
+        "start_block_index": 41,
+        "end_block_index": 41
+      },
+      {
+        "index": 4,
+        "title": "rd Entry: ACK",
+        "canonical": "rd_entry_ack",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 17,
+        "end_page": 17,
+        "start_block_index": 42,
+        "end_block_index": 46
+      },
+      {
+        "index": 5,
+        "title": "Protocol mix &",
+        "canonical": "protocol_mix",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 17,
+        "end_page": 18,
+        "start_block_index": 47,
+        "end_block_index": 49
+      },
+      {
+        "index": 6,
+        "title": "Name resolution",
+        "canonical": "name_resolution",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 18,
+        "end_page": 18,
+        "start_block_index": 50,
+        "end_block_index": 51
+      },
+      {
+        "index": 7,
+        "title": "Latency, jitter, and",
+        "canonical": "latency_jitter_and",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 18,
+        "end_page": 18,
+        "start_block_index": 52,
+        "end_block_index": 53
+      },
+      {
+        "index": 8,
+        "title": "TCP handshake",
+        "canonical": "tcp_handshake",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 18,
+        "end_page": 18,
+        "start_block_index": 54,
+        "end_block_index": 55
+      },
+      {
+        "index": 9,
+        "title": "Practical analysis",
+        "canonical": "practical_analysis",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 18,
+        "end_page": 18,
+        "start_block_index": 56,
+        "end_block_index": 57
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 58
+  },
+  "audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": []
+  },
+  "elapsed_ms": 2331.907,
+  "status": "success"
+}

@@ -1,0 +1,80 @@
+{
+  "doc_id": "p186",
+  "title": "From Validity to Inter-Subjectivity: An Argument for Reliability Signals in Search Environments",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "short_paper",
+    "non_experimental_paper",
+    "single_column"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "Reliability Presumes Inter-subjective Validity"
+    },
+    {
+      "level": 2,
+      "text": "Reliability Signals as Knowledge Context"
+    },
+    {
+      "level": 2,
+      "text": "From Gatekeeping to Contextualization"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "Search engines and information platforms are increasingly scrutinized for their role in spreading misinformation",
+      "expected_section": "Introduction",
+      "position": "start"
+    },
+    {
+      "text": "Since this makes validity hard to judge in practice, I argue that we should shift attention to the reliability of information",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "If reliability is to meaningfully guide information evaluation, it assumes that people expect others to agree on what constitutes good information",
+      "expected_section": "Reliability Presumes Inter-subjective Validity",
+      "position": "start"
+    },
+    {
+      "text": "Drawing on practice theory, it shows that users do not treat judgments as subjective, but appeal to shared standards grounded in the norms of specific practices",
+      "expected_section": "Reliability Presumes Inter-subjective Validity",
+      "position": "middle"
+    },
+    {
+      "text": "We propose knowledge context (Smith and Rieh, 2019) as a way for information systems to support better judgments about reliability",
+      "expected_section": "Reliability Signals as Knowledge Context",
+      "position": "start"
+    },
+    {
+      "text": "Most current systems hide this kind of context",
+      "expected_section": "Reliability Signals as Knowledge Context",
+      "position": "middle"
+    },
+    {
+      "text": "Platforms are often caught between two extremes: suppressing freedom of speech in the name of truth, or claiming neutrality while amplifying unreliable content",
+      "expected_section": "From Gatekeeping to Contextualization",
+      "position": "start"
+    },
+    {
+      "text": "A focus on reliability, and the social cues that shape it, offers a path toward more transparent, democratic, and epistemically responsible information environments",
+      "expected_section": "From Gatekeeping to Contextualization",
+      "position": "end"
+    }
+  ],
+  "figures": [],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/260401186v1.pdf on 2026-04-02 using pdftotext -layout and rendered-page inspection. This paper has no numbered figure/table captions in the source PDF."
+}

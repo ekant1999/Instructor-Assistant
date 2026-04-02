@@ -23,49 +23,49 @@
     {
       "level": 3,
       "text": "1. Introduction",
-      "normalized_text": "1 introduction",
+      "normalized_text": "introduction",
       "line_no": 25,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "2. Preliminaries",
-      "normalized_text": "2 preliminaries",
+      "normalized_text": "preliminaries",
       "line_no": 87,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "2.1. Problem Formulation",
-      "normalized_text": "2 1 problem formulation",
+      "normalized_text": "problem formulation",
       "line_no": 89,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "2.2. Supervised Fine-Tuning (SFT)",
-      "normalized_text": "2 2 supervised fine tuning sft",
+      "normalized_text": "supervised fine tuning sft",
       "line_no": 93,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "2.3. Online RL with Sparse Outcome Rewards",
-      "normalized_text": "2 3 online rl with sparse outcome rewards",
+      "normalized_text": "online rl with sparse outcome rewards",
       "line_no": 97,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3. Methodology",
-      "normalized_text": "3 methodology",
+      "normalized_text": "methodology",
       "line_no": 155,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3.1. Framework Overview",
-      "normalized_text": "3 1 framework overview",
+      "normalized_text": "framework overview",
       "line_no": 159,
       "suspicious": false
     },
@@ -79,77 +79,77 @@
     {
       "level": 3,
       "text": "3.2. On-Policy Trajectory Sampling",
-      "normalized_text": "3 2 on policy trajectory sampling",
+      "normalized_text": "on policy trajectory sampling",
       "line_no": 277,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3.3. Dense Teacher Supervision",
-      "normalized_text": "3 3 dense teacher supervision",
+      "normalized_text": "dense teacher supervision",
       "line_no": 285,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3.4. Optimization Objective and Analysis",
-      "normalized_text": "3 4 optimization objective and analysis",
+      "normalized_text": "optimization objective and analysis",
       "line_no": 287,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4. Experiments",
-      "normalized_text": "4 experiments",
+      "normalized_text": "experiments",
       "line_no": 369,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.1. Experimental Setup",
-      "normalized_text": "4 1 experimental setup",
+      "normalized_text": "experimental setup",
       "line_no": 389,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.2. Main Results: Efficiency and Efficacy",
-      "normalized_text": "4 2 main results efficiency and efficacy",
+      "normalized_text": "main results efficiency and efficacy",
       "line_no": 399,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "2. Impact of Group Sampling Size (G). We investigate the impact of the group-based sampling mechanism",
-      "normalized_text": "2 impact of group sampling size g we investigate the impact of the group based sampling mechanism",
+      "normalized_text": "impact of group sampling size g we investigate the impact of the group based sampling mechanism",
       "line_no": 453,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "5. Related Work",
-      "normalized_text": "5 related work",
+      "normalized_text": "related work",
       "line_no": 483,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "5.1. Offline SFT for Vision-Language-Action Models",
-      "normalized_text": "5 1 offline sft for vision language action models",
+      "normalized_text": "offline sft for vision language action models",
       "line_no": 485,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "5.2. Online RL for Vision-Language-Action Models",
-      "normalized_text": "5 2 online rl for vision language action models",
+      "normalized_text": "online rl for vision language action models",
       "line_no": 491,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "6. Conclusion",
-      "normalized_text": "6 conclusion",
+      "normalized_text": "conclusion",
       "line_no": 497,
       "suspicious": false
     },
@@ -188,7 +188,7 @@
     },
     {
       "heading_text": "1. Introduction",
-      "normalized_heading_text": "1 introduction",
+      "normalized_heading_text": "introduction",
       "level": 3,
       "line_start": 25,
       "line_end": 86,
@@ -200,7 +200,7 @@
     },
     {
       "heading_text": "2. Preliminaries",
-      "normalized_heading_text": "2 preliminaries",
+      "normalized_heading_text": "preliminaries",
       "level": 3,
       "line_start": 87,
       "line_end": 88,
@@ -212,7 +212,7 @@
     },
     {
       "heading_text": "2.1. Problem Formulation",
-      "normalized_heading_text": "2 1 problem formulation",
+      "normalized_heading_text": "problem formulation",
       "level": 3,
       "line_start": 89,
       "line_end": 92,
@@ -224,7 +224,7 @@
     },
     {
       "heading_text": "2.2. Supervised Fine-Tuning (SFT)",
-      "normalized_heading_text": "2 2 supervised fine tuning sft",
+      "normalized_heading_text": "supervised fine tuning sft",
       "level": 3,
       "line_start": 93,
       "line_end": 96,
@@ -236,7 +236,7 @@
     },
     {
       "heading_text": "2.3. Online RL with Sparse Outcome Rewards",
-      "normalized_heading_text": "2 3 online rl with sparse outcome rewards",
+      "normalized_heading_text": "online rl with sparse outcome rewards",
       "level": 3,
       "line_start": 97,
       "line_end": 154,
@@ -248,7 +248,7 @@
     },
     {
       "heading_text": "3. Methodology",
-      "normalized_heading_text": "3 methodology",
+      "normalized_heading_text": "methodology",
       "level": 3,
       "line_start": 155,
       "line_end": 158,
@@ -260,7 +260,7 @@
     },
     {
       "heading_text": "3.1. Framework Overview",
-      "normalized_heading_text": "3 1 framework overview",
+      "normalized_heading_text": "framework overview",
       "level": 3,
       "line_start": 159,
       "line_end": 256,
@@ -284,7 +284,7 @@
     },
     {
       "heading_text": "3.2. On-Policy Trajectory Sampling",
-      "normalized_heading_text": "3 2 on policy trajectory sampling",
+      "normalized_heading_text": "on policy trajectory sampling",
       "level": 3,
       "line_start": 277,
       "line_end": 284,
@@ -296,7 +296,7 @@
     },
     {
       "heading_text": "3.3. Dense Teacher Supervision",
-      "normalized_heading_text": "3 3 dense teacher supervision",
+      "normalized_heading_text": "dense teacher supervision",
       "level": 3,
       "line_start": 285,
       "line_end": 286,
@@ -308,7 +308,7 @@
     },
     {
       "heading_text": "3.4. Optimization Objective and Analysis",
-      "normalized_heading_text": "3 4 optimization objective and analysis",
+      "normalized_heading_text": "optimization objective and analysis",
       "level": 3,
       "line_start": 287,
       "line_end": 368,
@@ -320,7 +320,7 @@
     },
     {
       "heading_text": "4. Experiments",
-      "normalized_heading_text": "4 experiments",
+      "normalized_heading_text": "experiments",
       "level": 3,
       "line_start": 369,
       "line_end": 388,
@@ -332,7 +332,7 @@
     },
     {
       "heading_text": "4.1. Experimental Setup",
-      "normalized_heading_text": "4 1 experimental setup",
+      "normalized_heading_text": "experimental setup",
       "level": 3,
       "line_start": 389,
       "line_end": 398,
@@ -344,7 +344,7 @@
     },
     {
       "heading_text": "4.2. Main Results: Efficiency and Efficacy",
-      "normalized_heading_text": "4 2 main results efficiency and efficacy",
+      "normalized_heading_text": "main results efficiency and efficacy",
       "level": 3,
       "line_start": 399,
       "line_end": 452,
@@ -356,7 +356,7 @@
     },
     {
       "heading_text": "2. Impact of Group Sampling Size (G). We investigate the impact of the group-based sampling mechanism",
-      "normalized_heading_text": "2 impact of group sampling size g we investigate the impact of the group based sampling mechanism",
+      "normalized_heading_text": "impact of group sampling size g we investigate the impact of the group based sampling mechanism",
       "level": 3,
       "line_start": 453,
       "line_end": 482,
@@ -368,7 +368,7 @@
     },
     {
       "heading_text": "5. Related Work",
-      "normalized_heading_text": "5 related work",
+      "normalized_heading_text": "related work",
       "level": 3,
       "line_start": 483,
       "line_end": 484,
@@ -380,7 +380,7 @@
     },
     {
       "heading_text": "5.1. Offline SFT for Vision-Language-Action Models",
-      "normalized_heading_text": "5 1 offline sft for vision language action models",
+      "normalized_heading_text": "offline sft for vision language action models",
       "level": 3,
       "line_start": 485,
       "line_end": 490,
@@ -392,7 +392,7 @@
     },
     {
       "heading_text": "5.2. Online RL for Vision-Language-Action Models",
-      "normalized_heading_text": "5 2 online rl for vision language action models",
+      "normalized_heading_text": "online rl for vision language action models",
       "level": 3,
       "line_start": 491,
       "line_end": 496,
@@ -404,7 +404,7 @@
     },
     {
       "heading_text": "6. Conclusion",
-      "normalized_heading_text": "6 conclusion",
+      "normalized_heading_text": "conclusion",
       "level": 3,
       "line_start": 497,
       "line_end": 508,

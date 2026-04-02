@@ -1,0 +1,100 @@
+{
+  "doc_id": "a003",
+  "title": "Assignment 2: Classification - Customer Churn Prediction Using Classification",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "non_academic",
+    "student_assignment",
+    "instruction_sheet",
+    "short_document"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Objective"
+    },
+    {
+      "level": 2,
+      "text": "Dataset"
+    },
+    {
+      "level": 3,
+      "text": "Kaggle: Telco Customer Churn Dataset"
+    },
+    {
+      "level": 3,
+      "text": "Kaggle: Customer Personality Analysis"
+    },
+    {
+      "level": 2,
+      "text": "Instructions"
+    },
+    {
+      "level": 3,
+      "text": "Data Preprocessing"
+    },
+    {
+      "level": 3,
+      "text": "Train a Classification Model"
+    },
+    {
+      "level": 3,
+      "text": "Model Evaluation"
+    },
+    {
+      "level": 3,
+      "text": "Analysis"
+    },
+    {
+      "level": 2,
+      "text": "Submission"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "In this assignment, you will build a classification model to predict customer churn",
+      "expected_section": "Objective",
+      "position": "middle"
+    },
+    {
+      "text": "This dataset contains customer data from a telecommunications company, including information about services, account status, and whether the customer churned",
+      "expected_section": "Kaggle: Telco Customer Churn Dataset",
+      "position": "middle"
+    },
+    {
+      "text": "This dataset helps classify customers based on various demographics, purchase behavior, and marketing campaign data",
+      "expected_section": "Kaggle: Customer Personality Analysis",
+      "position": "middle"
+    },
+    {
+      "text": "Convert any categorical variables (e.g., ContractType) into numerical values using one-hot encoding",
+      "expected_section": "Data Preprocessing",
+      "position": "middle"
+    },
+    {
+      "text": "Choose a classification algorithm (e.g., Logistic Regression, Decision Tree, or Random Forest)",
+      "expected_section": "Train a Classification Model",
+      "position": "middle"
+    },
+    {
+      "text": "Evaluate the model using metrics such as accuracy, precision, recall, F1-score, and the confusion matrix",
+      "expected_section": "Model Evaluation",
+      "position": "middle"
+    },
+    {
+      "text": "Write a short analysis explaining how well your model performed",
+      "expected_section": "Analysis",
+      "position": "middle"
+    },
+    {
+      "text": "Jupyter notebook (.ipynb file) with your code, comments, and explanations",
+      "expected_section": "Submission",
+      "position": "start"
+    }
+  ],
+  "figures": [],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/Assignment3.pdf on 2026-04-02 using pdftotext -layout and page render inspection. This one-page assignment brief has no numbered figures or tables in the source PDF."
+}
