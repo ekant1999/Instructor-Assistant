@@ -1,0 +1,493 @@
+{
+  "doc_id": "p115",
+  "title": "OccAny: Generalized Unconstrained Urban 3D Occupancy",
+  "validated": true,
+  "layout_type": "two_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "appendix_heavy",
+    "table_heavy",
+    "figure_heavy"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract"
+    },
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "Related works"
+    },
+    {
+      "level": 2,
+      "text": "Method"
+    },
+    {
+      "level": 3,
+      "text": "3D Reconstruction with Segmentation Forcing"
+    },
+    {
+      "level": 3,
+      "text": "Novel-View Rendering"
+    },
+    {
+      "level": 3,
+      "text": "OccAny Inference"
+    },
+    {
+      "level": 3,
+      "text": "Training Losses"
+    },
+    {
+      "level": 2,
+      "text": "Experiments"
+    },
+    {
+      "level": 3,
+      "text": "Main results"
+    },
+    {
+      "level": 3,
+      "text": "Analysis"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    },
+    {
+      "level": 2,
+      "text": "Additional Details"
+    },
+    {
+      "level": 3,
+      "text": "Datasets"
+    },
+    {
+      "level": 3,
+      "text": "Training"
+    },
+    {
+      "level": 3,
+      "text": "OccAny+ using DA3 and SAM3"
+    },
+    {
+      "level": 2,
+      "text": "Supplementary Studies"
+    },
+    {
+      "level": 3,
+      "text": "Boosting semantic performance"
+    },
+    {
+      "level": 3,
+      "text": "More surround-view results"
+    },
+    {
+      "level": 3,
+      "text": "Novel-View Rendering vs. Depth Completion"
+    },
+    {
+      "level": 3,
+      "text": "Generalization of State-of-the-art (SOTA) 3D Supervised Occupancy Models"
+    },
+    {
+      "level": 3,
+      "text": "Ego Vehicle Trajectory Prediction"
+    },
+    {
+      "level": 3,
+      "text": "NVR complexity"
+    },
+    {
+      "level": 3,
+      "text": "Model sizes and speeds"
+    },
+    {
+      "level": 2,
+      "text": "Qualitative Examples"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "We address this gap and present OccAny, the first unconstrained urban 3D occupancy model capable of operating on out-of-domain uncalibrated scenes",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "We propose the first generalized 3D occupancy framework",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "A key task in this area is 3D occupancy prediction whose goal is to infer a voxelized map of the environment",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "We introduce a novel pipeline for urban 3D occupancy prediction that emphasizes scalability and generalization.",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "Visual geometry foundation model. Dust3r [66] introduced the visual geometry foundation model, which uses large-scale pointmap prediction to solve diverse 3D tasks.",
+      "expected_section": "Related works",
+      "position": "start"
+    },
+    {
+      "text": "We build OccAny, a 3D occupancy framework that can generalize to arbitrary out-of-domain urban scenes.",
+      "expected_section": "Method",
+      "position": "start"
+    },
+    {
+      "text": "The 3D Reconstruction stage aims to recover the scene geometry from a set of reconstruction frames",
+      "expected_section": "3D Reconstruction with Segmentation Forcing",
+      "position": "start"
+    },
+    {
+      "text": "The Segmentation Forcing loss compels OccAny to predict SAM2-like features.",
+      "expected_section": "3D Reconstruction with Segmentation Forcing",
+      "position": "middle"
+    },
+    {
+      "text": "We train a rendering encoder Ee and decoder De to predict pointmaps and SAM2-like features for arbitrary novel views",
+      "expected_section": "Novel-View Rendering",
+      "position": "start"
+    },
+    {
+      "text": "We first retrieve the reconstructed pointmaps, SAM2-like features and the registered camera poses of all Nrec input frames from the 3D Reconstruction stage.",
+      "expected_section": "OccAny Inference",
+      "position": "start"
+    },
+    {
+      "text": "Both stages are trained using the same set of losses",
+      "expected_section": "Training Losses",
+      "position": "start"
+    },
+    {
+      "text": "We evaluate the generalization of OccAny on two out-of-domain benchmarks: SemanticKITTI [1] and Occ3D-NuScenes [59]",
+      "expected_section": "Experiments",
+      "position": "start"
+    },
+    {
+      "text": "We first quantitatively evaluate our method using synthetic data with ground-truth surface details.",
+      "expected_section": "Main results",
+      "position": "start"
+    },
+    {
+      "text": "Tab. 6 analyzes the contribution of each proposed component.",
+      "expected_section": "Analysis",
+      "position": "start"
+    },
+    {
+      "text": "We propose for the first time a generalized 3D occupancy network, called OccAny, that is trained once and perform zero-shot inference on arbitrary out-of-domain sequential, monocular and surround-view unposed data.",
+      "expected_section": "Conclusion",
+      "position": "start"
+    },
+    {
+      "text": "Occ3D-NuScenes was built upon nuScenes [4].",
+      "expected_section": "Datasets",
+      "position": "start"
+    },
+    {
+      "text": "The 3D Reconstruction stage (cf . Sec. 3.1) is trained in two consecutive steps:",
+      "expected_section": "Training",
+      "position": "start"
+    },
+    {
+      "text": "For the 3D Reconstruction phase, we substitute the reconstruction encoder E and decoder D from MUSt3R with DA3 backbone",
+      "expected_section": "OccAny+ using DA3 and SAM3",
+      "position": "start"
+    },
+    {
+      "text": "We present here the supplementary studies not presented in the main text due to the lack of space.",
+      "expected_section": "Supplementary Studies",
+      "position": "start"
+    },
+    {
+      "text": "While the unified OccAny model conveniently uses distilled segmentation features, it can also be combined with the original features from segmentation foundation models at inference.",
+      "expected_section": "Boosting semantic performance",
+      "position": "start"
+    },
+    {
+      "text": "Tab. 8 details results and method constraints in the surround-view setting",
+      "expected_section": "More surround-view results",
+      "position": "start"
+    },
+    {
+      "text": "In this experiment, we compare the effectiveness of our Novel-View Rendering stage (cf . Sec. 3.2) with a baseline that performs depth completion on the projected pointmaps of the novel views.",
+      "expected_section": "Novel-View Rendering vs. Depth Completion",
+      "position": "start"
+    },
+    {
+      "text": "We assess the generalization capability of SOTA 3D fully-supervised models by evaluating models trained on a source dataset directly on a different target dataset.",
+      "expected_section": "Generalization of State-of-the-art (SOTA) 3D Supervised Occupancy Models",
+      "position": "start"
+    },
+    {
+      "text": "We assess the quality of ego-trajectory prediction using OccAny on the nuScenes validation set",
+      "expected_section": "Ego Vehicle Trajectory Prediction",
+      "position": "start"
+    },
+    {
+      "text": "We report in Tab. 12 the memory consumption and running time of NVR inference using one A100 GPU in the surround-view setting.",
+      "expected_section": "NVR complexity",
+      "position": "start"
+    },
+    {
+      "text": "We are report the model sizes and speeds of OccAny and baselines in Tab. 13.",
+      "expected_section": "Model sizes and speeds",
+      "position": "start"
+    },
+    {
+      "text": "We show additional qualitative results in Fig. 9, Fig. 10, Fig. 11, Fig. 12, and Fig. 13.",
+      "expected_section": "Qualitative Examples",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "generalized",
+        "3d",
+        "occupancy",
+        "model"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "training",
+        "two",
+        "stages",
+        "segmentation",
+        "forcing"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "inference",
+        "two",
+        "stages",
+        "ttva"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "occupancy",
+        "predictions",
+        "sequence",
+        "surround",
+        "view"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "qualitative",
+        "ablation",
+        "segmentation",
+        "forcing",
+        "novel",
+        "view",
+        "rendering"
+      ]
+    },
+    {
+      "number": 6,
+      "caption_contains": [
+        "ablating",
+        "nvr",
+        "inference",
+        "semantickitti"
+      ]
+    },
+    {
+      "number": 7,
+      "caption_contains": [
+        "pca",
+        "segmentation",
+        "features"
+      ]
+    },
+    {
+      "number": 8,
+      "caption_contains": [
+        "instance",
+        "segmentation",
+        "cars"
+      ]
+    },
+    {
+      "number": 9,
+      "caption_contains": [
+        "occupancy",
+        "predictions",
+        "sequential",
+        "data"
+      ]
+    },
+    {
+      "number": 10,
+      "caption_contains": [
+        "occupancy",
+        "predictions",
+        "surround",
+        "view",
+        "data"
+      ]
+    },
+    {
+      "number": 11,
+      "caption_contains": [
+        "qualitative",
+        "ablation",
+        "semantic",
+        "kitti"
+      ]
+    },
+    {
+      "number": 12,
+      "caption_contains": [
+        "qualitative",
+        "ablation",
+        "occ3d",
+        "nuscenes"
+      ]
+    },
+    {
+      "number": 13,
+      "caption_contains": [
+        "pca",
+        "predicted",
+        "feature",
+        "maps"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "sequence",
+        "setting"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "monocular",
+        "setting"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "surround",
+        "view",
+        "setting"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "semantic",
+        "occupancy",
+        "prediction",
+        "gsam2"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "changing",
+        "base",
+        "foundation",
+        "models"
+      ]
+    },
+    {
+      "number": 6,
+      "caption_contains": [
+        "ablation",
+        "results",
+        "semantickitti"
+      ]
+    },
+    {
+      "number": 7,
+      "caption_contains": [
+        "pretrained",
+        "segmentation",
+        "features",
+        "semantic",
+        "performance"
+      ]
+    },
+    {
+      "number": 8,
+      "caption_contains": [
+        "detailed",
+        "surround",
+        "view",
+        "results"
+      ]
+    },
+    {
+      "number": 9,
+      "caption_contains": [
+        "novel",
+        "view",
+        "rendering",
+        "depth",
+        "completion"
+      ]
+    },
+    {
+      "number": 10,
+      "caption_contains": [
+        "generalization",
+        "fully",
+        "supervised",
+        "methods"
+      ]
+    },
+    {
+      "number": 11,
+      "caption_contains": [
+        "ego",
+        "vehicle",
+        "trajectory",
+        "prediction"
+      ]
+    },
+    {
+      "number": 12,
+      "caption_contains": [
+        "nvr",
+        "inference",
+        "complexity"
+      ]
+    },
+    {
+      "number": 13,
+      "caption_contains": [
+        "model",
+        "size",
+        "speed"
+      ]
+    }
+  ],
+  "notes": "Manually validated against the source PDF on 2026-04-02. Gold headings, anchors, and asset numbers come from the PDF itself, not either markdown output."
+}

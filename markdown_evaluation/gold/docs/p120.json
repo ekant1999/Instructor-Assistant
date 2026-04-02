@@ -1,0 +1,460 @@
+{
+  "doc_id": "p120",
+  "title": "Detailed Geometry and Appearance from Opportunistic Motion",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "equation_heavy",
+    "figure_heavy",
+    "appendix_heavy"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract"
+    },
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "Related Work"
+    },
+    {
+      "level": 2,
+      "text": "Preliminaries: Gaussian Splatting"
+    },
+    {
+      "level": 2,
+      "text": "Method"
+    },
+    {
+      "level": 3,
+      "text": "Single-Frame 3D Reconstruction with Learned Priors"
+    },
+    {
+      "level": 3,
+      "text": "Motion-Aware Joint Optimization via Soft-Masked Transform"
+    },
+    {
+      "level": 3,
+      "text": "Motion-Aware Appearance Modeling via Radiance Probing"
+    },
+    {
+      "level": 3,
+      "text": "Meshing with Viewpoints from All Frames"
+    },
+    {
+      "level": 2,
+      "text": "Experimental Results"
+    },
+    {
+      "level": 3,
+      "text": "Evaluation on Synthetic Data"
+    },
+    {
+      "level": 3,
+      "text": "Evaluation on Real-World Data"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    },
+    {
+      "level": 2,
+      "text": "Results on In-the-wild Capture"
+    },
+    {
+      "level": 2,
+      "text": "Implementation Details"
+    },
+    {
+      "level": 2,
+      "text": "Dataset Details"
+    },
+    {
+      "level": 3,
+      "text": "Synthetic Dataset"
+    },
+    {
+      "level": 3,
+      "text": "HO3D Dataset [14]"
+    },
+    {
+      "level": 3,
+      "text": "HODome Dataset [47]"
+    },
+    {
+      "level": 2,
+      "text": "Additional Experimental Results"
+    },
+    {
+      "level": 3,
+      "text": "Additional Qualitative Results on Synthetic Data"
+    },
+    {
+      "level": 3,
+      "text": "Effectiveness of Motion-Aware Appearance Modeling"
+    },
+    {
+      "level": 3,
+      "text": "Effectiveness of Alternating Estimation"
+    },
+    {
+      "level": 3,
+      "text": "Effectiveness of Segmentation Mask Refinement"
+    },
+    {
+      "level": 3,
+      "text": "Additional Qualitative Results on Real-World Datasets"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "We show that this bound can be broken by exploiting opportunistic object motion",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "We address these by formulating a joint pose and shape optimization using 2D Gaussian splatting",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "Recovering 3D geometry from sparse, static views is inherently ill-posed.",
+      "expected_section": "Introduction",
+      "position": "start"
+    },
+    {
+      "text": "In this paper, we exploit the movement of an object to recover higher-resolution geometry and appearance from just a handful of static cameras.",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "Our approach derives a compact yet expressive appearance model that considers pose-dependent changes in both diffuse and specular reflections.",
+      "expected_section": "Related Work",
+      "position": "end"
+    },
+    {
+      "text": "Since our method is based on 3D Gaussian Splatting (3DGS), we briefly review it here",
+      "expected_section": "Preliminaries: Gaussian Splatting",
+      "position": "start"
+    },
+    {
+      "text": "Given sparse-view videos captured by V static cameras (e.g., V = 4 corner cameras), our goal is to reconstruct the geometry and appearance of a rigidly moving object with high-fidelity.",
+      "expected_section": "Method",
+      "position": "start"
+    },
+    {
+      "text": "We bootstrap our alternating estimation by initializing the canonical Gaussians from the first frames of the V views using MAtCha Gaussians [13]",
+      "expected_section": "Single-Frame 3D Reconstruction with Learned Priors",
+      "position": "start"
+    },
+    {
+      "text": "Using multi-view observations from subsequent timesteps, we alternate between estimating per-frame object poses and refining the canonical Gaussian parameters.",
+      "expected_section": "Motion-Aware Joint Optimization via Soft-Masked Transform",
+      "position": "start"
+    },
+    {
+      "text": "Following the alternating optimization phase, we perform a joint refinement of geometry and appearance using the full temporal sequence.",
+      "expected_section": "Motion-Aware Appearance Modeling via Radiance Probing",
+      "position": "start"
+    },
+    {
+      "text": "Once the joint optimization is complete, we extract a surface mesh of the foreground object.",
+      "expected_section": "Meshing with Viewpoints from All Frames",
+      "position": "start"
+    },
+    {
+      "text": "We validate the effectiveness of our method using a newly created synthetic multi-view video dataset and established real-world datasets.",
+      "expected_section": "Experimental Results",
+      "position": "start"
+    },
+    {
+      "text": "We first quantitatively evaluate our method using synthetic data with ground-truth surface details.",
+      "expected_section": "Evaluation on Synthetic Data",
+      "position": "start"
+    },
+    {
+      "text": "We further evaluate our method on several real-world datasets.",
+      "expected_section": "Evaluation on Real-World Data",
+      "position": "start"
+    },
+    {
+      "text": "We introduced a method to recover the 3D shape, appearance, and time-varying poses of a rigidly moving object from static, sparse-view RGB videos.",
+      "expected_section": "Conclusion",
+      "position": "start"
+    },
+    {
+      "text": "In Fig. 8 and the supplementary video, we test our method on in-the-wild videos captured by ourselves.",
+      "expected_section": "Results on In-the-wild Capture",
+      "position": "start"
+    },
+    {
+      "text": "The learnable parameters of our method are the parameters of 2D Gaussians, the appearance parameters shared across the object (θs and θd ), and per-frame object poses",
+      "expected_section": "Implementation Details",
+      "position": "start"
+    },
+    {
+      "text": "The synthetic dataset consists of multi-view videos of five object-environment pairs",
+      "expected_section": "Synthetic Dataset",
+      "position": "start"
+    },
+    {
+      "text": "For the HO3D dataset (a hand-object interaction dataset), we use the sequences that provide multi-view images",
+      "expected_section": "HO3D Dataset [14]",
+      "position": "start"
+    },
+    {
+      "text": "For the HODome dataset (high-fidelity capture of human-object interaction), we use the box, chair, desk, table, talltable, trashcan, and trolleycase sequences",
+      "expected_section": "HODome Dataset [47]",
+      "position": "start"
+    },
+    {
+      "text": "Figure 9 shows additional qualitative results of the surface normals recovered from the synthetic dataset.",
+      "expected_section": "Additional Qualitative Results on Synthetic Data",
+      "position": "start"
+    },
+    {
+      "text": "Figures 12 and 13 show qualitative results of the ablation studies on the diffuse and specular components of our motion-aware appearance model.",
+      "expected_section": "Effectiveness of Motion-Aware Appearance Modeling",
+      "position": "start"
+    },
+    {
+      "text": "To further evaluate the effectiveness of our alternating estimation framework, we test our method under more challenging temporally sparse settings.",
+      "expected_section": "Effectiveness of Alternating Estimation",
+      "position": "start"
+    },
+    {
+      "text": "We also evaluate the effectiveness of refining the per-Gaussian segmentation mask values mi .",
+      "expected_section": "Effectiveness of Segmentation Mask Refinement",
+      "position": "start"
+    },
+    {
+      "text": "Figure 18 shows additional qualitative results of the reconstructed surface geometry on real-world datasets.",
+      "expected_section": "Additional Qualitative Results on Real-World Datasets",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "high",
+        "fidelity",
+        "geometry",
+        "appearance",
+        "sparse",
+        "static",
+        "videos"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "method",
+        "overview",
+        "alternating",
+        "optimization"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "motion",
+        "aware",
+        "appearance",
+        "modeling"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "surface",
+        "normals",
+        "synthetic",
+        "data"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "novel",
+        "view",
+        "synthesis"
+      ]
+    },
+    {
+      "number": 6,
+      "caption_contains": [
+        "surface",
+        "normals",
+        "mesh",
+        "real",
+        "world"
+      ]
+    },
+    {
+      "number": 7,
+      "caption_contains": [
+        "alternating",
+        "estimation",
+        "progress"
+      ]
+    },
+    {
+      "number": 8,
+      "caption_contains": [
+        "in",
+        "the",
+        "wild",
+        "capture"
+      ]
+    },
+    {
+      "number": 9,
+      "caption_contains": [
+        "additional",
+        "surface",
+        "normals"
+      ]
+    },
+    {
+      "number": 10,
+      "caption_contains": [
+        "additional",
+        "novel",
+        "view",
+        "synthesis"
+      ]
+    },
+    {
+      "number": 11,
+      "caption_contains": [
+        "comparison",
+        "dg",
+        "mesh"
+      ]
+    },
+    {
+      "number": 12,
+      "caption_contains": [
+        "diffuse",
+        "specular",
+        "surface",
+        "normal"
+      ]
+    },
+    {
+      "number": 13,
+      "caption_contains": [
+        "diffuse",
+        "specular",
+        "novel",
+        "view"
+      ]
+    },
+    {
+      "number": 14,
+      "caption_contains": [
+        "specular",
+        "diffuse",
+        "components"
+      ]
+    },
+    {
+      "number": 15,
+      "caption_contains": [
+        "per",
+        "gaussian",
+        "sh"
+      ]
+    },
+    {
+      "number": 16,
+      "caption_contains": [
+        "without",
+        "alternating",
+        "estimation"
+      ]
+    },
+    {
+      "number": 17,
+      "caption_contains": [
+        "segmentation",
+        "mask",
+        "refinement"
+      ]
+    },
+    {
+      "number": 18,
+      "caption_contains": [
+        "surface",
+        "normals",
+        "mesh",
+        "real",
+        "world",
+        "datasets"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "surface",
+        "normal",
+        "accuracy",
+        "synthetic",
+        "data"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "novel",
+        "view",
+        "synthesis",
+        "synthetic",
+        "data"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "surface",
+        "mesh",
+        "reconstruction",
+        "synthetic",
+        "data"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "quantitative",
+        "results",
+        "real",
+        "world",
+        "datasets"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "comparison",
+        "per",
+        "gaussian",
+        "sh"
+      ]
+    }
+  ],
+  "notes": "Manually validated against the source PDF on 2026-04-02. Gold headings, anchors, and asset numbers come from the PDF itself, not either markdown output."
+}

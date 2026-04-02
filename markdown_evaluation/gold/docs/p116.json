@@ -1,0 +1,152 @@
+{
+  "doc_id": "p116",
+  "title": "MedObvious: Exposing the Medical Moravec’s Paradox in VLMs via Clinical Triage",
+  "validated": true,
+  "layout_type": "two_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "short_paper"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract"
+    },
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "MedObvious Construction"
+    },
+    {
+      "level": 2,
+      "text": "Experiments and Results"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "We introduce MedObvious, a 1,880-task benchmark that isolates input validation as a set-level consistency capability over small multi-panel image sets",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "These results show that pre-diagnostic verification remains unsolved for medical VLMs",
+      "expected_section": "Abstract",
+      "position": "end"
+    },
+    {
+      "text": "Clinical interpretation begins with pre-diagnostic triage",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "We introduce MedObvious, a benchmark for pre-diagnostic visual sanity checking in medical images",
+      "expected_section": "Introduction",
+      "position": "end"
+    },
+    {
+      "text": "MedObvious is a benchmark designed to test whether medical VLMs can recognize obvious input-level inconsistencies before attempting any diagnosis",
+      "expected_section": "MedObvious Construction",
+      "position": "start"
+    },
+    {
+      "text": "Each MedObvious instance presents a grid of n images",
+      "expected_section": "MedObvious Construction",
+      "position": "middle"
+    },
+    {
+      "text": "MedObvious targets a pre-diagnostic requirement, i.e., before interpretation, the model must verify that the input is coherent and safe to reason over",
+      "expected_section": "Experiments and Results",
+      "position": "start"
+    },
+    {
+      "text": "Performance is strongly format-dependent",
+      "expected_section": "Experiments and Results",
+      "position": "middle"
+    },
+    {
+      "text": "We present MedObvious, a benchmark for pre-diagnostic visual sanity checking in medical VLMs",
+      "expected_section": "Conclusion",
+      "position": "start"
+    },
+    {
+      "text": "current models remain unreliable gatekeepers, with frequent false alarms, scaling degradation, and strong format sensitivity",
+      "expected_section": "Conclusion",
+      "position": "middle"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "qualitative",
+        "medobvious",
+        "examples",
+        "pre",
+        "diagnostic",
+        "visual",
+        "triage"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "medobvious",
+        "overview",
+        "five",
+        "progressive",
+        "tiers",
+        "construction",
+        "evaluation",
+        "protocols"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "medobvious",
+        "composition",
+        "tiers",
+        "increase",
+        "clinical",
+        "specificity"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "medobvious",
+        "per",
+        "task",
+        "accuracy",
+        "task",
+        "correspond"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "per",
+        "tiers",
+        "overall",
+        "accuracy",
+        "different",
+        "vlms"
+      ]
+    }
+  ],
+  "notes": "Manually validated against the source PDF on 2026-04-01. Gold headings, anchors, and asset numbers come from the PDF itself, not either markdown output."
+}

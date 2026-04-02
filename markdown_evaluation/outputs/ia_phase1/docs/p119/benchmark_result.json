@@ -1,0 +1,141 @@
+{
+  "doc_id": "p119",
+  "system": "ia_phase1",
+  "paper_id": 119,
+  "title": "VLA-OPD: Bridging Offline SFT and Online RL for Vision-Language-Action Models via On-Policy Distillation",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/4a5ab78468782a40.pdf",
+  "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p119",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p119/paper.md",
+  "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p119/manifest.json",
+  "asset_counts": {
+    "figures": 0,
+    "tables": 0,
+    "equations": 0
+  },
+  "metadata": {
+    "title": "VLA-OPD: Bridging Offline SFT and Online RL for Vision-Language-Action Models via On-Policy Distillation",
+    "paper_id": "119",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/4a5ab78468782a40.pdf",
+    "generated_at": "2026-04-02T01:28:12.883218+00:00",
+    "num_figures": "0",
+    "num_tables": "0",
+    "num_equations": "0",
+    "page_count": "16"
+  },
+  "render_mode": "conservative",
+  "sectioning_strategy": "pdf_toc",
+  "sectioning_report": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 7,
+    "matched_headings": 8,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 5
+      },
+      {
+        "index": 1,
+        "title": "Introduction",
+        "canonical": "introduction",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 1,
+        "end_page": 3,
+        "start_block_index": 6,
+        "end_block_index": 28
+      },
+      {
+        "index": 2,
+        "title": "Preliminaries",
+        "canonical": "preliminaries",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 3,
+        "end_page": 4,
+        "start_block_index": 29,
+        "end_block_index": 97
+      },
+      {
+        "index": 3,
+        "title": "Methodology",
+        "canonical": "methodology",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 4,
+        "end_page": 8,
+        "start_block_index": 98,
+        "end_block_index": 170
+      },
+      {
+        "index": 4,
+        "title": "Experiments",
+        "canonical": "experiments",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 8,
+        "end_page": 13,
+        "start_block_index": 171,
+        "end_block_index": 231
+      },
+      {
+        "index": 5,
+        "title": "Related Work",
+        "canonical": "related_work",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.267,
+        "start_page": 13,
+        "end_page": 13,
+        "start_block_index": 232,
+        "end_block_index": 237
+      },
+      {
+        "index": 6,
+        "title": "Conclusion",
+        "canonical": "conclusion",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 13,
+        "end_page": 14,
+        "start_block_index": 238,
+        "end_block_index": 241
+      },
+      {
+        "index": 7,
+        "title": "References",
+        "canonical": "references",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 14,
+        "end_page": 16,
+        "start_block_index": 242,
+        "end_block_index": 282
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 283
+  },
+  "audit": {
+    "conservative_recommended": true,
+    "issue_count": 1,
+    "issues": [
+      "suspicious headings detected (1)"
+    ]
+  },
+  "elapsed_ms": 719.156,
+  "status": "success"
+}

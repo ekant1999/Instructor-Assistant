@@ -1,0 +1,91 @@
+{
+  "doc_id": "p120",
+  "system": "ia_phase1",
+  "paper_id": 120,
+  "title": "Detailed Geometry and Appearance from Opportunistic Motion",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf",
+  "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120/paper.md",
+  "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120/manifest.json",
+  "asset_counts": {
+    "figures": 0,
+    "tables": 0,
+    "equations": 0
+  },
+  "metadata": {
+    "title": "Detailed Geometry and Appearance from Opportunistic Motion",
+    "paper_id": "120",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf",
+    "generated_at": "2026-04-02T01:28:14.685649+00:00",
+    "num_figures": "0",
+    "num_tables": "0",
+    "num_equations": "0",
+    "page_count": "30"
+  },
+  "render_mode": "normal",
+  "sectioning_strategy": "pdf_toc",
+  "sectioning_report": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 3,
+    "matched_headings": 4,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 7
+      },
+      {
+        "index": 1,
+        "title": "Abstract",
+        "canonical": "abstract",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 2,
+        "start_block_index": 8,
+        "end_block_index": 13
+      },
+      {
+        "index": 2,
+        "title": "Detailed Geometry and Appearance from Opportunistic Motion",
+        "canonical": "detailed_geometry_and_appearance_from_opportunistic_motion",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.054,
+        "start_page": 3,
+        "end_page": 15,
+        "start_block_index": 14,
+        "end_block_index": 207
+      },
+      {
+        "index": 3,
+        "title": "References",
+        "canonical": "references",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 15,
+        "end_page": 30,
+        "start_block_index": 208,
+        "end_block_index": 347
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 348
+  },
+  "audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": []
+  },
+  "elapsed_ms": 1774.732,
+  "status": "success"
+}

@@ -1,0 +1,290 @@
+{
+  "doc_id": "p119",
+  "title": "VLA-OPD: Bridging Offline SFT and Online RL for Vision-Language-Action Models via On-Policy Distillation",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "equation_heavy",
+    "algorithm_heavy"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "Preliminaries"
+    },
+    {
+      "level": 3,
+      "text": "Problem Formulation"
+    },
+    {
+      "level": 3,
+      "text": "Supervised Fine-Tuning (SFT)"
+    },
+    {
+      "level": 3,
+      "text": "Online RL with Sparse Outcome Rewards"
+    },
+    {
+      "level": 2,
+      "text": "Methodology"
+    },
+    {
+      "level": 3,
+      "text": "Framework Overview"
+    },
+    {
+      "level": 3,
+      "text": "On-Policy Trajectory Sampling"
+    },
+    {
+      "level": 3,
+      "text": "Dense Teacher Supervision"
+    },
+    {
+      "level": 3,
+      "text": "Optimization Objective and Analysis"
+    },
+    {
+      "level": 2,
+      "text": "Experiments"
+    },
+    {
+      "level": 3,
+      "text": "Experimental Setup"
+    },
+    {
+      "level": 3,
+      "text": "Main Results: Efficiency and Efficacy"
+    },
+    {
+      "level": 3,
+      "text": "Mitigating Catastrophic Forgetting via On-Policy Alignment"
+    },
+    {
+      "level": 3,
+      "text": "Ablation Studies"
+    },
+    {
+      "level": 2,
+      "text": "Related Work"
+    },
+    {
+      "level": 3,
+      "text": "Offline SFT for Vision-Language-Action Models"
+    },
+    {
+      "level": 3,
+      "text": "Online RL for Vision-Language-Action Models"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "To bridge this gap, we introduce On-Policy VLA Distillation (VLA-OPD), a unified framework that synthesizes the efficiency of SFT with the robustness of RL",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "In this section, we formalize the VLA training problem and briefly review the two dominant paradigms",
+      "expected_section": "Preliminaries",
+      "position": "start"
+    },
+    {
+      "text": "We formulate the robotic manipulation task as a Markov Decision Process",
+      "expected_section": "Problem Formulation",
+      "position": "start"
+    },
+    {
+      "text": "Standard VLA training typically starts with SFT on a static dataset of expert demonstrations",
+      "expected_section": "Supervised Fine-Tuning (SFT)",
+      "position": "start"
+    },
+    {
+      "text": "However, despite its provenance from LLMs and architectural efficiency, applying GRPO to robotics introduces a unique challenge: feedback sparsity",
+      "expected_section": "Online RL with Sparse Outcome Rewards",
+      "position": "end"
+    },
+    {
+      "text": "VLA-OPD reformulates the alignment process as dense supervision on self-generated trajectories",
+      "expected_section": "Methodology",
+      "position": "start"
+    },
+    {
+      "text": "the training cycle consists of three phases",
+      "expected_section": "Framework Overview",
+      "position": "middle"
+    },
+    {
+      "text": "VLA-OPD discards the static offline dataset after initialization and switches to dynamic on-policy sampling",
+      "expected_section": "On-Policy Trajectory Sampling",
+      "position": "start"
+    },
+    {
+      "text": "Instead of relying on sparse outcome rewards that suffer from severe credit assignment issues",
+      "expected_section": "Dense Teacher Supervision",
+      "position": "start"
+    },
+    {
+      "text": "Reverse-KL as Dense Reward",
+      "expected_section": "Optimization Objective and Analysis",
+      "position": "start"
+    },
+    {
+      "text": "Our experimental design addresses several fundamental research questions regarding the efficiency, efficacy, and stability of On-Policy Distillation",
+      "expected_section": "Experiments",
+      "position": "start"
+    },
+    {
+      "text": "Benchmarks and Protocols. We evaluate across two distinct domains to test data-scarce generalization and complex coordination",
+      "expected_section": "Experimental Setup",
+      "position": "start"
+    },
+    {
+      "text": "We compare our method against the baseline GRPO",
+      "expected_section": "Main Results: Efficiency and Efficacy",
+      "position": "start"
+    },
+    {
+      "text": "We analyze catastrophic forgetting via a seen–unseen trade-off",
+      "expected_section": "Mitigating Catastrophic Forgetting via On-Policy Alignment",
+      "position": "start"
+    },
+    {
+      "text": "To validate the architectural design of VLA-OPD, we conduct ablation studies",
+      "expected_section": "Ablation Studies",
+      "position": "start"
+    },
+    {
+      "text": "Recent advancements in robotic manipulation have been largely driven by VLA models",
+      "expected_section": "Offline SFT for Vision-Language-Action Models",
+      "position": "start"
+    },
+    {
+      "text": "To address the distribution shift inherent in offline SFT, Online RL has been introduced to align models with policy-induced state distributions",
+      "expected_section": "Online RL for Vision-Language-Action Models",
+      "position": "start"
+    },
+    {
+      "text": "In this paper, we propose On-Policy VLA Distillation (VLA-OPD), a novel framework bridging the sample efficiency of offline SFT with the closed-loop robustness of online RL",
+      "expected_section": "Conclusion",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "overview",
+        "vla",
+        "opd",
+        "framework",
+        "unifies",
+        "offline",
+        "sft",
+        "online",
+        "rl"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "training",
+        "efficiency",
+        "comparison",
+        "compare",
+        "method",
+        "baseline",
+        "grpo"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "seen",
+        "unseen",
+        "trade",
+        "off",
+        "forgetting",
+        "analysis"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "ablation",
+        "study",
+        "reverse",
+        "kl",
+        "forward",
+        "kl",
+        "hard",
+        "ce"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "ablation",
+        "group",
+        "sampling",
+        "size",
+        "training",
+        "success",
+        "rates"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "comparison",
+        "vla",
+        "training",
+        "paradigms",
+        "vla",
+        "opd",
+        "combines",
+        "best"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "main",
+        "results",
+        "policy",
+        "efficacy",
+        "libero",
+        "success",
+        "rate"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "evaluation",
+        "selected",
+        "robotwin2",
+        "0",
+        "tasks",
+        "success",
+        "rates"
+      ]
+    }
+  ],
+  "notes": "Manually validated against the source PDF on 2026-04-01. Gold headings, anchors, and asset numbers come from the PDF itself, not either markdown output."
+}

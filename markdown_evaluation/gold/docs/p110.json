@@ -1,0 +1,539 @@
+{
+  "doc_id": "p110",
+  "title": "Scaling DoRA: High-Rank Adaptation via Factored Norms and Fused Kernels",
+  "validated": true,
+  "layout_type": "two_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "table_heavy",
+    "appendix_heavy",
+    "figure_heavy"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract"
+    },
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "Factored Norm Computation"
+    },
+    {
+      "level": 3,
+      "text": "Algebraic Decomposition"
+    },
+    {
+      "level": 3,
+      "text": "Assembly and Precision"
+    },
+    {
+      "level": 3,
+      "text": "Complexity"
+    },
+    {
+      "level": 2,
+      "text": "Fused Triton Kernels"
+    },
+    {
+      "level": 3,
+      "text": "Compose Kernel"
+    },
+    {
+      "level": 3,
+      "text": "Backward Kernel"
+    },
+    {
+      "level": 3,
+      "text": "Norm Assembly Kernel"
+    },
+    {
+      "level": 2,
+      "text": "Runtime Dispatch"
+    },
+    {
+      "level": 2,
+      "text": "Experiments"
+    },
+    {
+      "level": 3,
+      "text": "Setup"
+    },
+    {
+      "level": 3,
+      "text": "Model-Level Performance"
+    },
+    {
+      "level": 3,
+      "text": "Why Dense (B@A) Is Not Enough"
+    },
+    {
+      "level": 3,
+      "text": "Compose Kernel Performance"
+    },
+    {
+      "level": 3,
+      "text": "Backward Kernel Performance"
+    },
+    {
+      "level": 3,
+      "text": "Norm Memory Reduction"
+    },
+    {
+      "level": 3,
+      "text": "Memory Profile"
+    },
+    {
+      "level": 3,
+      "text": "Cross-Architecture Consistency"
+    },
+    {
+      "level": 3,
+      "text": "Convergence Equivalence"
+    },
+    {
+      "level": 2,
+      "text": "Discussion"
+    },
+    {
+      "level": 3,
+      "text": "Deployment Context"
+    },
+    {
+      "level": 3,
+      "text": "Tradeoffs and Limitations"
+    },
+    {
+      "level": 2,
+      "text": "Related Work"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    },
+    {
+      "level": 2,
+      "text": "Data Availability"
+    },
+    {
+      "level": 2,
+      "text": "Acknowledgements"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    },
+    {
+      "level": 2,
+      "text": "Forward Contract and Execution Semantics"
+    },
+    {
+      "level": 2,
+      "text": "Implementation Details"
+    },
+    {
+      "level": 2,
+      "text": "Kernel Specifications"
+    },
+    {
+      "level": 2,
+      "text": "Reproducibility"
+    },
+    {
+      "level": 2,
+      "text": "Full Model-Level Memory Table"
+    },
+    {
+      "level": 2,
+      "text": "Single-Layer E2E Decomposition"
+    },
+    {
+      "level": 2,
+      "text": "Framework Survey"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "We present two systems contributions: a factored norm that decomposes the squared norm into base, cross, and Gram terms computable through O(dout r + r2) intermediates, eliminating the dense product",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "Final-logit cosine similarity exceeds 0.9999 across all model/GPU pairs",
+      "expected_section": "Abstract",
+      "position": "end"
+    },
+    {
+      "text": "The bottleneck is the row-wise L2 norm of the composed weight W + sBA",
+      "expected_section": "Introduction",
+      "position": "start"
+    },
+    {
+      "text": "This paper does not propose a new adapter architecture, optimizer, or training recipe",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "The row-wise squared norm of the composed weight expands into three terms",
+      "expected_section": "Algebraic Decomposition",
+      "position": "start"
+    },
+    {
+      "text": "The magnitude division is always computed in PyTorch after the kernel returns",
+      "expected_section": "Assembly and Precision",
+      "position": "start"
+    },
+    {
+      "text": "The dominant transient is the base-norm computation",
+      "expected_section": "Complexity",
+      "position": "middle"
+    },
+    {
+      "text": "The fused Triton kernel collapses these into a single pass",
+      "expected_section": "Compose Kernel",
+      "position": "middle"
+    },
+    {
+      "text": "The fused backward computes dlora and dbase in a single Triton pass",
+      "expected_section": "Backward Kernel",
+      "position": "start"
+    },
+    {
+      "text": "A second Triton kernel fuses Equation 5, computing wnorm from the three factored terms",
+      "expected_section": "Norm Assembly Kernel",
+      "position": "start"
+    },
+    {
+      "text": "The composition path is selected at runtime by _compose_with_dispatch",
+      "expected_section": "Runtime Dispatch",
+      "position": "start"
+    },
+    {
+      "text": "Microbenchmarks use six GPUs spanning four architecture generations",
+      "expected_section": "Setup",
+      "position": "start"
+    },
+    {
+      "text": "Table 4 summarizes the headline result: gradient-computation speedup across six 8-32B VLMs on three GPUs",
+      "expected_section": "Model-Level Performance",
+      "position": "start"
+    },
+    {
+      "text": "The factored norm is particularly valuable when training and inference compete for GPU memory",
+      "expected_section": "Deployment Context",
+      "position": "start"
+    },
+    {
+      "text": "Where fusion offers no advantage",
+      "expected_section": "Tradeoffs and Limitations",
+      "position": "start"
+    },
+    {
+      "text": "Parameter-efficient fine-tuning. LoRA introduced low-rank adapter decomposition; DoRA adds magnitude-direction separation",
+      "expected_section": "Related Work",
+      "position": "start"
+    },
+    {
+      "text": "We presented a systems implementation of DoRA: a factored norm that reduces working memory",
+      "expected_section": "Conclusion",
+      "position": "start"
+    },
+    {
+      "text": "All source code, benchmark scripts, raw JSON results, Triton autotune caches, and figure generation scripts are available",
+      "expected_section": "Data Availability",
+      "position": "start"
+    },
+    {
+      "text": "This work was developed through extensive collaborative programming with Claude Opus 4.6",
+      "expected_section": "Acknowledgements",
+      "position": "start"
+    },
+    {
+      "text": "Formal contract for clean-room replication",
+      "expected_section": "Forward Contract and Execution Semantics",
+      "position": "end"
+    },
+    {
+      "text": "Chunk alignment. The chunk size aligns to 64 elements on CUDA/XPU devices",
+      "expected_section": "Implementation Details",
+      "position": "start"
+    },
+    {
+      "text": "This appendix provides exact specifications for the three Triton kernels and the PyTorch magnitude division stage",
+      "expected_section": "Kernel Specifications",
+      "position": "start"
+    },
+    {
+      "text": "Code and data. All source code, benchmark scripts, raw JSON results, Triton autotune caches",
+      "expected_section": "Reproducibility",
+      "position": "start"
+    },
+    {
+      "text": "Table 13 extends the main-body memory comparison to all six models",
+      "expected_section": "Full Model-Level Memory Table",
+      "position": "start"
+    },
+    {
+      "text": "The following figures show single-layer end-to-end speedup, which isolates the per-layer overhead but does not predict model-level speedup",
+      "expected_section": "Single-Layer E2E Decomposition",
+      "position": "start"
+    },
+    {
+      "text": "Table 15 summarizes the DoRA norm implementation across five major fine-tuning frameworks",
+      "expected_section": "Framework Survey",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "stable",
+        "compose",
+        "form"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "three",
+        "tier",
+        "dispatch"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "gradient",
+        "computation",
+        "speedup"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "inference",
+        "speedup"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "dense",
+        "b",
+        "a",
+        "position"
+      ]
+    },
+    {
+      "number": 6,
+      "caption_contains": [
+        "compose",
+        "kernel",
+        "speedup"
+      ]
+    },
+    {
+      "number": 7,
+      "caption_contains": [
+        "bandwidth",
+        "utilization"
+      ]
+    },
+    {
+      "number": 8,
+      "caption_contains": [
+        "backward",
+        "speedup"
+      ]
+    },
+    {
+      "number": 9,
+      "caption_contains": [
+        "norm",
+        "memory",
+        "reduction"
+      ]
+    },
+    {
+      "number": 10,
+      "caption_contains": [
+        "norm",
+        "latency",
+        "rank"
+      ]
+    },
+    {
+      "number": 11,
+      "caption_contains": [
+        "memory",
+        "profile"
+      ]
+    },
+    {
+      "number": 12,
+      "caption_contains": [
+        "convergence",
+        "eager",
+        "fused"
+      ]
+    },
+    {
+      "number": 13,
+      "caption_contains": [
+        "single",
+        "layer",
+        "e2e",
+        "overhead"
+      ]
+    },
+    {
+      "number": 14,
+      "caption_contains": [
+        "single",
+        "layer",
+        "e2e",
+        "speedup"
+      ]
+    },
+    {
+      "number": 15,
+      "caption_contains": [
+        "single",
+        "layer",
+        "hidden",
+        "dimension"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "factored",
+        "norm",
+        "memory",
+        "costs"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "dispatch",
+        "tiers",
+        "selection",
+        "criteria"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "benchmark",
+        "hardware"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "gradient",
+        "computation",
+        "speedup"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "absolute",
+        "gradient",
+        "computation",
+        "time"
+      ]
+    },
+    {
+      "number": 6,
+      "caption_contains": [
+        "speedup",
+        "peft",
+        "baseline",
+        "rank"
+      ]
+    },
+    {
+      "number": 7,
+      "caption_contains": [
+        "norm",
+        "memory",
+        "theoretical",
+        "reduction"
+      ]
+    },
+    {
+      "number": 8,
+      "caption_contains": [
+        "model",
+        "peak",
+        "vram"
+      ]
+    },
+    {
+      "number": 9,
+      "caption_contains": [
+        "microbenchmark",
+        "speedups"
+      ]
+    },
+    {
+      "number": 10,
+      "caption_contains": [
+        "multi",
+        "seed",
+        "convergence"
+      ]
+    },
+    {
+      "number": 11,
+      "caption_contains": [
+        "recommended",
+        "configuration",
+        "scenario"
+      ]
+    },
+    {
+      "number": 12,
+      "caption_contains": [
+        "compatibility",
+        "matrix"
+      ]
+    },
+    {
+      "number": 13,
+      "caption_contains": [
+        "model",
+        "level",
+        "peak",
+        "vram"
+      ]
+    },
+    {
+      "number": 14,
+      "caption_contains": [
+        "fp32",
+        "microbenchmark",
+        "speedups"
+      ]
+    },
+    {
+      "number": 15,
+      "caption_contains": [
+        "dora",
+        "frameworks",
+        "survey"
+      ]
+    }
+  ],
+  "notes": "Manually validated against the source PDF on 2026-04-01. Gold headings, anchors, and asset numbers come from the PDF itself, not either markdown output."
+}

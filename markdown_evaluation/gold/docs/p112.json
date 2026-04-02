@@ -1,0 +1,328 @@
+{
+  "doc_id": "p112",
+  "title": "MemDLM: Memory-Enhanced DLM Training",
+  "validated": true,
+  "layout_type": "two_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "equation_heavy",
+    "figure_heavy"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract"
+    },
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "Preliminaries and Motivation"
+    },
+    {
+      "level": 3,
+      "text": "Preliminaries: Masked Diffusion Language Models"
+    },
+    {
+      "level": 3,
+      "text": "Motivation: Quantifying Denoising Exposure Bias"
+    },
+    {
+      "level": 2,
+      "text": "Methodology"
+    },
+    {
+      "level": 3,
+      "text": "Bi-level Optimization for Denoising Simulation"
+    },
+    {
+      "level": 3,
+      "text": "The Inner Loop: Anchor-Consistent Trajectories"
+    },
+    {
+      "level": 3,
+      "text": "The Outer Loop: Conditioned Denoising"
+    },
+    {
+      "level": 2,
+      "text": "Experiments"
+    },
+    {
+      "level": 3,
+      "text": "Experimental Setup"
+    },
+    {
+      "level": 3,
+      "text": "Main Results: Long-Context Information Retrieval"
+    },
+    {
+      "level": 3,
+      "text": "Long-Context Generalization"
+    },
+    {
+      "level": 3,
+      "text": "Understanding MemDLM During Training"
+    },
+    {
+      "level": 3,
+      "text": "Understanding MemDLM During Inference"
+    },
+    {
+      "level": 3,
+      "text": "Ablation of Core Design Choices"
+    },
+    {
+      "level": 2,
+      "text": "Related Work"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "We propose MemDLM (Memory-Enhanced DLM), which narrows this gap by embedding a simulated denoising process into training via Bi-level Optimization.",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "By offloading memorization pressure from token representations to parameters, MemDLM yields faster convergence and lower training loss.",
+      "expected_section": "Abstract",
+      "position": "end"
+    },
+    {
+      "text": "Despite these architectural advantages, DLMs face an optimization challenge stemming from a train-inference mismatch.",
+      "expected_section": "Introduction",
+      "position": "start"
+    },
+    {
+      "text": "During this sequential simulation, we dynamically update a set of parameter-efficient fast weights.",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "Before formalizing our method, we first review the standard training and inference paradigms of Masked Diffusion Language Models (MDLMs).",
+      "expected_section": "Preliminaries and Motivation",
+      "position": "start"
+    },
+    {
+      "text": "Consider a sequence of clean text comprising L tokens, denoted as x0",
+      "expected_section": "Preliminaries: Masked Diffusion Language Models",
+      "position": "start"
+    },
+    {
+      "text": "Because the standard base model is never exposed to these sequential trajectories during training, the intermediate noisy sequences generated during inference inherently shift away from the true data distribution q(xt |x0 ).",
+      "expected_section": "Motivation: Quantifying Denoising Exposure Bias",
+      "position": "start"
+    },
+    {
+      "text": "We define the Exposure Bias Ratio as REB = Lseq /Lstatic .",
+      "expected_section": "Motivation: Quantifying Denoising Exposure Bias",
+      "position": "middle"
+    },
+    {
+      "text": "We achieve this by proposing MemDLM, which embeds a simulated denoising trajectory into the training process via a Bi-level Optimization framework.",
+      "expected_section": "Methodology",
+      "position": "middle"
+    },
+    {
+      "text": "To align the training objective with the iterative nature of inference, we partition the model parameters into the base weights θ and a set of parameter-efficient fast weights ϕ",
+      "expected_section": "Bi-level Optimization for Denoising Simulation",
+      "position": "start"
+    },
+    {
+      "text": "Rather than applying an arbitrary sequence of masks, we design the inner loop to simulate an Anchor-Consistent Local Trajectory.",
+      "expected_section": "The Inner Loop: Anchor-Consistent Trajectories",
+      "position": "start"
+    },
+    {
+      "text": "After the inner loop accumulates the adapted parameters ϕ2 for a given batch, the outer objective is computed on the exact same anchor timestep t and masked state xt .",
+      "expected_section": "The Outer Loop: Conditioned Denoising",
+      "position": "start"
+    },
+    {
+      "text": "We study two backbones in the main experiments: LLaDA-MoE-7B-A1B-Base [18] and LLaDA2.1-mini [20].",
+      "expected_section": "Experimental Setup",
+      "position": "middle"
+    },
+    {
+      "text": "As shown in Table 1, MemDLM consistently improves over the baseline MDLM across both backbones, with especially clear gains on the more challenging long-context settings.",
+      "expected_section": "Main Results: Long-Context Information Retrieval",
+      "position": "middle"
+    },
+    {
+      "text": "As shown in Table 2, absolute performance drops for all methods as the context becomes substantially longer, but MemDLM continues to improve over the baseline even in this extrapolation regime.",
+      "expected_section": "Main Results: Long-Context Information Retrieval",
+      "position": "end"
+    },
+    {
+      "text": "As shown in Table 3, integrating Parametric Memory during training significantly improves the base model’s ability to handle long-context tasks, even when evaluated zero-shot (Train-Only).",
+      "expected_section": "Long-Context Generalization",
+      "position": "middle"
+    },
+    {
+      "text": "Figure 4 examines the optimization behavior of MemDLM more directly.",
+      "expected_section": "Understanding MemDLM During Training",
+      "position": "start"
+    },
+    {
+      "text": "Our current inference procedure applies the inner loop to the prompt before generation, which empirically provides the most reliable way to improve context internalization and long-context understanding.",
+      "expected_section": "Understanding MemDLM During Inference",
+      "position": "start"
+    },
+    {
+      "text": "One central hypothesis of MemDLM is that the inner loop should remain consistent with the anchor-centered outer objective.",
+      "expected_section": "Ablation of Core Design Choices",
+      "position": "start"
+    },
+    {
+      "text": "MemDLM lies at the intersection of diffusion language modeling, fast-weight memory, bi-level adaptation, and inference-time adaptation.",
+      "expected_section": "Related Work",
+      "position": "start"
+    },
+    {
+      "text": "We introduced MemDLM, a memory-aware training framework for diffusion language models built on Bi-level Optimization and fast weights acting as Parametric Memory.",
+      "expected_section": "Conclusion",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "needle",
+        "haystack",
+        "results",
+        "overview"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "overview",
+        "memdlm",
+        "training",
+        "inference"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "exposure",
+        "bias",
+        "ratio",
+        "denoising"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "training",
+        "dynamics",
+        "llada",
+        "backbones"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "comparison",
+        "untuned",
+        "pretrained",
+        "model"
+      ]
+    },
+    {
+      "number": 6,
+      "caption_contains": [
+        "inner",
+        "loop",
+        "supervision",
+        "analysis"
+      ]
+    },
+    {
+      "number": 7,
+      "caption_contains": [
+        "adaptation",
+        "scope",
+        "analysis"
+      ]
+    },
+    {
+      "number": 8,
+      "caption_contains": [
+        "sensitivity",
+        "inference",
+        "anchor",
+        "ratio"
+      ]
+    },
+    {
+      "number": 9,
+      "caption_contains": [
+        "consistency",
+        "trajectory",
+        "design"
+      ]
+    },
+    {
+      "number": 10,
+      "caption_contains": [
+        "role",
+        "two",
+        "inner",
+        "loop",
+        "stages"
+      ]
+    },
+    {
+      "number": 11,
+      "caption_contains": [
+        "multiple",
+        "pre",
+        "anchor",
+        "steps"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "performance",
+        "needle",
+        "haystack",
+        "ruler",
+        "babilong"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "length",
+        "extrapolation",
+        "needle",
+        "haystack"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "longbench",
+        "datasets",
+        "train",
+        "inference"
+      ]
+    }
+  ],
+  "notes": "Manually validated against the source PDF on 2026-04-02. Gold headings, anchors, and asset numbers come from the PDF itself, not either markdown output."
+}

@@ -1,0 +1,382 @@
+{
+  "doc_id": "p114",
+  "title": "End-to-End Training for Unified Tokenization and Latent Denoising",
+  "validated": true,
+  "layout_type": "two_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "figure_heavy",
+    "appendix_heavy"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract"
+    },
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "Related Work"
+    },
+    {
+      "level": 2,
+      "text": "Unifying Tokenization & Latent Denoising"
+    },
+    {
+      "level": 3,
+      "text": "From VAE to UNITE"
+    },
+    {
+      "level": 3,
+      "text": "End-to-End Training for UNITE"
+    },
+    {
+      "level": 3,
+      "text": "Understanding UNITE’s Training Dynamics"
+    },
+    {
+      "level": 2,
+      "text": "Analyzing UNITE’s Generative Encoder"
+    },
+    {
+      "level": 2,
+      "text": "Experimental Results"
+    },
+    {
+      "level": 3,
+      "text": "ImageNet-256 Results"
+    },
+    {
+      "level": 3,
+      "text": "Beyond Vision: Application to Domains Without Pretrained Encoders"
+    },
+    {
+      "level": 3,
+      "text": "Training Efficiency"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    },
+    {
+      "level": 2,
+      "text": "Discussions"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    },
+    {
+      "level": 2,
+      "text": "Appendix"
+    },
+    {
+      "level": 2,
+      "text": "Reconstruction Fidelity Details"
+    },
+    {
+      "level": 2,
+      "text": "Evaluation Protocol"
+    },
+    {
+      "level": 2,
+      "text": "Additional Results"
+    },
+    {
+      "level": 3,
+      "text": "QM9 Molecular Generation"
+    },
+    {
+      "level": 3,
+      "text": "MP20 Crystal Generation"
+    },
+    {
+      "level": 3,
+      "text": "Ablation Studies on ImageNet 256×256"
+    },
+    {
+      "level": 2,
+      "text": "Architectural Details"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "We propose UNITE – an autoencoder architecture for unified tokenization and latent diffusion.",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "The shared parameters enable gradients to jointly shape the latent space, encouraging a common latent language.",
+      "expected_section": "Abstract",
+      "position": "end"
+    },
+    {
+      "text": "This separation is convenient, but it departs from the principle of end-to-end learning",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "We propose an alternative perspective on end-to-end training.",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "we focus on a single-stage training approach that learns tokenization and generation jointly, without access to pretrained SSL encoders.",
+      "expected_section": "Related Work",
+      "position": "end"
+    },
+    {
+      "text": "UNITE replaces the separate tokenizer and latent denoiser with a shared set of parameters, the Generative Encoder,",
+      "expected_section": "From VAE to UNITE",
+      "position": "middle"
+    },
+    {
+      "text": "Training Pipeline: We adopt a Vision Transformer (ViT) backbone for both the generative encoder and the decoder, motivated by the strong empirical performance of Transformer architectures in diffusion/flow denoising.",
+      "expected_section": "End-to-End Training for UNITE",
+      "position": "start"
+    },
+    {
+      "text": "The total objective is the sum of reconstruction and generation losses.",
+      "expected_section": "End-to-End Training for UNITE",
+      "position": "end"
+    },
+    {
+      "text": "The adversarial nature of joint training.",
+      "expected_section": "Understanding UNITE’s Training Dynamics",
+      "position": "start"
+    },
+    {
+      "text": "In UNITE, we pursue end-to-end training by sharing parameters between the encoder and denoiser roles of a single network.",
+      "expected_section": "Analyzing UNITE’s Generative Encoder",
+      "position": "start"
+    },
+    {
+      "text": "Can a single training job produce both a strong tokenizer and a strong generator?",
+      "expected_section": "Experimental Results",
+      "position": "start"
+    },
+    {
+      "text": "UNITE-B reaches an FID of 2.12, substantially improving over the single-stage baseline JiT-B/16",
+      "expected_section": "ImageNet-256 Results",
+      "position": "middle"
+    },
+    {
+      "text": "We demonstrate this capability on QM9 molecule generation, a setting with no DINO-equivalent pretrained encoder.",
+      "expected_section": "Beyond Vision: Application to Domains Without Pretrained Encoders",
+      "position": "middle"
+    },
+    {
+      "text": "We report total training FLOPs measured with gradient checkpointing enabled.",
+      "expected_section": "Training Efficiency",
+      "position": "start"
+    },
+    {
+      "text": "We present UNITE, a unified approach to joint tokenization and generation.",
+      "expected_section": "Conclusion",
+      "position": "start"
+    },
+    {
+      "text": "The core contribution of UNITE is to align tokenization and generation by training both over a shared latent space.",
+      "expected_section": "Discussions",
+      "position": "start"
+    },
+    {
+      "text": "In this appendix, we first provide more details on the reconstruction fidelity results in Sec. A.",
+      "expected_section": "Appendix",
+      "position": "start"
+    },
+    {
+      "text": "Here, we provide additional details on the adversarial fine-tuning procedure that reduces rFID from 1.01 to 0.51, without changing gFID.",
+      "expected_section": "Reconstruction Fidelity Details",
+      "position": "start"
+    },
+    {
+      "text": "For reproducibility, we detail the full evaluation protocol used for all ImageNet-256 generation results.",
+      "expected_section": "Evaluation Protocol",
+      "position": "start"
+    },
+    {
+      "text": "The QM9 dataset (Ramakrishnan et al., 2014) contains approximately 130K stable small organic molecules with up to 9 heavy atoms from the set {C, N, O, F}.",
+      "expected_section": "QM9 Molecular Generation",
+      "position": "start"
+    },
+    {
+      "text": "The MP20 dataset from the Materials Project (Jain et al., 2013) contains 45,231 inorganic crystal structures with up to 20 atoms per unit cell.",
+      "expected_section": "MP20 Crystal Generation",
+      "position": "start"
+    },
+    {
+      "text": "we provide a few additional ablations that further improve UNITE’s reconstruction and generation fidelity.",
+      "expected_section": "Ablation Studies on ImageNet 256×256",
+      "position": "start"
+    },
+    {
+      "text": "Tab. 7 and Tab. 8 provide additional architectural and training details.",
+      "expected_section": "Architectural Details",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "unified",
+        "tokenization",
+        "generation",
+        "generative",
+        "encoder"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "tokenization",
+        "generation",
+        "same",
+        "latent",
+        "inference"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "unite",
+        "training",
+        "pipeline",
+        "two",
+        "forward",
+        "passes"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "training",
+        "dynamics",
+        "reconstruction",
+        "denoising",
+        "objectives"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "weight",
+        "shared",
+        "separate",
+        "encoder",
+        "denoiser"
+      ]
+    },
+    {
+      "number": 6,
+      "caption_contains": [
+        "representation",
+        "alignment",
+        "tokenization",
+        "generation"
+      ]
+    },
+    {
+      "number": 7,
+      "caption_contains": [
+        "analyzing",
+        "denoising",
+        "trajectory"
+      ]
+    },
+    {
+      "number": 8,
+      "caption_contains": [
+        "selected",
+        "samples",
+        "unite",
+        "xl"
+      ]
+    },
+    {
+      "number": 9,
+      "caption_contains": [
+        "uncurated",
+        "class",
+        "conditional",
+        "samples"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "imagenet",
+        "256",
+        "generation"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "imagenet",
+        "256",
+        "reconstruction"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "qm9",
+        "molecule",
+        "generation"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "evaluation",
+        "protocol",
+        "reported",
+        "fid"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "mp20",
+        "crystal",
+        "generation"
+      ]
+    },
+    {
+      "number": 6,
+      "caption_contains": [
+        "ablation",
+        "imagenet",
+        "256",
+        "generation"
+      ]
+    },
+    {
+      "number": 7,
+      "caption_contains": [
+        "architecture",
+        "configurations",
+        "unite",
+        "models"
+      ]
+    },
+    {
+      "number": 8,
+      "caption_contains": [
+        "training",
+        "configuration",
+        "imagenet",
+        "256"
+      ]
+    }
+  ],
+  "notes": "Manually validated against the source PDF on 2026-04-02. Gold headings, anchors, and asset numbers come from the PDF itself, not either markdown output."
+}

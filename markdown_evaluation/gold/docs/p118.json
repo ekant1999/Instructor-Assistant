@@ -1,0 +1,393 @@
+{
+  "doc_id": "p118",
+  "title": "WRITEBACK-RAG: Training the Knowledge Base through Evidence Distillation and Write-Back Enrichment",
+  "validated": true,
+  "layout_type": "two_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "equation_heavy",
+    "appendix_heavy",
+    "table_heavy"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract"
+    },
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "Related Works"
+    },
+    {
+      "level": 2,
+      "text": "Problem Formulation"
+    },
+    {
+      "level": 2,
+      "text": "Methods"
+    },
+    {
+      "level": 3,
+      "text": "Overview"
+    },
+    {
+      "level": 3,
+      "text": "Utility Gate"
+    },
+    {
+      "level": 3,
+      "text": "Document Gate"
+    },
+    {
+      "level": 3,
+      "text": "Distillation"
+    },
+    {
+      "level": 3,
+      "text": "Write-Back"
+    },
+    {
+      "level": 2,
+      "text": "Experiments"
+    },
+    {
+      "level": 3,
+      "text": "Datasets"
+    },
+    {
+      "level": 3,
+      "text": "Implementation Details"
+    },
+    {
+      "level": 2,
+      "text": "Results"
+    },
+    {
+      "level": 3,
+      "text": "RQ1: Overall Performance"
+    },
+    {
+      "level": 3,
+      "text": "RQ2: Selection and Compression"
+    },
+    {
+      "level": 3,
+      "text": "RQ3: Evidence Rank Distribution"
+    },
+    {
+      "level": 3,
+      "text": "RQ4: Transfer and Reuse"
+    },
+    {
+      "level": 3,
+      "text": "RQ5: Component Ablations"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    },
+    {
+      "level": 2,
+      "text": "Limitations"
+    },
+    {
+      "level": 2,
+      "text": "Ethical Consideration"
+    },
+    {
+      "level": 2,
+      "text": "References"
+    },
+    {
+      "level": 2,
+      "text": "On the Use of \"KB Training\""
+    },
+    {
+      "level": 2,
+      "text": "W RITE BACK -RAG Prevents Answer Leakage"
+    },
+    {
+      "level": 2,
+      "text": "W RITE BACK -RAG as a General Method for RAG"
+    },
+    {
+      "level": 2,
+      "text": "Datasets"
+    },
+    {
+      "level": 2,
+      "text": "Hyperparameters"
+    },
+    {
+      "level": 2,
+      "text": "Knowledge Distillation Analysis"
+    },
+    {
+      "level": 2,
+      "text": "Prompt Templates"
+    },
+    {
+      "level": 2,
+      "text": "Representative Write-Back Examples"
+    },
+    {
+      "level": 2,
+      "text": "Rationale for using Naive RAG for Analysis"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "We argue that the knowledge base should be treated as a trainable component and propose W RITE BACK -RAG",
+      "expected_section": "Abstract",
+      "position": "middle"
+    },
+    {
+      "text": "Cross-method transfer experiments further show that the distilled knowledge benefits RAG pipelines other than the one used to produce it",
+      "expected_section": "Abstract",
+      "position": "end"
+    },
+    {
+      "text": "This observation motivates a new concept we call knowledge base training",
+      "expected_section": "Introduction",
+      "position": "middle"
+    },
+    {
+      "text": "a two-stage gating mechanism analyzes retrieval behavior to identify which training samples benefit from retrieval",
+      "expected_section": "Introduction",
+      "position": "end"
+    },
+    {
+      "text": "A RAG system consists of three components: a retriever R, a generator G, and a knowledge base K",
+      "expected_section": "Problem Formulation",
+      "position": "start"
+    },
+    {
+      "text": "W RITE BACK -RAG instantiates the KB training objective by learning from how a RAG system interacts with the corpus on labeled data",
+      "expected_section": "Overview",
+      "position": "start"
+    },
+    {
+      "text": "The utility gate operates at the sample level, selecting training examples where retrieved knowledge makes a genuine difference",
+      "expected_section": "Utility Gate",
+      "position": "start"
+    },
+    {
+      "text": "The document gate operates at the document level within each utility-approved example",
+      "expected_section": "Document Gate",
+      "position": "start"
+    },
+    {
+      "text": "Given a training query qi and its gated evidence, an LLM-based distiller F synthesizes a single knowledge unit",
+      "expected_section": "Distillation",
+      "position": "start"
+    },
+    {
+      "text": "The distilled knowledge units are collected into a separate write-back corpus",
+      "expected_section": "Write-Back",
+      "position": "start"
+    },
+    {
+      "text": "We evaluate on six benchmarks from the FlashRAG collection",
+      "expected_section": "Datasets",
+      "position": "start"
+    },
+    {
+      "text": "We use E5-base-v2 as the retriever with K=5 documents",
+      "expected_section": "Implementation Details",
+      "position": "start"
+    },
+    {
+      "text": "We organize the analysis around five research questions",
+      "expected_section": "Results",
+      "position": "start"
+    },
+    {
+      "text": "Table 2 reports results for all 48 settings",
+      "expected_section": "RQ1: Overall Performance",
+      "position": "start"
+    },
+    {
+      "text": "The utility gate selects vastly different fractions of training data depending on the task",
+      "expected_section": "RQ2: Selection and Compression",
+      "position": "middle"
+    },
+    {
+      "text": "To further understand how the document gate selects useful evidence, we analyze the retrieval-rank distribution of retained documents",
+      "expected_section": "RQ3: Evidence Rank Distribution",
+      "position": "start"
+    },
+    {
+      "text": "A key question is whether write-back knowledge is specific to the RAG method that produced it",
+      "expected_section": "RQ4: Transfer and Reuse",
+      "position": "start"
+    },
+    {
+      "text": "Table 4 ablates three controls of the write-back pipeline on NQ",
+      "expected_section": "RQ5: Component Ablations",
+      "position": "start"
+    },
+    {
+      "text": "We proposed W RITE BACK -RAG, a framework that treats the knowledge base as a trainable component of RAG systems",
+      "expected_section": "Conclusion",
+      "position": "start"
+    },
+    {
+      "text": "W RITE BACK -RAG has several limitations",
+      "expected_section": "Limitations",
+      "position": "start"
+    },
+    {
+      "text": "Because W RITE BACK -RAG writes distilled knowledge back into a retrievable corpus, errors or biases in the distillation process may persist",
+      "expected_section": "Ethical Consideration",
+      "position": "start"
+    },
+    {
+      "text": "The implementation of W RITE BACK -RAG is a corpus augmentation and distillation pipeline, not gradient-based optimization over KB parameters",
+      "expected_section": "On the Use of \"KB Training\"",
+      "position": "start"
+    },
+    {
+      "text": "Although the distiller never receives the gold answer, the utility gate selects examples where retrieval produces a correct answer",
+      "expected_section": "W RITE BACK -RAG Prevents Answer Leakage",
+      "position": "start"
+    },
+    {
+      "text": "W RITE BACK -RAG operates entirely at this shared layer",
+      "expected_section": "W RITE BACK -RAG as a General Method for RAG",
+      "position": "middle"
+    },
+    {
+      "text": "Our implementation uses one shared retriever encoder for both the original corpus and the write-back corpus",
+      "expected_section": "Hyperparameters",
+      "position": "start"
+    },
+    {
+      "text": "Figure 5 visualizes the relationship between extracted source evidence length and distilled write-back knowledge length across six datasets",
+      "expected_section": "Knowledge Distillation Analysis",
+      "position": "start"
+    },
+    {
+      "text": "We use task-specific prompts for retrieval-based inference",
+      "expected_section": "Prompt Templates",
+      "position": "start"
+    },
+    {
+      "text": "We next present representative training instances that were rewritten and added to the write-back corpus",
+      "expected_section": "Representative Write-Back Examples",
+      "position": "start"
+    },
+    {
+      "text": "We mainly adopt naive RAG as the reference baseline during analysis because it offers the most controlled setting for identifying the source of improvement",
+      "expected_section": "Rationale for using Naive RAG for Analysis",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "standard",
+        "rag",
+        "retrieves",
+        "fragmented",
+        "evidence"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "pipeline",
+        "training",
+        "gating",
+        "mechanism"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "retrieval",
+        "rank",
+        "distribution",
+        "retained",
+        "documents"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "cross",
+        "writeback",
+        "robustness"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "source",
+        "evidence",
+        "distilled",
+        "writeback"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": [
+        "main",
+        "evaluation",
+        "datasets"
+      ]
+    },
+    {
+      "number": 2,
+      "caption_contains": [
+        "main",
+        "results",
+        "six",
+        "benchmarks"
+      ]
+    },
+    {
+      "number": 3,
+      "caption_contains": [
+        "training",
+        "time",
+        "writeback",
+        "construction",
+        "statistics"
+      ]
+    },
+    {
+      "number": 4,
+      "caption_contains": [
+        "ablation",
+        "utility",
+        "gate",
+        "threshold"
+      ]
+    },
+    {
+      "number": 5,
+      "caption_contains": [
+        "detailed",
+        "dataset",
+        "statistics"
+      ]
+    },
+    {
+      "number": 6,
+      "caption_contains": [
+        "full",
+        "hyperparameter",
+        "settings"
+      ]
+    }
+  ],
+  "notes": "Manually validated against the source PDF on 2026-04-01. Gold headings, anchors, and asset numbers come from the PDF itself, not either markdown output."
+}
