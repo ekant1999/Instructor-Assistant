@@ -8,18 +8,18 @@
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p118/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p118/manifest.json",
   "asset_counts": {
-    "figures": 0,
-    "tables": 0,
-    "equations": 0
+    "figures": 5,
+    "tables": 6,
+    "equations": 31
   },
   "metadata": {
     "title": "WRITEBACK-RAG: Training the Knowledge Base through Evidence Distillation and Write-Back Enrichment",
     "paper_id": "118",
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/699ede68aa0d6853.pdf",
-    "generated_at": "2026-04-02T01:28:12.194533+00:00",
-    "num_figures": "0",
-    "num_tables": "0",
-    "num_equations": "0",
+    "generated_at": "2026-04-03T22:15:01.458806+00:00",
+    "num_figures": "5",
+    "num_tables": "6",
+    "num_equations": "31",
     "page_count": "15"
   },
   "render_mode": "normal",
@@ -194,6 +194,6 @@
     "issue_count": 0,
     "issues": []
   },
-  "elapsed_ms": 441.951,
+  "elapsed_ms": 10913.867,
   "status": "success"
 }

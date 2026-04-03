@@ -2,10 +2,10 @@
 title: "Detailed Geometry and Appearance from Opportunistic Motion"
 paper_id: 120
 source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf"
-generated_at: "2026-04-02T01:28:14.685649+00:00"
-num_figures: 0
-num_tables: 0
-num_equations: 0
+generated_at: "2026-04-03T22:15:29.155927+00:00"
+num_figures: 18
+num_tables: 4
+num_equations: 19
 ---
 
 Ryosuke Hirai 1, Kohei Yamashita 1, Antoine Guédon 2,3, Ryo Kawahara 1, Vincent Lepetit 3, and Ko Nishino 1
@@ -18,9 +18,9 @@ Sparse Static Cameras
 
 Object Motion Effective Dense Viewpoints
 
-Single-Frame Ours Ground Truth
+![Figure 1](assets/figures/page_001_vec_001.png)
 
-Fig. 1: We introduce a method to recover high-fidelity 3D geometry and appearance from sparse-view static videos. By leveraging “virtual viewpoints” induced by opportunistic object motion, our method jointly optimizes object pose and geometry through a motion-aware appearance representation to capture detailed surface structure.
+_Figure 1: We introduce a method to recover high-fidelity 3D geometry and appearance from sparse-view static videos. By leveraging “virtual viewpoints” induced by opportunistic object motion, our method jointly optimizes object pose and geometry through a motion-aware appearance representation to capture detailed surface structure._
 
 ## Abstract
 
@@ -48,41 +48,11 @@ Appearance Modeling for Specular and Dynamic Objects is indeed challenging for n
 
 where Y m l (v) denotes an SH basis function. The Gaussian parameters (µ i, q i, s i, σ i, and θ i) are optimized through a differentiable tile-based rasterizer. 2D Gaussian splatting [15] is a variant for accurate geometry reconstruction. It represents a 3D scene with oriented planar Gaussian primitives. Each 2D Gaussian is characterized by a surface normal n i and a 2D scale, facilitating perspective-consistent depth evaluation and accurate surface extraction. These surface normals allow for direct geometric regularization—such as depth-normal consistency losses—and, as we show later, provide the necessary geometric context to model complex view- and pose-dependent appearance for moving objects.
 
-Canonical
-Gaussians
+![Figure 2](assets/figures/page_005_vec_001.png)
 
-Canonical
-Gaussians
+_Figure 2: Method Overview. Given sparse multi-view videos and an initial set of canonical 2D Gaussians (a), our framework recovers per-frame object poses while iteratively refining the Gaussian geometry via differentiable rendering. To ensure robust convergence under sparse supervision, we employ an alternating optimization that switches between 6-DoF object pose estimation (b) and canonical Gaussian refinement (c) using the aggregated temporal information from all_
 
-Sparse Multi-View Videos
-
-ℒ refine
-
-RGB Observations
-+ Geometry Priors
-
-Segmentation
-
-Segmentation
-
-Canonical Gaussians with Mask
-
-Mask
-
-Observations
-
-Mask
-
-(b) Object pose estimation
-
-(c) Gaussian Refinement
-
-Fig. 2: Method Overview. Given sparse multi-view videos and an initial set of canonical
-2D Gaussians (a), our framework recovers per-frame object poses while iteratively
-refining the Gaussian geometry via differentiable rendering. To ensure robust convergence
-under sparse supervision, we employ an alternating optimization that switches between
-6-DoF object pose estimation (b) and canonical Gaussian refinement (c) using the
-aggregated temporal information from all processed frames.
+## Method
 
 duce a compact yet expressive appearance model that accounts for view- and pose-dependent appearance changes throughout the sequence.
 
@@ -92,6 +62,15 @@ duce a compact yet expressive appearance model that accounts for view- and pose-
 
 Using multi-view observations from subsequent timesteps, we alternate between estimating per-frame object poses and refining the canonical Gaussian parameters. In both stages, we transform the canonical Gaussians associated with the foreground (those with high mask values m i) according to the current pose estimate, render the scene, and back-propagate photometric gradients. A significant challenge is that initial mask values may be noisy, potentially degrading estimation accuracy. We address this by refining the per-Gaussian mask values m i concurrently with object motion. To facilitate this, we derive a soft-masked rigid transformation that allows gradients to flow directly to the mask values. Given the object pose (q t obj, t t obj) and mask values m i ∈ [0, 1], we compute the interpolated motion for each Gaussian:
 
+> Equation 3 JSON: `assets/equations/equation_0004.json`
+> Equation 3 image: `assets/equations/equation_0004.png`
+
+> Equation 4 JSON: `assets/equations/equation_0005.json`
+> Equation 4 image: `assets/equations/equation_0005.png`
+
+> Equation 5 JSON: `assets/equations/equation_0006.json`
+> Equation 5 image: `assets/equations/equation_0006.png`
+
 where R t obj,i is a rotation matrix for q t obj,i and p is the object centroid in the canonical space computed from the initial canonical Gaussians and the initial mask values. Other Gaussian attributes remain fixed to their canonical values. For this phase, we use the standard appearance model (Eq. (1)), but evaluate the viewing direction in the object’s local coordinate system. This effectively assumes a “body-attached” lighting environment, which we further refine in Sec. 4.3. We supervise the optimization using a composite loss function. Following 3DGS [19] and 2DGS [15], we employ a rendering loss L RGB (comprising L 1 and D-SSIM) and a depth-normal consistency loss L n. To ensure stability under sparse views, we integrate the geometric priors from MAtCha [13]: a depth prior loss L pdepth and a normal prior loss L pnormal based on foundation model estimates [8,42]. Finally, to enforce a clear separation between the moving object and the static background, we apply an entropy-based binary regularization on the mask values:
 
 for physically meaningful estimation. The overall loss function for the pose estimation phase L pose and Gaussian refinement phase L refine are defined as follows:
@@ -100,73 +79,32 @@ for physically meaningful estimation. The overall loss function for the pose est
 
 Following the alternating optimization phase, we perform a joint refinement of geometry and appearance using the full temporal sequence. To achieve highfidelity reconstruction from sparse views, we derive a compact, physically-inspired appearance model tailored for moving objects. As illustrated in Fig. 3a, specular radiance on smooth surfaces primarily depends on the surface reflectance k s and the incident illumination from the reflected viewing direction:
 
-𝐧
+> Equation 9 JSON: `assets/equations/equation_0009.json`
+> Equation 9 image: `assets/equations/equation_0009.png`
 
-𝐧
+![Figure 3](assets/figures/page_008_vec_001.png)
 
-𝐧
-
-(a) Effective Light for Specular Reflection
-
-(b) Effective Hemisphere for Diffuse Shading
-
-𝐤 𝑑,𝑖
-
-𝐯 𝑖
-
-𝛚 𝑟,𝑖
-
-𝐧 i
-
-𝐧 𝑗
-
-𝐜 𝑠,𝑖
-
-𝐜 𝑑,𝑖
-
-𝐜 𝑖
-
-𝛚 𝑟,𝑗
-
-𝐧 𝑖
-
-𝐤 𝑑,𝑖
-
-𝛚 𝑟,𝑗
-
-𝜃 𝑠
-
-𝐜 𝑠,𝑗
-
-𝐜 𝑗
-
-𝐜 𝑑,𝑗
-
-x
-
-(c) Definition of Inputs
-
-(e) Specular Model
-
-(f) Diffuse Model
-
-Fig. 3: Motion-Aware Appearance Modeling. (a) For moving objects, specular
-reflection is a function of incident radiance from the reflected viewing direction ω r,
-which evolves with object pose. (b) Similarly, diffuse reflection depends on the time-
-varying surface normal n relative to the static environment. (c) Our model factorizes
-appearance into specular (e) and diffuse (f) components by evaluating the surface normal
-and reflected viewing directions in the world coordinate system. (d) Unlike standard
-3DGS, which optimizes independent Spherical Harmonics (SH) for each primitive, our
-approach employs shared SH coefficients θ d and θ s across all foreground Gaussians to
-robustly capture the global illumination field.
+_Figure 3: Motion-Aware Appearance Modeling. (a) For moving objects, specular reflection is a function of incident radiance from the reflected viewing direction ωr, which evolves with object pose. (b) Similarly, diffuse reflection depends on the time- varying surface normal n relative to the static environment. (c) Our model factorizes appearance into specular (e) and diffuse (f) components by evaluating the surface normal and reflected viewing directions in the worl_
 
 where v and n denote the viewing direction and surface normal in the world coordinate system, respectively. Let ⊙ denote the Hadamard product. We approximate the specular component for each Gaussian (i) as
 
+> Equation 10 JSON: `assets/equations/equation_0011.json`
+> Equation 10 image: `assets/equations/equation_0011.png`
+
 where k s,i is the specular reflectance and ω r,i is the view direction reflected by the surface normal n i. In effect, this models a Phong-like [29] specular component. f is a weighted sum of SH basis functions. The learnable SH coefficients θ s approximate the incident radiance from the surrounding environment probed by the reflected view direction. Assuming the illumination is distant relative to the object size, the incident radiance remains invariant to surface translation; thus, we employ a single set of SH coefficients θ s shared across all foreground Gaussians. In practice, we set k s,i = 1, i.e., assume objects with uniform gloss. We further account for diffuse reflection, which also exhibits time-dependency as the object rotates through a static lighting environment. The radiance for a Lambertian surface is defined by
+
+> Equation 11 JSON: `assets/equations/equation_0012.json`
+> Equation 11 image: `assets/equations/equation_0012.png`
 
 where k d is diffuse albedo and L i denotes the incident radiance as a function of incident direction ω i. As depicted in Fig. 3b, this integral is a function of the time-varying surface normal n. We approximate the diffuse component as
 
+> Equation 12 JSON: `assets/equations/equation_0013.json`
+> Equation 12 image: `assets/equations/equation_0013.png`
+
 where θ d represents the learnable SH coefficients for the diffuse irradiance. Our final appearance model computes the total color as sum of the specular and diffuse components:
+
+> Equation 13 JSON: `assets/equations/equation_0014.json`
+> Equation 13 image: `assets/equations/equation_0014.png`
 
 Figure 3 (c)-(f) summarizes the differences between the standard 3DGS
 appearance model and our motion-aware factorized appearance model. By sharing
@@ -183,16 +121,10 @@ constraints. The final optimization objective is:
 
 Once the joint optimization is complete, we extract a surface mesh of the foreground object. We adapt the strategy of MILo [12] to our dynamic setting, allowing the meshing process to leverage observations of the motion at all timesteps rather than relying solely on the canonical frame. We first isolate the foreground Gaussians by thresholding the optimized mask values m i. Each selected Gaussian G i spawns a fixed set of pivot points anchored within its local coordinate frame. Because pivots are anchored to their parent Gaussian, they follow the object through time: at timestep t, each pivot is transformed by the same masked rigid motion as its Gaussian (Eqs. (4) and (5)). A Delaunay triangulation of the pivots yields a volumetric tetrahedral mesh which evolves over time as the pivots move with the object. We assign a learnable signed distance value (SDF) to each pivot and optimize these values over 1000 iterations. At each iteration, we first select a timestep and extract a triangle mesh from the current SDF values and Delaunay triangulation via differentiable marching tetrahedra [1]. Then, we select a viewpoint, render depth and normal maps from the extracted mesh, and compare them to the corresponding depth and normal maps rendered from the Gaussians. Gradients are back-propagated from this rendering loss to the SDF values, enforcing the surface of the dynamic object to match the geometry of the Gaussians. Crucially, this supervision aggregates over all views v and all timesteps t, so that the SDF values benefit from the same effectively dense observations that drove the Gaussian refinement. After convergence, the final mesh is extracted by applying marching tetrahedra to the first frame pivot positions.
 
-Table 1: Surface normal accuracy for synthetic data. We evaluate reconstruction
-quality on synthetic data using the mean, median, and 80th percentile errors against
-ground-truth surface normals. The results demonstrate that our proposed components
-significantly enhance the recovery of fine surface details. While simpler surfaces, such
-as the drain cleaner, can be handled by baseline methods, they do not fully reflect our
-method’s capability to reconstruct intricate geometric details.
+> Table JSON: `assets/tables/table_0001.json`
+> Table 1: Surface normal accuracy for synthetic data. We evaluate reconstruction quality on synthetic data using the mean, median, and 80th percentile errors against ground-truth surface normals. The results demonstrate that our proposed components significantly enhance the recovery of fine surface details. While simpler surfaces, such as the drain cleaner, can be handled by baseline methods, they do not fully reflect our method’s capability to reconstruct intricate geometric details.
 
 Mean ↓ Med. ↓ P80 ↓ Mean ↓ Med. ↓ P80 ↓ Mean ↓ Med. ↓ P80 ↓ Mean ↓ Med. ↓ P80 ↓ Mean ↓ Med. ↓ P80 ↓ Mean ↓ Med. ↓ P80 ↓
-
-## Experimental Results
 
 We validate the effectiveness of our method using a newly created synthetic multi-view video dataset and established real-world datasets.
 
@@ -208,9 +140,8 @@ Table 2: Novel view synthesis accuracy on synthetic data. The results high-
 light that our proposed appearance model is essential for accurately recovering object
 appearance from sparse multi-view observations.
 
-Table 3: Surface mesh reconstruction on synthetic data. We evaluate geometric
-accuracy using Chamfer Distance (CD, ↓) and Normal Error (↓). The results demonstrate
-the superior precision of our reconstruction compared to baseline methods.
+> Table JSON: `assets/tables/table_0002.json`
+> Table 3: Surface mesh reconstruction on synthetic data. We evaluate geometric accuracy using Chamfer Distance (CD, ↓) and Normal Error (↓). The results demonstrate the superior precision of our reconstruction compared to baseline methods.
 
 and the ground truth. We report the mean, median, and 80th percentile errors. Novel view synthesis accuracy is measured using PSNR, L1 error, SSIM, and LPIPS, calculated exclusively within the object regions. For the reconstructed mesh, we evaluate geometric fidelity using the Chamfer Distance (CD) and the average angular error of the surface normals. To calculate the latter, we compare the normal of each sampled point on the extracted mesh surface with the normal of the nearest point on the ground-truth surface.
 
@@ -218,27 +149,23 @@ and the ground truth. We report the mean, median, and 80th percentile errors. No
 
 We first quantitatively evaluate our method using synthetic data with groundtruth surface details. Tables 1 to 3 summarize the accuracy of the recovered surface normals, novel view synthesis, and 3D mesh models. These results demonstrate
 
-Fig. 4: Visualization of recovered surface normals. The error maps on the
-right visualize per-pixel estimation discrepancies. These results demonstrate that proper
-appearance modeling is essential for effectively leveraging radiometric cues to reconstruct
-fine surface details.
+![Figure 4](assets/figures/page_012_img_001.png)
 
-Fig. 5: Novel view Synthesis. Our appearance model significantly improves the
-fidelity of novel view synthesis when applied to objects with specularity.
+_Figure 4: Visualization of recovered surface normals. The error maps on the right visualize per-pixel estimation discrepancies. These results demonstrate that proper appearance modeling is essential for effectively leveraging radiometric cues to reconstruct fine surface details._
+
+![Figure 5](assets/figures/page_012_img_002.png)
+
+_Figure 5: Novel view Synthesis. Our appearance model significantly improves the fidelity of novel view synthesis when applied to objects with specularity._
 
 that our proposed components are essential for reconstructing detailed geometry and appearance. Notably, our method achieves significantly higher accuracy than the single-frame baselines in surface normal estimation and novel view synthesis for the bunny and drill sequences, which feature complex geometries that pose a challenge for the baseline. Qualitative results for recovered surface normals and novel view synthesis are shown in Figs. 4 and 5. Without effectively leveraging radiometric cues, learned priors and cross-view photometric consistency provide insufficient information to resolve fine surface details. Consequently, the “w/o Motion-Aware Appearance” baseline recovers only coarse geometry and appearance. In contrast, our method successfully reconstructs accurate surface details and novel views by fully exploiting radiometric cues through the proposed appearance model. In Tabs. 1 to 3, we compare our method with DG-Mesh [21], a representative baseline for surface mesh recovery from multi-view RGB video. While DG-Mesh
 
-Fig. 6: Surface normals and mesh models recovered from real-world datasets.
-Qualitative results on HO3D [14] and HODome [47] demonstrate the effectiveness and
-robustness of our method across diverse human-object interaction scenarios.
+![Figure 6](assets/figures/page_013_img_001.png)
 
-Views
-Mesh
+_Figure 6: Surface normals and mesh models recovered from real-world datasets. Qualitative results on HO3D [14] and HODome [47] demonstrate the effectiveness and robustness of our method across diverse human-object interaction scenarios._
 
-Fig. 7: Visualization of alternating estimation progress. We show the recovered
-geometry and object poses (represented as effective camera views) at several timesteps.
-As the temporal window expands and the effective camera coverage becomes more
-informative, the geometric accuracy of the reconstruction progressively improves.
+![Figure 7](assets/figures/page_013_img_002.png)
+
+_Figure 7: Visualization of alternating estimation progress. We show the recovered geometry and object poses (represented as effective camera views) at several timesteps. As the temporal window expands and the effective camera coverage becomes more informative, the geometric accuracy of the reconstruction progressively improves._
 
 supports deformable objects, it requires extensive camera motion to jointly estimate geometry, appearance, and deformation. Consequently, it struggles with the sparse inputs provided by static cameras. In contrast, our method effectively leverages sparse, static-view observations by jointly optimizing object pose, geometry, and appearance. Note that we only report results of DG-Mesh [21] on the synthetic data as it did not produce meaningful results on real data due to occlusions from human subjects and large motions.
 
@@ -246,8 +173,8 @@ supports deformable objects, it requires extensive camera motion to jointly esti
 
 We further evaluate our method on several real-world datasets. To maintain our assumption of a single rigidly moving object, we pre-process the scenes to remove human subjects from the representation. During initialization, we exclude Gaussians projected onto annotated human segmentation masks; during multi-frame optimization, we mask human regions when computing loss functions. Figure 6 and Tab. 4 present qualitative and quantitative results for surface normals, 3D mesh models, and novel view synthesis. While these datasets provide
 
-Table 4: Quantitative results on real-world datasets. Our method achieves better
-geometry accuracy and novel view synthesis quality than the baselines.
+> Table JSON: `assets/tables/table_0003.json`
+> Table 4: Quantitative results on real-world datasets. Our method achieves better geometry accuracy and novel view synthesis quality than the baselines.
 
 ground-truth meshes, they often lack fine geometric details; therefore, we restrict our geometric evaluation to the Chamfer Distance (CD). Although real-world conditions may not strictly adhere to all model assumptions, our alternating estimation framework and appearance model consistently improve reconstruction quality, demonstrating the robustness of our approach. Figure 7 visualizes the recovered 3D shapes and object poses at several timesteps of the alternating optimization process. We represent object poses as “effective camera views”—the camera’s position relative to the object’s local coordinate system. The results confirm that our method successfully leverages object motion, progressively improving geometric accuracy as the diversity of effective viewpoints increases.
 
@@ -447,8 +374,9 @@ Geometrically Accurate Radiance Fields for Dynamic Objects. In: ACM Multimedia
 Directional Factorization for 2D Gaussian Splatting. In: Conference on Computer
 Vision and Pattern Recognition (2025) 4
 
-Fig. 8: Results on in-the-wild capture. Our method reconstructs faithful appearance
-and geometry from real-world capture, including specular highlight on the object.
+![Figure 8](assets/figures/page_018_img_001.png)
+
+_Figure 8: Results on in-the-wild capture. Our method reconstructs faithful appearance and geometry from real-world capture, including specular highlight on the object._
 
 ## Results on In-the-wild Capture
 
@@ -481,9 +409,9 @@ For the HODome dataset (high-fidelity capture of human-object interaction), we u
 Figure 9 shows additional qualitative results of the surface normals recovered from
 the synthetic dataset. The drain cleaner has relatively simple geometry and can
 
-Fig. 9: Additional Visualization of Recovered Surface Normals. Our recovered
-surface normals are at least comparable to those of the baselines, suggesting the
-robustness of our method.
+![Figure 9](assets/figures/page_021_img_001.png)
+
+_Figure 9: Additional Visualization of Recovered Surface Normals. Our recovered surface normals are at least comparable to those of the baselines, suggesting the robustness of our method._
 
 be handled well by the baseline methods, leaving limited room for improvement by our method. Nevertheless, our method achieves surface-normal estimates comparable to the baselines even on such an object, indicating robustness across different object complexities. Figure 10 shows additional novel view synthesis results on the synthetic dataset. Our appearance model improves the fidelity of novel view synthesis across different objects. The ottoman (the second row) remains challenging even for our method, as it exhibits limited surface-normal variation, providing only sparse view-dependent appearance observations for appearance recovery. Figure 11 shows a qualitative comparison with DG-Mesh [21]. While it supports deformable objects, it struggles to recover fine surface details from sparse inputs captured by static cameras.
 
@@ -491,11 +419,9 @@ be handled well by the baseline methods, leaving limited room for improvement by
 
 Figures 12 and 13 show qualitative results of the ablation studies on the diffuse and specular components of our motion-aware appearance model. Removing either component degrades the recovery of view- and motion-dependent effects, leading to less faithful novel view synthesis and reduced surface-normal quality on objects with challenging materials such as the bunny. Figure 14 shows visualizations of the estimated specular and diffuse components. These results indicate that our method can effectively decompose the object appearance into specular highlights and diffuse shading, enabling separate analysis of each component. We further validate our motion-aware appearance model by comparing it against per-Gaussian SH, a variant of our method that optimizes spherical harmonics (SH) coefficients independently for each Gaussian, similar to 3D
 
-Novel View
+![Figure 10](assets/figures/page_022_img_001.png)
 
-Fig. 10: Additional Novel View Synthesis Results. Our appearance model im-
-proves the fidelity of novel view synthesis on different objects. The ottoman (the second
-row) remains challenging due to its limited surface-normal variation.
+_Figure 10: Additional Novel View Synthesis Results. Our appearance model im- proves the fidelity of novel view synthesis on different objects. The ottoman (the second row) remains challenging due to its limited surface-normal variation._
 
 Gaussian Splatting (3DGS). Table 5 and Fig. 15 show quantitative and qualitative results. Optimizing per-Gaussian SH coefficients can be unstable on complex objects such as the bunny, leading to degraded surface-normal and novel-view synthesis accuracy. In contrast, our full method with shared SH coefficients successfully recovers high-frequency details of surface normals, demonstrating the advantage of the shared SH coefficients.
 
@@ -503,8 +429,9 @@ Gaussian Splatting (3DGS). Table 5 and Fig. 15 show quantitative and qualitative
 
 To further evaluate the effectiveness of our alternating estimation framework, we test our method under more challenging temporally sparse settings. Specifically, we construct subsampled videos by skipping every other frame and every two frames. In these settings, the object rotates by approximately 26 degrees and 39 degrees, respectively, between adjacent frames. Figure 16 shows qualitative comparisons between our full method and a variant without alternating estimation (“w/o Alternating Estimation”). Without alternating estimation, the joint estimation suffers from the strong interdependency between geometry, pose, and appearance. In contrast, our method successfully recovers geometry and appearance even from the sparsest videos, clearly demonstrating the effectiveness of the alternating estimation framework.
 
-Fig. 11: Qualitative comparison with DG-Mesh [21]. While DG-Mesh supports
-deformable objects, it struggles with the sparse inputs provided by static cameras.
+![Figure 11](assets/figures/page_023_img_001.png)
+
+_Figure 11: Qualitative comparison with DG-Mesh [21]. While DG-Mesh supports deformable objects, it struggles with the sparse inputs provided by static cameras._
 
 ### Effectiveness of Segmentation Mask Refinement
 
@@ -516,71 +443,33 @@ Figure 18 shows additional qualitative results of the reconstructed surface geom
 etry on real-world datasets. Our method recovers fine-grained geometric details
 across objects with diverse shapes and material properties.
 
-Fig. 12: Effectiveness of diffuse and specular components for surface normal
-recovery. Modeling both diffuse and specular components is critical for recovering
-accurate surface normals on objects with diverse material properties, where view-
-dependent effects can otherwise bias the reconstruction.
+![Figure 12](assets/figures/page_024_img_001.png)
 
-Novel View
+_Figure 12: Effectiveness of diffuse and specular components for surface normal recovery. Modeling both diffuse and specular components is critical for recovering accurate surface normals on objects with diverse material properties, where view- dependent effects can otherwise bias the reconstruction._
 
-Fig. 13: Effectiveness of diffuse and specular components for novel view
-synthesis. Our full model can faithfully reproduce both specular highlights and diffuse
-shading.
+![Figure 13](assets/figures/page_025_img_001.png)
 
-Novel View
+_Figure 13: Effectiveness of diffuse and specular components for novel view synthesis. Our full model can faithfully reproduce both specular highlights and diffuse shading._
 
-GT
-Specular
-Diffuse
-Full
+![Figure 14](assets/figures/page_026_img_001.png)
 
-Fig. 14: Visualization of specular and diffuse components. In the second column
-of the specular components, we show the results with increased brightness for better
-visibility. Our method successfully decomposes the object appearance into specular and
-diffuse components, except for the challenging case of the ottoman.
+_Figure 14: Visualization of specular and diffuse components. In the second column of the specular components, we show the results with increased brightness for better visibility. Our method successfully decomposes the object appearance into specular and diffuse components, except for the challenging case of the ottoman._
 
-Table 5: Comparison with per-Gaussian SH, a variant of our method that
-optimizes SH coefficients independently for each Gaussian. We report (a) surface
-normal accuracy and (b) novel view synthesis quality on synthetic data. Optimizing
-per-Gaussian SH can be unstable on complex objects (e.g., the bunny), leading to
-degraded performance.
+> Table JSON: `assets/tables/table_0004.json`
+> Table 5: Comparison with per-Gaussian SH, a variant of our method that optimizes SH coefficients independently for each Gaussian. We report (a) surface normal accuracy and (b) novel view synthesis quality on synthetic data. Optimizing per-Gaussian SH can be unstable on complex objects (e.g., the bunny), leading to degraded performance.
 
-(a) Surface normal accuracy. Mean/median/80th percentile angular error (↓).
+![Figure 15](assets/figures/page_028_img_001.png)
 
-Mean ↓ Med. ↓ P80 ↓ Mean ↓ Med. ↓ P80 ↓ Mean ↓ Med. ↓ P80 ↓ Mean ↓ Med. ↓ P80 ↓ Mean ↓ Med. ↓ P80 ↓ Mean ↓ Med. ↓ P80 ↓
+_Figure 15: Qualitative comparison with per-Gaussian SH. In particular, our full model yields sharper reconstructions of fine surface details (e.g., the wrinkles on the bunny)._
 
-(b) Novel view synthesis accuracy. PSNR/SSIM (↑), L1/LPIPS (↓).
+![Figure 16](assets/figures/page_029_img_001.png)
 
-PSNR ↑
-SSIM ↑ LPIPS ↓
+_Figure 16: Comparison with our method without alternating estimation (“w/o Alternating Estimation”). In the “10 frames,” “15 frames,” and “29 frames” settings, the object rotates by approximately 39, 26, and 13 degrees, respectively, between adjacent frames. Our full method successfully recovers geometry and appearance even in the temporally sparsest setting._
 
-PSNR ↑
-SSIM ↑ LPIPS ↓
+![Figure 17](assets/figures/page_029_img_002.png)
 
-Fig. 15: Qualitative comparison with per-Gaussian SH. In particular, our full
-model yields sharper reconstructions of fine surface details (e.g., the wrinkles on the
-bunny).
+_Figure 17: Effectiveness of segmentation mask refinement. We compare our full method with a variant without mask refinement (“w/o Mask Refinement”), where the per-Gaussian mask values are fixed during optimization. Refining the mask values jointly with geometry and appearance is essential for converging to the true fine-scale geometry._
 
-Appearance
-Normal
-Normal Error
+![Figure 18](assets/figures/page_030_img_001.png)
 
-Fig. 16: Comparison with our method without alternating estimation (“w/o
-Alternating Estimation”). In the “10 frames,” “15 frames,” and “29 frames” settings,
-the object rotates by approximately 39, 26, and 13 degrees, respectively, between
-adjacent frames. Our full method successfully recovers geometry and appearance even
-in the temporally sparsest setting.
-
-Fig. 17: Effectiveness of segmentation mask refinement. We compare our full
-method with a variant without mask refinement (“w/o Mask Refinement”), where the
-per-Gaussian mask values are fixed during optimization. Refining the mask values
-jointly with geometry and appearance is essential for converging to the true fine-scale
-geometry.
-
-Single Frame
-Ours
-GT
-
-Fig. 18: Surface normals and mesh models recovered from real-world datasets.
-The results demonstrate the effectiveness and robustness of our method across diverse
-human-object interaction scenarios.
+_Figure 18: Surface normals and mesh models recovered from real-world datasets. The results demonstrate the effectiveness and robustness of our method across diverse human-object interaction scenarios._

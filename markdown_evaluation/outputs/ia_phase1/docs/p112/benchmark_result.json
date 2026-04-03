@@ -8,18 +8,18 @@
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p112/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p112/manifest.json",
   "asset_counts": {
-    "figures": 0,
-    "tables": 0,
-    "equations": 0
+    "figures": 11,
+    "tables": 3,
+    "equations": 18
   },
   "metadata": {
     "title": "MemDLM: Memory-Enhanced DLM Training",
     "paper_id": "112",
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/987e7ff453578105.pdf",
-    "generated_at": "2026-04-02T01:27:52.150617+00:00",
-    "num_figures": "0",
-    "num_tables": "0",
-    "num_equations": "0",
+    "generated_at": "2026-04-03T22:12:25.982745+00:00",
+    "num_figures": "11",
+    "num_tables": "3",
+    "num_equations": "18",
     "page_count": "16"
   },
   "render_mode": "normal",
@@ -146,6 +146,6 @@
     "issue_count": 0,
     "issues": []
   },
-  "elapsed_ms": 403.641,
+  "elapsed_ms": 8130.238,
   "status": "success"
 }

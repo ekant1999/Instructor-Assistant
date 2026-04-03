@@ -2,10 +2,10 @@
 title: "End-to-End Training for Unified Tokenization and Latent Denoising"
 paper_id: 114
 source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8fc3e78ffd8b88ba.pdf"
-generated_at: "2026-04-02T01:27:58.504057+00:00"
-num_figures: 0
-num_tables: 0
-num_equations: 0
+generated_at: "2026-04-03T22:13:07.785595+00:00"
+num_figures: 9
+num_tables: 7
+num_equations: 29
 ---
 
 Shivam Duggal 1 * Xingjian Bai 1 * Zongze Wu 2 Richard Zhang 2 Eli Shechtman 2
@@ -14,30 +14,11 @@ Antonio Torralba 1 Phillip Isola 1 William T. Freeman 1
 
 ## Abstract
 
-Images
-Gaussian
-
 Latent diffusion models (LDMs) enable highfidelity synthesis by operating in learned latent spaces. However, training state-of-the-art LDMs requires complex staging: a tokenizer must be trained first, before the diffusion model can be trained in the frozen latent space. We propose UNITE – an autoencoder architecture for unified tokenization and latent diffusion. UNITE consists of a Generative Encoder that serves as both image tokenizer and latent generator via weight sharing. Our key insight is that tokenization and generation can be viewed as the same latent inference problem under different conditioning regimes: tokenization infers latents from fully observed images, whereas generation infers them from noise together with text or class conditioning. Motivated by this, we introduce a single-stage training procedure that jointly optimizes both tasks via two forward passes through the same Generative Encoder. The shared parameters enable gradients to jointly shape the latent space, encouraging a “common latent language”. Across image and molecule modalities, UNITE achieves near state-of-the-art performance without adversarial losses or any pretrained encoders (e.g., DINO), reaching FID 2.12 and 1.73 for Base and Large models on ImageNet 256 × 256. We further analyze the Generative Encoder through the lenses of representation alignment and compression. These results show that single-stage joint training of tokenization and generation from scratch is feasible.
 
-Generative
+![Figure 1](assets/figures/page_001_img_001.png)
 
-Decoder
-
-Encoder
-
-Prior
-
-Generation
-
-Figure 1. Unified Tokenization & Generation via Generative
-Encoder (UNITE): We propose a single-stage architecture that
-unifies tokenization and generation through shared parameters.
-The Generative Encoder operates in two modes: (top) as a tok-
-enizer, it processes image patches and register tokens to produce
-a latent representation z 0; (bottom) as a generator/denoiser, it
-evolves latents along a flow-matching trajectory to synthesize z 0
-from Gaussian noise. The latent space is jointly shaped by recon.
-& generative objectives from scratch, without external supervision.
+_Figure 1: Unified Tokenization & Generation via Generative Encoder (UNITE): We propose a single-stage architecture that unifies tokenization and generation through shared parameters. The Generative Encoder operates in two modes: (top) as a tok- enizer, it processes image patches and register tokens to produce a latent representation z0; (bottom) as a generator/denoiser, it evolves latents along a flow-matching trajectory to synthesize z0 from Gaussian noise. The lat_
 
 ## Introduction
 
@@ -53,28 +34,9 @@ Prior works have explored fully end-to-end training of latent diffusion models b
 
 We propose an alternative perspective on end-to-end training. Our key insight is that tokenization and generation can be viewed as the same latent inference problem under different conditioning regimes (see Fig. 2). Tokenization can be viewed as a generative process under strong observability: given a data point x, the model induces a highly concentrated (near-single-point) distribution over latents, yielding a latent z that is consistent with and informative about x. Generation corresponds to a weak-observability regime, where z must be synthesized from noise (and optional conditions) using the learned prior. Under this view, these two operations differ mainly in how much information is available—from the full observation x in tokenization to only a prior in generation. Motivated by this view, we propose UNITE, which jointly trains tokenization and generation end-to-end without external supervision. UNITE ties tokenization & generation through a shared-parameter module we call the Generative Encoder (GE), so that gradi-
 
-Noisy Latent
-Distribution
+![Figure 2](assets/figures/page_002_vec_001.png)
 
-Image
-Manifold
-
-x
-
-Latent
-Manifold
-
-Tokenization
-
-Latent Gen.
-
-Figure 2. Tokenization and generation can be viewed as the same
-latent inference problem under different conditioning regimes. In
-tokenization, the full observation x strongly constrains the clean
-latent, z 0 ∼ p θ(z | x); in generation, a noisy latent z t provides
-weaker evidence, and the same target latent z 0 is recovered by
-denoising. This view motivates using a single shared Generative
-Encoder (GE θ) for both tokenization and latent denoising.
+_Figure 2: Tokenization and generation can be viewed as the same latent inference problem under different conditioning regimes. In tokenization, the full observation x strongly constrains the clean latent, z0 ∼pθ(z | x); in generation, a noisy latent zt provides weaker evidence, and the same target latent z0 is recovered by denoising. This view motivates using a single shared Generative Encoder (GEθ) for both tokenization and latent denoising._
 
 ents from both objectives directly shape the same weights, pushing the model toward a representation that is jointly optimal for the two tasks. Hence the name, UNITE: Unifying Tokenization & Latent Generation via shared Generative Encoder. See Fig. 1 for an overview.
 
@@ -108,48 +70,50 @@ In many ways, an early and elegant solution to this already exists: variational 
 
 In a VAE, the “tokenizer” is the encoder, E θ: it maps a data point x to a conditional latent distribution q(z | x) rather than a single code. The decoder, D ψ, reconstructs by sampling z ∼ q(z | x) and mapping back to data space via p(x | z). For any generative model, a central requirement is to map an easy-to-sample distribution into an expressive latent space that supports high-quality decoding. VAEs meet this requirement by regularizing the encoder so that its latent distribution remains close to a simple prior p(z) = N(0, I) (through the KL loss term), making generation as simple as sampling z ∼ p(z) and decoding.
 
+$$
+\begin{aligned}
+VAE: z = E \\theta(x); ˆ \\
+\end{aligned}
+$$
+> Equation 6 JSON: `assets/equations/equation_0006.json`
+> Equation 6 image: `assets/equations/equation_0006.png`
+
 VAE: z = E θ(x); ˆ
-x = D ψ(z);
 
 Notably, VAE-family encoder–decoder tokenizers have become a standard building block in modern vision and video
 
-Image patches
+![Figure 3](assets/figures/page_004_vec_001.png)
 
-Recon. Pathway
-
-Tokenizer ≈ Generator
-
-Gen. Pathway
-
-Gradients
-
-(as tokenizer)
-
-(as denoiser)
-
-## Registers
-
-Figure 3. UNITE Training Pipeline uses two forward passes
-through the Generative Encoder: first, mapping (distilling) image
-patches into latent registers, and second, denoising a noised version
-of those latents, with weights shared across both passes. Training
-combines reconstruction losses with a denoising loss |˜
-ˆ
-z 0−sg(˜
-z 0)|.
+_Figure 3: UNITE Training Pipeline uses two forward passes through the Generative Encoder: first, mapping (distilling) image patches into latent registers, and second, denoising a noised version of those latents, with weights shared across both passes. Training combines reconstruction losses with a denoising loss |˜ ˆ z0−sg(˜ z0)|._
 
 foundation-model pipelines: high-dimensional visual inputs are first compressed into latents via a VAE/VQ-style encoder, but generation is performed in latent space by a separate model. In this regime, these autoencoders function primarily as tokenizers rather than as the final generative model, since a simple Gaussian prior typically does not reach the sample fidelity of modern diffusion generators.
 
 Modern high-fidelity generative models therefore replace VAE-style Gaussian prior sampling with a learned iterative generative process, while retaining the VAE’s role as the tokenizer. In latent diffusion and flow models, a VAE-style encoder first maps data into a compact latent space, and a separate denoising model, G ϕ, is trained to transform Gaussian noise into samples from the latent data distribution via iterative denoising. In practice, this is often implemented as a staged pipeline: the tokenizer is trained and frozen; the denoiser is trained on top of the fixed latent space.
 
+$$
+\begin{aligned}
+LDM: z = E \\theta(x); ˆ \\
+z = G ϕ(z t, t);
+\end{aligned}
+$$
+> Equation 5 JSON: `assets/equations/equation_0005.json`
+> Equation 5 image: `assets/equations/equation_0005.png`
+
 LDM: z = E θ(x); ˆ
-x = D ψ(z); ˆ
 z = G ϕ(z t, t);
 
 UNITE replaces the separate tokenizer and latent denoiser with a shared set of parameters, the Generative Encoder, as demonstrated in Fig. 2. This shared module retains the simplicity of the autoencoder interface—an encoder and a decoder—while enabling single-stage learning of both tokenization and generation. Paired with a decoder D ψ that maps latents back to image space, the Generative Encoder GE θ operates in two modes. In tokenization mode, GE θ maps an image x to latent tokens z = GE θ(x) optimized for reconstruction, without enforcing an explicit KL-to-Gaussian bottleneck. In generation mode, the same GE θ is used as a latent denoiser: given a noisy latent z t and noise level t, it predicts the corresponding denoising target, enabling iterative sampling from Gaussian noise at inference time. Sharing parameters across these two modes lets gradients from both objectives jointly shape the same weights in a single training job. This yields a minimal end-to-end pipeline with performance approaching modern latent generative models, with the resulting formulation as:
 
+$$
+\begin{aligned}
+UNITE: z = GE \\theta(x); ˆ \\
+z = GE \\theta(z t, t);
+\end{aligned}
+$$
+> Equation 7 JSON: `assets/equations/equation_0007.json`
+> Equation 7 image: `assets/equations/equation_0007.png`
+
 UNITE: z = GE θ(x); ˆ
-x = D ψ(z); ˆ
 z = GE θ(z t, t);
 
 ## End-to-End Training for UNITE
@@ -164,23 +128,14 @@ The final layer of GE θ is a normalization module. Empirically, we find that La
 
 Overall, each training iteration performs two forward passes through the shared GE θ: an image-conditioned pass to produce clean latents for reconstruction, followed by a latentonly pass to denoise a corrupted version of those latents. The full system is trained end-to-end in a single stage by jointly optimizing a pixel-space reconstruction objective
 
-0.0
+![Figure 4](assets/figures/page_005_img_001.png)
 
-Noising Scale
-
-(max noise)
-
-(no noise)
-
-Epochs
-
-Figure 4. UNITE’s Training dynamics: The conflicting nature of
-the reconstruction and denoising objectives leads to an adversarial
-training behavior when trained jointly. The dotted lines (zoomed
-in) represent different ablations (see Appendix) based on the scale
-of noise added in reconstruction pathway for decoder robustness.
+_Figure 4: UNITE’s Training dynamics: The conflicting nature of the reconstruction and denoising objectives leads to an adversarial training behavior when trained jointly. The dotted lines (zoomed in) represent different ablations (see Appendix) based on the scale of noise added in reconstruction pathway for decoder robustness._
 
 (via D ψ) and a latent-space denoising objective (via GE θ).
+
+> Equation 9 JSON: `assets/equations/equation_0009.json`
+> Equation 9 image: `assets/equations/equation_0009.png`
 
 Training Objectives: We optimize two losses computed from the two forward passes described above. For reconstruction, we encode the image into clean latents z 0 = GE θ(x), inject small Gaussian noise ˜ z 0 = z 0 + σϵ with reconstruction noise scale σ = 0.7 following Leng et al. (2025); Yu et al. (2025a), and decode ˆ x = D ψ(˜ z 0). The reconstruction loss combines pixel-level and perceptual terms: L recon = ∥ˆ x − x∥1 + LPIPS(ˆ x, x). For generation, we apply rectified flow matching (Liu et al., 2023) on the latents. Given clean latents z 0, we construct noisy latents z t = tz 0+(1−t)ϵ with ϵ ∼N(0, I) and t ∼U[0, 1] (where t=1 corresponds to clean data and t=0 to pure noise), then train the generative encoder to predict clean latents via ˆ z 0 = GE θ(z t, t). We minimize L flow = E t,ϵ[∥ˆ z 0 − sg(z 0)∥2 2], where sg(·) denotes stop-gradient to prevent degenerate solutions. The total objective is the sum of reconstruction and generation losses.
 
@@ -202,52 +157,23 @@ In UNITE, we pursue end-to-end training by sharing parameters between the encode
 
 To better understand this design choice, we study two alternative routes to end-to-end latent diffusion training that each relax a component of our Generative Encoder mechanism. First, we remove parameter tying, maintaining separate encoder and denoiser networks while still training both objectives jointly. Second, we remove the stop-gradient through clean latents, allowing denoising gradients to backpropagate into the tokenization pathway. Together, these alternatives help isolate the role of weight sharing and gradient flow in our end-to-end formulation. Finally, we also study these end-to-end training approaches through the lenses of representation alignment and compression.
 
-Fréchet inception distance (FID)
+![Figure 5](assets/figures/page_006_img_001.png)
 
-Gen. FID (gFID)
-
-Recon. FID (rFID)
-
-\# Denoising Iters (per Recon. Iter)
-
-Figure 5. Weight-shared vs. Separate Enc-Denoiser training.
-UNITE uses a single Generative Encoder, sharing weights between
-tokenization and generation. To isolate the effect of weight shar-
-ing, we keep the rest of the end-to-end training pipeline fixed,
-including the stop-gradient that prevents denoising gradients from
-flowing into the tokenized output. Both UNITE and the separate
-encoder-denoiser ablation attain competitive performance, with
-UNITE benefiting from more denoising-to-reconstruction steps ra-
-tio during training, achieving the best overall rFID–gFID trade-off.
+_Figure 5: Weight-shared vs. Separate Enc-Denoiser training. UNITE uses a single Generative Encoder, sharing weights between tokenization and generation. To isolate the effect of weight shar- ing, we keep the rest of the end-to-end training pipeline fixed, including the stop-gradient that prevents denoising gradients from flowing into the tokenized output. Both UNITE and the separate encoder-denoiser ablation attain competitive performance, with UNITE benefiting from_
 
 Weight-Shared vs. Separate Encoder–Denoiser Training: Our Generative Encoder ties the encoding and denoising roles by sharing parameters. As an ablation, we keep the entire end-to-end pipeline fixed—including the stop-gradient that prevents denoising gradients from flowing through the tokenization output into the encoder–but instantiate separate networks for the encoder and the denoiser. In this separatenetworks ablation, the encoder & denoiser are optimized for their own objectives, with no gradient interaction involved.
 
 If the weight-shared Generative Encoder matches or improves upon this separate-weights variant, it already offers a practical advantage: fewer parameters to store and update, and a shorter description length (MDL) for the learned model. Fig. 5 shows that, while the separate-weights ablation is competitive, parameter tying yields the best overall reconstruction–generation trade-off. Specifically, we report rFID and gFID as a function of the number of denoising (flow) steps performed per reconstruction step during training. Under weight sharing, increasing the number of flow steps consistently improves generation fidelity, reducing gFID from 3.33 to 2.12 as the number of flow iterations is increased by 14×. This indicates that the latent space becomes more sampleable–while maintaining, or slightly improving, reconstruction fidelity, suggesting that the representation also remains information-preserving at the chosen compression dimension. Next, we study the role of the stop gradients operator between the denoiser and the tokenizer.
 
-(Denoiser à latent à Encoder) Gradient Backprop Impact on
+![Figure 6](assets/figures/page_007_vec_001.png)
 
-Figure 6. Representation alignment between tokenization and generation pathways. We measure alignment between tokenization
-and denoising activations using CKA and cosine similarity. Given an input image, we first record intermediate activations along the
-tokenization pathway, then corrupt the encoded latent and record the corresponding denoising-pathway activations. Left: both the
-weight-shared UNITE model and the separate encoder–denoiser ablation exhibit strong alignment, especially in later layers, indicating
-that tokenization and denoising are intrinsically aligned tasks. Middle: removing the stop-gradient and backpropagating denoising
-gradients through the latent weakens late-layer alignment, even though the denoising objective still matches the final latent target. Right:
-cosine similarity on the final latents decreases at lower denoising timesteps in the no-stop-gradient setting, suggesting that direct gradient
-backpropagation from denoising into tokenization leads to a less cleanly shared representation (see Fig. 7 for visual interpretation).
-
-Weight Sharing Impact on
-
-Layer ID
+_Figure 6: Representation alignment between tokenization and generation pathways. We measure alignment between tokenization and denoising activations using CKA and cosine similarity. Given an input image, we first record intermediate activations along the tokenization pathway, then corrupt the encoded latent and record the corresponding denoising-pathway activations. Left: both the weight-shared UNITE model and the separate encoder–denoiser ablation exhibit strong al_
 
 Backpropagating Denoising Gradients through the Encoder: Throughout this work, we stop denoising gradients from flowing through the clean latent into the tokenization pathway. Concretely, after the tokenization pass produces z 0 = GE θ(x), we apply sg(·) before constructing the noised latent z t used in the denoising pass. As a result, the flow-matching objective updates GE θ only through the second (denoising) forward pass, rather than also directly shaping tokenization through gradients flowing into z 0.
 
 Importantly, this does not decouple tokenization and generation: in the weight-shared Generative Encoder, reconstruction and denoising still act on the same set of network parameters, so both objectives jointly shape the learned representation. The stop-gradient only removes the more direct route in which denoising gradients also flow through the clean latent itself. In the separate encoder–denoiser setting, removing this stop-gradient yields a two-network end-to-end regime closely analogous to concurrent work on Unified Latents (UL) (Heek et al., 2026), which jointly trains separate encoder and denoiser modules without parameter sharing. We therefore study what happens when denoising gradients are allowed to backpropagate through the clean latent (termed the no-stop-grad setting in the following paragraphs), both in our weight-shared GE setting and in the separate encoder–denoiser ablation.
 
 Looking at rFID/gFID, removing the stop-gradient improves the separate encoder–denoiser ablation from 2.60/1.30 to 2.24/0.85 (gFID/rFID), indicating that end-to-end joint training of tokenization and generation is promising. As noted in the concurrent Unified Latents (Heek et al., 2026) (their Appendix B), obtaining the best performance in the no-stop-gradient setting requires tuning the denoising-to-
-
-(between final outputs)
-
-Cosine Similarity
 
 reconstruction loss ratio. By contrast, for UNITE, we obtain the best performance (gFID = 2.12, rFID = 1.1) with stopgradient in place. One possible hypothesis is that, under weight sharing, the two objectives already interact through a common parameter set, so allowing denoising gradients to additionally flow through the clean latent introduces extra (asymmetric) gradient interference. In this sense, weight sharing itself acts as a natural coupling mechanism between the two tasks: simply increasing the number of flow iterations improves performance, without requiring as much loss-weight tuning. We now showcase representation alignment and compression-based analysis.
 
@@ -264,23 +190,9 @@ T=0.6
 T=0.8
 Reconstruction
 
-Figure 7. Analyzing the denoising trajectory. Given an input image, we first encode it into latents, corrupt the latent with noise, and then
-decode the denoised prediction at different noise levels (first three columns). The final column shows direct decoding of the clean latent.
-Although all four models achieve competitive aggregate rFID/gFID, the stop-gradient variants (first two rows)–UNITE and the separate
-encoder-denoiser ablation–exhibit markedly cleaner intermediate denoising trajectories, with higher PSNR to the input image across all
-noise levels. This result is consistent with the representation-alignment in Fig. 6, which shows drop in alignment at final layers.
+![Figure 7](assets/figures/page_008_img_001.png)
 
-Sep. Enc
-
-Denoiser
-
-(no-stop-grad)
-
-UNITE
-
-Sep Enc-Den
-
-(no-stop-grad)
+_Figure 7: Analyzing the denoising trajectory. Given an input image, we first encode it into latents, corrupt the latent with noise, and then decode the denoised prediction at different noise levels (first three columns). The final column shows direct decoding of the clean latent. Although all four models achieve competitive aggregate rFID/gFID, the stop-gradient variants (first two rows)–UNITE and the separate encoder-denoiser ablation–exhibit markedly cleaner inter_
 
 (within blocks and at the encoder output), (ii) matched conditioning interfaces across modes (e.g., time and class signals injected in analogous ways) to avoid mode-specific shortcuts, (iii) conservative optimization (learning-rate warmup and schedules) to prevent one objective from dominating shared parameters early in training.
 
@@ -300,15 +212,14 @@ Table 1. ImageNet 256×256 generation. Our approach out-
 performs both recent single-stage pixel baselines and standard
 two-stage latent diffusion frameworks by a large margin.
 
+> Table JSON: `assets/tables/table_0001.json`
+> Table 2. ImageNet 256×256 reconstruction. Our tokenizer achieves competitive rFID without adversarial loss (Adv.) or pre- trained encoders. All UNITE rows use base backbone at 120 eps.
+
 backbone; instead, the shared model reuses essentially the same attention/MLP computation and expresses the residual mode-specific adaptation primarily through normalization and scale parameters. This provides a complementary MDLstyle interpretation of why sharing works in our setting: parameter tying may yield a shorter description of the joint latent-generation program, not by substantially altering the main reusable computation, but by preserving a common functional backbone while allocating only a small additional entropy budget to normalization. This interpretation aligns with our CKA analysis, since pathway alignment remains high while CKA is largely insensitive to norm/scale changes, suggesting that tokenization & denoising differ more in feature calibration than in core representational geometry.
 
 ## Experimental Results
 
 Can a single training job produce both a strong tokenizer and a strong generator? In this section, we show that UNITE achieves near–state-of-the-art performance on both reconstruction and generation tasks across image and molecule modalities. See Appendix for more ablations.
-
-Table 2. ImageNet 256×256 reconstruction. Our tokenizer
-achieves competitive rFID without adversarial loss (Adv.) or pre-
-trained encoders. All UNITE rows use base backbone at 120 eps.
 
 Generation. Tab. 1 summarizes our main generation results on ImageNet-256. The results indicate that truly end-toend training of tokenization and generation is not only feasible, but also competitive. In particular, UNITE-B reaches an FID of 2.12, substantially improving over the single-stage baseline JiT-B/16 (Li & He, 2025) (FID 3.66). Increasing the model capacity further improves performance: UNITE- L (encoder size: L, default patch size: 16) reduces FID to 1.73, surpassing two-stage approaches such as DiT-XL/2 (FID 2.27) and SiT-XL/2 (FID 2.06), suggesting that the unified setup continues to benefit from scale. Fig. 8 shows representative samples from UNITE-XL (more uncurated class-conditional generations in Appendix). Unlike previous latent diffusion pipelines that train VAEs with GAN-based adversarial objectives, UNITE uses no adversarial loss.
 
@@ -320,8 +231,11 @@ Compared with concurrent works including Latent Forcing (Baade et al., 2026) (LF
 pretrained VGG. However, (a) training VGG is inexpensive; (b)
 our molecule gen. results do not use LPIPS.
 
-Figure 8. Selected samples from UNITE-XL. Generated using
-50 steps with CFG. This model achieves FID 1.75.
+## ImageNet-256 Results
+
+![Figure 8](assets/figures/page_010_img_001.png)
+
+_Figure 8: Selected samples from UNITE-XL. Generated using 50 steps with CFG. This model achieves FID 1.75._
 
 Reconstruction. Tab. 2 compares the reconstruction quality of UNITE against existing tokenizers. Most prior methods decouple reconstruction and generation, and low-rFID tokenizers such as VAEs and VQGANs typically rely on adversarial objectives in addition to reconstruction losses. More recent approaches further improve reconstruction fidelity by leveraging externally pretrained self-supervised encoders (e.g., DINOv2). As a reference point, a vanilla ViT autoencoder (ViTok-B/16 Stage 1 (Hansen-Estruch et al., 2025)), trained from scratch with only L2+LPIPS+KL losses and no adversarial training, attains an rFID of 1.63.
 
@@ -333,10 +247,8 @@ Despite being trained jointly with a generative objective, UNITE-B (217M paramet
 
 Recent approaches such as REPA (Yu et al., 2025a) and RAE (Zheng et al., 2025) crucially depend on pretrained representation models, e.g., DINOv2 (Oquab et al., 2023), to strengthen latent diffusion. This reliance makes their transfer to domains where such encoders are unavailable—or
 
-Table 3. QM9 molecule generation. UNITE-S achieves the best
-reconstruction accuracy (99.37% match) and uniqueness (99.71%)
-under single-stage training. Crystal generation results on MP20
-are provided in Appendix C.2.
+> Table JSON: `assets/tables/table_0002.json`
+> Table 3. QM9 molecule generation. UNITE-S achieves the best reconstruction accuracy (99.37% match) and uniqueness (99.71%) under single-stage training. Crystal generation results on MP20 are provided in Appendix C.2.
 
 In contrast, our end-to-end formulation does not require pretrained encoders: tokenization and generation are learned jointly from scratch in a single training run ––making latent generative modeling applicable to domains where strong pretrained representation models do not exist.
 
@@ -464,50 +376,28 @@ For all reported FID numbers in the main paper (Tab. 1), we use the adaptive fif
 
 Tab. 4 compares FID under different evaluation protocols for the same UNITE-B checkpoint. Switching to a fixedstep second-order Heun solver with 50 steps (100 NFEs) yields FID within ∼0.05 of dopri5, consistent with prior observations that flow-matching models produce near-linear trajectories that are well approximated by low-order fixed-step integrators (Lipman et al., 2023; Liu et al., 2023). This small gap is also consistent with the SiT authors’ report that the FID difference between dopri5 and fixed-step solvers is <0.1.3
 
-Table 4. Effect of evaluation protocol on reported FID. All rows use the same UNITE-B checkpoint (240 epochs). “Balanced” denotes
-50 images per class; “Random” denotes uniformly sampled class labels. NFE = number of function evaluations.
+## A. Reconstruction Fidelity Details
+
+> Table JSON: `assets/tables/table_0003.json`
+> Table 4. Effect of evaluation protocol on reported FID. All rows use the same UNITE-B checkpoint (240 epochs). “Balanced” denotes 50 images per class; “Random” denotes uniformly sampled class labels. NFE = number of function evaluations.
 
 ## Additional Results
 
 ### QM9 Molecular Generation
 
-Our training configuration employs the UNITE-S architecture with a DiT-S backbone containing approximately 33M parameters. The model is trained end-to-end for 8000 epochs with a batch size of 512 using the AdamW optimizer with a learning rate of 1 × 10−4. This single-stage approach contrasts with ADiT’s two-stage training, which requires 5000 epochs for the tokenizer followed by another 5000 epochs for the diffusion model, totaling 10000 epochs of training across two separate optimization phases.
-
-For evaluation, we compute four primary metrics on 10000 generated samples. The match rate measures the percentage of reconstructed molecules that exactly match the input structure after discretization. The RMSD (Root Mean Square Deviation) in Angstroms quantifies reconstruction error in atomic positions. Validity percentage indicates the proportion of generated molecules satisfying chemical constraints including proper valencies, reasonable bond lengths, and absence of steric clashes. Uniqueness measures the percentage of distinct molecules among valid generations, computed using canonical SMILES representations to identify duplicates.
-
-The UNITE-S architecture employs a weight-shared encoder-denoiser operating in a 16-dimensional latent space, significantly compressed from the original 3D coordinate space. This compression factor of approximately 20:1 (from 29 atoms × 3 coordinates to 16 dimensions) requires the model to learn highly efficient representations while maintaining recon. fidelity.
+> Table JSON: `assets/tables/table_0004.json`
+> Table 5. MP20 crystal generation results. Evaluation on 10K generated samples.
 
 ### MP20 Crystal Generation
 
-The MP20 dataset from the Materials Project (Jain et al., 2013) contains 45,231 inorganic crystal structures with up to 20 atoms per unit cell. We train UNITE-S for 10000 epochs with batch size 512, following the same single-stage approach as QM9. Evaluation follows Joshi et al. (2025), computing structural validity (pairwise distances > 0.5 ˚ A, unit cell volume > 0.1 ˚ A 3), compositional validity (charge neutrality and electronegativity balance), and match rate using pymatgen’s (Ong et al., 2013) Structure Matcher.
+![Figure 9](assets/figures/page_017_img_001.png)
 
-Table 5. MP20 crystal generation results. Evaluation on 10K generated samples.
+_Figure 9: Uncurated, class-conditional samples on ImageNet 256×256 using UNITE-XL. We show images using CFG ω = 4.0. Each grid contains 21 randomly sampled images, demonstrating consistent quality across diverse categories including animals, objects, and scenes._
 
-Table 5 shows that UNITE-S achieves 87.9% overall validity on MP20, approaching ADiT’s 90.1% despite using single-
-stage training. Our structural validity of 99.0% nearly matches ADiT’s 99.6%, demonstrating effective learning of crystal
-geometry constraints. The match rate of 75.7% is reasonable considering ADiT’s dedicated tokenizer achieves 84.50% after
-separate optimization. These results validate that our unified approach generalizes well from molecules to crystals—the
-same architecture that achieves a 99.37% match rate on QM9 also performs competitively on the more complex MP20
-dataset without modification.
-
-class 12: house finch, linnet, Carpodacus mexicanus class 39: common iguana, iguana, Iguana iguana
-
-class 99: goose
-class 108: sea anemone, anemone
-
-class 309: bee
-class 470: candle, taper, wax light
-
-Figure 9. Uncurated, class-conditional samples on ImageNet 256×256 using UNITE-XL. We show images using CFG ω = 4.0. Each
-grid contains 21 randomly sampled images, demonstrating consistent quality across diverse categories including animals, objects, and
-scenes.
-
-Table 6. Ablation study on ImageNet-256 generation. We systematically evaluate key design choices across architecture, normalization,
-training dynamics, and augmentation strategies. All ablations are done using the base backbone and trained for 120 epochs.
+> Table JSON: `assets/tables/table_0005.json`
+> Table 6. Ablation study on ImageNet-256 generation. We systematically evaluate key design choices across architecture, normalization, training dynamics, and augmentation strategies. All ablations are done using the base backbone and trained for 120 epochs.
 
 ### Ablation Studies on ImageNet 256×256
-
-In addition to the weight-sharing and stop-gradient ablations shown in the main paper, we provide a few additional ablations that further improve UNITE’s reconstruction and generation fidelity.
 
 Reconstruction Noise Level. Table 6 (top half) investigates the impact of noise augmentation during reconstruction training, where Gaussian noise is injected into latent representations prior to decoding. Consistent with recent findings in RAE (Zheng et al., 2025) and TARflow (Zhai et al., 2024), this acts as a useful regularizer by preventing the decoder from overfitting to noise-free latent codes, thereby improving generative capability. Notably, due to our model’s learnable affine normalization, the system can autonomously calibrate its internal signal-to-noise ratio (SNR) to accommodate varying noise scales. As a result, the model exhibits strong robustness to the exact noise level, maintaining a nearly constant FID of around 2.7 across a range of noise levels.
 
@@ -517,6 +407,10 @@ Noise Schedule Shifting. Following RAE (Zheng et al., 2025), we find that noise-
 
 Tab. 7 and Tab. 8 provide additional architectural and training details. For more details, refer to the codebase.
 
-Table 7. Detailed architecture configurations for UNITE models.
+## Additional Results
 
-Table 8. Training configuration for ImageNet-256 experiments. All models trained with mixed precision BF16 & gradient clipping at 3.0.
+> Table JSON: `assets/tables/table_0006.json`
+> Table 7. Detailed architecture configurations for UNITE models.
+
+> Table JSON: `assets/tables/table_0007.json`
+> Table 8. Training configuration for ImageNet-256 experiments. All models trained with mixed precision BF16 & gradient clipping at 3.0.

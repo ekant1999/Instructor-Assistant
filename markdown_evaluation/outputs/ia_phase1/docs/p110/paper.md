@@ -2,10 +2,10 @@
 title: "Scaling DoRA: High-Rank Adaptation via Factored Norms and Fused Kernels"
 paper_id: 110
 source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/c4a536b15a8624a5.pdf"
-generated_at: "2026-04-02T01:27:51.640041+00:00"
-num_figures: 0
-num_tables: 0
-num_equations: 0
+generated_at: "2026-04-03T22:12:17.704844+00:00"
+num_figures: 12
+num_tables: 16
+num_equations: 32
 ---
 
 Alexandra Zelenin∗ Alexandra Zhuravlyova
@@ -17,6 +17,9 @@ Abstract
 Weight-Decomposed Low-Rank Adaptation (DoRA; Liu et al. [2024]) extends LoRA by decoupling weight magnitude from direction, but its forward pass requires the row-wise norm ∥W + s BA∥row, a computation that every major framework we surveyed implements by materializing the dense [d out, d in] product BA. At d in = 8192 and rank r = 384, a single module’s norm requires ∼512 MB of transient working memory in bf16, making high-rank DoRA costly and often infeasible on common single-GPU setups once hundreds of adapted modules and checkpointing are involved. We present two systems contributions: a factored norm that decomposes the squared norm into base, cross, and Gram terms computable through O(d out r + r 2) intermediates, eliminating the dense product. Fused Triton kernels collapse the four-kernel DoRA composition into a single pass, reducing memory traffic by ∼4× and using a numerically stable form that avoids catastrophic cancellation in the near-unity rescaling regime where magnitude scales concentrate in practice. Across six 8–32B vision-language models (VLMs) on three NVIDIA GPUs (RTX 6000 PRO, H200, B200) at r=384 in bf16, the fused implementation is 1.5–2.0× faster than HF PEFT’s DoRA implementation for inference, and 1.5–1.9× faster for gradient computation (optimizer step excluded), with up to 7 GB lower peak VRAM. Microbenchmarks on six GPUs spanning four architecture generations (L40S, A100, RTX 6000 PRO, H200, B200, B300) confirm 1.5–2.7× compose-kernel speedup. Final-logit cosine similarity exceeds 0.9999 across all model/GPU pairs, and multi-seed training curves match within 7.1 × 10−4 mean per-step loss delta over 2000 steps.
 
 ## Introduction
+
+> Equation 1 JSON: `assets/equations/equation_0001.json`
+> Equation 1 image: `assets/equations/equation_0001.png`
 
 Low-Rank Adaptation (LoRA; Hu et al. 2022) is the dominant method for parameter-efficient finetuning. DoRA [Liu et al., 2024] extends LoRA by decomposing the adapted weight into magnitude and direction: W′ = m ⊙ W + s BA
 
@@ -47,13 +50,22 @@ Factored Norm Computation
 
 The row-wise squared norm of the composed weight expands into three terms:
 
+> Equation 2 JSON: `assets/equations/equation_0002.json`
+> Equation 2 image: `assets/equations/equation_0002.png`
+
 where ⟨·, ·⟩row denotes the row-wise inner product. Each term is computable through low-rank intermediates:
 
 Base norm. ∥W∥2 row accumulates via chunks along d in, producing a vector of size d out. Chunking limits working memory to a configurable budget (default: 256 MB).
 
 Cross term. The row-wise inner product rewrites as:
 
+> Equation 3 JSON: `assets/equations/equation_0003.json`
+> Equation 3 image: `assets/equations/equation_0003.png`
+
 BA norm. The row-wise squared norm factors through the Gram matrix:
+
+> Equation 4 JSON: `assets/equations/equation_0004.json`
+> Equation 4 image: `assets/equations/equation_0004.png`
 
 where G = AA⊤ ∈ R r×r also accumulates chunk-wise. At r = 512 in fp32, G occupies 1 MB.
 
@@ -62,6 +74,9 @@ where G = AA⊤ ∈ R r×r also accumulates chunk-wise. At r = 512 in fp32, G oc
 The three per-row scalars assemble into the weight norm:
 
 r
+
+> Equation 5 JSON: `assets/equations/equation_0005.json`
+> Equation 5 image: `assets/equations/equation_0005.png`
 
 The magnitude division is always computed in PyTorch after the kernel returns:
 
@@ -73,11 +88,8 @@ Table 1 compares asymptotic and concrete memory costs.
 
 Why the measured reduction is smaller. The dominant transient is the base-norm computation (Term 1 of Equation 2): the chunked ∥W∥2 row accumulation creates a [d out, chunk_size] fp32 buffer that, at the default budget and d = 8192, approaches 256 MB, accounting for most of the 241 MB measured delta. This cost is rank-independent: identical at r = 16 and r = 768. The theoretical reduction, which counts only rank-dependent tensors (U and G), correctly predicts the asymptotic benefit as rank grows. Since W is frozen, ∥W∥2 row could be precomputed into a [d out] buffer (16 KB at d out = 4096), eliminating this transient entirely. We leave this caching for future work.
 
-Table 1: The factored norm reduces rank-dependent persistent memory by 15× at d=8192, r =512 in
-fp32. Measured reductions are smaller (3.2×) because allocator deltas include the rank-independent
-base-norm transient (§2.3).
-
-bf16 caveat. The factored norm accumulates in fp32 regardless of weight dtype. Against halfprecision PEFT baselines, this fp32 overhead inverts the isolated-norm memory ratio (PEFT/- factored) to 0.8× (i.e., factored uses more for the norm micro-operation in bf16). This does not negate model-level VRAM savings (Table 8), which include the fused compose kernel’s elimination of forward-pass intermediates.
+> Table JSON: `assets/tables/table_0001.json`
+> Table 1: The factored norm reduces rank-dependent persistent memory by 15× at d=8192, r=512 in fp32. Measured reductions are smaller (3.2×) because allocator deltas include the rank-independent base-norm transient (§2.3).
 
 Compute tradeoff. The factored norm is ∼4.8× slower than the dense reference when measured isolation (H200, fp32) because the reference performs a single contiguous torch.linalg.norm call, while the factored path uses multiple chunked matmuls. The system is faster end-to-end because the reference first materializes the full [d out, d in] product; it is this materialization, not the norm itself, that dominates time and memory. On lower-bandwidth hardware (RTX 6000 PRO, GDDR7), the factored norm matches or outperforms the reference at production ranks (r ≤ 384) for large weight matrices, so the 4.8× figure is a conservative bound.
 
@@ -93,21 +105,9 @@ The DoRA composition (g−1) ⊙ base + g ⊙ s ⊙ lora decomposes into four se
 
 Numerical stability. The algebraically equivalent form g ⊙ (s · lora + base) − base suffers from catastrophic cancellation when g ≈ 1. This regime is not hypothetical. The stored magnitude parameters reflect the heterogeneous row norms of pretrained weights and naturally vary across layers and models, but DoRA initializes m = ∥W∥row and magnitudes track weight norms throughout training, so the composed scale g = m/w norm concentrates tightly around unity (mean ≈ 1.0, std ≈ 0.0015). Measurement on a Qwen2-VL-7B adapter (r =128, 326 modules, 1.77M elements) shows that 100% of g values fall in the bf16 collapse zone (|g − 1| < ε bf16/2) and 20% in the fp16 zone: if (g−1) ⊙ base were evaluated in bf16, the base correction would vanish for every element; in fp16, for one in five. The stable form (g−1) ⊙ base + g ⊙ s ⊙ lora keeps the small correction (g−1) explicit, but its precision advantage depends on fp32 intermediate computation to prevent (g−1) from rounding to zero. Both the Triton kernel and PyTorch fallback use this form with fp32 compute. Figure 1 shows 3.0× lower peak error near g ≈ 1 compared to the naive alternative. Beyond the algebraic form,
 
-Numerical Stability: DoRA Compose at Near-Unity g
+![Figure 1](assets/figures/page_006_vec_001.png)
 
-(shape 2048×8192, bf16)
-
-Max Absolute Error
-
-3.0x improvement
-
-10−2
-
-Magnitude parameter m
-
-Figure 1: The stable compose form achieves 3.0× lower peak error near g ≈ 1 (bf16, d out = 8192,
-d in = 2048). The naive form g ⊙ (s · lora + base) − base exhibits catastrophic cancellation; the stable
-form and fused kernel both remain near the bf16 quantization floor. Reference: fp64.
+_Figure 1: The stable compose form achieves 3.0× lower peak error near g ≈1 (bf16, dout = 8192, din = 2048). The naive form g ⊙(s · lora + base) −base exhibits catastrophic cancellation; the stable form and fused kernel both remain near the bf16 quantization floor. Reference: fp64._
 
 Autotuning. Optimal kernel configurations vary substantially across GPUs (∼9% pairwise agreement across six GPUs), requiring per-device autotuning rather than a static table. First-run autotuning takes 10–30 s per kernel, and caches persist in Triton’s default directory. Details in Appendix B.
 
@@ -121,33 +121,14 @@ The fused backward computes d lora = g · s · d out and d base = (g−1) · d o
 
 A second Triton kernel fuses Equation 5, computing w norm from the three factored terms. Storereload barriers prevent FMA fusion, and an inline PTX sqrt.rn.f32 instruction replaces Triton’s default approximate sqrt, exactly reproducing PyTorch’s evaluation order. The kernel stops at
 
-Yes
+![Figure 2](assets/figures/page_007_vec_001.png)
 
-No
+_Figure 2: Three-tier dispatch: fused backward for training (Tier 1), fused forward for inference (Tier 2), eager fallback for CPU, no-Triton, or sub-crossover shapes (Tier 3)._
 
-(Triton fwd only)
-
-(Triton fwd+bwd)
-
-DEFAULT for training
-
-DEFAULT for inference
-
-No autograd nodes;
-
-Saves inner for bwd;
-
-skips if mag frozen
-
-no saved tensors
-
-Eager Fallback (PyTorch ops)
-
-Table 2: Dispatch tiers and their selection criteria.
+> Table JSON: `assets/tables/table_0002.json`
+> Table 2: Dispatch tiers and their selection criteria.
 
 w norm; the magnitude division (Equation 6) remains in PyTorch so both norm paths share the same precision context. Appendix C provides exact specifications for all three kernels.
-
-Runtime Dispatch
 
 The composition path is selected at runtime by _compose_with_dispatch (Figure 2, Table 2). Four environment variables control kernel availability and working-set budgets; defaults require no configuration.
 
@@ -178,30 +159,18 @@ three GPUs. The fused implementation is 1.46–1.87× faster than HF PEFT’s Do
 and 1.18–1.24× faster than our own eager baseline, with 1.3–6.7 GB lower peak VRAM (Table 8).
 These timings cover forward+backward only (excluding optimizer updates), so the end-to-end
 
-Table 3: Benchmark hardware. “Micro”: microbenchmark coverage. “Model”: full model-level
-gradient-computation and inference benchmarks.
+> Table JSON: `assets/tables/table_0003.json`
+> Table 3: Benchmark hardware. “Micro”: microbenchmark coverage. “Model”: full model-level gradient-computation and inference benchmarks.
 
-Table 4: Gradient-computation speedup on 8–32B VLMs (r = 384, bf16, seq=4096, bs=1, ga=8,
-loss_tokens=1024, 20 repeats). The HF PEFT DoRA baseline takes 46–87% longer per iteration
-than fused. 32B models OOM on RTX 6000 PRO (96 GB) under all configurations. See Table 5 for
-absolute times.
+> Table JSON: `assets/tables/table_0004.json`
+> Table 4: Gradient-computation speedup on 8–32B VLMs (r = 384, bf16, seq=4096, bs=1, ga=8, loss_tokens=1024, 20 repeats). The HF PEFT DoRA baseline takes 46–87% longer per iteration than fused. 32B models OOM on RTX 6000 PRO (96 GB) under all configurations. See Table 5 for absolute times.
 
-Table 5:
-Absolute gradient-computation time (seconds).
-Each iteration covers 8 gradient-
-accumulation micro-steps; 32 768 tokens total. Standard deviations ≤ 0.13 s (CV < 1.7%).
+> Table JSON: `assets/tables/table_0005.json`
+> Table 5: Absolute gradient-computation time (seconds). Each iteration covers 8 gradient- accumulation micro-steps; 32 768 tokens total. Standard deviations ≤0.13 s (CV < 1.7%).
 
 wall-clock gain is smaller: in the 2000-step convergence run, the same optimization reduced total training time by 8.3% once optimizer, data loading, and framework overhead were included (§5.9). The 32B models exceed the 96 GB RTX 6000 PRO under all configurations; this is a capacity limit, not a method-specific regression.
 
 Inference. Inference speedup is higher than gradient computation: 1.5–2.0× over PEFT, 1.14– 1.20× over eager (Figure 4), because the forward pass concentrates the compose savings without dilution from backward-pass work. RTX 6000 PRO runs inference on all six models including 32B (84–88 GB peak), which OOM during gradient computation.
-
-RTX PRO 6000
-H200
-B200
-
-(a) vs. HF PEFT Baseline
-
-(b) vs. Eager Baseline
 
 Speedup (PEFT / Fused)
 
@@ -241,118 +210,21 @@ Speedup (PEFT / Fused)
 
 ### Gemma3-27B
 
-Figure 3: Gradient-computation speedup across six VLMs on three GPUs (bf16, r =384, seq=4096).
-(a) Fused vs. the HF PEFT DoRA baseline: 1.46–1.87×. (b) Fused vs. eager: 1.18–1.24×. 32B
-models OOM on RTX 6000 PRO under all configurations.
+![Figure 3](assets/figures/page_010_vec_001.png)
 
-Inference Speedup: Fully Fused vs. HF PEFT (bf16, r=384, seq=4096)
-
-Inference Speedup (PEFT / Fused)
-
-2.03x
-
-1.97x
-
-1.86x
-
-1.82x
-
-1.79x
-
-1.78x
-
-1.76x
-
-1.74x
-
-1.71x
-
-1.70x
-
-1.65x
-
-1.63x
-
-1.62x
-
-1.61x
-
-1.5
-
-1.60x
-
-1.59x
-
-1.55x
-
-1.51x
-
-0.5
-
-0.0
+_Figure 3: Gradient-computation speedup across six VLMs on three GPUs (bf16, r=384, seq=4096). (a) Fused vs. the HF PEFT DoRA baseline: 1.46–1.87×. (b) Fused vs. eager: 1.18–1.24×. 32B models OOM on RTX 6000 PRO under all configurations._
 
 Figure 4: Inference speedup: 1.5–2.0× over the HF PEFT DoRA baseline. All six models run on all
 three GPUs, including 32B on RTX 6000 PRO (96 GB) that OOM during gradient computation.
 
 High-rank scaling. Table 6 validates the high-rank framing at r =384, 512, and 768. Speedup vs. PEFT DoRA increases with rank for the 32B model (1.66× → 1.74×) because PEFT’s materialization cost grows with r, while the factored norm’s rank-dependent overhead (U and G) remains small. Speedup vs. eager decreases modestly (1.18× → 1.14×) as larger LoRA matmuls dilute the compose kernel’s contribution.
 
-Table 6: Speedup vs. the HF PEFT DoRA baseline grows with rank; speedup vs. eager decreases
-modestly (H200, bf16, seq=4096, 20 repeats).
+> Table JSON: `assets/tables/table_0006.json`
+> Table 6: Speedup vs. the HF PEFT DoRA baseline grows with rank; speedup vs. eager decreases modestly (H200, bf16, seq=4096, 20 repeats).
 
-Model
-Rank
-Grad.
-Infer.
-Grad.
-Infer.
+![Figure 5](assets/figures/page_011_vec_001.png)
 
-Qwen3.5-27B
-1.57×
-1.65×
-1.21×
-1.16×
-1.61×
-1.68×
-1.18×
-1.14×
-1.53×
-1.59×
-1.15×
-1.11×
-
-Qwen3-VL-32B
-1.66×
-1.78×
-1.18×
-1.14×
-1.70×
-1.82×
-1.16×
-1.12×
-1.74×
-1.87×
-1.14×
-1.10×
-
-Fully Fused
-
-Gap Closed by Dense-BA (%)
-
-46%
-
-46%
-
-45%
-
-42%
-
-15%
-
-10%
-
-Figure 5: Dense (B@A) position in the eager-to-fused gap (0% = eager, 100% = fused). Negative
-values: dense (B@A) is slower than eager. The benefit is GPU-bandwidth-sensitive; the factored
-approach is robust.
+_Figure 5: Dense (B@A) position in the eager-to-fused gap (0% = eager, 100% = fused). Negative values: dense (B@A) is slower than eager. The benefit is GPU-bandwidth-sensitive; the factored approach is robust._
 
 ### Why Dense (B@A) Is Not Enough
 
@@ -367,76 +239,21 @@ gains derive from reduced memory traffic rather than architecture-specific effec
 
 Compose Kernel Speedup (bf16)
 
-Figure 6: Compose kernel speedup vs. eager (bf16) across six GPUs. (a) Forward: 1.5–4.5×.
-(b) Autograd: gains compound with activation size.
+![Figure 6](assets/figures/page_012_vec_001.png)
 
-Compose Kernel Bandwidth Utilization (fp32)
-
-GPU (color)
-
-L40S
-A100
-
-RTX PRO 6000
-H200
-
-B200
-B300
-
-8000
-
-B200/B300 peak 7.7 TB/s
-
-Approx. Bandwidth (GB/s)
-
-7000
-
-Kernel path (shape)
-
-6000
-
-H200 peak 4800 GB/s
-
-5000
-
-4000
-
-3000
-
-A100 peak 2039 GB/s
-
-RTX PRO 6000 peak 1600 GB/s
-
-L40S peak 864 GB/s
+_Figure 6: Compose kernel speedup vs. eager (bf16) across six GPUs. (a) Forward: 1.5–4.5×. (b) Autograd: gains compound with activation size._
 
 Figure 7: Bandwidth utilization (fp32, six GPUs). Fused approaches ∼50% of peak on all architec-
 tures; eager values are approximate lower bounds.
 
 Bandwidth utilization. The fused kernel achieves 3950–4070 GB/s on B200/B300 (∼53% of peak), 2490–2540 GB/s on H200 (∼53%), 1040–1050 GB/s on A100 (∼52%), 880–890 GB/s on RTX 6000 PRO (∼55%), and 460–470 GB/s on L40S (∼54%) at the largest shapes (Figure 7). On B200, the eager path reaches only 17% of peak, yielding the largest absolute bandwidth gap. Throughput scales nearly linearly with peak bandwidth across the full 0.86–7.7 TB/s range, confirming these kernels are memory-bandwidth-bound.
 
-Fused Backward Kernel Speedup (bf16)
+![Figure 8](assets/figures/page_013_vec_001.png)
 
-Speedup vs. Std. Autograd
+_Figure 8: Backward speedup (bf16). Below ∼4096 × 4096, launch overhead dominates; above ∼8192 × 8192, fused wins on all GPUs._
 
-1.6
-
-1.4
-
-Figure 8: Backward speedup (bf16). Below ∼4096 × 4096, launch overhead dominates; above
-∼8192 × 8192, fused wins on all GPUs.
-
-Table 7: Norm memory: measured allocation delta and theoretical reduction (fp32, H200). Measured
-reductions are smaller than theoretical because they include the rank-independent base-norm
-transient (§2.3).
-
-Shape
-Rank
-PEFT
-Factored
-Meas. ×
-Theory ×
-
-### Backward Kernel Performance
+> Table JSON: `assets/tables/table_0007.json`
+> Table 7: Norm memory: measured allocation delta and theoretical reduction (fp32, H200). Measured reductions are smaller than theoretical because they include the rank-independent base-norm transient (§2.3).
 
 The backward kernel shows a clear crossover: below ∼2048 × 6144 (rows × d out), launch overhead dominates and fused can trail eager (0.88–0.99×); above ∼8192 × 8192, fused wins on all six GPUs (Figure 8). Geometric mean speedup (bf16, all shapes): 1.23× B200, 1.22× B300/RTX 6000 PRO, 1.16× A100, 1.08× H200, 1.06× L40S. Gradient correctness: fp32 d lora and d base match the eager baseline at tolerance floor; d mag shows ≤ 2.14 × 10−4 difference due to the separate reduction path.
 
@@ -446,10 +263,6 @@ Figure 9 and Table 7 show both theoretical and measured memory reductions. The 8
 MoE shape achieves 11× measured reduction. The factored norm’s latency tradeoff (Figure 10) is
 hardware-dependent: on RTX 6000 PRO, factored matches or outperforms the reference at r ≤ 384
 for 8192 × 8192 matrices.
-
-(a) Theoretical Persistent Working Set
-
-(b) Measured Allocation Delta
 
 42x
 
@@ -565,36 +378,9 @@ Working Set (MB)
 
 512, r384
 
-Figure 9: Norm memory reduction. (a) Theoretical persistent working set. (b) Measured allocator
-delta. The MoE shape 8192 × 28672 achieves 11× measured reduction.
+![Figure 9](assets/figures/page_014_vec_001.png)
 
-RTX PRO 6000: Norm Computation Latency vs. Rank
-
-(a) 4096 x 4096, fp32
-
-(b) 8192 x 8192, fp32
-
-Reference
-Factored
-Fused
-
-Reference
-Factored
-Fused
-
-0.5
-
-### Norm Time (ms)
-
-Norm Time (ms)
-
-0.4
-
-0.3
-
-1.5
-
-0.2
+_Figure 9: Norm memory reduction. (a) Theoretical persistent working set. (b) Measured allocator delta. The MoE shape 8192 × 28672 achieves 11× measured reduction._
 
 Figure 10: Norm latency vs. rank (RTX 6000 PRO, fp32). The PEFT time is constant in r; factored
 scales linearly. At r ≤ 128, factored matches the reference due to reduced memory traffic.
@@ -603,27 +389,12 @@ scales linearly. At r ≤ 128, factored matches the reference due to reduced mem
 
 The fused backward path reduces forward peak VRAM by eliminating intermediate materialization while maintaining identical backward peak (Figure 11). At the model level (Table 8), fused uses 0.1–1.0 GB less peak VRAM than eager and 1.2–6.7 GB less than PEFT. Dense (B@A) uses more peak VRAM than fused on all models.
 
-(a) Peak Memory vs. Rank
+![Figure 11](assets/figures/page_015_vec_001.png)
 
-(b) Peak Memory vs. Batch/Seq
+_Figure 11: Memory profile (H200, bf16, d=4096, bs=4, seq=2048). (a) Fused reduces forward peak by 64 MB. (b) Savings grow with batch×seq; backward peak is unchanged._
 
-Eager Fwd Peak
-
-Fused Fwd Peak
-
-1250
-
-Bwd Peak (both)
-
-Configuration
-
-Figure 11: Memory profile (H200, bf16, d=4096, bs=4, seq=2048). (a) Fused reduces forward peak
-by 64 MB. (b) Savings grow with batch×seq; backward peak is unchanged.
-
-Table 8: Model-level peak VRAM (GB). Fused uses less than all baselines on every model. 32B
-models OOM on RTX 6000 PRO.
-
-### Cross-Architecture Consistency
+> Table JSON: `assets/tables/table_0008.json`
+> Table 8: Model-level peak VRAM (GB). Fused uses less than all baselines on every model. 32B models OOM on RTX 6000 PRO.
 
 Table 9 summarizes microbenchmark speedups across all six GPUs. Model-level eager/fused speedups
 range from 1.18× to 1.24× with cross-GPU CV < 2%, providing stronger statistical evidence than
@@ -631,16 +402,13 @@ additional repeats on a single GPU.
 
 Fidelity. Cosine similarity between fused and eager final logits exceeds 0.9999 for all six models on all three GPUs (cos ≥ 0.999996 on HBM-class GPUs). An earlier code version showed reduced fidelity on Gemma-3-12B (cos = 0.991–0.999); the root cause was fusing the magnitude division into Triton, which allowed FMA contraction and approximate sqrt to perturb rounding at large
 
-Table 9: Geometric mean microbenchmark speedups (all shapes, 200 repeats). Norm memory 0.8×
-in bf16 means factored uses more memory for the isolated norm due to fp32 accumulation transients
-(§2.3).
+> Table JSON: `assets/tables/table_0009.json`
+> Table 9: Geometric mean microbenchmark speedups (all shapes, 200 repeats). Norm memory 0.8× in bf16 means factored uses more memory for the isolated norm due to fp32 accumulation transients (§2.3).
 
-Table 10: Multi-seed convergence: eager vs. fused training loss (Qwen3.5-9B-Base, r =384, 2000
-steps). Grand mean per-step delta 7.1 × 10−4; final eval losses agree to < 1.5 × 10−4.
+> Table JSON: `assets/tables/table_0010.json`
+> Table 10: Multi-seed convergence: eager vs. fused training loss (Qwen3.5-9B-Base, r =384, 2000 steps). Grand mean per-step delta 7.1 × 10−4; final eval losses agree to < 1.5 × 10−4.
 
 activation scales. De-fusing the division (§4), adding store-reload barriers, and replacing the sqrt with inline PTX resolved the discrepancy, improving fidelity to cos > 0.9999 across all GPUs.
-
-### Convergence Equivalence
 
 To verify that fused kernels do not affect training dynamics, we trained controlled SFT experiments on a length-filtered derivative of MMFineReason-SFT-123K [Lin et al., 2026] using Qwen3.5-9B-Base, DoRA r = 384, α = 192, rsLoRA, bf16, AdamW, ZeRO-2, gradient checkpointing, bs = 3, ga = 2, seq=5120, 2000 steps on a single RTX 6000 PRO, using the SWIFT framework [Zhao et al., 2024], with three seeds (× eager/fused = 6 runs). Table 10 and Figure 12 summarize the results. The worst-case single-step delta (1.1 × 10−2, seed 1, step 398) is a transient early-training divergence that does not propagate: by step 1000, all deltas fall below 3.3 × 10−3. Gradient norms track identically, confirming that the d mag reduction-ordering difference does not accumulate over 2000 steps.
 
@@ -648,66 +416,12 @@ Wall-clock. The fused path completed 2000 steps in 330 min compared with 360 min
 
 Cross-model and cross-optimizer check. An additional pair on Qwen3-VL-8B-Instruct with Muon+AdamW (r =256, single seed) showed consistent results: mean |∆loss| = 7.7 × 10−4, final eval |∆| = 3.9 × 10−5, 8.2% wall-clock reduction.
 
-Eager
-Fused
+> Table JSON: `assets/tables/table_0011.json`
+> Table 11 consolidates practitioner recommendations.
 
-(a) Training loss
+![Figure 12](assets/figures/page_017_vec_001.png)
 
-(b) Eval loss
-
-(c) Gradient norm
-
-0.340
-
-0.55
-
-0.335
-
-0.330
-
-0.45
-
-0.325
-
-Norm
-
-### Loss
-
-0.320
-
-0.35
-
-0.315
-
-0.30
-
-0.310
-
-0.25
-
-0.305
-
-0.20
-
-Training step
-
-Training step
-
-Training step
-
-Figure 12: Convergence: eager vs. fused are visually indistinguishable (Qwen3.5-9B-Base, r =384,
-seed 3 of 3). (a) Training loss (25-step smoothing). (b) Eval loss (200-step intervals). (c) Gradient
-norms.
-
-## Discussion
-
-### Deployment Context
-
-The factored norm is particularly valuable when training and inference compete for GPU memory. Our GRPO [Shao et al., 2024] pipeline co-locates vLLM [Kwon et al., 2023] (tensor-parallel inference) alongside DoRA fine-tuning (r = 384) of a 38B VLM on 4×B200 (192 GB each), with large global batches under ZeRO-2 and gradient checkpointing. After vLLM reserves its KV-cache allocation, training headroom per GPU is tight; the memory challenge is cumulative rather than catastrophic. Each of the 500+ adapted modules re-materializes its norm temporaries during gradient checkpointing recomputation, and the resulting transient allocations fragment the caching allocator. Cross-device bandwidth, already under pressure from gradient all-reduce and tensorparallel inference communication, leaves little margin for the additional memory traffic of dense per-module materialization. The factored norm eliminates these transients, and we observed no numerical drift attributable to fusion. (This is an illustrative anecdote and was not benchmarked under the methodology of §5.)
-
-### Tradeoffs and Limitations
-
-Table 11 consolidates practitioner recommendations.
+_Figure 12: Convergence: eager vs. fused are visually indistinguishable (Qwen3.5-9B-Base, r=384, seed 3 of 3). (a) Training loss (25-step smoothing). (b) Eval loss (200-step intervals). (c) Gradient norms._
 
 Where fusion offers no advantage. Below ∼2048 × 6144 activations, launch latency dominates; the dispatch encodes this crossover conservatively. On non-CUDA platforms, Triton kernels are unavailable.
 
@@ -715,35 +429,10 @@ Fused backward VRAM. The fused backward saves one activation-sized tensor (inner
 
 Numerical precision. All PyTorch compose paths are bitwise identical. Triton preserves the same algebra but not bitwise equality (§4). Residual drift concentrates in d mag reductions rather
 
-Table 11: Recommended configuration by scenario.
+## Discussion
 
-Training, CUDA,
-above crossover
-Tier 1 (fused bwd)
-Full speedup; 0.1–1.0 GB less VRAM than eager
-
-Training,
-memory-constrained
-Tier 1 + frozen mag
-inner skipped; lower peak VRAM
-
-Inference, CUDA
-Tier 2 (fused fwd)
-Compose speedup, no backward memory
-
-r ≥ 384, any single
-GPU
-Factored norm
-PEFT path 46–87% slower
-
-r ≤ 64, d ≤ 4096
-Either norm
-Factored overhead minimal
-
-Colocated train +
-infer
-Factored norm
-Dense temporaries compete with inference budget
+> Table JSON: `assets/tables/table_0012.json`
+> Table 11: Recommended configuration by scenario.
 
 than pointwise compose. Convergence studies (§5.9) confirm these differences do not accumulate.
 
@@ -795,11 +484,11 @@ Yuze Zhao, Jintao Huang, Jinghan Hu, Xingjun Wang, Yunlin Mao, Daoze Zhang, Zeyi
 
 • Output: The module computes a delta ∆Y; the caller applies Y = Y base + ∆Y. • Compose Equation: ∆Y = g ⊙ (s XA⊤B⊤) + (g − 1) ⊙ Y base.
 
+## Implementation Details
+
 • Recomputed every forward pass; never cached across steps. • Detached (no gradient flow), per Liu et al. [2024] §4.3. • Accumulated in FP32 with autocast disabled. • ϵ = 10−12 (fp32/fp64) or 10−6 (bf16/fp16). • Bias subtracted before compose, re-added after.
 
 Formal contract for clean-room replication.
-
-## Implementation Details
 
 Chunk alignment. The chunk size aligns to 64 elements on CUDA/XPU devices for Tensor Core MMA alignment on all NVIDIA architectures since Volta.
 
@@ -895,10 +584,8 @@ cp code/scripts/dora. reference_hf_peft .py \
 
 ## Full Model-Level Memory Table
 
-Table 13 extends the main-body memory comparison (Table 8) to all six models.
-
-Table 13: Model-level gradient-computation peak VRAM (GB) across three GPUs, all six models.
-Same setup as Table 8. Values from peak_vram_mb.
+> Table JSON: `assets/tables/table_0014.json`
+> Table 13: Model-level gradient-computation peak VRAM (GB) across three GPUs, all six models. Same setup as Table 8. Values from peak_vram_mb.
 
 ## Single-Layer E2E Decomposition
 
@@ -906,27 +593,17 @@ The following figures show single-layer end-to-end (E2E) speedup, which isolates
 
 fp32 microbenchmark summary. Table 14 provides the fp32 rows omitted from the main-body summary (Table 9). Norm memory 3.2× in fp32 reflects the full theoretical benefit, since both paths accumulate in fp32 and the PEFT baseline also allocates fp32 temporaries.
 
-Table 14: Geometric mean microbenchmark speedups, fp32 (all shapes, 200 repeats). Complement
-to Table 9.
+> Table JSON: `assets/tables/table_0016.json`
+> Table 14: Geometric mean microbenchmark speedups, fp32 (all shapes, 200 repeats). Complement to Table 9.
 
-Table 15 summarizes the DoRA norm implementation across five major fine-tuning frameworks
-as of February 2026. We manually inspected the DoRA-related source code in each framework’s
-main branch at the specified commits/versions, searching for norm computation implementations.
-Paths are shown relative to each framework’s source root for readability. All use the same dense-
-materialization algorithm; none offer a memory-efficient alternative.
+## Framework Survey
 
-Table 15: DoRA norm implementation in major fine-tuning frameworks (February 2026).
-
-(a) Step Time vs. Rank
-
-(b) Speedup vs. Rank
+> Table JSON: `assets/tables/table_0015.json`
+> Table 15: DoRA norm implementation in major fine-tuning frameworks (February 2026).
 
 2.4
 
 ### Speedup (Eager / Fused)
-
-Eager
-Fully Fused
 
 ### Step Time (ms)
 
@@ -952,46 +629,14 @@ Figure 13: Single-layer E2E overhead decomposition (B200, bf16, d = 4096, bs=4, 
 Single-layer E2E does not predict model-level speedup: compose gains compound across ∼500 DoRA
 modules while per-layer backward overhead is amortized.
 
-1.35
+![Figure 13](assets/figures/page_028_vec_001.png)
 
-1.30
+_Figure 13: Single-layer E2E overhead decomposition (B200, bf16, d = 4096, bs=4, seq=2048). Single-layer E2E does not predict model-level speedup: compose gains compound across ∼500 DoRA modules while per-layer backward overhead is amortized._
 
-1.25
+![Figure 14](assets/figures/page_028_vec_002.png)
 
-1.19x
+_Figure 14: Single-layer E2E speedup (eager/fused) across six GPUs and ranks (bf16, d = 4096, bs=4, seq=2048). All GPUs show consistent improvement._
 
-1.15
+![Figure 15](assets/figures/page_029_vec_001.png)
 
-1.11x
-
-1.10x
-
-1.10x
-
-1.08x
-
-1.10
-
-1.04x
-
-1.02x
-
-1.05
-
-1.00
-
-0.95
-
-Figure 14: Single-layer E2E speedup (eager/fused) across six GPUs and ranks (bf16, d = 4096,
-bs=4, seq=2048). All GPUs show consistent improvement.
-
-1.3
-
-1.1
-
-0.9
-
-Hidden Dimension
-
-Figure 15: Single-layer E2E speedup vs. hidden dimension (bf16, r = 384, six GPUs). The benefit
-peaks at h = 3072–4096, corresponding to common LLM sizes.
+_Figure 15: Single-layer E2E speedup vs. hidden dimension (bf16, r = 384, six GPUs). The benefit peaks at h = 3072–4096, corresponding to common LLM sizes._

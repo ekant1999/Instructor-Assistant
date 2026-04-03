@@ -16,7 +16,7 @@
     "title": "CMPE 286 - LAB - 1",
     "paper_id": "565476836086",
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment1.pdf",
-    "generated_at": "2026-04-02T18:13:22.052851+00:00",
+    "generated_at": "2026-04-03T22:15:32.024945+00:00",
     "num_figures": "0",
     "num_tables": "0",
     "num_equations": "0",
@@ -158,6 +158,6 @@
     "issue_count": 0,
     "issues": []
   },
-  "elapsed_ms": 2331.907,
+  "elapsed_ms": 2634.155,
   "status": "success"
 }

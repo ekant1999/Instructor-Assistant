@@ -1,13 +1,13 @@
 {
   "paper_id": 404815770581,
-  "generated_at": "2026-04-02T18:13:25.652305+00:00",
+  "generated_at": "2026-04-03T22:15:36.049492+00:00",
   "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment2.pdf",
   "markdown_file": "paper.md",
   "metadata": {
     "title": "Performing CRUD operations in DynamoDB using AWS Lambda",
     "paper_id": 404815770581,
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment2.pdf",
-    "generated_at": "2026-04-02T18:13:25.641077+00:00",
+    "generated_at": "2026-04-03T22:15:36.038495+00:00",
     "num_figures": 0,
     "num_tables": 0,
     "num_equations": 7,

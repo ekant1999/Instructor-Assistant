@@ -8,18 +8,18 @@
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p115/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p115/manifest.json",
   "asset_counts": {
-    "figures": 0,
-    "tables": 0,
-    "equations": 0
+    "figures": 13,
+    "tables": 11,
+    "equations": 25
   },
   "metadata": {
     "title": "OccAny: Generalized Unconstrained Urban 3D Occupancy",
     "paper_id": "115",
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8f8c9e275748b72e.pdf",
-    "generated_at": "2026-04-02T01:28:10.892533+00:00",
-    "num_figures": "0",
-    "num_tables": "0",
-    "num_equations": "0",
+    "generated_at": "2026-04-03T22:14:42.392921+00:00",
+    "num_figures": "13",
+    "num_tables": "11",
+    "num_equations": "25",
     "page_count": "21"
   },
   "render_mode": "conservative",
@@ -160,6 +160,6 @@
       "suspicious headings detected (1)"
     ]
   },
-  "elapsed_ms": 12461.591,
+  "elapsed_ms": 94762.513,
   "status": "success"
 }

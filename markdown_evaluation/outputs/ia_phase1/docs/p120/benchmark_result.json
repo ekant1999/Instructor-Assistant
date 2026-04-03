@@ -8,21 +8,21 @@
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120/manifest.json",
   "asset_counts": {
-    "figures": 0,
-    "tables": 0,
-    "equations": 0
+    "figures": 18,
+    "tables": 4,
+    "equations": 19
   },
   "metadata": {
     "title": "Detailed Geometry and Appearance from Opportunistic Motion",
     "paper_id": "120",
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf",
-    "generated_at": "2026-04-02T01:28:14.685649+00:00",
-    "num_figures": "0",
-    "num_tables": "0",
-    "num_equations": "0",
+    "generated_at": "2026-04-03T22:15:29.155927+00:00",
+    "num_figures": "18",
+    "num_tables": "4",
+    "num_equations": "19",
     "page_count": "30"
   },
-  "render_mode": "normal",
+  "render_mode": "conservative",
   "sectioning_strategy": "pdf_toc",
   "sectioning_report": {
     "strategy": "pdf_toc",
@@ -86,6 +86,6 @@
     "issue_count": 0,
     "issues": []
   },
-  "elapsed_ms": 1774.732,
+  "elapsed_ms": 18444.44,
   "status": "success"
 }

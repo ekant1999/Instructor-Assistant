@@ -8,18 +8,18 @@
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p119/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p119/manifest.json",
   "asset_counts": {
-    "figures": 0,
-    "tables": 0,
-    "equations": 0
+    "figures": 5,
+    "tables": 2,
+    "equations": 22
   },
   "metadata": {
     "title": "VLA-OPD: Bridging Offline SFT and Online RL for Vision-Language-Action Models via On-Policy Distillation",
     "paper_id": "119",
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/4a5ab78468782a40.pdf",
-    "generated_at": "2026-04-02T01:28:12.883218+00:00",
-    "num_figures": "0",
-    "num_tables": "0",
-    "num_equations": "0",
+    "generated_at": "2026-04-03T22:15:10.786338+00:00",
+    "num_figures": "5",
+    "num_tables": "2",
+    "num_equations": "22",
     "page_count": "16"
   },
   "render_mode": "conservative",
@@ -136,6 +136,6 @@
       "suspicious headings detected (1)"
     ]
   },
-  "elapsed_ms": 719.156,
+  "elapsed_ms": 9401.305,
   "status": "success"
 }

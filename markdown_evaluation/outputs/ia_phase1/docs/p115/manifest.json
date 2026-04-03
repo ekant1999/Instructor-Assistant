@@ -1,16 +1,16 @@
 {
   "paper_id": 115,
-  "generated_at": "2026-04-02T01:28:11.037999+00:00",
+  "generated_at": "2026-04-03T22:14:42.636990+00:00",
   "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8f8c9e275748b72e.pdf",
   "markdown_file": "paper.md",
   "metadata": {
     "title": "OccAny: Generalized Unconstrained Urban 3D Occupancy",
     "paper_id": 115,
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8f8c9e275748b72e.pdf",
-    "generated_at": "2026-04-02T01:28:10.892533+00:00",
-    "num_figures": 0,
-    "num_tables": 0,
-    "num_equations": 0,
+    "generated_at": "2026-04-03T22:14:42.392921+00:00",
+    "num_figures": 13,
+    "num_tables": 11,
+    "num_equations": 25,
     "page_count": 21
   },
   "config": {
@@ -20,7 +20,7 @@
     "include_page_markers": false,
     "prefer_equation_latex": true,
     "include_equation_fallback_assets": true,
-    "ensure_assets": false,
+    "ensure_assets": true,
     "overwrite": true,
     "quality_audit_enabled": true,
     "conservative_fallback": true,
@@ -56,18 +56,17 @@
       "occany inference": 1,
       "occany using da3 and sam3": 1,
       "qualitative examples": 1,
-      "references": 1,
       "related works": 1,
       "supplementary studies": 1,
       "training": 1,
       "training losses": 1
     },
-    "total_headings": 24
+    "total_headings": 23
   },
   "asset_counts": {
-    "figures": 0,
-    "tables": 0,
-    "equations": 0
+    "figures": 13,
+    "tables": 11,
+    "equations": 25
   },
   "sectioning": {
     "strategy": "pdf_toc",
@@ -297,8 +296,565 @@
     }
   ],
   "assets": {
-    "figures": [],
-    "tables": [],
-    "equations": []
+    "figures": [
+      {
+        "id": 1,
+        "page_no": 1,
+        "file_name": "page_001_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "1",
+        "figure_body": "OccAny is a generalized 3D occupancy model that is trained once and can operate on out-of-domain sequential, monoc- ular, or surround-view urban images. It produces SAM2-like fea- tures, enabling promptable segmentation.",
+        "figure_caption": "Figure 1. OccAny is a generalized 3D occupancy model that is trained once and can operate on out-of-domain sequential, monoc- ular, or surround-view urban images. It produces SAM2-like fea- tures, enabling promptable segmentation.",
+        "section_canonical": "abstract",
+        "markdown_path": "assets/figures/page_001_img_001.png"
+      },
+      {
+        "id": 2,
+        "page_no": 3,
+        "file_name": "page_003_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "2",
+        "figure_body": "OccAny Training is done in two stages: (i) 3D Reconstruction infers 3D scene using Nrec reconstruction frames and (ii) Novel-View Rendering renders geometry of Nrnd new views having camera poses {Tj}Nrnd j=1 . Segmentation Forcing with SAM2 features helps regularize and improve geometry prediction. The scene memory M is dynamically updated during reconstruction, while during rendering, the final scene memory output from the reconstruction stage is used wit",
+        "figure_caption": "Figure 2. OccAny Training is done in two stages: (i) 3D Reconstruction infers 3D scene using Nrec reconstruction frames and (ii) Novel-View Rendering renders geometry of Nrnd new views having camera poses {Tj}Nrnd j=1 . Segmentation Forcing with SAM2 features helps regularize and improve geometry prediction. The scene memory M is dynamically updated during reconstruction, while during rendering, the final scene memory output from the reconstruction stage is used without updating",
+        "section_canonical": "methodology",
+        "markdown_path": "assets/figures/page_003_vec_001.png"
+      },
+      {
+        "id": 3,
+        "page_no": 4,
+        "file_name": "page_004_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "3",
+        "figure_body": "OccAny inference undergoes two stages: (i) 3D recon- struction to retrieve Nrec pointmaps with predicted camera poses {vi}Nrec i=1 , and (ii) novel-view rendering with TTVA sampled along the trajectory of {vi}Nrec i=1 . 3D occupancy is obtained by aggregat- ing all pointmaps and voxelizing them with trilinear interpolation.",
+        "figure_caption": "Figure 3. OccAny inference undergoes two stages: (i) 3D recon- struction to retrieve Nrec pointmaps with predicted camera poses {vi}Nrec i=1 , and (ii) novel-view rendering with TTVA sampled along the trajectory of {vi}Nrec i=1 . 3D occupancy is obtained by aggregat- ing all pointmaps and voxelizing them with trilinear interpolation.",
+        "section_canonical": "methodology",
+        "markdown_path": "assets/figures/page_004_vec_001.png"
+      },
+      {
+        "id": 4,
+        "page_no": 6,
+        "file_name": "page_006_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "4",
+        "figure_body": "Occupancy predictions of OccAny and baselines on a sequence and a surround view. We visualize here predicted voxels. For qualitative analysis, we overlay the semantic ground-truth colors on predicted voxels to better highlight class-wise gains. False positive voxels are painted in gray without any overlayed color. Compared to baselines, our occupancy predictions are denser and more accurate.",
+        "figure_caption": "Figure 4. Occupancy predictions of OccAny and baselines on a sequence and a surround view. We visualize here predicted voxels. For qualitative analysis, we overlay the semantic ground-truth colors on predicted voxels to better highlight class-wise gains. False positive voxels are painted in gray without any overlayed color. Compared to baselines, our occupancy predictions are denser and more accurate.",
+        "section_canonical": "experiments",
+        "markdown_path": "assets/figures/page_006_img_001.png"
+      },
+      {
+        "id": 5,
+        "page_no": 7,
+        "file_name": "page_007_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "5",
+        "figure_body": "Qualitative ablation shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 4. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.",
+        "figure_caption": "Figure 5. Qualitative ablation shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 4. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.",
+        "section_canonical": "experiments",
+        "markdown_path": "assets/figures/page_007_img_001.png"
+      },
+      {
+        "id": 6,
+        "page_no": 8,
+        "file_name": "page_008_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "8",
+        "figure_body": "Instance segmentation of cars with OccAny’s features.",
+        "figure_caption": "Figure 8. Instance segmentation of cars with OccAny’s features.",
+        "section_canonical": "experiments",
+        "markdown_path": "assets/figures/page_008_img_001.png"
+      },
+      {
+        "id": 7,
+        "page_no": 8,
+        "file_name": "page_008_img_002.png",
+        "figure_type": "embedded",
+        "figure_number": "7",
+        "figure_body": "PCA visualization of our segmentation features of multi-view sequences. Low-resolution features capture high-level semantics (e.g., separating cars, buildings, and roads), while high- resolution features capture low-level details such as boundaries and textures. Features remain consistent across different views.",
+        "figure_caption": "Figure 7. PCA visualization of our segmentation features of multi-view sequences. Low-resolution features capture high-level semantics (e.g., separating cars, buildings, and roads), while high- resolution features capture low-level details such as boundaries and textures. Features remain consistent across different views.",
+        "section_canonical": "experiments",
+        "markdown_path": "assets/figures/page_008_img_002.png"
+      },
+      {
+        "id": 8,
+        "page_no": 8,
+        "file_name": "page_008_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "6",
+        "figure_body": "Ablating NVR inference on SemanticKITTI",
+        "figure_caption": "Figure 6. Ablating NVR inference on SemanticKITTI",
+        "section_canonical": "experiments",
+        "markdown_path": "assets/figures/page_008_vec_001.png"
+      },
+      {
+        "id": 9,
+        "page_no": 17,
+        "file_name": "page_017_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "9",
+        "figure_body": "Occupancy predictions of OccAny and baselines on sequential data. We visualize here predicted voxels. For qualitative analysis, we overlay the semantic ground-truth colors on predicted voxels to better highlight class-wise gains. False positive voxels are painted in gray without any overlayed color. Compared to baselines, our occupancy predictions are denser and more accurate.",
+        "figure_caption": "Figure 9. Occupancy predictions of OccAny and baselines on sequential data. We visualize here predicted voxels. For qualitative analysis, we overlay the semantic ground-truth colors on predicted voxels to better highlight class-wise gains. False positive voxels are painted in gray without any overlayed color. Compared to baselines, our occupancy predictions are denser and more accurate.",
+        "section_canonical": "qualitative_examples",
+        "markdown_path": "assets/figures/page_017_img_001.png"
+      },
+      {
+        "id": 10,
+        "page_no": 18,
+        "file_name": "page_018_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "10",
+        "figure_body": "Occupancy predictions of OccAny and baselines on surround-view data. Voxel colorization follows Fig. 9. Compared to baselines, our occupancy predictions are denser and more accurate.",
+        "figure_caption": "Figure 10. Occupancy predictions of OccAny and baselines on surround-view data. Voxel colorization follows Fig. 9. Compared to baselines, our occupancy predictions are denser and more accurate.",
+        "section_canonical": "qualitative_examples",
+        "markdown_path": "assets/figures/page_018_img_001.png"
+      },
+      {
+        "id": 11,
+        "page_no": 19,
+        "file_name": "page_019_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "11",
+        "figure_body": "Qualitative ablation on Semantic KITTI shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.",
+        "figure_caption": "Figure 11. Qualitative ablation on Semantic KITTI shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.",
+        "section_canonical": "qualitative_examples",
+        "markdown_path": "assets/figures/page_019_img_001.png"
+      },
+      {
+        "id": 12,
+        "page_no": 20,
+        "file_name": "page_020_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "12",
+        "figure_body": "Qualitative ablation on Occ3D-NuScenes shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.",
+        "figure_caption": "Figure 12. Qualitative ablation on Occ3D-NuScenes shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.",
+        "section_canonical": "qualitative_examples",
+        "markdown_path": "assets/figures/page_020_img_001.png"
+      },
+      {
+        "id": 13,
+        "page_no": 21,
+        "file_name": "page_021_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "13",
+        "figure_body": "PCA visualization of predicted feature maps. Low-resolution features capture high-level semantics (e.g., separating cars, buildings, and roads), while high-resolution features capture low-level details such as boundaries and textures. Features remain consistent across different views.",
+        "figure_caption": "Figure 13. PCA visualization of predicted feature maps. Low-resolution features capture high-level semantics (e.g., separating cars, buildings, and roads), while high-resolution features capture low-level details such as boundaries and textures. Features remain consistent across different views.",
+        "section_canonical": "qualitative_examples",
+        "markdown_path": "assets/figures/page_021_img_001.png"
+      }
+    ],
+    "tables": [
+      {
+        "id": 1,
+        "page_no": 6,
+        "json_file": "table_0001.json",
+        "caption": "Table 1. Sequence setting. Occupancy prediction on Se- manticKITTI and Occ3D-NuScenes.",
+        "section_canonical": "experiments",
+        "markdown_json_path": "assets/tables/table_0001.json"
+      },
+      {
+        "id": 2,
+        "page_no": 6,
+        "json_file": "table_0002.json",
+        "caption": "Table 2. Monocular setting. Occupancy results with Monocular input on SemanticKITTI following [6, 24]. Results for MonoScene and Splatter Image are taken from [6, 75].",
+        "section_canonical": "experiments",
+        "markdown_json_path": "assets/tables/table_0002.json"
+      },
+      {
+        "id": 3,
+        "page_no": 7,
+        "json_file": "table_0003.json",
+        "caption": "Table 4. Semantic Occupancy Prediction with GSAM2 [48].",
+        "section_canonical": "experiments",
+        "markdown_json_path": "assets/tables/table_0003.json"
+      },
+      {
+        "id": 4,
+        "page_no": 7,
+        "json_file": "table_0004.json",
+        "caption": "Table 3. Surround-view setting. More results are in Tab. 8.",
+        "section_canonical": "experiments",
+        "markdown_json_path": "assets/tables/table_0004.json"
+      },
+      {
+        "id": 5,
+        "page_no": 8,
+        "json_file": "table_0005.json",
+        "caption": "Table 6. Ablation results on SemanticKitti. The “geo-aware” stands for applying geometry confidence maps C in the segmenta- tion forcing loss (cf. Eq. (3)).",
+        "section_canonical": "experiments",
+        "markdown_json_path": "assets/tables/table_0005.json"
+      },
+      {
+        "id": 6,
+        "page_no": 8,
+        "json_file": "table_0006.json",
+        "caption": "Table 5. Changing the base foundation models used in OccAny to DA3 [36] and SAM3 [8] results in the OccAny+ variant.",
+        "section_canonical": "experiments",
+        "markdown_json_path": "assets/tables/table_0006.json"
+      },
+      {
+        "id": 7,
+        "page_no": 13,
+        "json_file": "table_0007.json",
+        "caption": "Table 7. Using pretrained segmentation features to boost seman- tic performance. OccAny+ is the variant using DA3 and SAM3 base models. Parameter counts reflect the forward path from the input to the predicted pointmaps and segmentation features. Note that using \"pretrained\" semantic features incurs a higher parameter cost due to the use of pretrained encoder.",
+        "section_canonical": "appendix",
+        "markdown_json_path": "assets/tables/table_0007.json"
+      },
+      {
+        "id": 8,
+        "page_no": 13,
+        "json_file": "table_0008.json",
+        "caption": "Table 8. Detailed surround-view results. OccAny+ is the variant using DA3 and SAM3 base models.",
+        "section_canonical": "appendix",
+        "markdown_json_path": "assets/tables/table_0008.json"
+      },
+      {
+        "id": 9,
+        "page_no": 15,
+        "json_file": "table_0009.json",
+        "caption": "Table 9. Novel-View Rendering vs. Depth Completion. Occupancy prediction results on SemanticKITTI and Occ3D-NuScenes show the effectiveness of Novel-View Rendering.",
+        "section_canonical": "appendix",
+        "markdown_json_path": "assets/tables/table_0009.json"
+      },
+      {
+        "id": 10,
+        "page_no": 15,
+        "json_file": "table_0010.json",
+        "caption": "Table 10. Generalization results of fully-supervised methods. Occ label is denser through temporal accumulation of LiDAR point-clouds and subsequent post-processing, whereas the LiDAR label remains sparser at each timestep. OccAny works out of the box in any evaluation settings with different inference areas, voxel resolutions and sensor configurations. In contrast, other methods require manual code modifications to align testing and training conditions. Beyond being more versatile, OccAny clearly demonstrates superior generalization.",
+        "section_canonical": "appendix",
+        "markdown_json_path": "assets/tables/table_0010.json"
+      },
+      {
+        "id": 11,
+        "page_no": 15,
+        "json_file": "table_0011.json",
+        "caption": "Table 12. NVR inference complexity, measured on one A100 GPU.",
+        "section_canonical": "appendix",
+        "markdown_json_path": "assets/tables/table_0011.json"
+      }
+    ],
+    "equations": [
+      {
+        "id": 1,
+        "page_no": 1,
+        "file_name": "equation_0001.png",
+        "json_file": "equation_0001.json",
+        "section_canonical": "abstract",
+        "latex": "https://valeoai.github.io/OccAny",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0001.png",
+        "markdown_json_path": "assets/equations/equation_0001.json"
+      },
+      {
+        "id": 2,
+        "page_no": 1,
+        "file_name": "equation_0002.png",
+        "json_file": "equation_0002.json",
+        "section_canonical": "abstract",
+        "latex": "https://github.com/valeoai/OccAny .",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0002.png",
+        "markdown_json_path": "assets/equations/equation_0002.json"
+      },
+      {
+        "id": 3,
+        "page_no": 3,
+        "file_name": "equation_0003.png",
+        "json_file": "equation_0003.json",
+        "section_canonical": "methodology",
+        "latex": "j=1. Segmentation Forcing with SAM2 features",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0003.png",
+        "markdown_json_path": "assets/equations/equation_0003.json"
+      },
+      {
+        "id": 4,
+        "page_no": 3,
+        "file_name": "equation_0004.png",
+        "json_file": "equation_0004.json",
+        "section_canonical": "methodology",
+        "latex": "\\begin{aligned}\ni=1 \\\\\n\\\\in\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0004.png",
+        "markdown_json_path": "assets/equations/equation_0004.json"
+      },
+      {
+        "id": 5,
+        "page_no": 3,
+        "equation_number": "1",
+        "file_name": "equation_0005.png",
+        "json_file": "equation_0005.json",
+        "section_canonical": "methodology",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0005.png",
+        "markdown_json_path": "assets/equations/equation_0005.json"
+      },
+      {
+        "id": 6,
+        "page_no": 4,
+        "file_name": "equation_0006.png",
+        "json_file": "equation_0006.json",
+        "section_canonical": "methodology",
+        "latex": "i=1",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0006.png",
+        "markdown_json_path": "assets/equations/equation_0006.json"
+      },
+      {
+        "id": 7,
+        "page_no": 4,
+        "file_name": "equation_0007.png",
+        "json_file": "equation_0007.json",
+        "section_canonical": "methodology",
+        "latex": "i=1",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0007.png",
+        "markdown_json_path": "assets/equations/equation_0007.json"
+      },
+      {
+        "id": 8,
+        "page_no": 4,
+        "file_name": "equation_0008.png",
+        "json_file": "equation_0008.json",
+        "section_canonical": "methodology",
+        "latex": "i=1. 3D occupancy is obtained by aggregat-",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0008.png",
+        "markdown_json_path": "assets/equations/equation_0008.json"
+      },
+      {
+        "id": 9,
+        "page_no": 4,
+        "file_name": "equation_0009.png",
+        "json_file": "equation_0009.json",
+        "section_canonical": "methodology",
+        "latex": "j=1.",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0009.png",
+        "markdown_json_path": "assets/equations/equation_0009.json"
+      },
+      {
+        "id": 10,
+        "page_no": 4,
+        "file_name": "equation_0010.png",
+        "json_file": "equation_0010.json",
+        "section_canonical": "methodology",
+        "latex": "i=1.",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0010.png",
+        "markdown_json_path": "assets/equations/equation_0010.json"
+      },
+      {
+        "id": 11,
+        "page_no": 4,
+        "file_name": "equation_0011.png",
+        "json_file": "equation_0011.json",
+        "section_canonical": "methodology",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0011.png",
+        "markdown_json_path": "assets/equations/equation_0011.json"
+      },
+      {
+        "id": 12,
+        "page_no": 4,
+        "equation_number": "2",
+        "file_name": "equation_0012.png",
+        "json_file": "equation_0012.json",
+        "section_canonical": "methodology",
+        "latex": "j=1. (2)\n\\tag{2}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0012.png",
+        "markdown_json_path": "assets/equations/equation_0012.json"
+      },
+      {
+        "id": 13,
+        "page_no": 5,
+        "file_name": "equation_0013.png",
+        "json_file": "equation_0013.json",
+        "section_canonical": "methodology",
+        "latex": "\\begin{aligned}\nsequences with minimum length N=6 and maximum length \\\\\nN=10. Frames are sampled at 2Hz in all datasets.\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0013.png",
+        "markdown_json_path": "assets/equations/equation_0013.json"
+      },
+      {
+        "id": 14,
+        "page_no": 5,
+        "file_name": "equation_0014.png",
+        "json_file": "equation_0014.json",
+        "section_canonical": "methodology",
+        "latex": "L glo = 1",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0014.png",
+        "markdown_json_path": "assets/equations/equation_0014.json"
+      },
+      {
+        "id": 15,
+        "page_no": 5,
+        "file_name": "equation_0015.png",
+        "json_file": "equation_0015.json",
+        "section_canonical": "methodology",
+        "latex": "\\begin{aligned}\ni=1 \\\\\nC i \\\\odot\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0015.png",
+        "markdown_json_path": "assets/equations/equation_0015.json"
+      },
+      {
+        "id": 16,
+        "page_no": 5,
+        "file_name": "equation_0016.png",
+        "json_file": "equation_0016.json",
+        "section_canonical": "methodology",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0016.png",
+        "markdown_json_path": "assets/equations/equation_0016.json"
+      },
+      {
+        "id": 17,
+        "page_no": 5,
+        "file_name": "equation_0017.png",
+        "json_file": "equation_0017.json",
+        "section_canonical": "methodology",
+        "latex": "L forcing =",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0017.png",
+        "markdown_json_path": "assets/equations/equation_0017.json"
+      },
+      {
+        "id": 18,
+        "page_no": 5,
+        "file_name": "equation_0018.png",
+        "json_file": "equation_0018.json",
+        "section_canonical": "experiments",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0018.png",
+        "markdown_json_path": "assets/equations/equation_0018.json"
+      },
+      {
+        "id": 19,
+        "page_no": 5,
+        "file_name": "equation_0019.png",
+        "json_file": "equation_0019.json",
+        "section_canonical": "experiments",
+        "latex": "\\begin{aligned}\nj=1 \\\\\nj=1 are the novel-view images.\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0019.png",
+        "markdown_json_path": "assets/equations/equation_0019.json"
+      },
+      {
+        "id": 20,
+        "page_no": 6,
+        "file_name": "equation_0020.png",
+        "json_file": "equation_0020.json",
+        "section_canonical": "experiments",
+        "latex": "\\begin{aligned}\nCUT3R* \\\\\nAnySplat*†\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0020.png",
+        "markdown_json_path": "assets/equations/equation_0020.json"
+      },
+      {
+        "id": 21,
+        "page_no": 7,
+        "file_name": "equation_0021.png",
+        "json_file": "equation_0021.json",
+        "section_canonical": "experiments",
+        "latex": "\\begin{aligned}\nCUT3R* [65] + SAM2 [47] \\\\\nAnySplat*†[29]+ SAM2 [47] \\\\\nOccAny w/o forcing + SAM2 [47]\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0021.png",
+        "markdown_json_path": "assets/equations/equation_0021.json"
+      },
+      {
+        "id": 22,
+        "page_no": 13,
+        "file_name": "equation_0022.png",
+        "json_file": "equation_0022.json",
+        "section_canonical": "appendix",
+        "latex": "j=1. To facilitate cross-view information",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0022.png",
+        "markdown_json_path": "assets/equations/equation_0022.json"
+      },
+      {
+        "id": 23,
+        "page_no": 15,
+        "file_name": "equation_0023.png",
+        "json_file": "equation_0023.json",
+        "section_canonical": "appendix",
+        "latex": "GeoCalib [60] + DroidSLAM [57] + DA2 [78]",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0023.png",
+        "markdown_json_path": "assets/equations/equation_0023.json"
+      },
+      {
+        "id": 24,
+        "page_no": 17,
+        "file_name": "equation_0024.png",
+        "json_file": "equation_0024.json",
+        "section_canonical": "qualitative_examples",
+        "latex": "\\begin{aligned}\nCUT3R* \\\\\nAnySplat*†\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0024.png",
+        "markdown_json_path": "assets/equations/equation_0024.json"
+      },
+      {
+        "id": 25,
+        "page_no": 18,
+        "file_name": "equation_0025.png",
+        "json_file": "equation_0025.json",
+        "section_canonical": "qualitative_examples",
+        "latex": "\\begin{aligned}\nCUT3R* \\\\\nAnySplat*†\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0025.png",
+        "markdown_json_path": "assets/equations/equation_0025.json"
+      }
+    ]
   }
 }

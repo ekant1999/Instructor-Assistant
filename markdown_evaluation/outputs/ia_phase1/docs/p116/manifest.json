@@ -1,16 +1,16 @@
 {
   "paper_id": 116,
-  "generated_at": "2026-04-02T01:28:11.815439+00:00",
+  "generated_at": "2026-04-03T22:14:50.632907+00:00",
   "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/3a4547b47fc90fc4.pdf",
   "markdown_file": "paper.md",
   "metadata": {
     "title": "MedObvious: Exposing the Medical Moravec’s Paradox in VLMs via Clinical Triage",
     "paper_id": 116,
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/3a4547b47fc90fc4.pdf",
-    "generated_at": "2026-04-02T01:28:11.788487+00:00",
-    "num_figures": 0,
-    "num_tables": 0,
-    "num_equations": 0,
+    "generated_at": "2026-04-03T22:14:50.603547+00:00",
+    "num_figures": 2,
+    "num_tables": 3,
+    "num_equations": 16,
     "page_count": 11
   },
   "config": {
@@ -20,7 +20,7 @@
     "include_page_markers": false,
     "prefer_equation_latex": true,
     "include_equation_fallback_assets": true,
-    "ensure_assets": false,
+    "ensure_assets": true,
     "overwrite": true,
     "quality_audit_enabled": true,
     "conservative_fallback": true,
@@ -43,9 +43,9 @@
     "total_headings": 6
   },
   "asset_counts": {
-    "figures": 0,
-    "tables": 0,
-    "equations": 0
+    "figures": 2,
+    "tables": 3,
+    "equations": 16
   },
   "sectioning": {
     "strategy": "arxiv_source",
@@ -185,8 +185,280 @@
     }
   ],
   "assets": {
-    "figures": [],
-    "tables": [],
-    "equations": []
+    "figures": [
+      {
+        "id": 1,
+        "page_no": 2,
+        "file_name": "page_002_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "1",
+        "figure_body": "Qualitative MedObvious examples for pre-diagnostic visual triage. Each column corresponds to a grid in (a)–(c). We report the task ques- tion, ground truth, and predictions from representative VLMs.",
+        "figure_caption": "Fig. 1: Qualitative MedObvious examples for pre-diagnostic visual triage. Each column corresponds to a grid in (a)–(c). We report the task ques- tion, ground truth, and predictions from representative VLMs.",
+        "section_canonical": "introduction",
+        "markdown_path": "assets/figures/page_002_vec_001.png"
+      },
+      {
+        "id": 2,
+        "page_no": 4,
+        "file_name": "page_004_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "2",
+        "figure_body": "MedObvious overview. (A) Five progressive tiers (T1–T5). (B) Con- struction: multi-view studies are abstracted into small grids with either a single outlier or a negative-control (no outlier). (C) Five evaluation protocols: Detec- tion (MCQ/Open), Referring (MCQ/Open), and Visual Referring (Yes/No).",
+        "figure_caption": "Fig. 2: MedObvious overview. (A) Five progressive tiers (T1–T5). (B) Con- struction: multi-view studies are abstracted into small grids with either a single outlier or a negative-control (no outlier). (C) Five evaluation protocols: Detec- tion (MCQ/Open), Referring (MCQ/Open), and Visual Referring (Yes/No).",
+        "section_canonical": "introduction",
+        "markdown_path": "assets/figures/page_004_img_001.png"
+      }
+    ],
+    "tables": [
+      {
+        "id": 1,
+        "page_no": 5,
+        "json_file": "table_0001.json",
+        "caption": "Table 1: MedObvious composition. Tiers increase in clinical specificity.",
+        "section_canonical": "construction",
+        "markdown_json_path": "assets/tables/table_0001.json"
+      },
+      {
+        "id": 2,
+        "page_no": 6,
+        "json_file": "table_0002.json",
+        "caption": "Table 2: MedObvious: Per-task accuracy (%). Task A–E correspond to Detection MCQ, Detection Open, Referring MCQ, Referring Open, and Visual Referring, respectively. “Positive (Pos)”/“Negative (Neg)” indicate accuracy on anomalous/non-anomalous samples. Best results per task are bolded.",
+        "section_canonical": "construction",
+        "markdown_json_path": "assets/tables/table_0002.json"
+      },
+      {
+        "id": 3,
+        "page_no": 7,
+        "json_file": "table_0003.json",
+        "caption": "Table 3: Per-tiers overall accuracy (%) for different VLMs.",
+        "section_canonical": "experiments",
+        "markdown_json_path": "assets/tables/table_0003.json"
+      }
+    ],
+    "equations": [
+      {
+        "id": 1,
+        "page_no": 1,
+        "file_name": "equation_0001.png",
+        "json_file": "equation_0001.json",
+        "section_canonical": "front_matter",
+        "latex": "Project Page: https://ufaqkhan.github.io/MedObvious-Website/",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0001.png",
+        "markdown_json_path": "assets/equations/equation_0001.json"
+      },
+      {
+        "id": 2,
+        "page_no": 9,
+        "equation_number": "2023",
+        "file_name": "equation_0002.png",
+        "json_file": "equation_0002.json",
+        "section_canonical": "references",
+        "latex": "preprint arXiv:2303.08774 (2023)\n\\tag{2023}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0002.png",
+        "markdown_json_path": "assets/equations/equation_0002.json"
+      },
+      {
+        "id": 3,
+        "page_no": 9,
+        "equation_number": "2010",
+        "file_name": "equation_0003.png",
+        "json_file": "equation_0003.json",
+        "section_canonical": "references",
+        "latex": "arXiv:1012.3148 (2010)\n\\tag{2010}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0003.png",
+        "markdown_json_path": "assets/equations/equation_0003.json"
+      },
+      {
+        "id": 4,
+        "page_no": 9,
+        "equation_number": "2024",
+        "file_name": "equation_0004.png",
+        "json_file": "equation_0004.json",
+        "section_canonical": "references",
+        "latex": "arXiv:2410.07073 (2024)\n\\tag{2024}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0004.png",
+        "markdown_json_path": "assets/equations/equation_0004.json"
+      },
+      {
+        "id": 5,
+        "page_no": 9,
+        "equation_number": "2022",
+        "file_name": "equation_0005.png",
+        "json_file": "equation_0005.json",
+        "section_canonical": "references",
+        "latex": "23736 (2022)\n\\tag{2022}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0005.png",
+        "markdown_json_path": "assets/equations/equation_0005.json"
+      },
+      {
+        "id": 6,
+        "page_no": 9,
+        "equation_number": "2019",
+        "file_name": "equation_0006.png",
+        "json_file": "equation_0006.json",
+        "section_canonical": "references",
+        "latex": "Working Notes. 9-12 September 2019 (2019)\n\\tag{2019}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0006.png",
+        "markdown_json_path": "assets/equations/equation_0006.json"
+      },
+      {
+        "id": 7,
+        "page_no": 10,
+        "equation_number": "2012",
+        "file_name": "equation_0007.png",
+        "json_file": "equation_0007.json",
+        "section_canonical": "references",
+        "latex": "nance imaging 30(9), 1323–1341 (2012)\n\\tag{2012}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0007.png",
+        "markdown_json_path": "assets/equations/equation_0007.json"
+      },
+      {
+        "id": 8,
+        "page_no": 10,
+        "equation_number": "2018",
+        "file_name": "equation_0008.png",
+        "json_file": "equation_0008.json",
+        "section_canonical": "references",
+        "latex": "5(1), 180251 (2018)\n\\tag{2018}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0008.png",
+        "markdown_json_path": "assets/equations/equation_0008.json"
+      },
+      {
+        "id": 9,
+        "page_no": 10,
+        "equation_number": "2023",
+        "file_name": "equation_0009.png",
+        "json_file": "equation_0009.json",
+        "section_canonical": "references",
+        "latex": "28541–28564 (2023)\n\\tag{2023}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0009.png",
+        "markdown_json_path": "assets/equations/equation_0009.json"
+      },
+      {
+        "id": 10,
+        "page_no": 10,
+        "equation_number": "2021",
+        "file_name": "equation_0010.png",
+        "json_file": "equation_0010.json",
+        "section_canonical": "references",
+        "latex": "IEEE (2021)\n\\tag{2021}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0010.png",
+        "markdown_json_path": "assets/equations/equation_0010.json"
+      },
+      {
+        "id": 11,
+        "page_no": 10,
+        "equation_number": "2025",
+        "file_name": "equation_0011.png",
+        "json_file": "equation_0011.json",
+        "section_canonical": "references",
+        "latex": "arXiv:2509.15279 (2025)\n\\tag{2025}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0011.png",
+        "markdown_json_path": "assets/equations/equation_0011.json"
+      },
+      {
+        "id": 12,
+        "page_no": 10,
+        "equation_number": "2023",
+        "file_name": "equation_0012.png",
+        "json_file": "equation_0012.json",
+        "section_canonical": "references",
+        "latex": "information processing systems 36, 34892–34916 (2023)\n\\tag{2023}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0012.png",
+        "markdown_json_path": "assets/equations/equation_0012.json"
+      },
+      {
+        "id": 13,
+        "page_no": 11,
+        "equation_number": "2025",
+        "file_name": "equation_0013.png",
+        "json_file": "equation_0013.json",
+        "section_canonical": "references",
+        "latex": "preprint arXiv:2507.05201 (2025)\n\\tag{2025}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0013.png",
+        "markdown_json_path": "assets/equations/equation_0013.json"
+      },
+      {
+        "id": 14,
+        "page_no": 11,
+        "equation_number": "2025",
+        "file_name": "equation_0014.png",
+        "json_file": "equation_0014.json",
+        "section_canonical": "references",
+        "latex": "Communications 16(1), 7866 (2025)\n\\tag{2025}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0014.png",
+        "markdown_json_path": "assets/equations/equation_0014.json"
+      },
+      {
+        "id": 15,
+        "page_no": 11,
+        "equation_number": "2006",
+        "file_name": "equation_0015.png",
+        "json_file": "equation_0015.json",
+        "section_canonical": "references",
+        "latex": "cantly improved efficiency and reliability. Neuroimage 31(3), 1116–1128 (2006)\n\\tag{2006}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0015.png",
+        "markdown_json_path": "assets/equations/equation_0015.json"
+      },
+      {
+        "id": 16,
+        "page_no": 11,
+        "equation_number": "2023",
+        "file_name": "equation_0016.png",
+        "json_file": "equation_0016.json",
+        "section_canonical": "references",
+        "latex": "arXiv:2305.10415 (2023)\n\\tag{2023}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0016.png",
+        "markdown_json_path": "assets/equations/equation_0016.json"
+      }
+    ]
   }
 }

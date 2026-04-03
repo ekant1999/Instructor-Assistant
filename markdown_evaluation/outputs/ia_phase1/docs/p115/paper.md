@@ -2,10 +2,10 @@
 title: "OccAny: Generalized Unconstrained Urban 3D Occupancy"
 paper_id: 115
 source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8f8c9e275748b72e.pdf"
-generated_at: "2026-04-02T01:28:10.892533+00:00"
-num_figures: 0
-num_tables: 0
-num_equations: 0
+generated_at: "2026-04-03T22:14:42.392921+00:00"
+num_figures: 13
+num_tables: 11
+num_equations: 25
 ---
 
 Anh-Quan Cao Tuan-Hung Vu
@@ -14,30 +14,15 @@ Anh-Quan Cao Tuan-Hung Vu
 
 Abstract
 
-Sequence/Monocular
-3D Occupancy
-Segmentation
-
-Prompt
-
 Relying on in-domain annotations and precise sensor-rig priors, existing 3D occupancy prediction methods are limited in both scalability and out-of-domain generalization. While recent visual geometry foundation models exhibit strong generalization capabilities, they were mainly designed for general purposes and lack one or more key ingredients required for urban occupancy prediction, namely metric prediction, geometry completion in cluttered scenes and adaptation to urban scenarios. We address this gap and present OccAny, the first unconstrained urban 3D occupancy model capable of operating on out-of-domain uncalibrated scenes to predict and complete metric occupancy coupled with segmentation features. OccAny is versatile and can predict occupancy from sequential, monocular, or surround-view images. Our contributions are three-fold: (i) we propose the first generalized 3D occupancy framework with (ii) Segmentation Forcing that improves occupancy quality while enabling mask-level prediction, and (iii) a Novel View Rendering pipeline that infers novel-view geometry to enable test-time view augmentation for geometry completion. Extensive experiments demonstrate that OccAny outperforms all visual geometry baselines on 3D occupancy prediction task, while remaining competitive with in-domain self-supervised methods across three input settings on two established urban occupancy prediction datasets. Our code is available at https://github.com/valeoai/OccAny .
 
 ## Introduction
 
 The innate ability to see and make sense of the world in three dimensions underpins how humans understand and navigate the space. Advancing 3D scene understanding is crucial for spatial intelligent systems such as autonomous driving, robotics, and augmented reality. A key task in this area is 3D occupancy prediction whose goal is to infer a voxelized map of the environment and, when required, provide the corresponding semantics. Despite advances in architecture design [12, 46, 58, 72], training algorithm [5, 27, 30, 44, 76]
 
-Surround
+![Figure 1](assets/figures/page_001_img_001.png)
 
-Instances
-
-Prompt
-
-Instances
-
-Figure 1. OccAny is a generalized 3D occupancy model that is
-trained once and can operate on out-of-domain sequential, monoc-
-ular, or surround-view urban images. It produces SAM2-like fea-
-tures, enabling promptable segmentation.
+_Figure 1: OccAny is a generalized 3D occupancy model that is trained once and can operate on out-of-domain sequential, monoc- ular, or surround-view urban images. It produces SAM2-like fea- tures, enabling promptable segmentation._
 
 and dataset [4, 10, 13, 18], current state-of-the-art 3D models still lack the generalization of human perception, typically requiring constrained setup with precise sensor calibration. While humans can effortlessly infer complex 3D structures in any novel scenes, replicating this capability remains a demanding problem. State-of-the-art supervised approaches for 3D occupancy prediction [23, 32, 34, 67, 69, 76, 82] achieve remarkable results when the training and test data are drawn from the same distribution, i.e. both are collected using the same or a similar sensor rig under comparable conditions. A core component of these methods is the lifting of 2D features into 3D space, performed either via learnable mechanisms [23, 34] or via explicit camera modeling [5, 79]. However, this lifting operation inherently embeds sensor- and domain-specific biases into the models, which limits their ability to generalize to new sensor suites or environments. Recent self-supervised works [6, 15, 24, 28, 70] remove the need for 3D supervision by formulating occupancy prediction as a differentiable volume-rendering problem, thereby leveraging advances in neural rendering [30, 44]. Despite this, self-supervised models still struggle to generalize, as they remain specialized to a particular training domain with strong biases in camera poses and intrinsic parameters. As we look toward a near future with millions of autonomous fleets equipped with different sensor configurations, advancing 3D occupancy prediction requires generalizable and efficient solutions capable of leveraging heterogeneous training data to overcome
 
@@ -59,30 +44,13 @@ Research has rapidly expanded this paradigm beyond static, binocular inputs in s
 
 We build OccAny, a 3D occupancy framework that can generalize to arbitrary out-of-domain urban scenes. To this end, we adopt the transformer architecture from the Dust3r family and train the model on multiple urban datasets using standard point-level objectives commonly employed in prior works [3, 63, 66]. OccAny is supervised with metric-scale point-clouds enabling metric predictions at test time, a key
 
-Novel-View Rendering
-3D Reconstruction
+![Figure 2](assets/figures/page_003_vec_001.png)
 
-Poses
-
-SAM2
-
-Loss
-
-Frozen
-
-LiDAR
-
-Trainable
+_Figure 2: OccAny Training is done in two stages: (i) 3D Reconstruction infers 3D scene using Nrec reconstruction frames and (ii) Novel-View Rendering renders geometry of Nrnd new views having camera poses {Tj}Nrnd j=1 . Segmentation Forcing with SAM2 features helps regularize and improve geometry prediction. The scene memory M is dynamically updated during reconstruction, while during rendering, the final scene memory output from the reconstruction stage is used wit_
 
 element in occupancy prediction. We propose two novel strategies Segmentation Forcing and Novel View Rendering to accommodate the unique characteristics of 3D occupancy prediction in urban environments. Fig. 2 illustrates OccAny training process, which consists of two stages: 3D Reconstruction and Novel View Rendering. For each frame sequence, we randomly select N frames for training. In the reconstruction stage, we set the number of reconstruction frames to N rec = N. In the rendering stage, we use non-overlapping sets of N rec reconstruction frames and N rnd rendering frames, with N = N rec + N rnd.
 
 ### 3D Reconstruction with Segmentation Forcing
-
-Projection
-
-LiDAR
-
-SAM2
 
 • SAM2-like feature maps F i ∈ R H′×W ′×C, • global pointmaps P global i,1 ∈ R H×W ×3 in the global camera coordinate of the reference frame 1,
 
@@ -90,15 +58,9 @@ SAM2
 
 ### Novel-View Rendering
 
-Reconstruction view
+![Figure 3](assets/figures/page_004_vec_001.png)
 
-Novel view
-
-Interpolate
-
-Novel-View Rendering with TTVA
-
-3D Occupancy
+_Figure 3: OccAny inference undergoes two stages: (i) 3D recon- struction to retrieve Nrec pointmaps with predicted camera poses {vi}Nrec i=1 , and (ii) novel-view rendering with TTVA sampled along the trajectory of {vi}Nrec i=1 . 3D occupancy is obtained by aggregat- ing all pointmaps and voxelizing them with trilinear interpolation._
 
 ### OccAny Inference
 
@@ -123,24 +85,12 @@ decoder D for 3D reconstruction. Input frames are resized to 512-width with vary
 
 • Sequence: a sequence of 5 frames coming from a single camera on SemanticKITTI and Occ3D-NuScenes,
 
-Figure 4. Occupancy predictions of OccAny and baselines on a sequence and a surround view. We visualize here predicted voxels. For
-qualitative analysis, we overlay the semantic ground-truth colors on predicted voxels to better highlight class-wise gains. False positive
-voxels are painted in gray without any overlayed color. Compared to baselines, our occupancy predictions are denser and more accurate.
+![Figure 4](assets/figures/page_006_img_001.png)
 
-Prec. Rec.
-Prec. Rec.
+_Figure 4: Occupancy predictions of OccAny and baselines on a sequence and a surround view. We visualize here predicted voxels. For qualitative analysis, we overlay the semantic ground-truth colors on predicted voxels to better highlight class-wise gains. False positive voxels are painted in gray without any overlayed color. Compared to baselines, our occupancy predictions are denser and more accurate._
 
-Method
-Venue
-Semantic KITTI
-Occ3D-NuScenes
-
-OccAnybase: w/o Segmentation Forcing & Novel-view Rendering.
-
-Table 1.
-Sequence setting.
-Occupancy prediction on Se-
-manticKITTI and Occ3D-NuScenes.
+> Table JSON: `assets/tables/table_0001.json`
+> Table 1. Sequence setting. Occupancy prediction on Se- manticKITTI and Occ3D-NuScenes.
 
 (IoU) to assess geometry quality; mean IoU (mIoU) is used for semantic segmentation. Following open-vocabulary Li- DAR semantic segmentation works [17, 45, 50], we also report performance on super classes, denoted as mIoU sc. This helps evaluate results at a coarser semantic level, alleviating the impact of “prompting and text-to-image alignment” limitations [45] especially on semantically confusing classes, e.g., “car” vs. “other-vehicle”.
 
@@ -148,41 +98,26 @@ manticKITTI and Occ3D-NuScenes.
 
 Sequence. In the Sequence setting ( Tab. 1), OccAny surpasses all other zero-shot baselines. On SemanticKITTI, it reaches 25.91% IoU, surpassing the nearest baseline
 
-Test Method
-Venue
-Prec. Rec.
-
-out-of-domain
+> Table JSON: `assets/tables/table_0002.json`
+> Table 2. Monocular setting. Occupancy results with Monocular input on SemanticKITTI following [6, 24]. Results for MonoScene and Splatter Image are taken from [6, 75].
 
 OccAnybase: w/o Segmentation Forcing & Novel-view Rendering.
 
-Table 2. Monocular setting. Occupancy results with Monocular
-input on SemanticKITTI following [6, 24]. Results for MonoScene
-and Splatter Image are taken from [6, 75].
-
 (CUT3R*) by roughly 10 points. A similar trend is observed on Occ3D-NuScenes, where OccAny achieves 23.55% IoU, significantly outperforming baselines; of note, some baselines are already enhanced with post-hoc metric scaling and, if applicable, TTVA. This demonstrates OccAny’s ability to effectively complete geometry from limited-view sequence without in-domain training, thanks to Segmentation Forcing
 
-(a) Segmentation Forcing
+![Figure 5](assets/figures/page_007_img_001.png)
 
-(b) Novel-View Rendering
+_Figure 5: Qualitative ablation shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 4. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions._
 
-Figure 5. Qualitative ablation shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 4.
-The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.
+> Table JSON: `assets/tables/table_0003.json`
+> Table 4. Semantic Occupancy Prediction with GSAM2 [48].
 
-Test Method
-Venue
-Prec.
-Rec.
-
-Res. mIoU mIoU sc Res. mIoU mIoU sc
-
-Table 4. Semantic Occupancy Prediction with GSAM2 [48].
+> Table JSON: `assets/tables/table_0004.json`
+> Table 3. Surround-view setting. More results are in Tab. 8.
 
 ting on SemanticKITTI (Tab. 2), OccAny demonstrates remarkable generalization. It achieves 24.03% IoU, outperforming all other zero-shot baselines by significant margins (e.g., +11.00% IoU over CUT3R* w/ TTVA). Notably, it significantly surpasses several in-domain self-supervised methods like SceneRF (+10.19%); OccAny even surpasses self-supervised SOTAs SelfOcc (+2.06%) and OccNeRF (+1.22%), despite never been trained on SemanticKITTI.
 
 OccAnybase: w/o Segmentation Forcing & Novel-view Rendering.
-
-Table 3. Surround-view setting. More results are in Tab. 8.
 
 and Novel-View Rendering. The OccAny base variant, which is equivalent to fine-tuning MUSt3R on our datasets, was trained without the two proposed strategies and obtained only marginal improvements over baselines. Wrong metric reasoning leads to voxels predicted outside of the scene, significantly degrading the performance. The scale-invariant design of VGGT and AnySplat is not wellsuited for the occupancy task, unlike OccAny with metric prediction by design. The Gaussian Splatting of AnySplat, while favorable for synthesizing compelling images, produces lots of geometric artifacts, thereby hallucinating lots of noises and harming geometry prediction. Fig. 4 visualizes the occupancy results. Monocular. In the more challenging Monocular set-
 
@@ -190,27 +125,15 @@ Surround-view. In the Surround-view setting on Occ3D- NuScenes Tab. 3, OccAny ma
 
 Semantic Occupancy. We further evaluate 3D semantic occupancy (Tab. 4) by applying Grounded SAM2 pipeline directly on OccAny’s segmentation features. OccAny achieves the highest mIoU and mIoU sc across both datasets, compared to baselines using a separated SAM2 model to produce segmentation features. The comparison with the variant “OccAny w/o forcing + SAM2” confirms that our Segmentation Forcing strategy leads to a unified and simpler solution to
 
-Res. Pre. Rec. IoU mIoU mIoU sc Res. Pre. Rec. IoU mIoU mIoU sc
+> Table JSON: `assets/tables/table_0005.json`
+> Table 6. Ablation results on SemanticKitti. The “geo-aware” stands for applying geometry confidence maps C in the segmenta- tion forcing loss (cf. Eq. (3)).
 
-Table 5. Changing the base foundation models used in OccAny
-to DA3 [36] and SAM3 [8] results in the OccAny+ variant.
+> Table JSON: `assets/tables/table_0006.json`
+> Table 5. Changing the base foundation models used in OccAny to DA3 [36] and SAM3 [8] results in the OccAny+ variant.
 
-SemKITTI seq.
-SemKITTI single
+![Figure 6](assets/figures/page_008_vec_001.png)
 
-NVR
-
-geo-aware
-
-Table 6. Ablation results on SemanticKitti. The “geo-aware”
-stands for applying geometry confidence maps C in the segmenta-
-tion forcing loss (cf. Eq. (3)).
-
-25.91
-
-+lateral move
-
-Figure 6. Ablating NVR inference on SemanticKITTI
+_Figure 6: Ablating NVR inference on SemanticKITTI_
 
 better predict geometry and segmentation. Impact of base foundation models. We change the foundation models used in OccAny to DA3 [36] and SAM3 [8], resulting in the OccAny+ variant, detailed in Sec. A.3. Tab. 5 and Sec. B show that OccAny benefits from advances in generic foundation models, while being independently and orthogonally effective for occupancy prediction.
 
@@ -218,16 +141,13 @@ better predict geometry and segmentation. Impact of base foundation models. We c
 
 Method ablation. Tab. 6 analyzes the contribution of each proposed component. Removing Test-Time View Augmentation (TTVA) causes the most significant drop (−6.27% in sequence- and −12.47% in monocular setting), highlighting its critical role in geometry completion. The renderingspecific losses L Enc, geometry-aware L forcing, and the task tokens also consistently contribute to the final performance, proving their effectiveness. Fig. 5 shows gains brought by Segmentation Forcing and Novel-view Rendering (TTVA). NVR inference. We ablate NVR inference in Fig. 6. Starting from the baseline without TTVA, adding simple forward movement helps complete distant geometry (+1.83%). Introducing rotations and lateral shifts further helps complete the geometry by resolving occlusions from diverse views, improving IoU by +4.15% and resulting in the final 25.91%. Promptable segmentation feature. We visualize the seg-
 
-Figure 7. PCA visualization of our segmentation features of
-multi-view sequences. Low-resolution features capture high-level
-semantics (e.g., separating cars, buildings, and roads), while high-
-resolution features capture low-level details such as boundaries and
-textures. Features remain consistent across different views.
+![Figure 8](assets/figures/page_008_img_001.png)
 
-Input
-Instance Seg.
-Input
-Instance Seg.
+_Figure 8: Instance segmentation of cars with OccAny’s features._
+
+![Figure 7](assets/figures/page_008_img_002.png)
+
+_Figure 7: PCA visualization of our segmentation features of multi-view sequences. Low-resolution features capture high-level semantics (e.g., separating cars, buildings, and roads), while high- resolution features capture low-level details such as boundaries and textures. Features remain consistent across different views._
 
 Figure 8. Instance segmentation of cars with OccAny’s features.
 
@@ -238,8 +158,6 @@ mentation features of OccAny using PCA, as shown in Fig. 7. Low-resolution featu
 We propose for the first time a generalized 3D occupancy network, called OccAny, that is trained once and perform zeroshot inference on arbitrary out-of-domain sequential, monocular and surround-view unposed data. With the proposed Segmentation Forcing and Novel-View Rendering strategies, OccAny outperforms generic visual-geometry foundation models on occupancy prediction. OccAny surpasses several in-domain self-supervised models, while remaining behind more recent ones. Our work introduces a novel framework for occupancy prediction prioritizing scalability and generalization, paving the way toward the next generation of versatile and generalized occupancy networks. The gap to fully-supervised in-domain performance remains substantial, leaving room for future improvements in this direction.
 
 Acknowledgment. This work was granted access to the HPC resources of IDRIS under the allocations AD011014102R2, AD011013540R1 made by GENCI. We acknowledge EuroHPC Joint Undertaking for awarding the project ID EHPC-REG-2025R01-032 access to Karolina, Czech Republic.
-
-## References
 
 [1] Jens Behley, Martin Garbade, Andres Milioto, Jan Quenzel, Sven Behnke, Cyrill Stachniss, and Juergen Gall. Semantickitti: A dataset for semantic scene understanding of lidar sequences. In ICCV, 2019. 2, 5, 13
 
@@ -423,16 +341,10 @@ Acknowledgment. This work was granted access to the HPC resources of IDRIS under
 
 [89] Lojze Zust, Yohann Cabon, Juliette Marrie, Leonid Antsfeld, Boris Chidlovskii, Jerome Revaud, and Gabriela Csurka. Panst3r: Multi-view consistent panoptic segmentation. In ICCV, 2025. 2
 
-Res. mIoU mIoU sc Res. mIoU mIoU sc
-
-Table 7. Using pretrained segmentation features to boost seman-
-tic performance. OccAny+ is the variant using DA3 and SAM3
-base models. Parameter counts reflect the forward path from the
-input to the predicted pointmaps and segmentation features. Note
-that using "pretrained" semantic features incurs a higher parameter
-cost due to the use of pretrained encoder.
-
 ## Additional Details
+
+> Table JSON: `assets/tables/table_0007.json`
+> Table 7. Using pretrained segmentation features to boost seman- tic performance. OccAny+ is the variant using DA3 and SAM3 base models. Parameter counts reflect the forward path from the input to the predicted pointmaps and segmentation features. Note that using "pretrained" semantic features incurs a higher parameter cost due to the use of pretrained encoder.
 
 ### Datasets
 
@@ -444,33 +356,10 @@ The 3D Reconstruction stage (cf. Sec. 3.1) is trained in two consecutive steps: 
 
 • Mixed training. This step continues Sequence-only training while mixing surround-view data with sequential data (from the previous step) at a 1 : 1 ratio. For surround-view data, we use frames from different cameras captured at the same timestep. The Novel-View Rendering stage (cf. Sec. 3.2) is trained exclusively on sequential data. Empirically, we observed no gains when incorporating surround-view data in this stage. Each stage is trained for 100 epochs using the AdamW optimizer [39] with a learning rate of 7 × 10−5. We utilize a cosine scheduler with a minimum learning rate of 1×10−6 and a 3-epoch warmup. The training set consists of 50, 000 samples (sequences or sets of surrounding images), with 10, 000 drawn from each dataset. Experiments are conducted on 16 NVIDIA A100 40GB GPUs with an effective batch size of 64. The 3D Reconstruction and Novel-View
 
-GT
-LiDAR
-
-Sem.
-Adapt.
-
-Fixed
-Rig
-
-Fixed
-Ratio
-
-Extr.
-
-GT
-Occ.
-
-Intr.
-
-SimpleOcc Req. Req. Req. Req. Req. Req. – 33.92 7.05 DistillNeRF Req. Req. Req. Req. Req. – – 29.11 8.93 SelfOcc Req. Req. Req. Req. – Req. – 45.01 9.30 POP-3D Req. Req. Req. Req. Req. Req. – 28.17 9.31 OccNeRF Req. Req. Req. Req. – Req. – 39.20 9.53 GaussianOcc – Req. Req. Req. – Req. – 51.22 9.94 VEON Req. Req. Req. Req. Req. Req. Req. 57.92 12.38 GaussTR Req. Req. Req. Req. – Req. – 45.19 12.27
-
-Occ3D-NuScenes (ext. Tab. 3)
+> Table JSON: `assets/tables/table_0008.json`
+> Table 8. Detailed surround-view results. OccAny+ is the variant using DA3 and SAM3 base models.
 
 Req.: required in-domain data/priors. Rescale: metric scaling needed
-
-Table 8. Detailed surround-view results. OccAny+ is the variant
-using DA3 and SAM3 base models.
 
 Rendering stages required approximately 40 and 30 training
 hours, respectively.
@@ -511,30 +400,19 @@ Prec. Rec. IoU Prec. Rec. IoU Prec. Rec. IoU Prec. Rec. IoU
 Table 9. Novel-View Rendering vs. Depth Completion. Occupancy prediction results on SemanticKITTI and Occ3D-NuScenes show the
 effectiveness of Novel-View Rendering.
 
-Table 10. Generalization results of fully-supervised methods. Occ label is denser through temporal accumulation of LiDAR point-clouds
-and subsequent post-processing, whereas the LiDAR label remains sparser at each timestep. OccAny works out of the box in any evaluation
-settings with different inference areas, voxel resolutions and sensor configurations. In contrast, other methods require manual code
-modifications to align testing and training conditions. Beyond being more versatile, OccAny clearly demonstrates superior generalization.
+> Table JSON: `assets/tables/table_0010.json`
+> Table 10. Generalization results of fully-supervised methods. Occ label is denser through temporal accumulation of LiDAR point-clouds and subsequent post-processing, whereas the LiDAR label remains sparser at each timestep. OccAny works out of the box in any evaluation settings with different inference areas, voxel resolutions and sensor configurations. In contrast, other methods require manual code modifications to align testing and training conditions. Beyond being more versatile, OccAny clearly demonstrates superior generalization.
 
 For ALOcc [11], only the model trained on Occ3D-NuScenes is available. Since ALOcc encodes the stereo cost volume’s frustum grid within its parameters, the network is constrained to a fixed input resolution of 704 × 256. Consequently, we evaluate ALOcc on SemanticKITTI at this exact resolution, adhering to the official implementation by using 16 history frames and pairs of consecutive timesteps as stereo input.
 
-The results in Table 10 highlight a significant drop in performance when these models are inferred on the unseen SemanticKITTI dataset. CVT-Occ and ALOcc achieve IoUs of only 9.43% and 14.28%, respectively, whereas our proposed method demonstrates superior robustness with an IoU of 24.03%.
+> Table JSON: `assets/tables/table_0011.json`
+> Table 12. NVR inference complexity, measured on one A100 GPU.
 
 ### Ego Vehicle Trajectory Prediction
 
 We assess the quality of ego-trajectory prediction using OccAny on the nuScenes validation set, following the evaluation protocol of [16, 20]. OccAny+ outperforms the base DA3-LARGE model in terms of Average Displacement Error (ADE), demonstrating clear advantages in urban scenes. Furthermore, it approaches the accuracy of optimization-based RGB-D SLAM methods while remaining fully feed-forward and significantly simpler.
 
-Prec.
-Rec.
-Prec.
-Rec.
-
-Table 11. Ego Vehicle Trajectory Prediction.
-
 \#Aug. Frames
-
-Table 12. NVR inference complexity, measured on one A100
-GPU.
 
 Table 13. Model size and speed. Train times are from the original
 papers. Inference times are measured in the surround setting with 6
@@ -550,19 +428,22 @@ We are report the model sizes and speeds of OccAny and baselines in Tab. 13. Occ
 
 We show additional qualitative results in Fig. 9, Fig. 10, Fig. 11, Fig. 12, and Fig. 13.
 
-Figure 9. Occupancy predictions of OccAny and baselines on sequential data. We visualize here predicted voxels. For qualitative analysis,
-we overlay the semantic ground-truth colors on predicted voxels to better highlight class-wise gains. False positive voxels are painted in gray
-without any overlayed color. Compared to baselines, our occupancy predictions are denser and more accurate.
+![Figure 9](assets/figures/page_017_img_001.png)
 
-Figure 10. Occupancy predictions of OccAny and baselines on surround-view data. Voxel colorization follows Fig. 9. Compared to
-baselines, our occupancy predictions are denser and more accurate.
+_Figure 9: Occupancy predictions of OccAny and baselines on sequential data. We visualize here predicted voxels. For qualitative analysis, we overlay the semantic ground-truth colors on predicted voxels to better highlight class-wise gains. False positive voxels are painted in gray without any overlayed color. Compared to baselines, our occupancy predictions are denser and more accurate._
 
-Figure 11. Qualitative ablation on Semantic KITTI shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel
-colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.
+![Figure 10](assets/figures/page_018_img_001.png)
 
-Figure 12. Qualitative ablation on Occ3D-NuScenes shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel
-colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.
+_Figure 10: Occupancy predictions of OccAny and baselines on surround-view data. Voxel colorization follows Fig. 9. Compared to baselines, our occupancy predictions are denser and more accurate._
 
-Figure 13. PCA visualization of predicted feature maps. Low-resolution features capture high-level semantics (e.g., separating cars,
-buildings, and roads), while high-resolution features capture low-level details such as boundaries and textures. Features remain consistent
-across different views.
+![Figure 11](assets/figures/page_019_img_001.png)
+
+_Figure 11: Qualitative ablation on Semantic KITTI shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions._
+
+![Figure 12](assets/figures/page_020_img_001.png)
+
+_Figure 12: Qualitative ablation on Occ3D-NuScenes shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions._
+
+![Figure 13](assets/figures/page_021_img_001.png)
+
+_Figure 13: PCA visualization of predicted feature maps. Low-resolution features capture high-level semantics (e.g., separating cars, buildings, and roads), while high-resolution features capture low-level details such as boundaries and textures. Features remain consistent across different views._

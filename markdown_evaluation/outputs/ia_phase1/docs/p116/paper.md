@@ -2,10 +2,10 @@
 title: "MedObvious: Exposing the Medical Moravec’s Paradox in VLMs via Clinical Triage"
 paper_id: 116
 source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/3a4547b47fc90fc4.pdf"
-generated_at: "2026-04-02T01:28:11.788487+00:00"
-num_figures: 0
-num_tables: 0
-num_equations: 0
+generated_at: "2026-04-03T22:14:50.603547+00:00"
+num_figures: 2
+num_tables: 3
+num_equations: 16
 ---
 
 Ufaq Khan⋆1, Umair Nawaz 1, Lekkala Sai Teja 2, Numaan Saeed 1, Muhammad Bilal 3, Yutong Xie 1, Mohammad Yaqub 1, and Muhammad Haris Khan 1
@@ -20,40 +20,9 @@ Keywords: Medical Vision-Language Models · Pre-diagnostic Sanity Checking · Cl
 
 Vision-Language Models (VLMs) are increasingly being used to interpret medical images. Recent systems can generate radiology-style descriptions, answer clinical
 
-(a) Visual Referring
+![Figure 1](assets/figures/page_002_vec_001.png)
 
-(b) Detection MCQ
-
-(c) Detection MCQ
-
-Question Is this highlighted scan the clinical outlier; i.e., does it differ in modality, anatomy, or pathology from the others? Answer yes/no
-
-You are reviewing a 2 × 2 grid of medical scans. One scan is the clinical outlier as it differs in modality, anatomy, or pathology. Which position contains the outlier? A) top-left B) top-right C) bottom-left D) bottom-right E) None
-
-In this 2 × 2 medical image grid, one scan contains a clinical anomaly (chest CT). Which position is it? A) top-left B) top-right C) bottom-left D) bottom-right E) None
-
-Yes
-A (Top-left)
-A (Top-left)
-
-LLaVA-1.5
-No (✗)
-B (✗)
-B (✗)
-
-Qwen3-VL
-Yes (✓)
-D (✗)
-D (✗)
-
-Lingshu
-Yes (✓)
-B (✗)
-A (✓)
-
-Fig. 1: Qualitative MedObvious examples for pre-diagnostic visual
-triage. Each column corresponds to a grid in (a)–(c). We report the task ques-
-tion, ground truth, and predictions from representative VLMs.
+_Figure 1: Qualitative MedObvious examples for pre-diagnostic visual triage. Each column corresponds to a grid in (a)–(c). We report the task ques- tion, ground truth, and predictions from representative VLMs._
 
 questions, and perform multi-step reasoning over images and text, driven by both general-purpose models such as GPT-4o [1], Flamingo [4] and LLaVA [21] and medical adaptations such as LLaVA-Med [16], RadFM [28], and others [23,13,22]. In parallel, these models are being explored as the core perception for visual AI agents [17,10] that can also interact with imaging software (e.g., navigating viewers, selecting series, adjusting visualization, and triggering downstream tools). This progress has motivated their potential use as assistants for clinical reporting and decision support. However, fluent language generation does not guarantee reliable visual perception. VLMs may produce coherent diagnostic narratives while failing basic sanity checks, such as detecting incorrect orientation, mismatched anatomy, unexpected modality, or physically implausible artifacts. We refer to this mismatch as the Medical Moravec’s Paradox, extending Moravec’s observation [2] that perception and spatial reasoning, trivial for humans, can be disproportionately difficult for machines even when higher-level outputs appear plausible. In medical imaging, this gap is consequential because failures occur before diagnosis: when the input is invalid or inconsistent, downstream reports become clinically uninterpretable. Clinical interpretation begins with pre-diagnostic triage: clinicians first verify body part, view, modality, laterality, orientation, and basic image integrity, and they do not proceed to diagnosis if these checks fail. This requirement is amplified in multi-image and AI-agentic settings, where decisions depend on
 
@@ -61,10 +30,9 @@ consistency across a set of inputs, such as multiple fetal ultrasound views or l
 
 – We formalize the Medical Moravec’s Paradox for medical VLMs, highlighting a gap between fluent diagnostic language and reliable pre-diagnostic visual sanity-checking, especially in multi-image and agentic-viewer settings.
 
-Fig. 2: MedObvious overview. (A) Five progressive tiers (T1–T5). (B) Con-
-struction: multi-view studies are abstracted into small grids with either a single
-outlier or a negative-control (no outlier). (C) Five evaluation protocols: Detec-
-tion (MCQ/Open), Referring (MCQ/Open), and Visual Referring (Yes/No).
+![Figure 2](assets/figures/page_004_img_001.png)
+
+_Figure 2: MedObvious overview. (A) Five progressive tiers (T1–T5). (B) Con- struction: multi-view studies are abstracted into small grids with either a single outlier or a negative-control (no outlier). (C) Five evaluation protocols: Detec- tion (MCQ/Open), Referring (MCQ/Open), and Visual Referring (Yes/No)._
 
 – We present first MedObvious, a 1,880 task benchmark spanning 5 progressive tiers, multiple grid configurations, five evaluation modes, and systematic negative controls, designed to evaluate pre-diagnostic visual triage independently of diagnosis.
 
@@ -76,16 +44,11 @@ MedObvious is a benchmark designed to test whether medical VLMs can recognize ob
 
 as reviewing the progression of Multiple Sclerosis from two or more brain MRI scans, an incorrectly positioned slice could lead to a completely different clinical decision. A flipped series, corrupted slice, or modality/anatomy mismatch is a coherence break that should be detected prior to diagnosis. This set-level checking is also reflected in common imaging software (e.g., 3D Slicer and ITK-SNAP), which presents multi-planar views in multi-panel layouts resembling 2 × 2 grid. Our grid-based tasks are therefore a controlled abstraction of this real requirement by detecting whether any element in a small visual set violates expected consistency before proceeding to downstream reasoning or agentic actions.
 
-Table 1: MedObvious composition. Tiers increase in clinical specificity.
+> Table JSON: `assets/tables/table_0001.json`
+> Table 1: MedObvious composition. Tiers increase in clinical specificity.
 
-Tier Name Grid \#Mod. Tasks Pos. Neg. Clinical analog
-
-T1 Foundation 2 × 2 2 440 275 165 Basic QC (orientation, modality) T2 Diversity 2 × 2 2 480 300 180 Robustness across sources T3 Scaling 3 × 3 4 360 225 135 Multi-view/-slice comparison T4 Semantics 2 × 2 3 320 200 120 Anatomy/viewpoint verification T5 Triage Mixed 4 280 175 105 “Stop and verify” safety cues
-
-Table 2: MedObvious: Per-task accuracy (%). Task A–E correspond to
-Detection MCQ, Detection Open, Referring MCQ, Referring Open, and Visual
-Referring, respectively. “Positive (Pos)”/“Negative (Neg)” indicate accuracy on
-anomalous/non-anomalous samples. Best results per task are bolded.
+> Table JSON: `assets/tables/table_0002.json`
+> Table 2: MedObvious: Per-task accuracy (%). Task A–E correspond to Detection MCQ, Detection Open, Referring MCQ, Referring Open, and Visual Referring, respectively. “Positive (Pos)”/“Negative (Neg)” indicate accuracy on anomalous/non-anomalous samples. Best results per task are bolded.
 
 Evaluation Protocols. Each grid is evaluated in 5 formats to separate visual capability from response-format effects: Detection MCQ (pick the outlier), Detection Open (state the outlier position), Referring MCQ (choose an outlier description given its position), Referring Open (describe the outlier given its position), and Visual Referring (Yes/No for highlighted region). Using both multiplechoice and open-ended settings exposes selection biases and over-generation. Negative controls. To measure false alarms, MedObvious includes explicit negative controls where all panels are consistent and no outlier exists (37.5% of tasks; 705/1,880). The correct label is y = ∅ (or “No” for binary verification).
 
@@ -93,9 +56,8 @@ Evaluation Protocols. Each grid is evaluated in 5 formats to separate visual cap
 
 MedObvious targets a pre-diagnostic requirement, i.e., before interpretation, the model must verify that the input is coherent and safe to reason over. We therefore evaluate VLMs as potential pre-diagnostic gatekeepers using the following clinically grounded research questions: RQ1 (Gatekeeping and false alarms). Can models detect gross input violations (wrong modality or anatomy) and decide whether to proceed or abstain? Also, can models correctly determine that no anomaly is present when given normal, internally consistent inputs? RQ2 (Set-level consistency). How does performance change as the candidate set grows, requiring systematic comparison across images?
 
-Table 3: Per-tiers overall accuracy (%) for different VLMs.
-
-RQ3 (Clinical semantics). Do models reliably detect clinically meaningful mismatches (e.g., anatomy/viewpoint) rather than relying on superficial cues, and do they confuse such mismatches with pathology? RQ4 (Grounding). Under physically implausible or cross-modality inconsistencies, do models reject the input or rationalize it with plausible narratives? RQ5 (Interface robustness). Are sanity-check decisions consistent across binary, localization, and free-text interfaces, or strongly format-dependent? Evaluation Pipeline. All models are evaluated on the full MedObvious benchmark in a zero-shot setting, without fine-tuning, retrieval augmentation, or few-shot exemplars. We evaluate three model groups:
+> Table JSON: `assets/tables/table_0003.json`
+> Table 3: Per-tiers overall accuracy (%) for different VLMs.
 
 Each instance is evaluated in five formats, each with format-specific prompts. Outputs are constrained and parsed into a closed label space (option letter, grid position, or Yes/No) to ensure consistent scoring across models. Moreover, opensource models are evaluated with a unified inference pipeline on NVIDIA A100 (40 GB) GPU. Proprietary models are queried via public APIs using the same prompts and output normalization. Evaluation Metrics. We report accuracy for each format, as well as Positive accuracy (outlier present), Negative accuracy (no outlier), and Overall accuracy. Reporting Positive and Negative separately is clinically important as a model can appear strong on anomaly-present cases, yet remain unsafe due to false alarms on normal inputs. Results. We summarize results by research question. Table 2 reports performance on the 5 evaluation modes, and Table 3 reports performance on 5 tiers. RQ1 (Gatekeeping and false alarms). Table 2 shows that overall accuracy is still far from a reliable pre-diagnostic gate, with large variance between models. The most safety-relevant signal is the Pos(+) and Neg(−) split. Several models achieve high Pos(+) accuracy while collapsing on Neg(−), indicating a “always-find-something” bias that would be unacceptable for a gatekeeper. In contrast, a smaller subset achieves substantially higher Neg(−), demonstrating that abstention is learnable, but not consistently present across model families.
 

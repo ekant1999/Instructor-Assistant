@@ -2,10 +2,10 @@
 title: "MemDLM: Memory-Enhanced DLM Training"
 paper_id: 112
 source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/987e7ff453578105.pdf"
-generated_at: "2026-04-02T01:27:52.150617+00:00"
-num_figures: 0
-num_tables: 0
-num_equations: 0
+generated_at: "2026-04-03T22:12:25.982745+00:00"
+num_figures: 11
+num_tables: 3
+num_equations: 18
 ---
 
 Zehua Pei 1, Hui-Ling Zhen 2, Weizhe Lin 2, Sinno Jialin Pan 1, Yunhe Wang 2, Mingxuan Yuan 2, Bei Yu 1
@@ -16,50 +16,9 @@ Zehua Pei 1, Hui-Ling Zhen 2, Weizhe Lin 2, Sinno Jialin Pan 1, Yunhe Wang 2, Mi
 
 Diffusion Language Models (DLMs) offer attractive advantages over Auto- Regressive (AR) models, such as full-attention parallel decoding and flexible generation. However, they suffer from a notable train-inference mismatch: DLMs are trained with a static, single-step masked prediction objective, but deployed through a multi-step progressive denoising trajectory. We propose MemDLM (Memory-Enhanced DLM), which narrows this gap by embedding a simulated denoising process into training via Bi-level Optimization. An inner loop updates a set of fast weights, forming a Parametric Memory that captures the local trajectory experience of each sample, while an outer loop updates the base model conditioned on this memory. By offloading memorization pressure from token representations to parameters, MemDLM yields faster convergence and lower training loss. Moreover, the inner loop can be re-enabled at inference time as an adaptation step, yielding additional gains on long-context understanding. We find that, when activated at inference time, this Parametric Memory acts as an emergent in-weight retrieval mechanism, helping MemDLM further reduce token-level attention bottlenecks on challenging Needle-in-a-Haystack retrieval tasks. Code: https://github.com/JarvisPei/MemDLM.
 
-Standard MDLM
-MemDLM
+![Figure 1](assets/figures/page_001_vec_001.png)
 
-Avg. Absolute Improvement
-
-LLaDA-MoE
-LLaDA2.1
-
-### LLaDA-MoE
-
-Improvement
-
-2K
-
-Score
-
-10.69
-
-10.40
-
-8.67
-
-### LLaDA2.1
-
-6.70
-
-5.33
-
-1.62
-
-2K
-
-MV
-VT
-CWE
-BABI
-
-Context length
-
-Figure 1: Needle-in-a-Haystack results overview. Gray bars denote Standard MDLM and blue
-bars denote MemDLM. Left: detailed results on RULER-MV, RULER-VT, RULER-CWE, and
-BABILong for the LLaDA-MoE-7B-A1B-Base and LLaDA2.1-mini backbones. Right: mean
-absolute improvement of MemDLM over Standard MDLM for each task, averaged across the
-evaluated context lengths within each backbone.
+_Figure 1: Needle-in-a-Haystack results overview. Gray bars denote Standard MDLM and blue bars denote MemDLM. Left: detailed results on RULER-MV, RULER-VT, RULER-CWE, and BABILong for the LLaDA-MoE-7B-A1B-Base and LLaDA2.1-mini backbones. Right: mean absolute improvement of MemDLM over Standard MDLM for each task, averaged across the evaluated context lengths within each backbone._
 
 ## Introduction
 
@@ -89,54 +48,21 @@ Before formalizing our method, we first review the standard training and inferen
 
 Consider a sequence of clean text comprising L tokens, denoted as x 0 = (x 1 0, . . . , x L 0), where each token belongs to a discrete vocabulary V. Discrete diffusion models operate by defining a forward corruption process that gradually introduces noise over a continuous time variable t ∈ [0, 1]. At t = 0, the sequence is completely clean (x 0), and at t = 1, the sequence reaches a state of pure noise (x 1). The model is then trained to approximate the reverse generative process, learning to map a noisy state x t back to the original text x 0.
 
-x 8TJpnVe+ien53Xqld53EU4QiO4RQ8uIQa3EIdGsBgAM/wCm+OdF6cd+dj3lpw8plD+APn8wcOno2p</latexit> 1
+$$
+ω 1 →L(1)
+\tag{1}
+$$
+> Equation 1 JSON: `assets/equations/equation_0003.json`
+> Equation 1 image: `assets/equations/equation_0003.png`
 
-……
+![Figure 2](assets/figures/page_003_vec_001.png)
 
-x SvOWTV0nou5d1hv3jVrzpqijE7QKTpHrpCTXSHWqiNKFLoGb2iNwecF+fd+ViMlpwic4z+wPn8ASIdkdI=</latexit> t pre
-
-q XSD6qiBKJLoGb2iN0tbL9a79TFvzVnZzCH6A+vzB/S9kG4=</latexit> (x t|x 0)
-
-q EVDAhOIsvL5PmWcU5r1Rvq6XaVRZHh2hY1RGDrpANXSD6qiBKJLoGb2iN0tbL9a79TFvzVnZzCH6A+vzB/S9kG4=</latexit> (x t|x 0)
-
-p ω,ε 0(x t|x t pre)
-
-Mask
-
-x PrwDK/w5kjnxXl3PmatOWce4SH8gfP5A5ndjms=</latexit> t
-
-x TQiXu2I6IpJQ0OnkdAhfl+L/Sato2hWzfFUu1M/vF3Fk0RE6RqfIRlVUR5eogZqIoiF6QE/o2RDGo/FivC5GM8YywkP0A8bJyegjs0=</latexit> t
-
-x DCFXc7IrpmChCweSTMyF8XYr/J+2SXazalZtKoXm5iOLTtApOkdFVENdI1ayEUcfSAntCzJa1H68V6XZmrFXPMfoB6+0TxsaPWg=</latexit> t
-
-v3Im5H0bAfDp/qBcJDAGeRoK7XDIKYqwJoZLrv2I6IJQ0MGldAhfl+L/ScM2c0WzcFnIVCuLOJLoAB2hLMqhEqiC1RDdUTRHXpAT+jZuDcejRfjdT6aMBY7+gHjLdPwTeYFw=</latexit>p ω,ε 2(x 0|x t)
-
-J2gKrLRJWqgW9RELURip7RK3oznowX4934WLQWjHymjP7A+PwBjL2UCQ=</latexit>p ω(x 0|x t)
-
-dmPthBMyn84d6kcAQ4GkguMsloyDGmhAquf4rpgMiCQUdW0qH8HUp/p80cqZdNAuXhUy1sogjiQ7REcoiG5VQFV2gGqojiu7QA3pCz8a98Wi8GK/z0YSx2NlHP2C8fQIC/ZfC</latexit>p ω,ε 1(x 0|x t)
-
-x OjDM7zCmyOdF+fd+Zi15px5hIfwB87nDzLNjic=</latexit> 0
-
-x fXiaNs7J3Xq7cVkrVq6dZHk4gmM4BQ8uoAo3UIM6MOjDM7zCmyOdF+fd+Zi15px5hIfwB87nDzLNjic=</latexit> 0
-
-x fXiaNs7J3Xq7cVkrVq6dZHk4gmM4BQ8uoAo3UIM6MOjDM7zCmyOdF+fd+Zi15px5hIfwB87nDzLNjic=</latexit> 0
-
-Outer Loop
-
-Inner Loop
-
-Static Single-Step Training
-
-Bi-level Optimization with Parametric Memory
-
-Figure 2: Overview of MemDLM. Left: standard MDLM training uses a static single-step denoising
-objective from x t to x 0. Right: MemDLM uses Bi-level Optimization in which an inner loop updates
-fast weights ϕ along an anchor-consistent local trajectory (x t pre → x t → x 0), and the outer loop
-updates the base model θ on the anchor state x t conditioned on this parametric memory. Legend:
-dark tokens denote mask tokens, light tokens denote observed tokens, straight arrows denote forward
-or reverse prediction flow, and blue curved arrows denote inner-loop fast-weight updates.
+_Figure 2: Overview of MemDLM. Left: standard MDLM training uses a static single-step denoising objective from xt to x0. Right: MemDLM uses Bi-level Optimization in which an inner loop updates fast weights ϕ along an anchor-consistent local trajectory (xtpre →xt →x0), and the outer loop updates the base model θ on the anchor state xt conditioned on this parametric memory. Legend: dark tokens denote mask tokens, light tokens denote observed tokens, straight arrows den_
 
 Absorbing-State Masking. In the specific framework of MDLMs, the forward corruption q(x t|x 0) is instantiated as an absorbing-state process. Rather than transitioning tokens to random vocabulary items, tokens are replaced by a dedicated absorbing token, m / ∈V (often denoted as [MASK]). Under a linear noise schedule, the probability that the i-th token is masked at time t is simply t:
+
+> Equation 1 JSON: `assets/equations/equation_0005.json`
+> Equation 1 image: `assets/equations/equation_0005.png`
 
 q(x i
 t|x i
@@ -149,6 +75,12 @@ t = m),
 where I(·) denotes the indicator function.
 
 Standard MDLM training minimizes the expected negative log-likelihood of these masked tokens over uniformly sampled timesteps, yielding the following objective:
+
+$$
+L MDLM(\\theta) = E t∼U(0,1),x 0
+$$
+> Equation 7 JSON: `assets/equations/equation_0007.json`
+> Equation 7 image: `assets/equations/equation_0007.png`
 
 L MDLM(θ) = E t∼U(0,1),x 0
 
@@ -166,17 +98,25 @@ To empirically quantify this discrepancy, we evaluate models on a validation set
 
 Static Condition: The model predicts masked tokens from a pristine context where the ground-truth response is artificially masked according to the true forward process. This represents the idealized state optimized during training:
 
+$$
+L static = E x 0,x t∼q(·|x 0) [− log p \\theta(x 0|x t)] .
+\tag{3}
+$$
+> Equation 3 JSON: `assets/equations/equation_0008.json`
+> Equation 3 image: `assets/equations/equation_0008.png`
+
 L static = E x 0,x t∼q(·|x 0) [− log p θ(x 0|x t)] . (3)
 
 Sequential Condition: Starting from a 100% masked response, the model iteratively predicts and unmasks tokens using its own predictions until reaching timestep t. This represents the actual conditions encountered during generation, where the noisy state ˆ x t is sampled from the model’s own iterative trajectory rather than the true forward process:
+
+> Equation 9 JSON: `assets/equations/equation_0009.json`
+> Equation 9 image: `assets/equations/equation_0009.png`
 
 L seq = E x 0,ˆ x t∼p θ [− log p θ(x 0|ˆ x t)] . (4)
 
 We define the Exposure Bias Ratio as R EB = L seq/L static. Because sequential generation inevitably introduces compounding errors (ˆ x t diverges from x t), this ratio is expected to be strictly greater than 1.0. A higher R EB indicates a more severe exposure bias, meaning the model struggles to denoise its own intermediate representations.
 
 As illustrated in Figure 3, a Standard MDLM exhibits a steep, rapidly climbing exposure-bias curve. By the end of the generation process, the sequential loss is substantially higher than the static loss, confirming that standard training leaves the model highly vulnerable to its own sequential noise.
-
-Exposure Bias Ratio
 
 Figure 3 also clarifies an important aspect of our
 empirical analysis. Even when evaluated zero-shot
@@ -192,12 +132,9 @@ Train & Inference), the curve is smoothed further,
 indicating an additional prompt-specific adaptation
 effect on top of the training-time gains.
 
-Denoising Steps
+![Figure 3](assets/figures/page_004_vec_001.png)
 
-Figure 3: Exposure Bias Ratio (R EB) across
-denoising steps. Standard MDLM degrades
-rapidly, while MemDLM remains substan-
-tially flatter.
+_Figure 3: Exposure Bias Ratio (REB) across denoising steps. Standard MDLM degrades rapidly, while MemDLM remains substan- tially flatter._
 
 These observations motivate our method along two key lines. First, mitigating train-inference mismatch requires reducing the model’s reliance on fragile token-space context during training. Second, if local trajectory information is internalized in parameter space, the learned model may acquire more stable long-context representations even without inference-time adaptation. This bridge between denoising robustness and long-context performance is the central motivation behind MemDLM.
 
@@ -208,6 +145,17 @@ Motivated by the empirical observations of exposure bias in Section 2, we aim to
 ### Bi-level Optimization for Denoising Simulation
 
 To align the training objective with the iterative nature of inference, we partition the model parameters into the base weights θ and a set of parameter-efficient fast weights ϕ (e.g., low-rank adapters). We formulate the training process as a Bi-level Optimization problem:
+
+$$
+\begin{aligned}
+ϕ k = ϕ k−1 − η∇ϕ L(k) \\
+inner(\\theta, ϕ k−1) \\
+for k = 1, . . . , K.
+\end{aligned}
+\tag{6}
+$$
+> Equation 6 JSON: `assets/equations/equation_0010.json`
+> Equation 6 image: `assets/equations/equation_0010.png`
 
 subject to ϕ k = ϕ k−1 − η∇ϕ L(k) inner(θ, ϕ k−1) for k = 1, . . . , K. (6)
 
@@ -221,11 +169,45 @@ We formulate the inner loop as a two-stage gradient update (K = 2), initializing
 
 Formally, the fast weights accumulate the trajectory dynamics through the following sequence of updates:
 
+$$
+L(1)
+\tag{1}
+$$
+> Equation 1 JSON: `assets/equations/equation_0011.json`
+> Equation 1 image: `assets/equations/equation_0011.png`
+
+$$
+ϕ 1 = ϕ 0 − η∇ϕ L(1)
+\tag{1}
+$$
+> Equation 1 JSON: `assets/equations/equation_0012.json`
+> Equation 1 image: `assets/equations/equation_0012.png`
+
+$$
+L(2)
+\tag{2}
+$$
+> Equation 2 JSON: `assets/equations/equation_0015.json`
+> Equation 2 image: `assets/equations/equation_0015.png`
+
+$$
+ϕ 2 = ϕ 1 − η∇ϕ L(2)
+\tag{2}
+$$
+> Equation 2 JSON: `assets/equations/equation_0014.json`
+> Equation 2 image: `assets/equations/equation_0014.png`
+
 where η is the inner learning rate. Together, these two stages encourage the fast weights to capture how a noisier local state transitions through the anchor state x t toward the clean target x 0. In this way, the inner loop accumulates an anchor-centered local trajectory in the final parametric state ϕ 2.
 
 ### The Outer Loop: Conditioned Denoising
 
 After the inner loop accumulates the adapted parameters ϕ 2 for a given batch, the outer objective is computed on the exact same anchor timestep t and masked state x t. The full outer objective mirrors standard MDLM training, but conditions the prediction on the Parametric Memory ϕ 2:
+
+$$
+L MemDLM(\\theta) = E t∼U(0,1),x 0
+$$
+> Equation 17 JSON: `assets/equations/equation_0017.json`
+> Equation 17 image: `assets/equations/equation_0017.png`
 
 L MemDLM(θ) = E t∼U(0,1),x 0
 
@@ -255,22 +237,11 @@ Evaluation Benchmarks. We evaluate long-context capabilities in two stages. Firs
 
 Information retrieval in extended contexts, commonly evaluated as "Needle-in-a-Haystack" (NIAH), poses a significant challenge for DLMs. In standard models, retrieving a specific "needle" relies entirely on token-level attention over thousands of irrelevant "haystack" tokens. As the context length grows, the attention mechanism becomes increasingly diluted. During the sequential generation of
 
-Table 1: Performance on challenging Needle-in-a-Haystack (NIAH) tasks from RULER and BABI-
-Long across increasing context lengths. We report results for two backbones under three settings:
-Standard MDLM, MemDLM (Train-Only), and MemDLM (Train & Inference). RULER columns
-correspond to the Multi-Value (MV), Variable Tracking (VT), and Common Words Extraction (CWE)
-sub-tasks. Bold indicates the best result within each backbone block.
+> Table JSON: `assets/tables/table_0001.json`
+> Table 1: Performance on challenging Needle-in-a-Haystack (NIAH) tasks from RULER and BABI- Long across increasing context lengths. We report results for two backbones under three settings: Standard MDLM, MemDLM (Train-Only), and MemDLM (Train & Inference). RULER columns correspond to the Multi-Value (MV), Variable Tracking (VT), and Common Words Extraction (CWE) sub-tasks. Bold indicates the best result within each backbone block.
 
-Table 2: Length extrapolation on Needle-in-a-Haystack tasks using the LLaDA-MoE backbone,
-evaluated beyond its native 8K context setting. MemDLM continues to outperform Standard MDLM
-at 16K and 32K across RULER and BABILong.
-
-the response, relying purely on this vast, uncompressed token-space context often leads to incorrect
-or hallucinated outputs.
-
-We evaluate models on the RULER benchmark (focusing on the most challenging sub-tasks: Multi- Value, Variable Tracking, Common Words Extraction) and the BABILong long-context benchmark, scaling context lengths from 1K up to 8K tokens.
-
-As shown in Table 1, MemDLM consistently improves over the baseline MDLM across both backbones, with especially clear gains on the more challenging long-context settings. Crucially, even the Train-Only variant yields strong improvements, showing that the main benefit is not solely due to re-running the inner loop at inference time. Instead, simulating denoising with fast weights during training appears to improve the base model’s context representations and reduce the burden of preserving local information purely in token space. Enabling the inner loop at inference time then provides an additional prompt-specific adaptation step. For example, on the LLaDA-MoE backbone, MemDLM improves RULER Variable Tracking at 8K from 78.8% to 95.8%, while on LLaDA2.1 it improves BABILong at 8K from 47.4% to 57.0%.
+> Table JSON: `assets/tables/table_0002.json`
+> Table 2: Length extrapolation on Needle-in-a-Haystack tasks using the LLaDA-MoE backbone, evaluated beyond its native 8K context setting. MemDLM continues to outperform Standard MDLM at 16K and 32K across RULER and BABILong.
 
 These results provide strong evidence for the efficacy of Parametric Memory. The strong Train-Only results suggest that memory-aware training already teaches the base model to form more robust long-context representations. When the inner loop is additionally applied over the prompt at inference time, MemDLM gains a more explicit prompt-conditioned memory pathway. We interpret this extra inference-time effect as an in-weight retrieval mechanism, which further helps the model mitigate the token-level attention bottleneck during generation.
 
@@ -280,22 +251,14 @@ Length extrapolation via Parametric Memory. To further probe the robustness of t
 
 Building on the retrieval results, we evaluate our method on diverse real-world tasks from the LongBench dataset. Here, we compare Standard MDLM against our MemDLM model under two
 
-Table 3: Performance on LongBench datasets. Standard MDLM is the baseline. MemDLM
-(Train-Only) uses Parametric Memory during training but disables it at inference. MemDLM (Train
-& Inference) reactivates the inner loop at inference time.
+> Table JSON: `assets/tables/table_0003.json`
+> Table 3: Performance on LongBench datasets. Standard MDLM is the baseline. MemDLM (Train-Only) uses Parametric Memory during training but disables it at inference. MemDLM (Train & Inference) reactivates the inner loop at inference time.
 
-Figure 4: Training dynamics on the LLaDA-MoE and LLaDA2.1 backbones. We compare Standard
-MDLM and MemDLM using train loss and evaluation loss. For the train-loss panels, faint curves show
-the raw logged values and bold curves show a smoothed trend. Across both backbones, MemDLM
-converges faster and reaches consistently lower train and evaluation loss, supporting the view that
-memory-aware training improves optimization by reducing the burden of preserving local trajectory
-information purely in token space.
+![Figure 4](assets/figures/page_008_vec_001.png)
 
-settings: Train-Only (evaluated zero-shot without the inner loop) and Train & Inference (evaluated with the inner loop active on the prompt).
+_Figure 4: Training dynamics on the LLaDA-MoE and LLaDA2.1 backbones. We compare Standard MDLM and MemDLM using train loss and evaluation loss. For the train-loss panels, faint curves show the raw logged values and bold curves show a smoothed trend. Across both backbones, MemDLM converges faster and reaches consistently lower train and evaluation loss, supporting the view that memory-aware training improves optimization by reducing the burden of preserving local traj_
 
 As shown in Table 3, integrating Parametric Memory during training significantly improves the base model’s ability to handle long-context tasks, even when evaluated zero-shot (Train-Only). This mirrors the NIAH results and suggests that the training-time benefit already transfers to downstream longcontext reasoning. When the inner loop is reactivated during inference, we observe consistent further improvements across almost all tasks, indicating that prompt-specific adaptation is complementary to the gains already obtained during training.
-
-### Understanding MemDLM During Training
 
 Figure 4 examines the optimization behavior of
 MemDLM more directly. Across both backbones,
@@ -310,83 +273,19 @@ Parametric Memory reduces optimization pressure by
 allowing part of the local trajectory information to be
 absorbed in parameter space.
 
-Pretrained vs. Trained
+![Figure 5](assets/figures/page_008_vec_002.png)
 
-0.7
-
-Base
-Standard MDLM
-MemDLM (Train-Only)
-MemDLM
-
-0.6
-
-### Score
-
-0.3
-
-0.2
-
-0.1
-
-Context length
-
-Figure 5: Comparison with the untuned pre-
-trained LLaDA-MoE-7B-A1B-Base model
-across context lengths.
+_Figure 5: Comparison with the untuned pre- trained LLaDA-MoE-7B-A1B-Base model across context lengths._
 
 We further compare against the untuned LLaDA-MoE-7B-A1B-Base model to understand how training changes pretrained long-context behavior. Figure 5 shows that Standard MDLM fine-tuning does not uniformly preserve this capability: it drops below the base model at 1K and 2K, even though it improves at longer contexts. In contrast, MemDLM improves consistently over both the pretrained base and the Standard MDLM-trained model across the full 1K–32K range. This suggests that memory-aware training better preserves and refines the pretrained model’s long-context representations than standard MDLM fine-tuning.
 
-Train Loss During Optimization
+![Figure 6](assets/figures/page_009_vec_001.png)
 
-Train Loss During Adaptation
+_Figure 6: Inner-loop supervision analysis on the LLaDA-MoE, evaluated on BABILong-1K._
 
-MDLM Cross-Entropy Logit Distill. Logit Distill. (RKL) Hidden Cosine Hidden MSE
+![Figure 7](assets/figures/page_009_vec_002.png)
 
-FFN 0.05
-FFN 0.10
-FFN 0.25
-
-FFN 0.50
-FFN+Attn 0.10
-Full Param.
-
-### MDLM
-
-0.616
-
-0.05
-
-CE
-
-0.10
-
-### Logits
-
-### RKL
-
-0.626
-
-0.25
-
-### Cosine
-
-0.574
-
-0.572
-
-MSE
-
-0.648
-
-### Full
-
-Figure 6: Inner-loop supervision analysis on the
-LLaDA-MoE, evaluated on BABILong-1K.
-
-Figure 7:
-Adaptation scope analysis on the
-LLaDA-MoE, evaluated on BABILong-1K.
+_Figure 7: Adaptation scope analysis on the LLaDA-MoE, evaluated on BABILong-1K._
 
 Inner-loop supervision. An important training-stage question is what kind of supervision most effectively encodes useful trajectory information in the fast weights. Beyond the default cross-entropy objective, we explore several alternatives, including logit distillation with Kullback-Leibler (KL) [29] or reverse-KL divergence and hidden-state distillation with cosine or MSE losses. These variants are a form of self-distillation: the teacher and student are not different models, but different views of the same model under different information states. Specifically, both branches use the same underlying model with the current fast-weight state, but the teacher branch is evaluated under no_grad while the student branch carries gradients through the inner loop. In the progressive setting, the teacher is evaluated on the next denoising state and therefore sees strictly more revealed context than the student on the current state. This makes the supervision a form of privileged-information self-distillation rather than a standard same-input teacher-student setup. This formulation is conceptually related to recent self-adaptation methods [30] that distill from a stronger information state of the same model, as well as recent self-distillation and reinforcement-learning formulations [31, 32, 33]. Figure 6 summarizes a controlled comparison on the LLaDA-MoE backbone, evaluated on BABILong-1K. A notable result is that MemDLM remains trainable under several quite different inner-loop supervision choices, including multiple self-distillation objectives. This suggests that the overall memory-writing mechanism is not tightly coupled to a single particular loss design. Among the tested variants, the plain token-level cross-entropy objective still achieves the best final score (0.684), outperforming logit distillation with KL (0.660), logit distillation with reverse-KL (0.624), hidden-state cosine (0.582), and hidden-state MSE (0.572). Cross-entropy therefore provides the most effective supervision, while the self-distillation variants still demonstrate that the method continues to work.
 
@@ -408,97 +307,23 @@ Beyond exploratory analyses, we also perform ablations that test which component
 
 Consistency of the trajectory design. One central hypothesis of MemDLM is that the inner loop should remain consistent with the anchor-centered outer objective. To test this, we compare our default consistent design against an inconsistent progressive-memory variant. Figure 9 shows a clear optimization gap: the consistent trajectory converges to substantially lower training loss, while the inconsistent variant plateaus much earlier. This gap also carries over to downstream
 
-Inference Anchor Ratio
+![Figure 8](assets/figures/page_010_vec_001.png)
 
-0.7
-
-Ratio 0.2
-Ratio 0.3
-Ratio 0.4
-Ratio 0.5
-Ratio 0.8
-
-0.6
-
-Score
-
-0.4
-
-0.3
-
-0.2
-
-1K
-2K
-16K
-
-Context length
-
-Figure 8: Sensitivity to the inference an-
-chor ratio. We vary the target mask ratio
-of the adapted prompt state on the LLaDA-
-MoE backbone and evaluate from 1K to 16K.
-All settings follow a similar trend across con-
-text lengths.
+_Figure 8: Sensitivity to the inference an- chor ratio. We vary the target mask ratio of the adapted prompt state on the LLaDA- MoE backbone and evaluate from 1K to 16K. All settings follow a similar trend across con- text lengths._
 
 One possible reason for this low sensitivity is the bidirectional nature of DLM denoising. When the inner loss is computed, the model can attend to all tokens in the corrupted prompt, so changing whether a token is treated as observed input or as a supervised prediction target does not fully remove its information from the local computation. In this view, varying the anchor ratio mainly changes how the prompt information is partitioned within the denoising objective, rather than whether that information is accessible at all, which may explain why a broad range of ratios behaves similarly in practice.
 
-Consistency of the Trajectory Design
+![Figure 9](assets/figures/page_010_vec_002.png)
 
-Inconsistent
-Consistent
+_Figure 9: Consistency of the trajectory design. Training loss for an inconsistent progressive-memory variant and our consis- tent design._
 
-0.604
+![Figure 10](assets/figures/page_011_vec_001.png)
 
-Inconsist.
+_Figure 10: Role of the two inner-loop stages. Training loss for pre-anchor-only, anchor-to- target-only, and two-stage variants on the LLaDA- MoE, evaluated on BABILong-1K._
 
-Consistent
+![Figure 11](assets/figures/page_011_vec_002.png)
 
-Figure 9: Consistency of the trajectory
-design. Training loss for an inconsistent
-progressive-memory variant and our consis-
-tent design.
-
-Role of the Two Inner-Loop Stages
-
-Multiple Pre-Anchor Steps
-
-2.25
-
-### BABILong-1K
-
-Both
-
-### Both-anchor
-
-1.75
-
-0.644
-
-### A-to-T
-
-0.590
-
-1.50
-
-### Pre-anchor
-
-Pre-broad
-
-1.25
-
-1.00
-
-0.75
-
-Figure 10: Role of the two inner-loop stages.
-Training loss for pre-anchor-only, anchor-to-
-target-only, and two-stage variants on the LLaDA-
-MoE, evaluated on BABILong-1K.
-
-Figure 11: Multiple pre-anchor steps. Training
-loss for 2-step, 3-step, and 4-step variants on the
-LLaDA-MoE, evaluated on BABILong-1K.
+_Figure 11: Multiple pre-anchor steps. Training loss for 2-step, 3-step, and 4-step variants on the LLaDA-MoE, evaluated on BABILong-1K._
 
 retrieval, improving BABILong-1K from 0.604 to 0.684. These results suggest that trajectory consistency is not merely an implementation detail; it is a core ingredient that allows the fast-weight updates to support, rather than conflict with, the anchor-centered outer objective.
 

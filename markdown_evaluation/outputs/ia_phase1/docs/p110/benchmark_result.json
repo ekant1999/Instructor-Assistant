@@ -8,18 +8,18 @@
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p110/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p110/manifest.json",
   "asset_counts": {
-    "figures": 0,
-    "tables": 0,
-    "equations": 0
+    "figures": 12,
+    "tables": 16,
+    "equations": 32
   },
   "metadata": {
     "title": "Scaling DoRA: High-Rank Adaptation via Factored Norms and Fused Kernels",
     "paper_id": "110",
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/c4a536b15a8624a5.pdf",
-    "generated_at": "2026-04-02T01:27:51.640041+00:00",
-    "num_figures": "0",
-    "num_tables": "0",
-    "num_equations": "0",
+    "generated_at": "2026-04-03T22:12:17.704844+00:00",
+    "num_figures": "12",
+    "num_tables": "16",
+    "num_equations": "32",
     "page_count": "29"
   },
   "render_mode": "conservative",
@@ -244,6 +244,6 @@
       "suspicious headings detected (1)"
     ]
   },
-  "elapsed_ms": 611.011,
+  "elapsed_ms": 8706.119,
   "status": "success"
 }

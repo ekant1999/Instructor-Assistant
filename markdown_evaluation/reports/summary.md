@@ -8,13 +8,13 @@
 - Gold-scored documents: `14`
 - Successes: `14`
 - Failures: `0`
-- Mean heading F1: `0.709`
-- Mean anchor assignment accuracy: `0.538`
-- Mean figure recall: `0.699`
-- Mean table recall: `0.571`
-- Mean runtime (ms): `2731.7`
-- Mean duplicate heading count: `0.07`
-- Mean empty section count: `1.64`
+- Mean heading F1: `0.720`
+- Mean anchor assignment accuracy: `0.512`
+- Mean figure recall: `0.714`
+- Mean table recall: `0.566`
+- Mean runtime (ms): `15504.1`
+- Mean duplicate heading count: `0.29`
+- Mean empty section count: `0.86`
 
 ### ocr_agent
 
@@ -38,7 +38,7 @@
 - Layout: `one_column`
 - Tags: `born_digital, non_academic, student_assignment, screenshot_heavy, network_analysis_report`
 - Status: `success`
-- Runtime (ms): `2331.9`
+- Runtime (ms): `2634.2`
 - Heading F1: `0.000`
 - Heading order score: `0.000`
 - Anchor recall: `0.571`
@@ -72,7 +72,7 @@
 - Layout: `one_column`
 - Tags: `born_digital, non_academic, student_assignment, code_heavy, screenshot_heavy, cloud_report`
 - Status: `success`
-- Runtime (ms): `3583.5`
+- Runtime (ms): `4008.5`
 - Heading F1: `0.000`
 - Heading order score: `0.000`
 - Anchor recall: `0.625`
@@ -106,7 +106,7 @@
 - Layout: `one_column`
 - Tags: `born_digital, non_academic, student_assignment, instruction_sheet, short_document`
 - Status: `success`
-- Runtime (ms): `166.9`
+- Runtime (ms): `181.0`
 - Heading F1: `0.571`
 - Heading order score: `0.400`
 - Anchor recall: `0.375`
@@ -140,16 +140,16 @@
 - Layout: `two_column`
 - Tags: `born_digital, academic_paper, table_heavy, appendix_heavy, figure_heavy`
 - Status: `success`
-- Runtime (ms): `611.0`
-- Heading F1: `0.833`
-- Heading order score: `0.833`
-- Anchor recall: `0.692`
-- Anchor assignment accuracy: `0.538`
-- Figure recall: `0.933`
+- Runtime (ms): `8706.1`
+- Heading F1: `0.788`
+- Heading order score: `0.722`
+- Anchor recall: `0.615`
+- Anchor assignment accuracy: `0.423`
+- Figure recall: `1.000`
 - Table recall: `1.000`
 - Duplicate headings: `0`
-- Empty sections: `4`
-- Consecutive heading runs: `4`
+- Empty sections: `3`
+- Consecutive heading runs: `3`
 
 ### p110 / ocr_agent
 
@@ -174,16 +174,16 @@
 - Layout: `two_column`
 - Tags: `born_digital, academic_paper, equation_heavy, figure_heavy`
 - Status: `success`
-- Runtime (ms): `403.6`
-- Heading F1: `0.760`
-- Heading order score: `1.000`
-- Anchor recall: `0.810`
-- Anchor assignment accuracy: `0.810`
+- Runtime (ms): `8130.2`
+- Heading F1: `0.973`
+- Heading order score: `0.947`
+- Anchor recall: `0.762`
+- Anchor assignment accuracy: `0.714`
 - Figure recall: `1.000`
 - Table recall: `1.000`
 - Duplicate headings: `0`
-- Empty sections: `8`
-- Consecutive heading runs: `3`
+- Empty sections: `0`
+- Consecutive heading runs: `0`
 
 ### p112 / ocr_agent
 
@@ -208,14 +208,14 @@
 - Layout: `two_column`
 - Tags: `born_digital, academic_paper, figure_heavy, appendix_heavy`
 - Status: `success`
-- Runtime (ms): `6354.2`
-- Heading F1: `0.936`
-- Heading order score: `0.957`
-- Anchor recall: `0.913`
-- Anchor assignment accuracy: `0.826`
+- Runtime (ms): `41810.9`
+- Heading F1: `0.939`
+- Heading order score: `1.000`
+- Anchor recall: `0.826`
+- Anchor assignment accuracy: `0.783`
 - Figure recall: `1.000`
 - Table recall: `1.000`
-- Duplicate headings: `0`
+- Duplicate headings: `2`
 - Empty sections: `2`
 - Consecutive heading runs: `2`
 
@@ -242,16 +242,16 @@
 - Layout: `two_column`
 - Tags: `born_digital, academic_paper, appendix_heavy, table_heavy, figure_heavy`
 - Status: `success`
-- Runtime (ms): `12461.6`
-- Heading F1: `0.960`
-- Heading order score: `0.923`
+- Runtime (ms): `94762.5`
+- Heading F1: `0.939`
+- Heading order score: `0.885`
 - Anchor recall: `0.704`
 - Anchor assignment accuracy: `0.630`
-- Figure recall: `0.846`
-- Table recall: `1.000`
+- Figure recall: `1.000`
+- Table recall: `0.923`
 - Duplicate headings: `0`
-- Empty sections: `3`
-- Consecutive heading runs: `3`
+- Empty sections: `2`
+- Consecutive heading runs: `2`
 
 ### p115 / ocr_agent
 
@@ -276,7 +276,7 @@
 - Layout: `two_column`
 - Tags: `born_digital, academic_paper, short_paper`
 - Status: `success`
-- Runtime (ms): `776.5`
+- Runtime (ms): `7993.8`
 - Heading F1: `1.000`
 - Heading order score: `1.000`
 - Anchor recall: `0.800`
@@ -310,16 +310,16 @@
 - Layout: `two_column`
 - Tags: `born_digital, academic_paper, equation_heavy, appendix_heavy, table_heavy`
 - Status: `success`
-- Runtime (ms): `442.0`
+- Runtime (ms): `10913.9`
 - Heading F1: `0.871`
-- Heading order score: `0.844`
+- Heading order score: `0.781`
 - Anchor recall: `0.517`
-- Anchor assignment accuracy: `0.448`
+- Anchor assignment accuracy: `0.379`
 - Figure recall: `1.000`
 - Table recall: `1.000`
-- Duplicate headings: `1`
-- Empty sections: `2`
-- Consecutive heading runs: `2`
+- Duplicate headings: `2`
+- Empty sections: `1`
+- Consecutive heading runs: `1`
 
 ### p118 / ocr_agent
 
@@ -344,7 +344,7 @@
 - Layout: `one_column`
 - Tags: `born_digital, academic_paper, equation_heavy, algorithm_heavy`
 - Status: `success`
-- Runtime (ms): `719.2`
+- Runtime (ms): `9401.3`
 - Heading F1: `1.000`
 - Heading order score: `1.000`
 - Anchor recall: `0.944`
@@ -378,11 +378,11 @@
 - Layout: `one_column`
 - Tags: `born_digital, academic_paper, equation_heavy, figure_heavy, appendix_heavy`
 - Status: `success`
-- Runtime (ms): `1774.7`
+- Runtime (ms): `18444.4`
 - Heading F1: `0.980`
 - Heading order score: `0.962`
 - Anchor recall: `0.760`
-- Anchor assignment accuracy: `0.760`
+- Anchor assignment accuracy: `0.720`
 - Figure recall: `1.000`
 - Table recall: `1.000`
 - Duplicate headings: `0`
@@ -412,7 +412,7 @@
 - Layout: `two_column`
 - Tags: `born_digital, academic_paper, short_paper, figure_heavy, table_heavy, robotics_paper`
 - Status: `success`
-- Runtime (ms): `2411.8`
+- Runtime (ms): `2604.1`
 - Heading F1: `0.643`
 - Heading order score: `0.500`
 - Anchor recall: `1.000`
@@ -446,7 +446,7 @@
 - Layout: `one_column`
 - Tags: `born_digital, academic_paper, short_paper, non_experimental_paper, single_column`
 - Status: `success`
-- Runtime (ms): `1252.7`
+- Runtime (ms): `1351.3`
 - Heading F1: `0.889`
 - Heading order score: `0.800`
 - Anchor recall: `1.000`
@@ -480,7 +480,7 @@
 - Layout: `two_column`
 - Tags: `born_digital, academic_paper, equation_heavy, figure_heavy, table_heavy, robotics_paper, reinforcement_learning`
 - Status: `success`
-- Runtime (ms): `4954.3`
+- Runtime (ms): `6114.6`
 - Heading F1: `0.485`
 - Heading order score: `0.320`
 - Anchor recall: `0.810`
