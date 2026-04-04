@@ -1,0 +1,97 @@
+{
+  "paper_id": 261731869403,
+  "generated_at": "2026-04-04T22:55:09.761242+00:00",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/TextHeavy/text_heavy_placeholder_literature_digest.pdf",
+  "markdown_file": "paper.md",
+  "metadata": {
+    "title": "Literature Digest Summary",
+    "paper_id": 261731869403,
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/TextHeavy/text_heavy_placeholder_literature_digest.pdf",
+    "generated_at": "2026-04-04T22:55:09.731751+00:00",
+    "num_figures": 0,
+    "num_tables": 0,
+    "num_equations": 0,
+    "page_count": 7
+  },
+  "config": {
+    "asset_mode": "copy",
+    "asset_path_mode": "relative",
+    "include_frontmatter": true,
+    "include_page_markers": false,
+    "prefer_equation_latex": true,
+    "include_equation_fallback_assets": true,
+    "ensure_assets": true,
+    "overwrite": true,
+    "quality_audit_enabled": true,
+    "conservative_fallback": true,
+    "conservative_equations_as_assets_only": true
+  },
+  "render_mode": "normal",
+  "quality_audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": [],
+    "suspicious_headings": [],
+    "heading_counts": {
+      "section 3 structured discussion": 1
+    },
+    "total_headings": 1
+  },
+  "asset_counts": {
+    "figures": 0,
+    "tables": 0,
+    "equations": 0
+  },
+  "sectioning": {
+    "strategy": "heuristic",
+    "candidate_headings": 1,
+    "matched_headings": 2,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 3,
+        "start_block_index": 0,
+        "end_block_index": 15
+      },
+      {
+        "index": 1,
+        "title": "Section 3: Structured Discussion",
+        "canonical": "discussion",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 3,
+        "end_page": 7,
+        "start_block_index": 16,
+        "end_block_index": 42
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 43
+  },
+  "sections": [
+    {
+      "section_index": 0,
+      "section_canonical": "front_matter",
+      "section_title": "Front Matter",
+      "page_no": 1
+    },
+    {
+      "section_index": 1,
+      "section_canonical": "discussion",
+      "section_title": "Section 3: Structured Discussion",
+      "page_no": 3
+    }
+  ],
+  "assets": {
+    "figures": [],
+    "tables": [],
+    "equations": []
+  }
+}

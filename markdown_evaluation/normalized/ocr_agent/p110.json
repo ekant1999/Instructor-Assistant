@@ -1,7 +1,7 @@
 {
   "doc_id": "p110",
   "system": "ocr_agent",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/c4a536b15a8624a5.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/c4a536b15a8624a5.pdf",
   "title": "p110",
   "status": "success",
   "markdown_line_count": 1239,
@@ -246,6 +246,13 @@
       "kind": "figure"
     },
     {
+      "number": 1,
+      "caption": "on Page 7",
+      "normalized_caption": "on page 7",
+      "line_no": 264,
+      "kind": "figure"
+    },
+    {
       "number": 4,
       "caption": "Inference speedup: 1.5–2.0× over the HF PEFT DoRA baseline. All six models run on all three GPUs, including 32B on RTX 6000 PRO (96 GB) that OOM during gradient computation.",
       "normalized_caption": "inference speedup 1 5 2 0 over the hf peft dora baseline all six models run on all three gpus including 32b on rtx 6000 pro 96 gb that oom during gradient computation",
@@ -319,9 +326,23 @@
     },
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 54,
+      "kind": "table"
+    },
+    {
+      "number": 1,
       "caption": "compares asymptotic and concrete memory costs.",
       "normalized_caption": "compares asymptotic and concrete memory costs",
       "line_no": 124,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 126,
       "kind": "table"
     },
     {
@@ -332,10 +353,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 156,
+      "kind": "table"
+    },
+    {
       "number": 2,
       "caption": "Dispatch tiers and their selection criteria.",
       "normalized_caption": "dispatch tiers and their selection criteria",
       "line_no": 266,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 268,
       "kind": "table"
     },
     {
@@ -353,6 +388,13 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 328,
+      "kind": "table"
+    },
+    {
       "number": 4,
       "caption": "Gradient-computation speedup on 8–32B VLMs (r = 384, bf16, seq=4096, bs=1, ga=8, loss tokens=1024, 20 repeats). The HF PEFT DoRA baseline takes 46–87% longer per iteration than fused. 32B models OOM on RTX 6000 PRO (96 GB) under all configurations. See Table 5 for absolute times.",
       "normalized_caption": "gradient computation speedup on 8 32b vlms r 384 bf16 seq 4096 bs 1 ga 8 loss tokens 1024 20 repeats the hf peft dora baseline takes 46 87 longer per iteration than fused 32b models oom on rtx 6000 pro 96 gb under all configurations see table 5 for absolute times",
@@ -360,10 +402,24 @@
       "kind": "table"
     },
     {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 332,
+      "kind": "table"
+    },
+    {
       "number": 5,
       "caption": "Absolute gradient-computation time (seconds). Each iteration covers 8 gradient- accumulation micro-steps; 32 768 tokens total. Standard deviations ≤0.13 s (CV < 1.7%).",
       "normalized_caption": "absolute gradient computation time seconds each iteration covers 8 gradient accumulation micro steps 32 768 tokens total standard deviations 0 13 s cv 1 7",
       "line_no": 334,
+      "kind": "table"
+    },
+    {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 336,
       "kind": "table"
     },
     {
@@ -381,10 +437,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 362,
+      "kind": "table"
+    },
+    {
       "number": 7,
       "caption": "Norm memory: measured allocation delta and theoretical reduction (fp32, H200). Measured reductions are smaller than theoretical because they include the rank-independent base-norm transient (§2.3).",
       "normalized_caption": "norm memory measured allocation delta and theoretical reduction fp32 h200 measured reductions are smaller than theoretical because they include the rank independent base norm transient 2 3",
       "line_no": 576,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 578,
       "kind": "table"
     },
     {
@@ -395,10 +465,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 620,
+      "kind": "table"
+    },
+    {
       "number": 9,
       "caption": "summarizes microbenchmark speedups across all six GPUs. Model-level eager/fused speedups range from 1.18× to 1.24× with cross-GPU CV < 2%, providing stronger statistical evidence than additional repeats on a single GPU.",
       "normalized_caption": "summarizes microbenchmark speedups across all six gpus model level eager fused speedups range from 1 18 to 1 24 with cross gpu cv 2 providing stronger statistical evidence than additional repeats on a single gpu",
       "line_no": 622,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 624,
       "kind": "table"
     },
     {
@@ -409,10 +493,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 672,
+      "kind": "table"
+    },
+    {
       "number": 10,
       "caption": "Multi-seed convergence: eager vs. fused training loss (Qwen3.5-9B-Base, r =384, 2000 steps). Grand mean per-step delta 7.1 × 10−4; final eval losses agree to < 1.5 × 10−4.",
       "normalized_caption": "multi seed convergence eager vs fused training loss qwen3 5 9b base r 384 2000 steps grand mean per step delta 7 1 10 4 final eval losses agree to 1 5 10 4",
       "line_no": 674,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 676,
       "kind": "table"
     },
     {
@@ -423,10 +521,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 774,
+      "kind": "table"
+    },
+    {
       "number": 11,
       "caption": "Recommended configuration by scenario.",
       "normalized_caption": "recommended configuration by scenario",
       "line_no": 782,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 784,
       "kind": "table"
     },
     {
@@ -445,9 +557,23 @@
     },
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 1022,
+      "kind": "table"
+    },
+    {
+      "number": 1,
       "caption": "(Page 25)",
       "normalized_caption": "page 25",
       "line_no": 1032,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 1042,
       "kind": "table"
     },
     {
@@ -458,10 +584,31 @@
       "kind": "table"
     },
     {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 1055,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 1101,
+      "kind": "table"
+    },
+    {
       "number": 13,
       "caption": "extends the main-body memory comparison (Table 8) to all six models.",
       "normalized_caption": "extends the main body memory comparison table 8 to all six models",
       "line_no": 1111,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 1113,
       "kind": "table"
     },
     {
@@ -472,10 +619,24 @@
       "kind": "table"
     },
     {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 1117,
+      "kind": "table"
+    },
+    {
       "number": 14,
       "caption": "Geometric mean microbenchmark speedups, fp32 (all shapes, 200 repeats). Complement to Table 9.",
       "normalized_caption": "geometric mean microbenchmark speedups fp32 all shapes 200 repeats complement to table 9",
       "line_no": 1129,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 1131,
       "kind": "table"
     },
     {
@@ -493,10 +654,24 @@
       "kind": "table"
     },
     {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 1139,
+      "kind": "table"
+    },
+    {
       "number": 15,
       "caption": "DoRA norm implementation in major fine-tuning frameworks (February 2026).",
       "normalized_caption": "dora norm implementation in major fine tuning frameworks february 2026",
       "line_no": 1141,
+      "kind": "table"
+    },
+    {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 1143,
       "kind": "table"
     }
   ],
@@ -504,10 +679,10 @@
     "heading_count": 12,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 10,
-    "table_caption_count": 27,
-    "duplicate_figure_caption_count": 1,
-    "duplicate_table_caption_count": 12,
+    "figure_caption_count": 11,
+    "table_caption_count": 51,
+    "duplicate_figure_caption_count": 2,
+    "duplicate_table_caption_count": 36,
     "empty_section_count": 3,
     "consecutive_heading_run_count": 3,
     "max_consecutive_heading_run": 2
@@ -516,10 +691,10 @@
     "doc_id": "p110",
     "system": "ocr_agent",
     "title": "Scaling DoRA: High-Rank Adaptation via Factored Norms and Fused Kernels",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/c4a536b15a8624a5.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/c4a536b15a8624a5.pdf",
     "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p110/p110.pdf",
     "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p110",
-    "ocr_backend": "dummy",
+    "ocr_backend": "ocr_server",
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
@@ -527,8 +702,10 @@
       "tables": 24,
       "page_images": 0
     },
-    "elapsed_ms": 3078.906,
+    "elapsed_ms": 3758.685,
     "status": "success",
-    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p110/paper.md"
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p110/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
   }
 }

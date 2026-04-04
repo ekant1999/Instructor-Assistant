@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import multiprocessing as mp
+import re
 import shutil
+import sys
 import time
 import traceback
 from pathlib import Path
@@ -20,9 +23,26 @@ from markdown_evaluation.scripts._common import (
 )
 
 
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _ensure_repo_import_root() -> None:
+    repo_root = str(_REPO_ROOT)
+    if sys.path and sys.path[0] == repo_root:
+        return
+    sys.path = [entry for entry in sys.path if entry != repo_root]
+    sys.path.insert(0, repo_root)
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run hybrid ocr_agent extractor for benchmark documents.")
     parser.add_argument("--doc-ids", nargs="*", help="Optional subset of benchmark doc_ids.")
+    parser.add_argument(
+        "--system-name",
+        choices=["ocr_agent", "improved_ocr_agent"],
+        default="ocr_agent",
+        help="Which OCR agent package/output namespace to benchmark.",
+    )
     parser.add_argument("--ocr-server", help="Optional OCR/VLM server URL used by ocr_agent.")
     parser.add_argument("--ocr-model", default="allenai/olmOCR-2-7B-1025-FP8")
     parser.add_argument("--ocr-workspace", default="./tmp_ocr")
@@ -40,8 +60,78 @@ def _count_assets(doc_dir: Path, doc_id: str) -> Dict[str, int]:
     return {"figures": figures, "tables": tables, "page_images": pages}
 
 
+_OCR_PAGE_MARKER_RE = re.compile(r"^<!-- OCR page (?P<page_num>\d+) -->\s*$")
+_PAGE_MODE_MARKER_RE = re.compile(r"^<!-- page \d+ mode: (?P<mode>[^>]+) -->\s*$")
+_OCR_PLACEHOLDER_RE = re.compile(
+    r"!\[(?P<alt>[^\]]*)\]\((?P<name>page_(?P<x0>\d+)_(?P<y0>\d+)_(?P<x1>\d+)_(?P<y1>\d+)\.png)\)"
+)
+
+
+def _materialize_ocr_placeholder_assets(*, doc_dir: Path, doc_id: str, markdown_path: Path) -> None:
+    try:
+        from PIL import Image
+    except ImportError:
+        return
+
+    markdown = markdown_path.read_text(encoding="utf-8")
+    assets_root = doc_dir / f"{doc_id}_assets"
+    page_dir = assets_root / "page_images"
+    figure_dir = assets_root / "figures"
+    figure_dir.mkdir(parents=True, exist_ok=True)
+
+    rewritten_lines: List[str] = []
+    current_ocr_page: Optional[int] = None
+
+    for line in markdown.splitlines():
+        page_mode = _PAGE_MODE_MARKER_RE.match(line.strip())
+        if page_mode and page_mode.group("mode").strip() != "ocr":
+            current_ocr_page = None
+            rewritten_lines.append(line)
+            continue
+
+        marker = _OCR_PAGE_MARKER_RE.match(line.strip())
+        if marker:
+            current_ocr_page = int(marker.group("page_num"))
+            rewritten_lines.append(line)
+            continue
+
+        if current_ocr_page is None:
+            rewritten_lines.append(line)
+            continue
+
+        page_image_path = page_dir / f"{doc_id}_page_{current_ocr_page}.png"
+        if not page_image_path.exists():
+            rewritten_lines.append(line)
+            continue
+
+        def _replace(match: re.Match[str]) -> str:
+            x0 = int(match.group("x0"))
+            y0 = int(match.group("y0"))
+            x1 = int(match.group("x1"))
+            y1 = int(match.group("y1"))
+            out_name = f"ocr_page_{current_ocr_page}_{x0}_{y0}_{x1}_{y1}.png"
+            out_path = figure_dir / out_name
+            if not out_path.exists():
+                with Image.open(page_image_path) as image:
+                    width, height = image.size
+                    left = max(0, min(min(x0, x1), width))
+                    upper = max(0, min(min(y0, y1), height))
+                    right = max(0, min(max(x0, x1), width))
+                    lower = max(0, min(max(y0, y1), height))
+                    if right > left and lower > upper:
+                        image.crop((left, upper, right, lower)).save(out_path, format="PNG")
+            if out_path.exists():
+                return f"![{match.group('alt')}]({doc_id}_assets/figures/{out_name})"
+            return match.group(0)
+
+        rewritten_lines.append(_OCR_PLACEHOLDER_RE.sub(_replace, line))
+
+    markdown_path.write_text("\n".join(rewritten_lines) + "\n", encoding="utf-8")
+
+
 def _worker_extract_doc(
     *,
+    package_name: str,
     local_pdf_path: str,
     markdown_path: str,
     ocr_server: Optional[str],
@@ -51,8 +141,12 @@ def _worker_extract_doc(
     result_queue: "mp.Queue[Dict[str, Any]]",
 ) -> None:
     try:
-        from ocr_agent.hybrid_pdf_extractor import HybridPDFExtractor, PipelineCustomOCRBackend
-        from ocr_agent.pipeline_custom import make_ocr_args
+        _ensure_repo_import_root()
+        extractor_module = importlib.import_module(f"{package_name}.hybrid_pdf_extractor")
+        ocr_module = importlib.import_module(f"{package_name}.pipeline_custom")
+        HybridPDFExtractor = extractor_module.HybridPDFExtractor
+        PipelineCustomOCRBackend = extractor_module.PipelineCustomOCRBackend
+        make_ocr_args = ocr_module.make_ocr_args
 
         backend = None
         backend_name = "dummy"
@@ -76,6 +170,11 @@ def _worker_extract_doc(
         )
         start = time.perf_counter()
         saved_path = extractor.save_markdown(output_path=markdown_path)
+        _materialize_ocr_placeholder_assets(
+            doc_dir=Path(markdown_path).parent,
+            doc_id=Path(markdown_path).parent.name,
+            markdown_path=Path(markdown_path),
+        )
         elapsed_ms = round((time.perf_counter() - start) * 1000.0, 3)
         markdown = Path(markdown_path).read_text(encoding="utf-8")
         document_mode = "unknown"
@@ -87,6 +186,8 @@ def _worker_extract_doc(
             {
                 "status": "success",
                 "markdown_path": str(Path(saved_path).resolve()),
+                "extractor_module_path": str(getattr(extractor_module, "__file__", "")),
+                "postprocess_enabled": bool(getattr(extractor_module, "normalize_markdown", None)),
                 "ocr_backend": backend_name,
                 "use_pdf_page_ocr": bool(use_pdf_page_ocr),
                 "document_mode": document_mode,
@@ -107,6 +208,8 @@ def _worker_extract_doc(
 def run_ocr_agent_exports(
     docs: Sequence[BenchmarkDoc],
     *,
+    system_name: str = "ocr_agent",
+    package_name: str = "ocr_agent",
     ocr_server: Optional[str] = None,
     ocr_model: str = "allenai/olmOCR-2-7B-1025-FP8",
     ocr_workspace: str = "./tmp_ocr",
@@ -115,16 +218,16 @@ def run_ocr_agent_exports(
     overwrite: bool = False,
 ) -> List[Dict[str, Any]]:
     try:
-        import ocr_agent.hybrid_pdf_extractor  # noqa: F401
-        import ocr_agent.pipeline_custom  # noqa: F401
+        _ensure_repo_import_root()
+        importlib.import_module(f"{package_name}.hybrid_pdf_extractor")
+        importlib.import_module(f"{package_name}.pipeline_custom")
     except ModuleNotFoundError as exc:
         raise RuntimeError(
-            "ocr_agent dependencies are missing. Install the required OCR stack in "
+            f"{package_name} dependencies are missing. Install the required OCR stack in "
             "the active Python environment before running this benchmark."
         ) from exc
 
     ensure_dirs()
-    system_name = "ocr_agent"
     root = system_root(system_name)
     rows: List[Dict[str, Any]] = []
 
@@ -138,11 +241,12 @@ def run_ocr_agent_exports(
         else:
             shutil.copy2(doc.pdf_path, local_pdf_path)
 
-        print(f"[ocr_agent] [{idx}/{len(docs)}] start {doc.doc_id}", flush=True)
+        print(f"[{system_name}] [{idx}/{len(docs)}] start {doc.doc_id}", flush=True)
         result_queue: "mp.Queue[Dict[str, Any]]" = mp.Queue()
         process = mp.get_context("spawn").Process(
             target=_worker_extract_doc,
             kwargs={
+                "package_name": package_name,
                 "local_pdf_path": str(local_pdf_path),
                 "markdown_path": str(markdown_path),
                 "ocr_server": ocr_server,
@@ -163,7 +267,7 @@ def run_ocr_agent_exports(
             worker_result = {
                 "status": "timeout",
                 "error_type": "TimeoutExpired",
-                "error_message": f"ocr_agent exceeded {timeout_seconds}s for {doc.doc_id}",
+                "error_message": f"{system_name} exceeded {timeout_seconds}s for {doc.doc_id}",
                 "elapsed_ms": round((time.perf_counter() - started_at) * 1000.0, 3),
                 "ocr_backend": "ocr_server" if ocr_server else "dummy",
                 "use_pdf_page_ocr": bool(use_pdf_page_ocr),
@@ -175,7 +279,7 @@ def run_ocr_agent_exports(
             worker_result = {
                 "status": "error",
                 "error_type": "NoResultError",
-                "error_message": f"ocr_agent exited without returning a result for {doc.doc_id}",
+                "error_message": f"{system_name} exited without returning a result for {doc.doc_id}",
                 "elapsed_ms": round((time.perf_counter() - started_at) * 1000.0, 3),
                 "ocr_backend": "ocr_server" if ocr_server else "dummy",
                 "use_pdf_page_ocr": bool(use_pdf_page_ocr),
@@ -198,6 +302,10 @@ def run_ocr_agent_exports(
         }
         if worker_result.get("markdown_path"):
             row["markdown_path"] = str(worker_result["markdown_path"])
+        if worker_result.get("extractor_module_path"):
+            row["extractor_module_path"] = str(worker_result["extractor_module_path"])
+        if "postprocess_enabled" in worker_result:
+            row["postprocess_enabled"] = bool(worker_result["postprocess_enabled"])
         if worker_result.get("error_type"):
             row["error_type"] = str(worker_result["error_type"])
         if worker_result.get("error_message"):
@@ -206,15 +314,38 @@ def run_ocr_agent_exports(
             row["traceback"] = str(worker_result["traceback"])
         write_json(doc_dir / "benchmark_result.json", row)
         print(
-            f"[ocr_agent] [{idx}/{len(docs)}] {doc.doc_id} -> {row['status']} "
+            f"[{system_name}] [{idx}/{len(docs)}] {doc.doc_id} -> {row['status']} "
             f"({row['elapsed_ms']:.1f} ms)",
             flush=True,
         )
         rows.append(row)
 
     write_jsonl(root / "run_manifest.jsonl", rows)
-    write_json(RUN_DIR / "latest_ocr_agent.json", {"system": system_name, "documents": rows})
+    write_json(RUN_DIR / f"latest_{system_name}.json", {"system": system_name, "documents": rows})
     return rows
+
+
+def run_improved_ocr_agent_exports(
+    docs: Sequence[BenchmarkDoc],
+    *,
+    ocr_server: Optional[str] = None,
+    ocr_model: str = "allenai/olmOCR-2-7B-1025-FP8",
+    ocr_workspace: str = "./tmp_ocr",
+    use_pdf_page_ocr: bool = False,
+    timeout_seconds: int = 180,
+    overwrite: bool = False,
+) -> List[Dict[str, Any]]:
+    return run_ocr_agent_exports(
+        docs,
+        system_name="improved_ocr_agent",
+        package_name="improved_ocr_agent",
+        ocr_server=ocr_server,
+        ocr_model=ocr_model,
+        ocr_workspace=ocr_workspace,
+        use_pdf_page_ocr=use_pdf_page_ocr,
+        timeout_seconds=timeout_seconds,
+        overwrite=overwrite,
+    )
 
 
 def main() -> int:
@@ -222,6 +353,8 @@ def main() -> int:
     docs = select_docs(args.doc_ids)
     rows = run_ocr_agent_exports(
         docs,
+        system_name=args.system_name,
+        package_name=args.system_name,
         ocr_server=args.ocr_server,
         ocr_model=args.ocr_model,
         ocr_workspace=args.ocr_workspace,
@@ -229,7 +362,7 @@ def main() -> int:
         timeout_seconds=int(args.timeout_seconds),
         overwrite=bool(args.overwrite),
     )
-    print(f"[ocr_agent] exported {len(rows)} document(s)")
+    print(f"[{args.system_name}] exported {len(rows)} document(s)")
     return 0
 
 

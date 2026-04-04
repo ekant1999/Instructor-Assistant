@@ -2,18 +2,20 @@
   "doc_id": "a001",
   "system": "ocr_agent",
   "title": "CMPE 286 - LAB - 1",
-  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment1.pdf",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment1.pdf",
   "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a001/a001.pdf",
   "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a001",
-  "ocr_backend": "dummy",
+  "ocr_backend": "ocr_server",
   "use_pdf_page_ocr": false,
   "document_mode": "ocr",
   "asset_counts": {
-    "figures": 5,
+    "figures": 34,
     "tables": 0,
     "page_images": 12
   },
-  "elapsed_ms": 2330.764,
+  "elapsed_ms": 370110.79,
   "status": "success",
-  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a001/paper.md"
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a001/paper.md",
+  "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+  "postprocess_enabled": false
 }

@@ -1,0 +1,192 @@
+{
+  "doc_id": "p037",
+  "title": "Attention Is All You Need",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "academic_paper",
+    "equation_heavy",
+    "figure_heavy",
+    "table_heavy",
+    "seminal_paper",
+    "pdf_type_research"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract"
+    },
+    {
+      "level": 2,
+      "text": "Introduction"
+    },
+    {
+      "level": 2,
+      "text": "Background"
+    },
+    {
+      "level": 2,
+      "text": "Model Architecture"
+    },
+    {
+      "level": 3,
+      "text": "Encoder and Decoder Stacks"
+    },
+    {
+      "level": 3,
+      "text": "Attention"
+    },
+    {
+      "level": 4,
+      "text": "Scaled Dot-Product Attention"
+    },
+    {
+      "level": 4,
+      "text": "Multi-Head Attention"
+    },
+    {
+      "level": 4,
+      "text": "Applications of Attention in our Model"
+    },
+    {
+      "level": 3,
+      "text": "Position-wise Feed-Forward Networks"
+    },
+    {
+      "level": 3,
+      "text": "Embeddings and Softmax"
+    },
+    {
+      "level": 3,
+      "text": "Positional Encoding"
+    },
+    {
+      "level": 2,
+      "text": "Why Self-Attention"
+    },
+    {
+      "level": 2,
+      "text": "Training"
+    },
+    {
+      "level": 3,
+      "text": "Training Data and Batching"
+    },
+    {
+      "level": 3,
+      "text": "Hardware and Schedule"
+    },
+    {
+      "level": 3,
+      "text": "Optimizer"
+    },
+    {
+      "level": 3,
+      "text": "Regularization"
+    },
+    {
+      "level": 2,
+      "text": "Results"
+    },
+    {
+      "level": 3,
+      "text": "Machine Translation"
+    },
+    {
+      "level": 3,
+      "text": "Model Variations"
+    },
+    {
+      "level": 3,
+      "text": "English Constituency Parsing"
+    },
+    {
+      "level": 2,
+      "text": "Conclusion"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms",
+      "expected_section": "Abstract",
+      "position": "start"
+    },
+    {
+      "text": "The Transformer allows for significantly more parallelization and can reach a new state of the art in translation quality",
+      "expected_section": "Introduction",
+      "position": "end"
+    },
+    {
+      "text": "Self-attention, sometimes called intra-attention is an attention mechanism relating different positions of a single sequence",
+      "expected_section": "Background",
+      "position": "middle"
+    },
+    {
+      "text": "The encoder is composed of a stack of N = 6 identical layers.",
+      "expected_section": "Encoder and Decoder Stacks",
+      "position": "start"
+    },
+    {
+      "text": "We call our particular attention \"Scaled Dot-Product Attention\"",
+      "expected_section": "Scaled Dot-Product Attention",
+      "position": "start"
+    },
+    {
+      "text": "We trained our models on one machine with 8 NVIDIA P100 GPUs.",
+      "expected_section": "Hardware and Schedule",
+      "position": "start"
+    },
+    {
+      "text": "On the WMT 2014 English-to-German translation task, the big transformer model",
+      "expected_section": "Machine Translation",
+      "position": "start"
+    },
+    {
+      "text": "We are excited about the future of attention-based models and plan to apply them to other tasks.",
+      "expected_section": "Conclusion",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": "The Transformer - model architecture"
+    },
+    {
+      "number": 2,
+      "caption_contains": "Scaled Dot-Product Attention"
+    },
+    {
+      "number": 3,
+      "caption_contains": "following long-distance dependencies"
+    },
+    {
+      "number": 4,
+      "caption_contains": "anaphora resolution"
+    },
+    {
+      "number": 5,
+      "caption_contains": "attention heads exhibit behaviour"
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption_contains": "Maximum path lengths"
+    },
+    {
+      "number": 2,
+      "caption_contains": "Transformer achieves better BLEU scores"
+    },
+    {
+      "number": 3,
+      "caption_contains": "Variations on the Transformer architecture"
+    },
+    {
+      "number": 4,
+      "caption_contains": "English constituency parsing"
+    }
+  ],
+  "notes": "Manually validated against markdown_evaluation/pdfs/ResearchPapers/10f9519a4068b56b.pdf on 2026-04-04 using pdftotext -layout and PDF heading/caption inspection."
+}

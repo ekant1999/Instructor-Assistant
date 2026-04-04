@@ -1,0 +1,152 @@
+{
+  "doc_id": "p186",
+  "system": "improved_ocr_agent",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401186v1.pdf",
+  "title": "From Validity to Inter-Subjectivity: An Argument for Reliability Signals in Search Environments",
+  "status": "success",
+  "markdown_line_count": 97,
+  "headings": [
+    {
+      "level": 2,
+      "text": "Reliability Signals as Knowledge Context",
+      "normalized_text": "reliability signals as knowledge context",
+      "line_no": 15,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "From Gatekeeping to Contextualization",
+      "normalized_text": "from gatekeeping to contextualization",
+      "line_no": 20,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "T. Tennis (Eds.), Advances in Classification Research, Vol. 17: Proceedings of the 17th ASIS&T",
+      "normalized_text": "tennis eds advances in classification research vol 17 proceedings of the 17th asis t",
+      "line_no": 40,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "J. Gonzalo, & M. Kluck (Eds.), Evaluation of cross-language information retrieval systems (pp. 143–",
+      "normalized_text": "gonzalo m kluck eds evaluation of cross language information retrieval systems pp 143",
+      "line_no": 92,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "Reliability Signals as Knowledge Context",
+      "normalized_heading_text": "reliability signals as knowledge context",
+      "level": 2,
+      "line_start": 15,
+      "line_end": 19,
+      "prose_text": "We propose knowledge context (Smith and Rieh, 2019) as a way for information systems to support better judgments about reliability. Instead of trying to decide what is true, systems should help users see whether information is broadly supported or uncertain. Knowledge context could include simple, visible signals; such as whether a claim is backed by many sources, has been challenged, or presents only one side of an issue (Lorenz-Spreen et al., 2020). For example, a search result might show how many sources refer to it or whether others have raised concerns about missing context. Social media posts could display who has shared the content, how widely and where it spread, or link to different viewpoints (Yamamoto and Shimada, 2016; Lazer et al., 2018; Roozenbeek et al., 2020). These signals help users understand not just the content, but how it fits into a wider conversation.\nMost current systems hide this kind of context. Rankings are based on clicks or popularity, but users\ndon’t see why something is shown first, or how it relates to other, similar pieces. This lack of transparency reinforces personalization and limits opportunities for analytic reasoning (Feinberg, 2006; Mai, 2013; Voorhees, 2002; Rafferty, 2018; Robertson et al., 2023). Showing these kinds of cues can encourage users to think more carefully (Sunstein, 2006; Lorenz-Spreen et al., 2020; van der Bles et al., 2020), helping them spot disagreement, evaluate support, and decide what to trust while leaving the judgment of truth in their hands.",
+      "full_text": "We propose knowledge context (Smith and Rieh, 2019) as a way for information systems to support better judgments about reliability. Instead of trying to decide what is true, systems should help users see whether information is broadly supported or uncertain. Knowledge context could include simple, visible signals; such as whether a claim is backed by many sources, has been challenged, or presents only one side of an issue (Lorenz-Spreen et al., 2020). For example, a search result might show how many sources refer to it or whether others have raised concerns about missing context. Social media posts could display who has shared the content, how widely and where it spread, or link to different viewpoints (Yamamoto and Shimada, 2016; Lazer et al., 2018; Roozenbeek et al., 2020). These signals help users understand not just the content, but how it fits into a wider conversation.\nMost current systems hide this kind of context. Rankings are based on clicks or popularity, but users\ndon’t see why something is shown first, or how it relates to other, similar pieces. This lack of transparency reinforces personalization and limits opportunities for analytic reasoning (Feinberg, 2006; Mai, 2013; Voorhees, 2002; Rafferty, 2018; Robertson et al., 2023). Showing these kinds of cues can encourage users to think more carefully (Sunstein, 2006; Lorenz-Spreen et al., 2020; van der Bles et al., 2020), helping them spot disagreement, evaluate support, and decide what to trust while leaving the judgment of truth in their hands.",
+      "word_count": 227,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "From Gatekeeping to Contextualization",
+      "normalized_heading_text": "from gatekeeping to contextualization",
+      "level": 2,
+      "line_start": 20,
+      "line_end": 39,
+      "prose_text": "Platforms are often caught between two extremes: suppressing freedom of speech in the name of truth, or claiming neutrality while amplifying unreliable content (Gillespie, 2018; Klonick, 2018). We propose a third approach: instead of acting as truth arbiters, platforms should help users assess the reliability of information by exposing the context in which claims are made. The core challenge is not censorship or misinformation, but how to build systems that support reasoning under uncertainty. A focus on reliability, and the social cues that shape it, offers a path toward more transparent, democratic, and epistemically responsible information environments (Nguyen, 2023).\nBoykoff, M. T. & Boykoff, J. M. (2004). Balance as bias: global warming and the US prestige press.\nGlobal Environmental Change, 14(2):125–136, doi:10.1016/j.gloenvcha.2003.10.001.\nCollins, H., & Evans, R. (2008). Rethinking Expertise. Chicago Studies in Science, Technology, and\nthe Environment. University of Chicago Press.\nCova, F. (2018). Beyond intersubjective validity: recent empirical investigations into the nature of\naesthetic judgment. In Advances in experimental philosophy of aesthetics, chapter 1, pages 13–32, doi:\nEntman, R. M. (1993). Framing: Toward clarification of a fractured paradigm. Journal of\nCommunication, 43(4):51–58, doi:10.1111/j.1460-2466.1993.tb01304.x.\nFeinberg, M. (2006). An examination of authority in social classification systems. In J. Furner & J.",
+      "full_text": "Platforms are often caught between two extremes: suppressing freedom of speech in the name of truth, or claiming neutrality while amplifying unreliable content (Gillespie, 2018; Klonick, 2018). We propose a third approach: instead of acting as truth arbiters, platforms should help users assess the reliability of information by exposing the context in which claims are made. The core challenge is not censorship or misinformation, but how to build systems that support reasoning under uncertainty. A focus on reliability, and the social cues that shape it, offers a path toward more transparent, democratic, and epistemically responsible information environments (Nguyen, 2023).\n---\n<!-- page 3 mode: hybrid_paper -->\nBoykoff, M. T. & Boykoff, J. M. (2004). Balance as bias: global warming and the US prestige press.\nGlobal Environmental Change, 14(2):125–136, doi:10.1016/j.gloenvcha.2003.10.001.\nCollins, H., & Evans, R. (2008). Rethinking Expertise. Chicago Studies in Science, Technology, and\n![Figure 3 on Page 3](p186_assets/figures/p186_page_3_fig_1.png)\nthe Environment. University of Chicago Press.\nCova, F. (2018). Beyond intersubjective validity: recent empirical investigations into the nature of\naesthetic judgment. In Advances in experimental philosophy of aesthetics, chapter 1, pages 13–32, doi:\n$$\n10.5040/9781350038950.ch-001.\n$$\nEntman, R. M. (1993). Framing: Toward clarification of a fractured paradigm. Journal of\n$$\nCommunication, 43(4):51–58, doi:10.1111/j.1460-2466.1993.tb01304.x.\n$$\nFeinberg, M. (2006). An examination of authority in social classification systems. In J. Furner & J.",
+      "word_count": 172,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "T. Tennis (Eds.), Advances in Classification Research, Vol. 17: Proceedings of the 17th ASIS&T",
+      "normalized_heading_text": "tennis eds advances in classification research vol 17 proceedings of the 17th asis t",
+      "level": 3,
+      "line_start": 40,
+      "line_end": 91,
+      "prose_text": "SIG/CR Workshop (Austin, TX, November 4, 2006). American Society for Information Science and Technology, uri:http://hdl.handle.net/10150/105084.\nGillespie, T. (2018). Custodians of the Internet: Platforms, content moderation, and the hidden\ndecisions that shape social media. New Haven, CT: Yale University Press.\nGoldman, A. (1999). Knowledge in a Social World. Oxford: Clarendon Press.\nIPCC (2023). Climate change 2023: Synthesis report. Summary for policymakers.\nIntergovernmental Panel on Climate Change.\nRetrieved April 30, 2025, from\nhttps://www.ipcc.ch/report/ar6/syr/\nKlonick, K. (2018). The new governors: The people, rules, and processes governing online speech.\nHarvard Law Review, 131(6):1598–1670.\nLazer, D. M. J., Baum, M. A., Benkler, Y., Berinsky, A. J., Greenhill, K. M., Menczer, F., Metzger,\nM. J., Nyhan, B., Pennycook, G., Rothschild, D., Schudson, M., Sloman, S. A., Sunstein, C. R.,\nThorson, E. A., Watts, D. J., & Zittrain, J. L. (2018). The science of fake news. Science, 359(6380):1094–1096. doi:10.1126/science.aao2998\nLewandowsky, S., Ecker, U. K. H., Seifert, C. M., Schwarz, N., & Cook, J. (2012). Misinformation\nand its correction: Continued influence and successful debiasing. Psychological Science in the Public Interest, 13(3):106–131. doi:10.1177/1529100612451018\nLorenz-Spreen, P., Lewandowsky, S., Sunstein, C. R., & Hertwig, R. (2020). How behavioural\nsciences can promote truth, autonomy and democratic discourse online. Nature Human Behaviour, 4(11):1102–1109. doi: 10.1038/s41562-020-0889-7\nMai, J.-E. (2013). The quality and qualities of information. Journal of the American Society for\nInformation Science and Technology, 64(4):675–688. doi:10.1002/asi.22783\nMetzger, M. J., & Flanagin, A. J. (Eds.). (2007). Digital media, youth, and credibility. The John D.\nand Catherine T. MacArthur Foundation Series on Digital Media and Learning. Cambridge, MA: The MIT Press.\nNguyen, C. T. (2023). Hostile epistemology. Social Philosophy Today, 39:9–32. doi:\nRafferty, P. (2018). Tagging. Knowledge Organization, 45(6):500–516.\nRobertson, R. E., Green, J., Ruck, D. J., Ognyanova, K., Wilson, C., & Lazer, D. (2023). Users\nchoose to engage with more partisan news than they are exposed to on google search. Nature, 618(7964):342–348. doi:10.1038/s41586-023-06078-5\nRoozenbeek, J., van der Linden, S., & Nygren, T. (2020). Prebunking interventions based on\n“inoculation” theory can reduce susceptibility to misinformation across cultures. Harvard Kennedy School Misinformation Review. doi:10.37016//mr-2020-008.\nSmith, C. L. & Rieh, S. Y. (2019). Knowledge-context in search systems: Toward information-\nliterate actions. In Proceedings of the 2019 Conference on Human Information Interaction and Retrieval (CHIIR ’19), pp. 55–62, ACM. doi:10.1145/3295750.3298940\nSunstein, C. R. (2006). Infotopia how many minds produce knowledge. Oxford University Press.\nVan der Bles, A. M., van der Linden, S., Freeman, A. L. J., & Spiegelhalter, D. J. (2020). The effects\nof communicating uncertainty on public trust in facts and numbers. Proceedings of the National Academy of Sciences, 117(14):7672–7683. doi:10.1073/pnas.1913678117\nVan der Sluis, F. (2022). A conversationalist approach to information quality in information\ninteraction and retrieval. arXiv. doi:10.48550/arXiv.2210.07296\nVan der Sluis, F., Faure, J., & Homnual, S. P. (2024). An empirical exploration of the subjectivity\nproblem of information qualities. Journal of the Association for Information Science and Technology, 75(7): 829–843. doi:10.1002/asi.24884\nVan der Sluis, F., Faure, J., & Phutachard Homnual, S. (2023). Quality conversations and\nconsiderations on Reddit. In J. Gwizdka & S. Y. Rieh (Eds.), Proceedings of the 2023 Conference on Human Information Interaction and Retrieval (pp. 373–377). ACM. doi: 10.1145/3576840.3578272\nVan der Sluis, F., Smith, C., Bogers, T., & Meier, F. (2022). Information quality in information\ninteraction and retrieval: Workshop proposal for CHIIR 2022. In Proceedings of the ACM SIGIR Conference on Human Information Interaction and Retrieval (CHIIR 2022) (pp. 371–373). ACM. doi:\nVoorhees, E. (2002). The philosophy of information retrieval evaluation. In C. Peters, M. Braschler,",
+      "full_text": "SIG/CR Workshop (Austin, TX, November 4, 2006). American Society for Information Science and Technology, uri:http://hdl.handle.net/10150/105084.\nGillespie, T. (2018). Custodians of the Internet: Platforms, content moderation, and the hidden\ndecisions that shape social media. New Haven, CT: Yale University Press.\nGoldman, A. (1999). Knowledge in a Social World. Oxford: Clarendon Press.\n```text\nIPCC (2023). Climate change 2023: Synthesis report. Summary for policymakers.\n```\nIntergovernmental Panel on Climate Change.\nRetrieved April 30, 2025, from\nhttps://www.ipcc.ch/report/ar6/syr/\nKlonick, K. (2018). The new governors: The people, rules, and processes governing online speech.\nHarvard Law Review, 131(6):1598–1670.\nLazer, D. M. J., Baum, M. A., Benkler, Y., Berinsky, A. J., Greenhill, K. M., Menczer, F., Metzger,\nM. J., Nyhan, B., Pennycook, G., Rothschild, D., Schudson, M., Sloman, S. A., Sunstein, C. R.,\nThorson, E. A., Watts, D. J., & Zittrain, J. L. (2018). The science of fake news. Science, 359(6380):1094–1096. doi:10.1126/science.aao2998\nLewandowsky, S., Ecker, U. K. H., Seifert, C. M., Schwarz, N., & Cook, J. (2012). Misinformation\nand its correction: Continued influence and successful debiasing. Psychological Science in the Public Interest, 13(3):106–131. doi:10.1177/1529100612451018\nLorenz-Spreen, P., Lewandowsky, S., Sunstein, C. R., & Hertwig, R. (2020). How behavioural\nsciences can promote truth, autonomy and democratic discourse online. Nature Human Behaviour, 4(11):1102–1109. doi: 10.1038/s41562-020-0889-7\nMai, J.-E. (2013). The quality and qualities of information. Journal of the American Society for\nInformation Science and Technology, 64(4):675–688. doi:10.1002/asi.22783\nMetzger, M. J., & Flanagin, A. J. (Eds.). (2007). Digital media, youth, and credibility. The John D.\nand Catherine T. MacArthur Foundation Series on Digital Media and Learning. Cambridge, MA: The MIT Press.\nNguyen, C. T. (2023). Hostile epistemology. Social Philosophy Today, 39:9–32. doi:\n10.5840/socphiltoday2023391\n---\n<!-- page 4 mode: hybrid_paper -->\nRafferty, P. (2018). Tagging. Knowledge Organization, 45(6):500–516.\nRobertson, R. E., Green, J., Ruck, D. J., Ognyanova, K., Wilson, C., & Lazer, D. (2023). Users\nchoose to engage with more partisan news than they are exposed to on google search. Nature, 618(7964):342–348. doi:10.1038/s41586-023-06078-5\n![Figure 4 on Page 4](p186_assets/figures/p186_page_4_fig_1.png)\nRoozenbeek, J., van der Linden, S., & Nygren, T. (2020). Prebunking interventions based on\n“inoculation” theory can reduce susceptibility to misinformation across cultures. Harvard Kennedy School Misinformation Review. doi:10.37016//mr-2020-008.\nSmith, C. L. & Rieh, S. Y. (2019). Knowledge-context in search systems: Toward information-\nliterate actions. In Proceedings of the 2019 Conference on Human Information Interaction and Retrieval (CHIIR ’19), pp. 55–62, ACM. doi:10.1145/3295750.3298940\nSunstein, C. R. (2006). Infotopia how many minds produce knowledge. Oxford University Press.\nVan der Bles, A. M., van der Linden, S., Freeman, A. L. J., & Spiegelhalter, D. J. (2020). The effects\nof communicating uncertainty on public trust in facts and numbers. Proceedings of the National Academy of Sciences, 117(14):7672–7683. doi:10.1073/pnas.1913678117\nVan der Sluis, F. (2022). A conversationalist approach to information quality in information\ninteraction and retrieval. arXiv. doi:10.48550/arXiv.2210.07296\nVan der Sluis, F., Faure, J., & Homnual, S. P. (2024). An empirical exploration of the subjectivity\nproblem of information qualities. Journal of the Association for Information Science and Technology, 75(7): 829–843. doi:10.1002/asi.24884\nVan der Sluis, F., Faure, J., & Phutachard Homnual, S. (2023). Quality conversations and\nconsiderations on Reddit. In J. Gwizdka & S. Y. Rieh (Eds.), Proceedings of the 2023 Conference on Human Information Interaction and Retrieval (pp. 373–377). ACM. doi: 10.1145/3576840.3578272\nVan der Sluis, F., Smith, C., Bogers, T., & Meier, F. (2022). Information quality in information\ninteraction and retrieval: Workshop proposal for CHIIR 2022. In Proceedings of the ACM SIGIR Conference on Human Information Interaction and Retrieval (CHIIR 2022) (pp. 371–373). ACM. doi:\n$$\n10.1145/3498366.3505798\n$$\nVoorhees, E. (2002). The philosophy of information retrieval evaluation. In C. Peters, M. Braschler,",
+      "word_count": 436,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "J. Gonzalo, & M. Kluck (Eds.), Evaluation of cross-language information retrieval systems (pp. 143–",
+      "normalized_heading_text": "gonzalo m kluck eds evaluation of cross language information retrieval systems pp 143",
+      "level": 3,
+      "line_start": 92,
+      "line_end": 97,
+      "prose_text": "Wilson, P. (1983). Second-hand knowledge: An inquiry into cognitive authority. Greenwood Press.\nYamamoto, Y., & Shimada, S. (2016). Can disputed topic suggestion enhance user consideration of\ninformation credibility in web search? In Proceedings of the 27th ACM Conference on Hypertext and Social Media (HT ’16) (pp. 169–177). ACM. doi:10.1145/2914586.2914592",
+      "full_text": "170). Springer.\nWilson, P. (1983). Second-hand knowledge: An inquiry into cognitive authority. Greenwood Press.\nYamamoto, Y., & Shimada, S. (2016). Can disputed topic suggestion enhance user consideration of\ninformation credibility in web search? In Proceedings of the 27th ACM Conference on Hypertext and Social Media (HT ’16) (pp. 169–177). ACM. doi:10.1145/2914586.2914592\n---",
+      "word_count": 41,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "on Page 1",
+      "normalized_caption": "on page 1",
+      "line_no": 4,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "on Page 2",
+      "normalized_caption": "on page 2",
+      "line_no": 7,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "on Page 3",
+      "normalized_caption": "on page 3",
+      "line_no": 27,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "on Page 4",
+      "normalized_caption": "on page 4",
+      "line_no": 71,
+      "kind": "figure"
+    }
+  ],
+  "tables": [],
+  "intrinsic_metrics": {
+    "heading_count": 4,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 4,
+    "table_caption_count": 0,
+    "duplicate_figure_caption_count": 0,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 0,
+    "consecutive_heading_run_count": 0,
+    "max_consecutive_heading_run": 0
+  },
+  "run_metadata": {
+    "doc_id": "p186",
+    "system": "improved_ocr_agent",
+    "title": "From Validity to Inter-Subjectivity: An Argument for Reliability Signals in Search Environments",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401186v1.pdf",
+    "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p186/p186.pdf",
+    "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p186",
+    "ocr_backend": "ocr_server",
+    "use_pdf_page_ocr": false,
+    "document_mode": "hybrid_paper",
+    "asset_counts": {
+      "figures": 4,
+      "tables": 0,
+      "page_images": 0
+    },
+    "elapsed_ms": 669.66,
+    "status": "success",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p186/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": true
+  }
+}

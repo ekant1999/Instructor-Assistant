@@ -1,10 +1,10 @@
 {
   "doc_id": "a001",
   "system": "ocr_agent",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment1.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment1.pdf",
   "title": "a001",
   "status": "success",
-  "markdown_line_count": 196,
+  "markdown_line_count": 868,
   "headings": [
     {
       "level": 1,
@@ -17,35 +17,35 @@
       "level": 3,
       "text": "1. Protocol mix & encryption. The capture shows a contemporary web stack where",
       "normalized_text": "protocol mix encryption the capture shows a contemporary web stack where",
-      "line_no": 162,
+      "line_no": 834,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "2. Name resolution precedes data flows. For each site, DNS queries precede",
       "normalized_text": "name resolution precedes data flows for each site dns queries precede",
-      "line_no": 178,
+      "line_no": 850,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3. Latency, jitter, and paths. Repeated 100-ping batches reveal that where the server is",
       "normalized_text": "latency jitter and paths repeated 100 ping batches reveal that where the server is",
-      "line_no": 182,
+      "line_no": 854,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4. TCP handshake timing. The SYN->SYN,ACK interval aligns with end-to-end RTT;",
       "normalized_text": "tcp handshake timing the syn syn ack interval aligns with end to end rtt",
-      "line_no": 188,
+      "line_no": 860,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "5. Practical analysis aids. Custom columns for ports and HTTP fields, plus simple",
       "normalized_text": "practical analysis aids custom columns for ports and http fields plus simple",
-      "line_no": 192,
+      "line_no": 864,
       "suspicious": false
     }
   ],
@@ -55,10 +55,10 @@
       "normalized_heading_text": "a001",
       "level": 1,
       "line_start": 1,
-      "line_end": 161,
-      "prose_text": "Name: Siddhant Abhijit Raje\nPart 3: Identify HTTP Requests and Responses:\n- Filter for HTTP packets and identify GET and POST requests (any one request is fine).\n- Click on a packet and expand the Hypertext Transfer Protocol section to see details of the request (like\nthe URL, Host, and User-Agent).\nNormal browsing instantly produces DNS lookups, then TCP/TLS or UDP/QUIC connections, followed by application data. Background traffic (e.g., mDNS, DHCPv6, ARP/ND) is typical on LANs and may appear even when you aren’t actively browsing.\nPart 6: Delay and Jitter\n1. Harvard.edu 2. Mit.edu 3. Utexas.edu 4. www.ust.hk 5. Ethz.ch\nObservation: U.S. destinations generally have lower RTTs than overseas ones; transoceanic links produce the largest hop-to-hop increases in traceroute. Wireless links and last-mile congestion raise jitter. Larger ICMP payloads may slightly increase RTT and variability due to serialization time and buffering.\nTime between SYN and SYN, ACK: 0.025380\nTime between SYN, ACK and ACK: 0.000256\n(Changed the time view as: Set View -> Time Display Format -> Seconds Since Previous Displayed Packet)",
-      "full_text": "<!-- document_mode: ocr -->\n<!-- page 1 mode: hybrid_paper -->\nCMPE 286 – LAB – 1\nName: Siddhant Abhijit Raje\nStudent ID: 018179954\nPart 2:\nHTTP Traffic:\n![Figure 1 on Page 1](a001_assets/figures/a001_page_1_fig_1.png)\n---\n<!-- page 2 mode: ocr -->\n<!-- OCR page 2 -->\n![OCR Page 2](a001_page_2.png)\n---\n<!-- page 3 mode: ocr -->\n<!-- OCR page 3 -->\n![OCR Page 3](a001_page_3.png)\n---\n<!-- page 4 mode: hybrid_paper -->\nPart 3: Identify HTTP Requests and Responses:\n- Filter for HTTP packets and identify GET and POST requests (any one request is fine).\n- Click on a packet and expand the Hypertext Transfer Protocol section to see details of the request (like\nthe URL, Host, and User-Agent).\nNormal browsing instantly produces DNS lookups, then TCP/TLS or UDP/QUIC connections, followed by application data. Background traffic (e.g., mDNS, DHCPv6, ARP/ND) is typical on LANs and may appear even when you aren’t actively browsing.\n![Figure 1 on Page 4](a001_assets/figures/a001_page_4_fig_1.png)\n---\n<!-- page 5 mode: ocr -->\n<!-- OCR page 5 -->\n![OCR Page 5](a001_page_5.png)\n---\n<!-- page 6 mode: ocr -->\n<!-- OCR page 6 -->\n![OCR Page 6](a001_page_6.png)\n---\n<!-- page 7 mode: ocr -->\n<!-- OCR page 7 -->\n![OCR Page 7](a001_page_7.png)\n---\n<!-- page 8 mode: ocr -->\n<!-- OCR page 8 -->\n![OCR Page 8](a001_page_8.png)\n---\n<!-- page 9 mode: hybrid_paper -->\nMIT Pings:\nPart 6: Delay and Jitter\nHosts selected:\n1. Harvard.edu 2. Mit.edu 3. Utexas.edu 4. www.ust.hk 5. Ethz.ch\n![Figure 1 on Page 9](a001_assets/figures/a001_page_9_fig_1.png)\n---\n<!-- page 10 mode: ocr -->\n<!-- OCR page 10 -->\n![OCR Page 10](a001_page_10.png)\n---\n<!-- page 11 mode: ocr -->\n<!-- OCR page 11 -->\n![OCR Page 11](a001_page_11.png)\n---\n<!-- page 12 mode: ocr -->\n<!-- OCR page 12 -->\n![OCR Page 12](a001_page_12.png)\n---\n<!-- page 13 mode: ocr -->\n<!-- OCR page 13 -->\n![OCR Page 13](a001_page_13.png)\n---\n<!-- page 14 mode: ocr -->\n<!-- OCR page 14 -->\n![OCR Page 14](a001_page_14.png)\n---\n<!-- page 15 mode: ocr -->\n<!-- OCR page 15 -->\n![OCR Page 15](a001_page_15.png)\n---\n<!-- page 16 mode: hybrid_paper -->\n![Figure 1 on Page 16](a001_assets/figures/a001_page_16_fig_1.png)\nObservation: U.S. destinations generally have lower RTTs than overseas ones; transoceanic links produce the largest hop-to-hop increases in traceroute. Wireless links and last-mile congestion raise jitter. Larger ICMP payloads may slightly increase RTT and variability due to serialization time and buffering.\n---\n<!-- page 17 mode: hybrid_paper -->\nTime between SYN and SYN, ACK: 0.025380\nTime between SYN, ACK and ACK: 0.000256\n(Changed the time view as: Set View -> Time Display Format -> Seconds Since Previous Displayed Packet)\nFinal Observations:",
-      "word_count": 165,
+      "line_end": 833,
+      "prose_text": "Name: Siddhant Abhijit Raje\nPart 3: Identify HTTP Requests and Responses:\n- Filter for HTTP packets and identify GET and POST requests (any one request is fine).\n- Click on a packet and expand the Hypertext Transfer Protocol section to see details of the request (like\nthe URL, Host, and User-Agent).\nNormal browsing instantly produces DNS lookups, then TCP/TLS or UDP/QUIC connections, followed by application data. Background traffic (e.g., mDNS, DHCPv6, ARP/ND) is typical on LANs and may appear even when you aren’t actively browsing.\nAnalyze DNS Packets:\nPart 4: Custom Columns:\nCustom Coloring rules:\nPart 5: Advanced Analysis\nPart 6: Delay and Jitter\n1. Harvard.edu 2. Mit.edu 3. Utexas.edu 4. www.ust.hk 5. Ethz.ch\nHistogram of RTT:\nRTT Histogram - Combined\n    <th>file</th>\n    <th>count</th>\n    <th>min_ms</th>\n    <th>max_ms</th>\n    <th>avg_ms</th>\n    <th>median_ms</th>\n    <th>stdev_ms</th>\n    <th>p50_ms</th>\n    <th>p90_ms</th>\n    <th>p95_ms</th>\n    <th>p99_ms</th>\n    <th>mad_successive_ms</th>\n    <td>ping_harvard_run1.txt</td>\n    <td>ping_harvard_run2.txt</td>\n    <td>ping_harvard_run3.txt</td>\n    <td>ping_harvard_run4.txt</td>\n    <td>ping_harvard_run5.txt</td>\n    <td>ping_harvard_run6.txt</td>\n    <td>ping_harvard_run7.txt</td>\n    <td>ping_harvard_run8.txt</td>\n    <td>ping_harvard_run9.txt</td>\n    <td>ping_harvard_run10.txt</td>\n    <th>file</th>\n    <th>count</th>\n    <th>min_ms</th>\n    <th>max_ms</th>\n    <th>avg_ms</th>\n    <th>median_ms</th>\n    <th>stdev_ms</th>\n    <th>p50_ms</th>\n    <th>p90_ms</th>\n    <th>p95_ms</th>\n    <th>p99_ms</th>\n    <th>mad_successive_ms</th>\n    <td>ping_mit_run1.txt</td>\n    <td>ping_mit_run2.txt</td>\n    <td>ping_mit_run3.txt</td>\n    <td>ping_mit_run4.txt</td>\n    <td>ping_mit_run5.txt</td>\n    <td>ping_mit_run6.txt</td>\n    <td>ping_mit_run7.txt</td>\n    <td>ping_mit_run8.txt</td>\n    <td>ping_mit_run9.txt</td>\n    <td>ping_mit_run10.txt</td>\n    <th>file</th>\n    <th>count</th>\n    <th>min_ms</th>\n    <th>max_ms</th>\n    <th>avg_ms</th>\n    <th>median_ms</th>\n    <th>stdev_ms</th>\n    <th>p50_ms</th>\n    <th>p90_ms</th>\n    <th>p95_ms</th>\n    <th>p99_ms</th>\n    <th>mad_successive_ms</th>\n    <td>ping_utexas_run1.txt</td>\n    <td>ping_utexas_run2.txt</td>\n    <td>ping_utexas_run3.txt</td>\n    <td>ping_utexas_run4.txt</td>\n    <td>ping_utexas_run5.txt</td>\n    <td>ping_utexas_run6.txt</td>\n    <td>ping_utexas_run7.txt</td>\n    <td>ping_utexas_run8.txt</td>\n    <td>ping_utexas_run9.txt</td>\n    <td>ping_utexas_run10.txt</td>\n    <th>file</th>\n    <th>count</th>\n    <th>min_ms</th>\n    <th>max_ms</th>\n    <th>avg_ms</th>\n    <th>median_ms</th>\n    <th>stdev_ms</th>\n    <th>p50_ms</th>\n    <th>p90_ms</th>\n    <th>p95_ms</th>\n    <th>p99_ms</th>\n    <th>mad_successive_ms</th>\n    <td>ping_ust_run1.txt</td>\n    <td>ping_ust_run2.txt</td>\n    <td>ping_ust_run3.txt</td>\n    <td>ping_ust_run4.txt</td>\n    <td>ping_ust_run5.txt</td>\n    <td>ping_ust_run6.txt</td>\n    <td>ping_ust_run7.txt</td>\n    <td>ping_ust_run8.txt</td>\n    <td>ping_ust_run9.txt</td>\n    <td>ping_ust_run10.txt</td>\nObservation: U.S. destinations generally have lower RTTs than overseas ones; transoceanic links produce the largest hop-to-hop increases in traceroute. Wireless links and last-mile congestion raise jitter. Larger ICMP payloads may slightly increase RTT and variability due to serialization time and buffering.\nTime between SYN and SYN, ACK: 0.025380\nTime between SYN, ACK and ACK: 0.000256\n(Changed the time view as: Set View -> Time Display Format -> Seconds Since Previous Displayed Packet)",
+      "full_text": "<!-- document_mode: ocr -->\n<!-- page 1 mode: hybrid_paper -->\nCMPE 286 – LAB – 1\nName: Siddhant Abhijit Raje\nStudent ID: 018179954\nPart 2:\nHTTP Traffic:\n![Figure 1 on Page 1](a001_assets/figures/a001_page_1_fig_1.png)\n---\n<!-- page 2 mode: ocr -->\n<!-- OCR page 2 -->\nDNS Traffic:\n![Screenshot of a network traffic capture showing HTTP requests and responses](a001_assets/figures/ocr_page_2_324_186_1536_496.png)\n![Screenshot of a network traffic capture showing DNS requests and responses](a001_assets/figures/ocr_page_2_324_1092_1536_496.png)\n---\n<!-- page 3 mode: ocr -->\n<!-- OCR page 3 -->\nTCP Traffic:\n![Screenshot of a network traffic capture showing TCP traffic analysis](a001_assets/figures/ocr_page_3_324_312_1536_798.png)\nUDP Traffic:\n---\n<!-- page 4 mode: hybrid_paper -->\nPart 3: Identify HTTP Requests and Responses:\n- Filter for HTTP packets and identify GET and POST requests (any one request is fine).\n- Click on a packet and expand the Hypertext Transfer Protocol section to see details of the request (like\nthe URL, Host, and User-Agent).\nNormal browsing instantly produces DNS lookups, then TCP/TLS or UDP/QUIC connections, followed by application data. Background traffic (e.g., mDNS, DHCPv6, ARP/ND) is typical on LANs and may appear even when you aren’t actively browsing.\n![Figure 1 on Page 4](a001_assets/figures/a001_page_4_fig_1.png)\n---\n<!-- page 5 mode: ocr -->\n<!-- OCR page 5 -->\nAnalyze DNS Packets:\n---\n<!-- page 6 mode: ocr -->\n<!-- OCR page 6 -->\nPart 4: Custom Columns:\n![Screenshot of a network traffic capture tool showing custom columns and HTTP requests](a001_assets/figures/ocr_page_6_320_384_1568_768.png)\nCustom Coloring rules:\nHTTP:\n---\n<!-- page 7 mode: ocr -->\n<!-- OCR page 7 -->\nDNS:\n![Screenshot of a network traffic capture showing HTTP requests](a001_assets/figures/ocr_page_7_256_184_1792_384.png)\n![Screenshot of a network traffic capture showing DNS requests](a001_assets/figures/ocr_page_7_256_1024_1792_384.png)\n---\n<!-- page 8 mode: ocr -->\n<!-- OCR page 8 -->\nPart 5: Advanced Analysis\nProtocol Hierarchy:\n![Wireshark Protocol Hierarchy Statistics screenshot](a001_assets/figures/ocr_page_8_324_370_1846_1092.png)\nTCP Stream:\n---\n<!-- page 9 mode: hybrid_paper -->\nMIT Pings:\nPart 6: Delay and Jitter\nHosts selected:\n1. Harvard.edu 2. Mit.edu 3. Utexas.edu 4. www.ust.hk 5. Ethz.ch\n![Figure 1 on Page 9](a001_assets/figures/a001_page_9_fig_1.png)\n---\n<!-- page 10 mode: ocr -->\n<!-- OCR page 10 -->\nUTexas Pings:\n---\n<!-- page 11 mode: ocr -->\n<!-- OCR page 11 -->\nHistogram of RTT:\nHarvard.edu:\n---\n<!-- page 12 mode: ocr -->\n<!-- OCR page 12 -->\nRTT Histogram - Combined\n![Histogram showing RTT (ms) distribution](a001_assets/figures/ocr_page_12_324_186_1507_1092.png)\nStats:\n<table>\n  <tr>\n    <th>file</th>\n    <th>count</th>\n    <th>min_ms</th>\n    <th>max_ms</th>\n    <th>avg_ms</th>\n    <th>median_ms</th>\n    <th>stdev_ms</th>\n    <th>p50_ms</th>\n    <th>p90_ms</th>\n    <th>p95_ms</th>\n    <th>p99_ms</th>\n    <th>mad_successive_ms</th>\n  </tr>\n  <tr>\n    <td>ping_harvard_run1.txt</td>\n    <td>100</td>\n    <td>12.596</td>\n    <td>111.842</td>\n    <td>30.0007300000000000</td>\n    <td>21.429</td>\n    <td>23.83009767943080</td>\n    <td>21.397</td>\n    <td>62.126</td>\n    <td>96.159</td>\n    <td>110.857</td>\n    <td>16.198676767676800</td>\n  </tr>\n  <tr>\n    <td>ping_harvard_run2.txt</td>\n    <td>100</td>\n    <td>10.184</td>\n    <td>134.758</td>\n    <td>30.15724</td>\n    <td>21.1685</td>\n    <td>25.402209517403400</td>\n    <td>21.161</td>\n    <td>74.64</td>\n    <td>88.054</td>\n    <td>113.405</td>\n    <td>18.009181818181800</td>\n  </tr>\n  <tr>\n    <td>ping_harvard_run3.txt</td>\n    <td>99</td>\n    <td>4.852</td>\n    <td>14.135</td>\n    <td>8.233737373737380</td>\n    <td>9.854</td>\n    <td>2.376013423250490</td>\n    <td>9.854</td>\n    <td>10.424</td>\n    <td>10.692</td>\n    <td>14.135</td>\n    <td>1.661520408163270</td>\n  </tr>\n  <tr>\n    <td>ping_harvard_run4.txt</td>\n    <td>100</td>\n    <td>9.926</td>\n    <td>101.44</td>\n    <td>25.32239</td>\n    <td>16.828</td>\n    <td>22.344149006081200</td>\n    <td>16.755</td>\n    <td>69.008</td>\n    <td>82.838</td>\n    <td>100.646</td>\n    <td>14.49489898989900</td>\n  </tr>\n  <tr>\n    <td>ping_harvard_run5.txt</td>\n    <td>100</td>\n    <td>9.519</td>\n    <td>197.653</td>\n    <td>30.398960000000000</td>\n    <td>18.6205</td>\n    <td>31.3955756082949</td>\n    <td>18.555</td>\n    <td>65.316</td>\n    <td>98.098</td>\n    <td>151.659</td>\n    <td>22.68414141414140</td>\n  </tr>\n  <tr>\n    <td>ping_harvard_run6.txt</td>\n    <td>100</td>\n    <td>12.646</td>\n    <td>172.883</td>\n    <td>28.971160000000000</td>\n    <td>21.9605</td>\n    <td>24.400183962595100</td>\n    <td>21.945</td>\n    <td>49.054</td>\n    <td>80.21</td>\n    <td>108.435</td>\n    <td>14.663000000000000</td>\n  </tr>\n  <tr>\n    <td>ping_harvard_run7.txt</td>\n    <td>100</td>\n    <td>9.254</td>\n    <td>198.974</td>\n    <td>40.05934</td>\n    <td>17.7635</td>\n    <td>44.26631123493210</td>\n    <td>17.731</td>\n    <td>101.842</td>\n    <td>145.092</td>\n    <td>190.03</td>\n    <td>26.294202020202000</td>\n  </tr>\n  <tr>\n    <td>ping_harvard_run8.txt</td>\n    <td>100</td>\n    <td>10.765</td>\n    <td>161.236</td>\n    <td>28.237410000000000</td>\n    <td>17.6175</td>\n    <td>27.069216220082800</td>\n    <td>17.522</td>\n    <td>68.564</td>\n    <td>98.905</td>\n    <td>108.536</td>\n    <td>18.209505050505100</td>\n  </tr>\n  <tr>\n    <td>ping_harvard_run9.txt</td>\n    <td>100</td>\n    <td>11.422</td>\n    <td>177.277</td>\n    <td>28.341130000000000</td>\n    <td>18.1575</td>\n    <td>27.91743156859120</td>\n    <td>18.154</td>\n    <td>65.272</td>\n    <td>96.096</td>\n    <td>103.608</td>\n    <td>18.685666666666700</td>\n  </tr>\n  <tr>\n    <td>ping_harvard_run10.txt</td>\n    <td>100</td>\n    <td>12.369</td>\n    <td>271.383</td>\n    <td>32.656290000000000</td>\n    <td>21.9675</td>\n    <td>36.53653678068660</td>\n    <td>21.864</td>\n    <td>57.739</td>\n    <td>98.227</td>\n    <td>199.556</td>\n    <td>23.190262626262600</td>\n  </tr>\n</table>\nMit.edu:\n---\n<!-- page 13 mode: ocr -->\n<!-- OCR page 13 -->\n![RTT Histogram - Combined](a001_assets/figures/ocr_page_13_324_186_1572_1092.png)\nStats:\n<table>\n  <tr>\n    <th>file</th>\n    <th>count</th>\n    <th>min_ms</th>\n    <th>max_ms</th>\n    <th>avg_ms</th>\n    <th>median_ms</th>\n    <th>stdev_ms</th>\n    <th>p50_ms</th>\n    <th>p90_ms</th>\n    <th>p95_ms</th>\n    <th>p99_ms</th>\n    <th>mad_successive_ms</th>\n  </tr>\n  <tr>\n    <td>ping_mit_run1.txt</td>\n    <td>100</td>\n    <td>77.279</td>\n    <td>255.307</td>\n    <td>107.73970000000000</td>\n    <td>87.906</td>\n    <td>36.37414637090640</td>\n    <td>87.539</td>\n    <td>157.787</td>\n    <td>164.105</td>\n    <td>243.77</td>\n    <td>30.462373737373700</td>\n  </tr>\n  <tr>\n    <td>ping_mit_run2.txt</td>\n    <td>100</td>\n    <td>29.042</td>\n    <td>193.71</td>\n    <td>54.15174000000000</td>\n    <td>37.6685</td>\n    <td>35.69516777092310</td>\n    <td>37.637</td>\n    <td>111.719</td>\n    <td>129.3</td>\n    <td>161.94</td>\n    <td>24.409929292929300</td>\n  </tr>\n  <tr>\n    <td>ping_mit_run3.txt</td>\n    <td>100</td>\n    <td>12.013</td>\n    <td>59.759</td>\n    <td>15.57745000000000</td>\n    <td>16.2915</td>\n    <td>4.824693377759250</td>\n    <td>16.287</td>\n    <td>16.689</td>\n    <td>16.804</td>\n    <td>18.056</td>\n    <td>2.5175757575757600</td>\n  </tr>\n  <tr>\n    <td>ping_mit_run4.txt</td>\n    <td>100</td>\n    <td>29.995</td>\n    <td>126.099</td>\n    <td>47.24466</td>\n    <td>36.1415</td>\n    <td>25.391198357794200</td>\n    <td>36.131</td>\n    <td>90.636</td>\n    <td>103.867</td>\n    <td>125.2</td>\n    <td>15.124909090909100</td>\n  </tr>\n  <tr>\n    <td>ping_mit_run5.txt</td>\n    <td>100</td>\n    <td>19.256</td>\n    <td>149.346</td>\n    <td>40.59334000000000</td>\n    <td>31.3855</td>\n    <td>25.24223794934420</td>\n    <td>31.364</td>\n    <td>84.344</td>\n    <td>101.801</td>\n    <td>116.538</td>\n    <td>15.345404040404000</td>\n  </tr>\n  <tr>\n    <td>ping_mit_run6.txt</td>\n    <td>100</td>\n    <td>20.839</td>\n    <td>156.987</td>\n    <td>42.49267</td>\n    <td>28.1415</td>\n    <td>30.755618106161000</td>\n    <td>28.024</td>\n    <td>95.675</td>\n    <td>113.447</td>\n    <td>141.767</td>\n    <td>19.33853535353540</td>\n  </tr>\n  <tr>\n    <td>ping_mit_run7.txt</td>\n    <td>100</td>\n    <td>11.001</td>\n    <td>486.49</td>\n    <td>36.01467000000000</td>\n    <td>20.289</td>\n    <td>53.18523695653070</td>\n    <td>20.22</td>\n    <td>82.48</td>\n    <td>105.466</td>\n    <td>137.659</td>\n    <td>25.874232323232300</td>\n  </tr>\n  <tr>\n    <td>ping_mit_run8.txt</td>\n    <td>100</td>\n    <td>9.795</td>\n    <td>105.008</td>\n    <td>24.98635000000000</td>\n    <td>16.86700000000000</td>\n    <td>21.839448832805000</td>\n    <td>16.851</td>\n    <td>61.67</td>\n    <td>80.484</td>\n    <td>99.585</td>\n    <td>15.588171717171700</td>\n  </tr>\n  <tr>\n    <td>ping_mit_run9.txt</td>\n    <td>100</td>\n    <td>9.376</td>\n    <td>180.535</td>\n    <td>28.00679000000000</td>\n    <td>18.3775</td>\n    <td>27.12876389574380</td>\n    <td>18.295</td>\n    <td>61.991</td>\n    <td>97.414</td>\n    <td>107.26</td>\n    <td>18.147757575757600</td>\n  </tr>\n  <tr>\n    <td>ping_mit_run10.txt</td>\n    <td>100</td>\n    <td>74.293</td>\n    <td>470.234</td>\n    <td>100.32610000000000</td>\n    <td>84.89500000000000</td>\n    <td>44.54853299027770</td>\n    <td>84.79</td>\n    <td>141.307</td>\n    <td>153.539</td>\n    <td>171.251</td>\n    <td>24.806030303030300</td>\n  </tr>\n</table>\nUtxas.edu:\n---\n<!-- page 14 mode: ocr -->\n<!-- OCR page 14 -->\n![RTT Histogram - Combined](a001_assets/figures/ocr_page_14_324_186_1572_1092.png)\nStats:\n<table>\n  <tr>\n    <th>file</th>\n    <th>count</th>\n    <th>min_ms</th>\n    <th>max_ms</th>\n    <th>avg_ms</th>\n    <th>median_ms</th>\n    <th>stdev_ms</th>\n    <th>p50_ms</th>\n    <th>p90_ms</th>\n    <th>p95_ms</th>\n    <th>p99_ms</th>\n    <th>mad_successive_ms</th>\n  </tr>\n  <tr>\n    <td>ping_utexas_run1.txt</td>\n    <td>100</td>\n    <td>10.082</td>\n    <td>210.406</td>\n    <td>29.142510000000000</td>\n    <td>18.6785</td>\n    <td>32.95998957306370</td>\n    <td>18.664</td>\n    <td>68.471</td>\n    <td>87.26</td>\n    <td>209.14</td>\n    <td>22.249626262626300</td>\n  </tr>\n  <tr>\n    <td>ping_utexas_run2.txt</td>\n    <td>100</td>\n    <td>9.76</td>\n    <td>105.378</td>\n    <td>29.403850000000000</td>\n    <td>19.555500000000000</td>\n    <td>24.3860994128465</td>\n    <td>19.495</td>\n    <td>65.69</td>\n    <td>91.348</td>\n    <td>102.19</td>\n    <td>18.402535353535400</td>\n  </tr>\n  <tr>\n    <td>ping_utexas_run3.txt</td>\n    <td>100</td>\n    <td>4.361</td>\n    <td>72.799</td>\n    <td>8.807780000000000</td>\n    <td>9.089500000000000</td>\n    <td>7.3137865782867400</td>\n    <td>9.067</td>\n    <td>10.445</td>\n    <td>11.254</td>\n    <td>30.328</td>\n    <td>4.070686868686870</td>\n  </tr>\n  <tr>\n    <td>ping_utexas_run4.txt</td>\n    <td>100</td>\n    <td>11.16</td>\n    <td>104.085</td>\n    <td>23.858760000000000</td>\n    <td>17.241</td>\n    <td>20.678955518003200</td>\n    <td>17.211</td>\n    <td>39.976</td>\n    <td>77.421</td>\n    <td>103.835</td>\n    <td>13.364838383838400</td>\n  </tr>\n  <tr>\n    <td>ping_utexas_run5.txt</td>\n    <td>100</td>\n    <td>9.679</td>\n    <td>277.873</td>\n    <td>29.052200000000000</td>\n    <td>15.412000000000000</td>\n    <td>39.37691618835900</td>\n    <td>15.388</td>\n    <td>72.371</td>\n    <td>96.472</td>\n    <td>219.974</td>\n    <td>24.9071313131313</td>\n  </tr>\n  <tr>\n    <td>ping_utexas_run6.txt</td>\n    <td>100</td>\n    <td>8.749</td>\n    <td>193.262</td>\n    <td>29.947050000000000</td>\n    <td>19.197</td>\n    <td>30.032436894560500</td>\n    <td>19.025</td>\n    <td>76.703</td>\n    <td>101.213</td>\n    <td>110.304</td>\n    <td>17.56334343434340</td>\n  </tr>\n  <tr>\n    <td>ping_utexas_run7.txt</td>\n    <td>100</td>\n    <td>8.763</td>\n    <td>168.538</td>\n    <td>26.182520000000000</td>\n    <td>15.878</td>\n    <td>27.250535890377000</td>\n    <td>15.871</td>\n    <td>64.722</td>\n    <td>97.566</td>\n    <td>106.962</td>\n    <td>16.42637373737370</td>\n  </tr>\n  <tr>\n    <td>ping_utexas_run8.txt</td>\n    <td>100</td>\n    <td>8.159</td>\n    <td>129.364</td>\n    <td>28.178940000000000</td>\n    <td>19.1655</td>\n    <td>25.06672746801940</td>\n    <td>19.152</td>\n    <td>57.806</td>\n    <td>91.927</td>\n    <td>117.226</td>\n    <td>17.854959595959600</td>\n  </tr>\n  <tr>\n    <td>ping_utexas_run9.txt</td>\n    <td>100</td>\n    <td>8.583</td>\n    <td>180.15</td>\n    <td>27.59482</td>\n    <td>19.1225</td>\n    <td>26.574062335626800</td>\n    <td>19.104</td>\n    <td>58.284</td>\n    <td>89.658</td>\n    <td>110.551</td>\n    <td>16.240818181818200</td>\n  </tr>\n  <tr>\n    <td>ping_utexas_run10.txt</td>\n    <td>100</td>\n    <td>10.545</td>\n    <td>132.189</td>\n    <td>29.313550000000000</td>\n    <td>18.569500000000000</td>\n    <td>28.35691817228730</td>\n    <td>18.563</td>\n    <td>85.76</td>\n    <td>101.405</td>\n    <td>124.089</td>\n    <td>20.368898989899000</td>\n  </tr>\n</table>\nUST:\n---\n<!-- page 15 mode: ocr -->\n<!-- OCR page 15 -->\n![RTT Histogram - Combined](a001_assets/figures/ocr_page_15_324_186_1572_1042.png)\nStats:\n<table>\n  <tr>\n    <th>file</th>\n    <th>count</th>\n    <th>min_ms</th>\n    <th>max_ms</th>\n    <th>avg_ms</th>\n    <th>median_ms</th>\n    <th>stdev_ms</th>\n    <th>p50_ms</th>\n    <th>p90_ms</th>\n    <th>p95_ms</th>\n    <th>p99_ms</th>\n    <th>mad_successive_ms</th>\n  </tr>\n  <tr>\n    <td>ping_ust_run1.txt</td>\n    <td>100</td>\n    <td>165.216</td>\n    <td>441.416</td>\n    <td>202.8927200000000</td>\n    <td>177.334</td>\n    <td>55.03462058037520</td>\n    <td>177.042</td>\n    <td>262.46</td>\n    <td>323.257</td>\n    <td>419.295</td>\n    <td>43.26264646464650</td>\n  </tr>\n  <tr>\n    <td>ping_ust_run2.txt</td>\n    <td>100</td>\n    <td>165.363</td>\n    <td>322.076</td>\n    <td>190.93506000000000</td>\n    <td>177.135</td>\n    <td>29.679454092838200</td>\n    <td>176.781</td>\n    <td>241.075</td>\n    <td>255.776</td>\n    <td>274.166</td>\n    <td>24.357212121212100</td>\n  </tr>\n  <tr>\n    <td>ping_ust_run3.txt</td>\n    <td>100</td>\n    <td>167.088</td>\n    <td>284.895</td>\n    <td>187.93784000000000</td>\n    <td>175.59750000000000</td>\n    <td>27.250913435425400</td>\n    <td>175.568</td>\n    <td>232.172</td>\n    <td>256.404</td>\n    <td>275.601</td>\n    <td>21.84889898989900</td>\n  </tr>\n  <tr>\n    <td>ping_ust_run4.txt</td>\n    <td>100</td>\n    <td>164.96</td>\n    <td>277.41</td>\n    <td>190.12985</td>\n    <td>175.4975</td>\n    <td>29.686713610935100</td>\n    <td>175.473</td>\n    <td>240.9</td>\n    <td>259.605</td>\n    <td>267.5</td>\n    <td>25.371686868686900</td>\n  </tr>\n  <tr>\n    <td>ping_ust_run5.txt</td>\n    <td>100</td>\n    <td>165.867</td>\n    <td>404.178</td>\n    <td>194.69113000000000</td>\n    <td>175.2835</td>\n    <td>41.23967455407920</td>\n    <td>175.271</td>\n    <td>243.698</td>\n    <td>261.759</td>\n    <td>363.114</td>\n    <td>33.157252525252500</td>\n  </tr>\n  <tr>\n    <td>ping_ust_run6.txt</td>\n    <td>100</td>\n    <td>168.238</td>\n    <td>741.713</td>\n    <td>218.27052</td>\n    <td>178.24100000000000</td>\n    <td>88.52738597955620</td>\n    <td>178.022</td>\n    <td>309.875</td>\n    <td>377.153</td>\n    <td>608.705</td>\n    <td>59.0361717171717</td>\n  </tr>\n  <tr>\n    <td>ping_ust_run7.txt</td>\n    <td>100</td>\n    <td>169.24</td>\n    <td>486.457</td>\n    <td>212.2392100000000</td>\n    <td>178.02300000000000</td>\n    <td>66.64111056896150</td>\n    <td>177.954</td>\n    <td>315.225</td>\n    <td>363.251</td>\n    <td>428.402</td>\n    <td>44.37959595959600</td>\n  </tr>\n  <tr>\n    <td>ping_ust_run8.txt</td>\n    <td>100</td>\n    <td>169.169</td>\n    <td>351.402</td>\n    <td>190.96145</td>\n    <td>178.515</td>\n    <td>28.676503842585800</td>\n    <td>178.452</td>\n    <td>227.167</td>\n    <td>243.392</td>\n    <td>261.199</td>\n    <td>25.718959595959600</td>\n  </tr>\n  <tr>\n    <td>ping_ust_run9.txt</td>\n    <td>100</td>\n    <td>165.613</td>\n    <td>302.791</td>\n    <td>191.67509000000000</td>\n    <td>176.513</td>\n    <td>30.86045715965550</td>\n    <td>176.464</td>\n    <td>249.619</td>\n    <td>260.409</td>\n    <td>269.196</td>\n    <td>26.237666666666700</td>\n  </tr>\n  <tr>\n    <td>ping_ust_run10.txt</td>\n    <td>100</td>\n    <td>167.718</td>\n    <td>318.014</td>\n    <td>189.63009</td>\n    <td>177.232</td>\n    <td>31.477688288400700</td>\n    <td>177.162</td>\n    <td>230.503</td>\n    <td>257.973</td>\n    <td>307.74</td>\n    <td>22.096656565656600</td>\n  </tr>\n</table>\nEthz:\n---\n<!-- page 16 mode: hybrid_paper -->\n![Figure 1 on Page 16](a001_assets/figures/a001_page_16_fig_1.png)\nObservation: U.S. destinations generally have lower RTTs than overseas ones; transoceanic links produce the largest hop-to-hop increases in traceroute. Wireless links and last-mile congestion raise jitter. Larger ICMP payloads may slightly increase RTT and variability due to serialization time and buffering.\n---\n<!-- page 17 mode: hybrid_paper -->\nTime between SYN and SYN, ACK: 0.025380\nTime between SYN, ACK and ACK: 0.000256\n(Changed the time view as: Set View -> Time Display Format -> Seconds Since Previous Displayed Packet)\nFinal Observations:",
+      "word_count": 611,
       "empty": false,
       "asset_only": false
     },
@@ -66,8 +66,8 @@
       "heading_text": "1. Protocol mix & encryption. The capture shows a contemporary web stack where",
       "normalized_heading_text": "protocol mix encryption the capture shows a contemporary web stack where",
       "level": 3,
-      "line_start": 162,
-      "line_end": 177,
+      "line_start": 834,
+      "line_end": 849,
       "prose_text": "1st Entry : SYN\n2nd Entry: SYN, ACK\n3rd Entry: ACK\nencryption and UDP-based transports are first-class: DNS to map names to IPs, then either TLS over TCP (HTTPS) or QUIC over UDP (HTTP/3). QUIC’s presence\nunder the generic udp filter explains why DNS and QUIC co-appear; protocol hierarchy confirms their relative shares.",
       "full_text": "1st Entry : SYN\n2nd Entry: SYN, ACK\n3rd Entry: ACK\n![Figure 1 on Page 17](a001_assets/figures/a001_page_17_fig_1.png)\nencryption and UDP-based transports are first-class: DNS to map names to IPs, then either TLS over TCP (HTTPS) or QUIC over UDP (HTTP/3). QUIC’s presence\n---\n<!-- page 18 mode: simple_text -->\nunder the generic udp filter explains why DNS and QUIC co-appear; protocol hierarchy confirms their relative shares.",
       "word_count": 52,
@@ -78,8 +78,8 @@
       "heading_text": "2. Name resolution precedes data flows. For each site, DNS queries precede",
       "normalized_heading_text": "name resolution precedes data flows for each site dns queries precede",
       "level": 3,
-      "line_start": 178,
-      "line_end": 181,
+      "line_start": 850,
+      "line_end": 853,
       "prose_text": "connection establishment. Cached domains reduce or eliminate network DNS lookups. Where DNS is slow or fails, application flows stall, a reminder that name resolution is on the critical path.",
       "full_text": "connection establishment. Cached domains reduce or eliminate network DNS lookups. Where DNS is slow or fails, application flows stall, a reminder that name resolution is on the critical path.",
       "word_count": 28,
@@ -90,8 +90,8 @@
       "heading_text": "3. Latency, jitter, and paths. Repeated 100-ping batches reveal that where the server is",
       "normalized_heading_text": "latency jitter and paths repeated 100 ping batches reveal that where the server is",
       "level": 3,
-      "line_start": 182,
-      "line_end": 187,
+      "line_start": 854,
+      "line_end": 859,
       "prose_text": "(and when you measure) matters: nearby U.S. hosts exhibit low median RTTs and tight dispersion, while overseas hosts have higher medians with larger tails.\nTraceroute highlights the longest link(s)-often a transoceanic or inter-regional backbone, and occasional path changes across runs.",
       "full_text": "(and when you measure) matters: nearby U.S. hosts exhibit low median RTTs and tight dispersion, while overseas hosts have higher medians with larger tails.\nTraceroute highlights the longest link(s)-often a transoceanic or inter-regional backbone, and occasional path changes across runs.",
       "word_count": 39,
@@ -102,8 +102,8 @@
       "heading_text": "4. TCP handshake timing. The SYN->SYN,ACK interval aligns with end-to-end RTT;",
       "normalized_heading_text": "tcp handshake timing the syn syn ack interval aligns with end to end rtt",
       "level": 3,
-      "line_start": 188,
-      "line_end": 191,
+      "line_start": 860,
+      "line_end": 863,
       "prose_text": "SYN,ACK->ACK is almost entirely host processing. ECN flags (ECE/CWR) may appear during handshake on networks that negotiate congestion-experienced signaling.",
       "full_text": "SYN,ACK->ACK is almost entirely host processing. ECN flags (ECE/CWR) may appear during handshake on networks that negotiate congestion-experienced signaling.",
       "word_count": 22,
@@ -114,8 +114,8 @@
       "heading_text": "5. Practical analysis aids. Custom columns for ports and HTTP fields, plus simple",
       "normalized_heading_text": "practical analysis aids custom columns for ports and http fields plus simple",
       "level": 3,
-      "line_start": 192,
-      "line_end": 196,
+      "line_start": 864,
+      "line_end": 868,
       "prose_text": "coloring rules, significantly speed up triage-particularly when QUIC, DNS, and TLS traffic interleave. Protocol Hierarchy and “Follow TCP Stream” provide fast summaries and per-flow clarity, respectively.",
       "full_text": "coloring rules, significantly speed up triage-particularly when QUIC, DNS, and TLS traffic interleave. Protocol Hierarchy and “Follow TCP Stream” provide fast summaries and per-flow clarity, respectively.\n---",
       "word_count": 26,
@@ -123,15 +123,51 @@
       "asset_only": false
     }
   ],
-  "figures": [],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "on Page 1",
+      "normalized_caption": "on page 1",
+      "line_no": 16,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 4",
+      "normalized_caption": "on page 4",
+      "line_no": 56,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 9",
+      "normalized_caption": "on page 9",
+      "line_no": 116,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 16",
+      "normalized_caption": "on page 16",
+      "line_no": 818,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 17",
+      "normalized_caption": "on page 17",
+      "line_no": 840,
+      "kind": "figure"
+    }
+  ],
   "tables": [],
   "intrinsic_metrics": {
     "heading_count": 6,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 0,
+    "figure_caption_count": 5,
     "table_caption_count": 0,
-    "duplicate_figure_caption_count": 0,
+    "duplicate_figure_caption_count": 4,
     "duplicate_table_caption_count": 0,
     "empty_section_count": 0,
     "consecutive_heading_run_count": 0,
@@ -141,19 +177,21 @@
     "doc_id": "a001",
     "system": "ocr_agent",
     "title": "CMPE 286 - LAB - 1",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment1.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment1.pdf",
     "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a001/a001.pdf",
     "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a001",
-    "ocr_backend": "dummy",
+    "ocr_backend": "ocr_server",
     "use_pdf_page_ocr": false,
     "document_mode": "ocr",
     "asset_counts": {
-      "figures": 5,
+      "figures": 34,
       "tables": 0,
       "page_images": 12
     },
-    "elapsed_ms": 2330.764,
+    "elapsed_ms": 370110.79,
     "status": "success",
-    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a001/paper.md"
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a001/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
   }
 }

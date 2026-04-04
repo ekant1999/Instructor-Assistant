@@ -1,0 +1,178 @@
+{
+  "paper_id": 701530298732,
+  "generated_at": "2026-04-04T22:55:07.081702+00:00",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment7.pdf",
+  "markdown_file": "paper.md",
+  "metadata": {
+    "title": "CS 249 - Assignment: VM Resource Monitoring and Benchmarking",
+    "paper_id": 701530298732,
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment7.pdf",
+    "generated_at": "2026-04-04T22:55:07.071766+00:00",
+    "num_figures": 3,
+    "num_tables": 1,
+    "num_equations": 0,
+    "page_count": 3
+  },
+  "config": {
+    "asset_mode": "copy",
+    "asset_path_mode": "relative",
+    "include_frontmatter": true,
+    "include_page_markers": false,
+    "prefer_equation_latex": true,
+    "include_equation_fallback_assets": true,
+    "ensure_assets": true,
+    "overwrite": true,
+    "quality_audit_enabled": true,
+    "conservative_fallback": true,
+    "conservative_equations_as_assets_only": true
+  },
+  "render_mode": "normal",
+  "quality_audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": [],
+    "suspicious_headings": [],
+    "heading_counts": {
+      "benchmark figures": 1,
+      "summary table and findings": 1,
+      "test environment": 1
+    },
+    "total_headings": 3
+  },
+  "asset_counts": {
+    "figures": 3,
+    "tables": 1,
+    "equations": 0
+  },
+  "sectioning": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 3,
+    "matched_headings": 4,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 4
+      },
+      {
+        "index": 1,
+        "title": "Test Environment",
+        "canonical": "test_environment",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 5,
+        "end_block_index": 10
+      },
+      {
+        "index": 2,
+        "title": "Benchmark Figures",
+        "canonical": "benchmark_figures",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 2,
+        "start_block_index": 11,
+        "end_block_index": 13
+      },
+      {
+        "index": 3,
+        "title": "Summary Table and Findings",
+        "canonical": "results",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 3,
+        "end_page": 3,
+        "start_block_index": 14,
+        "end_block_index": 27
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 28
+  },
+  "sections": [
+    {
+      "section_index": 0,
+      "section_canonical": "front_matter",
+      "section_title": "Front Matter",
+      "page_no": 1
+    },
+    {
+      "section_index": 1,
+      "section_canonical": "test_environment",
+      "section_title": "Test Environment",
+      "page_no": 1
+    },
+    {
+      "section_index": 2,
+      "section_canonical": "benchmark_figures",
+      "section_title": "Benchmark Figures",
+      "page_no": 2
+    },
+    {
+      "section_index": 3,
+      "section_canonical": "results",
+      "section_title": "Summary Table and Findings",
+      "page_no": 3
+    }
+  ],
+  "assets": {
+    "figures": [
+      {
+        "id": 1,
+        "page_no": 1,
+        "file_name": "page_001_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "1",
+        "figure_body": "Mock terminal output during the load test.",
+        "figure_caption": "Figure 1. Mock terminal output during the load test.",
+        "section_canonical": "test_environment",
+        "markdown_path": "assets/figures/page_001_img_001.png"
+      },
+      {
+        "id": 2,
+        "page_no": 2,
+        "file_name": "page_002_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "2",
+        "figure_body": "CPU and memory utilization observed across the benchmark.",
+        "figure_caption": "Figure 2. CPU and memory utilization observed across the benchmark.",
+        "section_canonical": "benchmark_figures",
+        "markdown_path": "assets/figures/page_002_img_001.png"
+      },
+      {
+        "id": 3,
+        "page_no": 2,
+        "file_name": "page_002_img_002.png",
+        "figure_type": "embedded",
+        "figure_number": "3",
+        "figure_body": "Throughput and tail-latency progression across the test.",
+        "figure_caption": "Figure 3. Throughput and tail-latency progression across the test.",
+        "section_canonical": "benchmark_figures",
+        "markdown_path": "assets/figures/page_002_img_002.png"
+      }
+    ],
+    "tables": [
+      {
+        "id": 1,
+        "page_no": 3,
+        "json_file": "table_0001.json",
+        "caption": "3. Summary Table and Findings",
+        "section_canonical": "results",
+        "markdown_json_path": "assets/tables/table_0001.json"
+      }
+    ],
+    "equations": []
+  }
+}

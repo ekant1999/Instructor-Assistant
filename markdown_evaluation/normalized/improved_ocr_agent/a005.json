@@ -1,0 +1,171 @@
+{
+  "doc_id": "a005",
+  "system": "improved_ocr_agent",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+  "title": "CMPE 286 - LAB - 3: Web Traffic Inspection and RTT Study",
+  "status": "success",
+  "markdown_line_count": 42,
+  "headings": [
+    {
+      "level": 2,
+      "text": "Part 1: Environment Setup",
+      "normalized_text": "part 1 environment setup",
+      "line_no": 10,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Part 2: Protocol Filters",
+      "normalized_text": "part 2 protocol filters",
+      "line_no": 15,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Part 3: HTTP Request Summary",
+      "normalized_text": "part 3 http request summary",
+      "line_no": 20,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Part 4: Delay and Jitter",
+      "normalized_text": "part 4 delay and jitter",
+      "line_no": 26,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Part 5: TCP 3-Way Handshake and Observations",
+      "normalized_text": "part 5 tcp 3 way handshake and observations",
+      "line_no": 34,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "Part 1: Environment Setup",
+      "normalized_heading_text": "part 1 environment setup",
+      "level": 2,
+      "line_start": 10,
+      "line_end": 14,
+      "prose_text": "",
+      "full_text": "![Figure 1 on Page 1](a005_assets/figures/a005_page_1_fig_1.png)\n---\n<!-- page 2 mode: hybrid_paper -->",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": true
+    },
+    {
+      "heading_text": "Part 2: Protocol Filters",
+      "normalized_heading_text": "part 2 protocol filters",
+      "level": 2,
+      "line_start": 15,
+      "line_end": 19,
+      "prose_text": "",
+      "full_text": "![Figure 2 on Page 2](a005_assets/figures/a005_page_2_fig_1.png)\n---\n<!-- page 3 mode: hybrid_paper -->",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": true
+    },
+    {
+      "heading_text": "Part 3: HTTP Request Summary",
+      "normalized_heading_text": "part 3 http request summary",
+      "level": 2,
+      "line_start": 20,
+      "line_end": 25,
+      "prose_text": "The following table summarizes sample requests identified from the filtered capture. All values below are fabricated for benchmarking purposes but follow realistic web-traffic patterns.",
+      "full_text": "The following table summarizes sample requests identified from the filtered capture. All values below are fabricated for benchmarking purposes but follow realistic web-traffic patterns.\n![Figure 3 on Page 3](a005_assets/figures/a005_page_3_fig_1.png)\n---\n<!-- page 4 mode: hybrid_paper -->",
+      "word_count": 24,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Part 4: Delay and Jitter",
+      "normalized_heading_text": "part 4 delay and jitter",
+      "level": 2,
+      "line_start": 26,
+      "line_end": 33,
+      "prose_text": "Host Runs Median RTT (ms) P95 RTT (ms) Std Dev (ms) MAD Successive (ms)\nharvard.edu 10 21.7 98.2 27.3 18.4\nmit.edu 10 36.1 129.3 35.8 24.8",
+      "full_text": "Host Runs Median RTT (ms) P95 RTT (ms) Std Dev (ms) MAD Successive (ms)\nharvard.edu 10 21.7 98.2 27.3 18.4\nmit.edu 10 36.1 129.3 35.8 24.8\n![Figure 4 on Page 4](a005_assets/figures/a005_page_4_fig_1.png)\n---\n<!-- page 5 mode: hybrid_paper -->",
+      "word_count": 18,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Part 5: TCP 3-Way Handshake and Observations",
+      "normalized_heading_text": "part 5 tcp 3 way handshake and observations",
+      "level": 2,
+      "line_start": 34,
+      "line_end": 42,
+      "prose_text": "A single connection was isolated and the time display was changed to “Seconds Since Previous Displayed Packet.” The sample handshake timings are shown below.\n1. Name resolution appeared before every application flow, reinforcing that DNS latency is on the critical path.\n2. The TCP and TLS filters highlighted the same sessions that later carried HTTP payloads.\n3. Domestic destinations showed tighter RTT distributions than overseas destinations, while long-tail spikes\nwere more visible in the remote host sample.\n4. Custom columns for ports, host, and URI made triage substantially faster when multiple protocols\ninterleaved in the same capture.",
+      "full_text": "A single connection was isolated and the time display was changed to “Seconds Since Previous Displayed Packet.” The sample handshake timings are shown below.\n1. Name resolution appeared before every application flow, reinforcing that DNS latency is on the critical path.\n2. The TCP and TLS filters highlighted the same sessions that later carried HTTP payloads.\n3. Domestic destinations showed tighter RTT distributions than overseas destinations, while long-tail spikes\nwere more visible in the remote host sample.\n4. Custom columns for ports, host, and URI made triage substantially faster when multiple protocols\ninterleaved in the same capture.\n---",
+      "word_count": 92,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "on Page 1",
+      "normalized_caption": "on page 1",
+      "line_no": 11,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "on Page 2",
+      "normalized_caption": "on page 2",
+      "line_no": 16,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "on Page 3",
+      "normalized_caption": "on page 3",
+      "line_no": 22,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "on Page 4",
+      "normalized_caption": "on page 4",
+      "line_no": 30,
+      "kind": "figure"
+    }
+  ],
+  "tables": [],
+  "intrinsic_metrics": {
+    "heading_count": 5,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 4,
+    "table_caption_count": 0,
+    "duplicate_figure_caption_count": 0,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 2,
+    "consecutive_heading_run_count": 1,
+    "max_consecutive_heading_run": 3
+  },
+  "run_metadata": {
+    "doc_id": "a005",
+    "system": "improved_ocr_agent",
+    "title": "CMPE 286 - LAB - 3: Web Traffic Inspection and RTT Study",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+    "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a005/a005.pdf",
+    "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a005",
+    "ocr_backend": "ocr_server",
+    "use_pdf_page_ocr": false,
+    "document_mode": "hybrid_paper",
+    "asset_counts": {
+      "figures": 4,
+      "tables": 0,
+      "page_images": 0
+    },
+    "elapsed_ms": 935.636,
+    "status": "success",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a005/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": true
+  }
+}

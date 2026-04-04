@@ -1,0 +1,1228 @@
+{
+  "doc_id": "p110",
+  "system": "improved_ocr_agent",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/c4a536b15a8624a5.pdf",
+  "title": "Scaling DoRA: High-Rank Adaptation via Factored Norms and Fused Kernels",
+  "status": "success",
+  "markdown_line_count": 684,
+  "headings": [
+    {
+      "level": 2,
+      "text": "Abstract",
+      "normalized_text": "abstract",
+      "line_no": 10,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Introduction",
+      "normalized_text": "introduction",
+      "line_no": 16,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Factored Norm Computation",
+      "normalized_text": "factored norm computation",
+      "line_no": 46,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Algebraic Decomposition",
+      "normalized_text": "algebraic decomposition",
+      "line_no": 49,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Assembly and Precision",
+      "normalized_text": "assembly and precision",
+      "line_no": 81,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Complexity",
+      "normalized_text": "complexity",
+      "line_no": 96,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Fused Triton Kernels",
+      "normalized_text": "fused triton kernels",
+      "line_no": 133,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Compose Kernel",
+      "normalized_text": "compose kernel",
+      "line_no": 136,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Backward Kernel",
+      "normalized_text": "backward kernel",
+      "line_no": 161,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Norm Assembly Kernel",
+      "normalized_text": "norm assembly kernel",
+      "line_no": 167,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Yes",
+      "normalized_text": "yes",
+      "line_no": 175,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "No",
+      "normalized_text": "no",
+      "line_no": 177,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Runtime Dispatch",
+      "normalized_text": "runtime dispatch",
+      "line_no": 181,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Experiments",
+      "normalized_text": "experiments",
+      "line_no": 198,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Setup",
+      "normalized_text": "setup",
+      "line_no": 201,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Model-Level Performance",
+      "normalized_text": "model level performance",
+      "line_no": 206,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Why Dense (B@A) Is Not Enough",
+      "normalized_text": "why dense b a is not enough",
+      "line_no": 234,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Compose Kernel Performance",
+      "normalized_text": "compose kernel performance",
+      "line_no": 236,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Backward Kernel Performance",
+      "normalized_text": "backward kernel performance",
+      "line_no": 346,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Norm Memory Reduction",
+      "normalized_text": "norm memory reduction",
+      "line_no": 348,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Memory Profile",
+      "normalized_text": "memory profile",
+      "line_no": 354,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Cross-Architecture Consistency",
+      "normalized_text": "cross architecture consistency",
+      "line_no": 362,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Convergence Equivalence",
+      "normalized_text": "convergence equivalence",
+      "line_no": 370,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Discussion",
+      "normalized_text": "discussion",
+      "line_no": 414,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Deployment Context",
+      "normalized_text": "deployment context",
+      "line_no": 417,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "Tradeoffs and Limitations",
+      "normalized_text": "tradeoffs and limitations",
+      "line_no": 422,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Related Work",
+      "normalized_text": "related work",
+      "line_no": 436,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Conclusion",
+      "normalized_text": "conclusion",
+      "line_no": 449,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Data Availability",
+      "normalized_text": "data availability",
+      "line_no": 455,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Acknowledgements",
+      "normalized_text": "acknowledgements",
+      "line_no": 461,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "References",
+      "normalized_text": "references",
+      "line_no": 464,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Forward Contract and Execution Semantics",
+      "normalized_text": "forward contract and execution semantics",
+      "line_no": 501,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Module Interface & Compose Semantics",
+      "normalized_text": "module interface compose semantics",
+      "line_no": 503,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Norm Policy",
+      "normalized_text": "norm policy",
+      "line_no": 509,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Implementation Details",
+      "normalized_text": "implementation details",
+      "line_no": 518,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Kernel Specifications",
+      "normalized_text": "kernel specifications",
+      "line_no": 544,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Compose Forward kernel",
+      "normalized_text": "compose forward kernel",
+      "line_no": 547,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Compose Backward kernel",
+      "normalized_text": "compose backward kernel",
+      "line_no": 552,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Norm Assembly kernel (norm-only)",
+      "normalized_text": "norm assembly kernel norm only",
+      "line_no": 555,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Magnitude division (PyTorch)",
+      "normalized_text": "magnitude division pytorch",
+      "line_no": 561,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Reproducibility",
+      "normalized_text": "reproducibility",
+      "line_no": 569,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Full Model-Level Memory Table",
+      "normalized_text": "full model level memory table",
+      "line_no": 620,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Single-Layer E2E Decomposition",
+      "normalized_text": "single layer e2e decomposition",
+      "line_no": 628,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Framework Survey",
+      "normalized_text": "framework survey",
+      "line_no": 630,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "Abstract",
+      "normalized_heading_text": "abstract",
+      "level": 2,
+      "line_start": 10,
+      "line_end": 15,
+      "prose_text": "Weight-Decomposed Low-Rank Adaptation (DoRA; Liu et al. [2024]) extends LoRA by decoupling weight magnitude from direction, but its forward pass requires the row-wise norm ∥W + sBA∥row, a computation that every major framework we surveyed implements by materializing the dense [dout, din] product BA. At din = 8192 and rank r = 384, a single module’s norm requires ∼512 MB of transient working memory in bf16, making high-rank DoRA costly and often infeasible on common single-GPU setups once hundreds of adapted modules and checkpointing are involved.\nWe present two systems contributions: a factored norm that decomposes the squared norm into base, cross, and Gram terms computable through O(doutr + r2) intermediates, eliminating the dense product. Fused Triton kernels collapse the four-kernel DoRA composition into a single pass, reducing memory traffic by ∼4× and using a numerically stable form that avoids catastrophic cancellation in the near-unity rescaling regime where magnitude scales concentrate in practice.\nAcross six 8–32B vision-language models (VLMs) on three NVIDIA GPUs (RTX 6000 PRO, H200, B200) at r=384 in bf16, the fused implementation is 1.5–2.0× faster than HF PEFT’s DoRA implementation for inference, and 1.5–1.9× faster for gradient computation (optimizer step excluded), with up to 7 GB lower peak VRAM. Microbenchmarks on six GPUs spanning four architecture generations (L40S, A100, RTX 6000 PRO, H200, B200, B300) confirm 1.5–2.7× compose-kernel speedup. Final-logit cosine similarity exceeds 0.9999 across all model/GPU pairs, and multi-seed training curves match within 7.1 × 10−4 mean per-step loss delta over 2000 steps.",
+      "full_text": "Weight-Decomposed Low-Rank Adaptation (DoRA; Liu et al. [2024]) extends LoRA by decoupling weight magnitude from direction, but its forward pass requires the row-wise norm ∥W + sBA∥row, a computation that every major framework we surveyed implements by materializing the dense [dout, din] product BA. At din = 8192 and rank r = 384, a single module’s norm requires ∼512 MB of transient working memory in bf16, making high-rank DoRA costly and often infeasible on common single-GPU setups once hundreds of adapted modules and checkpointing are involved.\nWe present two systems contributions: a factored norm that decomposes the squared norm into base, cross, and Gram terms computable through O(doutr + r2) intermediates, eliminating the dense product. Fused Triton kernels collapse the four-kernel DoRA composition into a single pass, reducing memory traffic by ∼4× and using a numerically stable form that avoids catastrophic cancellation in the near-unity rescaling regime where magnitude scales concentrate in practice.\nAcross six 8–32B vision-language models (VLMs) on three NVIDIA GPUs (RTX 6000 PRO, H200, B200) at r=384 in bf16, the fused implementation is 1.5–2.0× faster than HF PEFT’s DoRA implementation for inference, and 1.5–1.9× faster for gradient computation (optimizer step excluded), with up to 7 GB lower peak VRAM. Microbenchmarks on six GPUs spanning four architecture generations (L40S, A100, RTX 6000 PRO, H200, B200, B300) confirm 1.5–2.7× compose-kernel speedup. Final-logit cosine similarity exceeds 0.9999 across all model/GPU pairs, and multi-seed training curves match within 7.1 × 10−4 mean per-step loss delta over 2000 steps.\n1",
+      "word_count": 220,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Introduction",
+      "normalized_heading_text": "introduction",
+      "level": 2,
+      "line_start": 16,
+      "line_end": 45,
+      "prose_text": "Low-Rank Adaptation (LoRA; Hu et al. 2022) is the dominant method for parameter-efficient finetuning. DoRA [Liu et al., 2024] extends LoRA by decomposing the adapted weight into magnitude and direction:\nwhere W ∈Rdout×din is the frozen base weight, B ∈Rdout×r and A ∈Rr×din are low-rank factors, s is a scaling coefficient (e.g., rsLoRA; Kalajdzievski 2023), and m ∈Rdout is a learnable magnitude vector. High-rank configurations narrow the gap to full fine-tuning on complex downstream tasks [Hu et al., 2022, Liu et al., 2024]. We treat weights as [dout, din] and compute per-output-row norms (dim=1), consistent with PEFT and torchtune.\n∗Correspondence: alexa@eyes.ml\n| x_eye = torch.eye(lora_A.weight.shape[1], ...) # [d_in, d_in] |\n| lora_weight = lora_B(lora_A(x_eye)).T # [d_out, d_in] |\n| weight_norm = torch.linalg.norm(weight + scaling * lora_weight, dim=1) |\nThis incurs O(d2 in) memory for the identity matrix alone: 32 MB at din = 4096, 128 MB at din = 8192 in bf16. Including the dense BA product and composed-weight copy, a single module allocates 3–4 dense [dout, din] temporaries: ∼512 MB at din = 8192. With gradient checkpointing [Chen et al., 2016], these temporaries are allocated twice per step. Across hundreds of adapted modules in an 8–32B model, this cumulative pressure is a major contributor to both speed degradation and OOM failures at high rank.\nThe most obvious fix (computing lora_B.weight @ lora_A.weight directly) eliminates the identity matrix but still materializes the full [dout, din] product, which is the dominant cost. We show in §5.3 that this “dense (B@A)” path provides inconsistent speedups that depend on GPU bandwidth class and sometimes runs slower than the PEFT baseline.\nThis paper does not propose a new adapter architecture, optimizer, or training recipe. Our contribution is systems-oriented: we execute the same DoRA computation with a smaller working set and lower memory traffic. Specifically:\nA factored norm computation (§2) decomposes ∥W + sBA∥2\nrow into three terms, each evaluable through O(doutr+r2) intermediates without materializing BA. At d = 8192, r = 512 in fp32, the theoretical persistent-memory reduction is 15× (Table 1).\n2. Fused Triton kernels (§3) collapse the DoRA composition (g−1)⊙base+g⊙s⊙lora from four\nCUDA kernel launches to one pass. A numerically stable form avoids catastrophic cancellation when g ≈1. Forward speedup: 1.5–2.7× (geometric mean); backward speedup: 1.06–1.23×.\nA three-tier runtime dispatch (§4) selects the optimal path (fused backward for training, fused forward for inference, eager fallback for CPU or sub-crossover shapes), compatible with torch.compile [Ansel et al., 2024], gradient checkpointing, DeepSpeed ZeRO [Rajbhandari et al., 2020], and FSDP1.\nBoth contributions are validated on six NVIDIA GPUs spanning four architecture generations (L40S, A100, RTX 6000 PRO, H200, B200, B300; 48–268 GB) with model-level benchmarks on three GPUs across six 8–32B VLMs (§5). Throughout this paper, four configurations are compared: PEFT (unmodified HF PEFT identity-matrix path), Dense (B@A) (direct product, still materializes the full matrix), Eager (our factored norm with PyTorch composition), and Fused (our factored norm with Triton kernels).",
+      "full_text": "Low-Rank Adaptation (LoRA; Hu et al. 2022) is the dominant method for parameter-efficient finetuning. DoRA [Liu et al., 2024] extends LoRA by decomposing the adapted weight into magnitude and direction:\nW′ = m ⊙ W + sBA\n∥W + sBA∥row (1)\nwhere W ∈Rdout×din is the frozen base weight, B ∈Rdout×r and A ∈Rr×din are low-rank factors, s is a scaling coefficient (e.g., rsLoRA; Kalajdzievski 2023), and m ∈Rdout is a learnable magnitude vector. High-rank configurations narrow the gap to full fine-tuning on complex downstream tasks [Hu et al., 2022, Liu et al., 2024]. We treat weights as [dout, din] and compute per-output-row norms (dim=1), consistent with PEFT and torchtune.\n∗Correspondence: alexa@eyes.ml\n1\n---\n<!-- page 2 mode: hybrid_paper -->\n**Table 1 (Page 2)**\n|  |\n$$\n|---|\n| x_eye = torch.eye(lora_A.weight.shape[1], ...) # [d_in, d_in] |\n| lora_weight = lora_B(lora_A(x_eye)).T # [d_out, d_in] |\n| weight_norm = torch.linalg.norm(weight + scaling * lora_weight, dim=1) |\n$$\n|  |\n![Table 1 on Page 2](p110_assets/tables/p110_page_2_table_1.png)\nThis incurs O(d2 in) memory for the identity matrix alone: 32 MB at din = 4096, 128 MB at din = 8192 in bf16. Including the dense BA product and composed-weight copy, a single module allocates 3–4 dense [dout, din] temporaries: ∼512 MB at din = 8192. With gradient checkpointing [Chen et al., 2016], these temporaries are allocated twice per step. Across hundreds of adapted modules in an 8–32B model, this cumulative pressure is a major contributor to both speed degradation and OOM failures at high rank.\nThe most obvious fix (computing lora_B.weight @ lora_A.weight directly) eliminates the identity matrix but still materializes the full [dout, din] product, which is the dominant cost. We show in §5.3 that this “dense (B@A)” path provides inconsistent speedups that depend on GPU bandwidth class and sometimes runs slower than the PEFT baseline.\nThis paper does not propose a new adapter architecture, optimizer, or training recipe. Our contribution is systems-oriented: we execute the same DoRA computation with a smaller working set and lower memory traffic. Specifically:\nA factored norm computation (§2) decomposes ∥W + sBA∥2\nrow into three terms, each evaluable through O(doutr+r2) intermediates without materializing BA. At d = 8192, r = 512 in fp32, the theoretical persistent-memory reduction is 15× (Table 1).\n2. Fused Triton kernels (§3) collapse the DoRA composition (g−1)⊙base+g⊙s⊙lora from four\nCUDA kernel launches to one pass. A numerically stable form avoids catastrophic cancellation when g ≈1. Forward speedup: 1.5–2.7× (geometric mean); backward speedup: 1.06–1.23×.\nA three-tier runtime dispatch (§4) selects the optimal path (fused backward for training, fused forward for inference, eager fallback for CPU or sub-crossover shapes), compatible with torch.compile [Ansel et al., 2024], gradient checkpointing, DeepSpeed ZeRO [Rajbhandari et al., 2020], and FSDP1.\nBoth contributions are validated on six NVIDIA GPUs spanning four architecture generations (L40S, A100, RTX 6000 PRO, H200, B200, B300; 48–268 GB) with model-level benchmarks on three GPUs across six 8–32B VLMs (§5). Throughout this paper, four configurations are compared: PEFT (unmodified HF PEFT identity-matrix path), Dense (B@A) (direct product, still materializes the full matrix), Eager (our factored norm with PyTorch composition), and Fused (our factored norm with Triton kernels).\n2",
+      "word_count": 432,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Factored Norm Computation",
+      "normalized_heading_text": "factored norm computation",
+      "level": 2,
+      "line_start": 46,
+      "line_end": 48,
+      "prose_text": "",
+      "full_text": "2.1",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Algebraic Decomposition",
+      "normalized_heading_text": "algebraic decomposition",
+      "level": 3,
+      "line_start": 49,
+      "line_end": 80,
+      "prose_text": "The row-wise squared norm of the composed weight expands into three terms:\n∥W + sBA∥2 row = ∥W∥2 row | {z } base\n+ 2s⟨W, BA⟩row | {z } cross + s2 ∥BA∥2 row | {z } BA norm\nwhere ⟨·, ·⟩row denotes the row-wise inner product. Each term is computable through low-rank intermediates:\n∥W∥2 row accumulates via chunks along din, producing a vector of size dout. Chunking limits working memory to a configurable budget (default: 256 MB).\nThe row-wise inner product rewrites as:\nwhere U = WA⊤∈Rdout×r accumulates chunk-wise: U ←U + WcA⊤ c .\nThe row-wise squared norm factors through the Gram matrix:\nwhere G = AA⊤∈Rr×r also accumulates chunk-wise. At r = 512 in fp32, G occupies 1 MB.",
+      "full_text": "The row-wise squared norm of the composed weight expands into three terms:\n$$\n∥W + sBA∥2 row = ∥W∥2 row | {z } base\n$$\n+ 2s⟨W, BA⟩row | {z } cross + s2 ∥BA∥2 row | {z } BA norm\n$$\n(2)\n$$\n2\n---\n<!-- page 3 mode: hybrid_paper -->\n$$\nwhere ⟨·, ·⟩row denotes the row-wise inner product. Each term is computable through low-rank intermediates:\n$$\nBase norm.\n∥W∥2 row accumulates via chunks along din, producing a vector of size dout. Chunking limits working memory to a configurable budget (default: 256 MB).\nCross term.\nThe row-wise inner product rewrites as:\n$$\n⟨W, BA⟩j = X\nwhere U = WA⊤∈Rdout×r accumulates chunk-wise: U ←U + WcA⊤ c .\n$$\nBA norm.\nThe row-wise squared norm factors through the Gram matrix:\n$$\nℓ Bjℓ· Ujℓ= (B ⊙U)j · 1 (3)\n∥BA∥2 j = (BG ⊙B)j · 1 (4)\nwhere G = AA⊤∈Rr×r also accumulates chunk-wise. At r = 512 in fp32, G occupies 1 MB.\n$$\n2.2",
+      "word_count": 90,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Assembly and Precision",
+      "normalized_heading_text": "assembly and precision",
+      "level": 3,
+      "line_start": 81,
+      "line_end": 95,
+      "prose_text": "The three per-row scalars assemble into the weight norm:\nmax \u0010 ∥W∥2 row + 2s · cross + s2 · ba_norm, 0 \u0011 (5)\nThe magnitude division is always computed in PyTorch after the kernel returns:\nThis ensures identical precision regardless of whether the Triton or PyTorch norm path produced wnorm, eliminating a source of fidelity divergence we observed at large activation scales (see §5.8).\nAll accumulation is performed in fp32 under torch.no_grad() with autocast disabled. Disabling autocast alone does not force fp32 when inputs are bf16, so each chunk of W, A, B, and the intermediate Uc is explicitly cast to fp32 before accumulation. This is consistent with the DoRA paper’s instruction (Section 4.3) to treat the norm as a detached constant [Liu et al., 2024]. We use g consistently throughout to denote the post-division scale, distinct from the learnable magnitude m.",
+      "full_text": "The three per-row scalars assemble into the weight norm:\nr\nwnorm =\n$$\nmax \u0010 ∥W∥2 row + 2s · cross + s2 · ba_norm, 0 \u0011 (5)\n$$\nThe magnitude division is always computed in PyTorch after the kernel returns:\n$$\ng ≜m / max(wnorm, ϵ) (6)\n$$\nThis ensures identical precision regardless of whether the Triton or PyTorch norm path produced wnorm, eliminating a source of fidelity divergence we observed at large activation scales (see §5.8).\nAll accumulation is performed in fp32 under torch.no_grad() with autocast disabled. Disabling autocast alone does not force fp32 when inputs are bf16, so each chunk of W, A, B, and the intermediate Uc is explicitly cast to fp32 before accumulation. This is consistent with the DoRA paper’s instruction (Section 4.3) to treat the norm as a detached constant [Liu et al., 2024]. We use g consistently throughout to denote the post-division scale, distinct from the learnable magnitude m.\n2.3",
+      "word_count": 126,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Complexity",
+      "normalized_heading_text": "complexity",
+      "level": 3,
+      "line_start": 96,
+      "line_end": 132,
+      "prose_text": "Table 1 compares asymptotic and concrete memory costs.\nWhy the measured reduction is smaller.\nThe dominant transient is the base-norm computation (Term 1 of Equation 2): the chunked ∥W∥2 row accumulation creates a [dout, chunk_size] fp32 buffer that, at the default budget and d = 8192, approaches 256 MB, accounting for most of the 241 MB measured delta. This cost is rank-independent: identical at r = 16 and r = 768. The theoretical reduction, which counts only rank-dependent tensors (U and G), correctly predicts the asymptotic benefit as rank grows.\nSince W is frozen, ∥W∥2 row could be precomputed into a [dout] buffer (16 KB at dout = 4096), eliminating this transient entirely. We leave this caching for future work.\n**Table 1: The factored norm reduces rank-dependent persistent memory by 15× at d=8192, r=512 in fp32. Measured reductions are smaller (3.2×) because allocator deltas include the rank-independent base-norm transient (§2.3).**\nAlgorithm 1: Factored Row-wise Norm\nInput: W ∈Rdout×din (frozen); A ∈Rr×din, B ∈Rdout×r; s ∈R; ε (dtype-dependent); chunk_budget (bytes, default 256 MB)\ncs ←min(din, ⌊budget/(dout · 4)⌋), aligned to 64 elements.\nAll accumulation in fp32 under torch.no_grad(), autocast disabled. Cast W chunks, A, B to fp32 on the fly.\nInitialize: base_sq ←0dout, cross ←0dout, G ←0r×r (all fp32)\nfor each chunk c of size cs:\nW_c = W[:, c:c+cs].float() [dout, cs] A_c = A[:, c:c+cs].float() [r, cs] base_sq += (W_c**2).sum(dim=1) G ←G + AcA⊤ c Uc ←WcA⊤ c [dout, r] (not retained) cross += (B.float() * U_c).sum(dim=1)\nba_sq = (B.float() @ G * B.float()).sum(dim=1) [dout] wnorm ← p\nmax(base_sq + 2s · cross + s2 · ba_sq, 0) [dout] return w_norm.to(input_dtype)\nNotes: Chunk size aligns to 64 for Tensor Core MMA. Uc is never stored for multiple chunks simultaneously. When s=0, cross and ba_sq are skipped; Uc and G are not allocated. G is ≤2.4 MB at r = 768 in fp32.",
+      "full_text": "Table 1 compares asymptotic and concrete memory costs.\nWhy the measured reduction is smaller.\nThe dominant transient is the base-norm computation (Term 1 of Equation 2): the chunked ∥W∥2 row accumulation creates a [dout, chunk_size] fp32 buffer that, at the default budget and d = 8192, approaches 256 MB, accounting for most of the 241 MB measured delta. This cost is rank-independent: identical at r = 16 and r = 768. The theoretical reduction, which counts only rank-dependent tensors (U and G), correctly predicts the asymptotic benefit as rank grows.\nSince W is frozen, ∥W∥2 row could be precomputed into a [dout] buffer (16 KB at dout = 4096), eliminating this transient entirely. We leave this caching for future work.\n3\n---\n<!-- page 4 mode: hybrid_paper -->\n**Table 1: The factored norm reduces rank-dependent persistent memory by 15× at d=8192, r=512 in fp32. Measured reductions are smaller (3.2×) because allocator deltas include the rank-independent base-norm transient (§2.3).**\n![Table 1](p110_assets/tables/p110_page_4_table_caption_1.png)\n4\n---\n<!-- page 5 mode: simple_text -->\nAlgorithm 1: Factored Row-wise Norm\n```text\nInput: W ∈Rdout×din (frozen); A ∈Rr×din, B ∈Rdout×r; s ∈R; ε (dtype-dependent); chunk_budget (bytes, default 256 MB)\n```\n$$\ncs ←min(din, ⌊budget/(dout · 4)⌋), aligned to 64 elements.\n$$\nAll accumulation in fp32 under torch.no_grad(), autocast disabled. Cast W chunks, A, B to fp32 on the fly.\n$$\nInitialize: base_sq ←0dout, cross ←0dout, G ←0r×r (all fp32)\n$$\n```text\nfor each chunk c of size cs:\n```\nW_c = W[:, c:c+cs].float() [dout, cs] A_c = A[:, c:c+cs].float() [r, cs] base_sq += (W_c**2).sum(dim=1) G ←G + AcA⊤ c Uc ←WcA⊤ c [dout, r] (not retained) cross += (B.float() * U_c).sum(dim=1)\n$$\nba_sq = (B.float() @ G * B.float()).sum(dim=1) [dout] wnorm ← p\n$$\n```text\nmax(base_sq + 2s · cross + s2 · ba_sq, 0) [dout] return w_norm.to(input_dtype)\n```\nNotes: Chunk size aligns to 64 for Tensor Core MMA. Uc is never stored for multiple chunks simultaneously. When s=0, cross and ba_sq are skipped; Uc and G are not allocated. G is ≤2.4 MB at r = 768 in fp32.\n3",
+      "word_count": 253,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Fused Triton Kernels",
+      "normalized_heading_text": "fused triton kernels",
+      "level": 2,
+      "line_start": 133,
+      "line_end": 135,
+      "prose_text": "",
+      "full_text": "3.1",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Compose Kernel",
+      "normalized_heading_text": "compose kernel",
+      "level": 3,
+      "line_start": 136,
+      "line_end": 160,
+      "prose_text": "The DoRA composition (g−1) ⊙base + g ⊙s ⊙lora decomposes into four sequential element-wise operations in standard PyTorch, each launching a separate CUDA kernel: 3 reads + 1 write per op yields ∼12 memory passes total. The fused Triton [Tillet et al., 2019] kernel collapses these into a single pass: 3 reads (base, lora, g) + 1 write, a ∼4× reduction in memory traffic. The realized speedup of 2.0–2.7× (rather than 4×) reflects the fact that the eager path is partially latency-bound by kernel-launch gaps; the fused kernel achieves ∼50% of peak HBM bandwidth (Figure 7), vs.\n∼20% for the eager path.\nThe algebraically equivalent form g ⊙(s · lora + base) −base suffers from catastrophic cancellation when g ≈1. This regime is not hypothetical. The stored magnitude parameters reflect the heterogeneous row norms of pretrained weights and naturally vary across layers and models, but DoRA initializes m = ∥W∥row and magnitudes track weight norms throughout training, so the composed scale g = m/wnorm concentrates tightly around unity (mean ≈1.0, std ≈0.0015). Measurement on a Qwen2-VL-7B adapter (r=128, 326 modules, 1.77M elements) shows that 100% of g values fall in the bf16 collapse zone (|g −1| < εbf16/2) and 20% in the fp16 zone: if (g−1) ⊙base were evaluated in bf16, the base correction would vanish for every element; in fp16, for one in five.\nThe stable form (g−1) ⊙base + g ⊙s ⊙lora keeps the small correction (g−1) explicit, but its precision advantage depends on fp32 intermediate computation to prevent (g−1) from rounding to zero. Both the Triton kernel and PyTorch fallback use this form with fp32 compute. Figure 1 shows 3.0× lower peak error near g ≈1 compared to the naive alternative. Beyond the algebraic form,\nMax Absolute Error\nNumerical Stability: DoRA Compose at Near-Unity g\n0.9 0.99 0.999 0.9999 1.0 1.0001 1.001 1.01 1.1\n(g = m=kWkrow; benchmark uses unit-norm rows so g ¼ m)\nFigure 1: The stable compose form achieves 3.0× lower peak error near g ≈1 (bf16, dout = 8192, din = 2048). The naive form g ⊙(s · lora + base) −base exhibits catastrophic cancellation; the stable form and fused kernel both remain near the bf16 quantization floor. Reference: fp64.\nbf16 multiplication is non-associative: all code paths enforce a single canonical evaluation order (s · lora first, then g · (·)), ensuring bitwise parity across all PyTorch composition paths.\nOptimal kernel configurations vary substantially across GPUs (∼9% pairwise agreement across six GPUs), requiring per-device autotuning rather than a static table. First-run autotuning takes 10–30 s per kernel, and caches persist in Triton’s default directory. Details in Appendix B.",
+      "full_text": "The DoRA composition (g−1) ⊙base + g ⊙s ⊙lora decomposes into four sequential element-wise operations in standard PyTorch, each launching a separate CUDA kernel: 3 reads + 1 write per op yields ∼12 memory passes total. The fused Triton [Tillet et al., 2019] kernel collapses these into a single pass: 3 reads (base, lora, g) + 1 write, a ∼4× reduction in memory traffic. The realized speedup of 2.0–2.7× (rather than 4×) reflects the fact that the eager path is partially latency-bound by kernel-launch gaps; the fused kernel achieves ∼50% of peak HBM bandwidth (Figure 7), vs.\n∼20% for the eager path.\nNumerical stability.\nThe algebraically equivalent form g ⊙(s · lora + base) −base suffers from catastrophic cancellation when g ≈1. This regime is not hypothetical. The stored magnitude parameters reflect the heterogeneous row norms of pretrained weights and naturally vary across layers and models, but DoRA initializes m = ∥W∥row and magnitudes track weight norms throughout training, so the composed scale g = m/wnorm concentrates tightly around unity (mean ≈1.0, std ≈0.0015). Measurement on a Qwen2-VL-7B adapter (r=128, 326 modules, 1.77M elements) shows that 100% of g values fall in the bf16 collapse zone (|g −1| < εbf16/2) and 20% in the fp16 zone: if (g−1) ⊙base were evaluated in bf16, the base correction would vanish for every element; in fp16, for one in five.\nThe stable form (g−1) ⊙base + g ⊙s ⊙lora keeps the small correction (g−1) explicit, but its precision advantage depends on fp32 intermediate computation to prevent (g−1) from rounding to zero. Both the Triton kernel and PyTorch fallback use this form with fp32 compute. Figure 1 shows 3.0× lower peak error near g ≈1 compared to the naive alternative. Beyond the algebraic form,\n5\n---\n<!-- page 6 mode: hybrid_paper -->\n4 × 10−2\nMax Absolute Error\n3 × 10−2\n2 × 10−2\n10−2\nNumerical Stability: DoRA Compose at Near-Unity g\n(shape 2048×8192, bf16)\n0.9 0.99 0.999 0.9999 1.0 1.0001 1.001 1.01 1.1\nMagnitude parameter m\n(g = m=kWkrow; benchmark uses unit-norm rows so g ¼ m)\nFigure 1: The stable compose form achieves 3.0× lower peak error near g ≈1 (bf16, dout = 8192, din = 2048). The naive form g ⊙(s · lora + base) −base exhibits catastrophic cancellation; the stable form and fused kernel both remain near the bf16 quantization floor. Reference: fp64.\nbf16 multiplication is non-associative: all code paths enforce a single canonical evaluation order (s · lora first, then g · (·)), ensuring bitwise parity across all PyTorch composition paths.\nAutotuning.\nOptimal kernel configurations vary substantially across GPUs (∼9% pairwise agreement across six GPUs), requiring per-device autotuning rather than a static table. First-run autotuning takes 10–30 s per kernel, and caches persist in Triton’s default directory. Details in Appendix B.\n3.2",
+      "word_count": 342,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Backward Kernel",
+      "normalized_heading_text": "backward kernel",
+      "level": 3,
+      "line_start": 161,
+      "line_end": 166,
+      "prose_text": "The fused backward computes dlora = g · s · dout and dbase = (g−1) · dout in a single Triton pass. Two design decisions merit note:\n• Reduced ROWS_PER_PROGRAM: Writing two output tensors doubles per-element traffic; reducing rows per program lowers register pressure and improves SM utilization.\n• dmag via PyTorch reduction: The magnitude gradient uses a separate .sum() rather than tl.atomic_add, avoiding contention at large num_rows and the non-deterministic ordering of floating-point atomics.",
+      "full_text": "The fused backward computes dlora = g · s · dout and dbase = (g−1) · dout in a single Triton pass. Two design decisions merit note:\n• Reduced ROWS_PER_PROGRAM: Writing two output tensors doubles per-element traffic; reducing rows per program lowers register pressure and improves SM utilization.\n• dmag via PyTorch reduction: The magnitude gradient uses a separate .sum() rather than tl.atomic_add, avoiding contention at large num_rows and the non-deterministic ordering of floating-point atomics.\n3.3",
+      "word_count": 68,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Norm Assembly Kernel",
+      "normalized_heading_text": "norm assembly kernel",
+      "level": 3,
+      "line_start": 167,
+      "line_end": 174,
+      "prose_text": "A second Triton kernel fuses Equation 5, computing wnorm from the three factored terms. Storereload barriers prevent FMA fusion, and an inline PTX sqrt.rn.f32 instruction replaces Triton’s default approximate sqrt, exactly reproducing PyTorch’s evaluation order. The kernel stops at\n_compose_with_dispatch",
+      "full_text": "A second Triton kernel fuses Equation 5, computing wnorm from the three factored terms. Storereload barriers prevent FMA fusion, and an inline PTX sqrt.rn.f32 instruction replaces Triton’s default approximate sqrt, exactly reproducing PyTorch’s evaluation order. The kernel stops at\n6\n---\n<!-- page 7 mode: hybrid_paper -->\n_compose_with_dispatch\nrequires_grad?",
+      "word_count": 42,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Yes",
+      "normalized_heading_text": "yes",
+      "level": 2,
+      "line_start": 175,
+      "line_end": 176,
+      "prose_text": "",
+      "full_text": "",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "No",
+      "normalized_heading_text": "no",
+      "level": 2,
+      "line_start": 177,
+      "line_end": 180,
+      "prose_text": "**Table 2: Dispatch tiers and their selection criteria.**",
+      "full_text": "**Table 2: Dispatch tiers and their selection criteria.**\n![Table 2](p110_assets/tables/p110_page_7_table_caption_1.png)",
+      "word_count": 7,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Runtime Dispatch",
+      "normalized_heading_text": "runtime dispatch",
+      "level": 2,
+      "line_start": 181,
+      "line_end": 197,
+      "prose_text": "VLMs, KV projections (dout as low as 512) fall below the crossover, so ∼71% of adapted modules per layer dispatch to Tier 1 during training and ∼29% fall back to Tier 3.\nTier 2 (Fused Forward).\nA forward-only Triton kernel with no autograd graph nodes, dispatched when requires_grad is false.\nTier 3 (Eager Fallback).\nPure PyTorch; handles CPU, no-Triton, and sub-crossover training.\nUses out-of-place composition when autograd is active to avoid aliasing.\nAll PyTorch compose paths produce bitwise-identical forward outputs by enforcing a single evaluation order. The Triton kernels preserve the same algebra but not bitwise equality (FMA contraction and reduction trees can perturb last bits); we treat Triton–PyTorch agreement as an empirical envelope: fp32 outputs stay within 10−4 max-abs error, bf16/fp16 remain within dtype-appropriate tolerances (§5.8).\nThe fused compose is registered as a custom op (peft::fused_dora_compose) via torch.library, making the dispatch graph-break-free under torch.compile when dropout is inactive (p = 0). DeepSpeed ZeRO-2/3 and FSDP1 are supported; FSDP2/DTensor is not (§6). The forward contract, torch.compile details, and the chunked-dropout path are specified in Appendices A and B.\nAcross all tiers, g = m/ max(wnorm, ϵ) is computed in PyTorch outside the no_grad norm context, ensuring identical precision regardless of execution tier.",
+      "full_text": "---\n<!-- page 8 mode: simple_text -->\nVLMs, KV projections (dout as low as 512) fall below the crossover, so ∼71% of adapted modules per layer dispatch to Tier 1 during training and ∼29% fall back to Tier 3.\nTier 2 (Fused Forward).\nA forward-only Triton kernel with no autograd graph nodes, dispatched when requires_grad is false.\nTier 3 (Eager Fallback).\nPure PyTorch; handles CPU, no-Triton, and sub-crossover training.\nUses out-of-place composition when autograd is active to avoid aliasing.\nPrecision.\nAll PyTorch compose paths produce bitwise-identical forward outputs by enforcing a single evaluation order. The Triton kernels preserve the same algebra but not bitwise equality (FMA contraction and reduction trees can perturb last bits); we treat Triton–PyTorch agreement as an empirical envelope: fp32 outputs stay within 10−4 max-abs error, bf16/fp16 remain within dtype-appropriate tolerances (§5.8).\nCompatibility.\nThe fused compose is registered as a custom op (peft::fused_dora_compose) via torch.library, making the dispatch graph-break-free under torch.compile when dropout is inactive (p = 0). DeepSpeed ZeRO-2/3 and FSDP1 are supported; FSDP2/DTensor is not (§6). The forward contract, torch.compile details, and the chunked-dropout path are specified in Appendices A and B.\nMagnitude division.\nAcross all tiers, g = m/ max(wnorm, ϵ) is computed in PyTorch outside the no_grad norm context, ensuring identical precision regardless of execution tier.\n5",
+      "word_count": 192,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Experiments",
+      "normalized_heading_text": "experiments",
+      "level": 2,
+      "line_start": 198,
+      "line_end": 200,
+      "prose_text": "",
+      "full_text": "5.1",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Setup",
+      "normalized_heading_text": "setup",
+      "level": 3,
+      "line_start": 201,
+      "line_end": 205,
+      "prose_text": "Microbenchmarks use six GPUs spanning four architecture generations (Table 3); model-level benchmarks use three GPUs (RTX 6000 PRO, H200, B200) with sufficient VRAM for the tested models. All GPUs run identical software: PyTorch 2.10.0+cu130, Triton 3.6.0, Transformers 5.2.0, CUDA 13.1, driver 580.126.09. The PEFT baseline is upstream commit 20a9829 (v0.18.0.rc0).1\nModel-level benchmarks exclude the optimizer step to isolate DoRA overhead and use a partialsequence loss (1024 loss tokens) to match production RLHF/GRPO memory profiles; full-sequence loss creates a 6–12 GB logit spike that masks adapter working-set differences. A sensitivity check at 4096 loss tokens confirms speedups are unchanged. Each microbenchmark reports the median of 200 CUDA-event-timed trials (10 warmup); model-level benchmarks use 20 repeats (3 warmup, CV < 1.7%). Memory measurement methodology and full reproducibility instructions are provided in Appendix D.",
+      "full_text": "Microbenchmarks use six GPUs spanning four architecture generations (Table 3); model-level benchmarks use three GPUs (RTX 6000 PRO, H200, B200) with sufficient VRAM for the tested models. All GPUs run identical software: PyTorch 2.10.0+cu130, Triton 3.6.0, Transformers 5.2.0, CUDA 13.1, driver 580.126.09. The PEFT baseline is upstream commit 20a9829 (v0.18.0.rc0).1\nModel-level benchmarks exclude the optimizer step to isolate DoRA overhead and use a partialsequence loss (1024 loss tokens) to match production RLHF/GRPO memory profiles; full-sequence loss creates a 6–12 GB logit spike that masks adapter working-set differences. A sensitivity check at 4096 loss tokens confirms speedups are unchanged. Each microbenchmark reports the median of 200 CUDA-event-timed trials (10 warmup); model-level benchmarks use 20 repeats (3 warmup, CV < 1.7%). Memory measurement methodology and full reproducibility instructions are provided in Appendix D.\n5.2",
+      "word_count": 114,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Model-Level Performance",
+      "normalized_heading_text": "model level performance",
+      "level": 3,
+      "line_start": 206,
+      "line_end": 233,
+      "prose_text": "Table 4 summarizes the headline result: gradient-computation speedup across six 8–32B VLMs on three GPUs. The fused implementation is 1.46–1.87× faster than HF PEFT’s DoRA implementation and 1.18–1.24× faster than our own eager baseline, with 1.3–6.7 GB lower peak VRAM (Table 8).\nThese timings cover forward+backward only (excluding optimizer updates), so the end-to-end\n1Later HEAD 9cf86c7 (2026-02-24) is algorithmically identical for training; see §7.\n**Table 3: Benchmark hardware. “Micro”: microbenchmark coverage. “Model”: full model-level gradient-computation and inference benchmarks.**\n**Table 4: Gradient-computation speedup on 8–32B VLMs (r = 384, bf16, seq=4096, bs=1, ga=8, loss_tokens=1024, 20 repeats). The HF PEFT DoRA baseline takes 46–87% longer per iteration than fused. 32B models OOM on RTX 6000 PRO (96 GB) under all configurations. See Table 5 for absolute times.**\n**Table 5: Absolute gradient-computation time (seconds). Each iteration covers 8 gradient- accumulation micro-steps; 32 768 tokens total. Standard deviations ≤0.13 s (CV < 1.7%).**\nFigure 4: Inference speedup: 1.5–2.0× over the HF PEFT DoRA baseline. All six models run on all three GPUs, including 32B on RTX 6000 PRO (96 GB) that OOM during gradient computation.\nTable 6 validates the high-rank framing at r=384, 512, and 768. Speedup vs.\nPEFT DoRA increases with rank for the 32B model (1.66× →1.74×) because PEFT’s materialization cost grows with r, while the factored norm’s rank-dependent overhead (U and G) remains small.\nSpeedup vs. eager decreases modestly (1.18× →1.14×) as larger LoRA matmuls dilute the compose kernel’s contribution.\n**Table 6: Speedup vs. the HF PEFT DoRA baseline grows with rank; speedup vs. eager decreases modestly (H200, bf16, seq=4096, 20 repeats).**",
+      "full_text": "Table 4 summarizes the headline result: gradient-computation speedup across six 8–32B VLMs on three GPUs. The fused implementation is 1.46–1.87× faster than HF PEFT’s DoRA implementation and 1.18–1.24× faster than our own eager baseline, with 1.3–6.7 GB lower peak VRAM (Table 8).\nThese timings cover forward+backward only (excluding optimizer updates), so the end-to-end\n1Later HEAD 9cf86c7 (2026-02-24) is algorithmically identical for training; see §7.\n8\n---\n<!-- page 9 mode: hybrid_paper -->\n**Table 3: Benchmark hardware. “Micro”: microbenchmark coverage. “Model”: full model-level gradient-computation and inference benchmarks.**\n![Table 3](p110_assets/tables/p110_page_9_table_caption_1.png)\n**Table 4: Gradient-computation speedup on 8–32B VLMs (r = 384, bf16, seq=4096, bs=1, ga=8, loss_tokens=1024, 20 repeats). The HF PEFT DoRA baseline takes 46–87% longer per iteration than fused. 32B models OOM on RTX 6000 PRO (96 GB) under all configurations. See Table 5 for absolute times.**\n![Table 4](p110_assets/tables/p110_page_9_table_caption_2.png)\n**Table 5: Absolute gradient-computation time (seconds). Each iteration covers 8 gradient- accumulation micro-steps; 32 768 tokens total. Standard deviations ≤0.13 s (CV < 1.7%).**\n![Table 5](p110_assets/tables/p110_page_9_table_caption_3.png)\n---\n<!-- page 10 mode: hybrid_paper -->\nFigure 4: Inference speedup: 1.5–2.0× over the HF PEFT DoRA baseline. All six models run on all three GPUs, including 32B on RTX 6000 PRO (96 GB) that OOM during gradient computation.\nHigh-rank scaling.\nTable 6 validates the high-rank framing at r=384, 512, and 768. Speedup vs.\nPEFT DoRA increases with rank for the 32B model (1.66× →1.74×) because PEFT’s materialization cost grows with r, while the factored norm’s rank-dependent overhead (U and G) remains small.\n$$\nSpeedup vs. eager decreases modestly (1.18× →1.14×) as larger LoRA matmuls dilute the compose kernel’s contribution.\n$$\n10\n---\n<!-- page 11 mode: hybrid_paper -->\n**Table 6: Speedup vs. the HF PEFT DoRA baseline grows with rank; speedup vs. eager decreases modestly (H200, bf16, seq=4096, 20 repeats).**\n![Table 6](p110_assets/tables/p110_page_11_table_caption_1.png)",
+      "word_count": 216,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Why Dense (B@A) Is Not Enough",
+      "normalized_heading_text": "why dense b a is not enough",
+      "level": 3,
+      "line_start": 234,
+      "line_end": 235,
+      "prose_text": "",
+      "full_text": "",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Compose Kernel Performance",
+      "normalized_heading_text": "compose kernel performance",
+      "level": 3,
+      "line_start": 236,
+      "line_end": 345,
+      "prose_text": "Compose Kernel Speedup (bf16)\nSpeedup vs. Eager\nSpeedup vs. Eager\nFigure 6: Compose kernel speedup vs. eager (bf16) across six GPUs. (a) Forward: 1.5–4.5×.\n(b) Autograd: gains compound with activation size.\nApprox. Bandwidth (GB/s)\nCompose Kernel Bandwidth Utilization (fp32)\nFigure 7: Bandwidth utilization (fp32, six GPUs). Fused approaches ∼50% of peak on all architectures; eager values are approximate lower bounds.\nThe fused kernel achieves 3950–4070 GB/s on B200/B300 (∼53% of peak), 2490–2540 GB/s on H200 (∼53%), 1040–1050 GB/s on A100 (∼52%), 880–890 GB/s on RTX 6000 PRO (∼55%), and 460–470 GB/s on L40S (∼54%) at the largest shapes (Figure 7).\nOn B200, the eager path reaches only 17% of peak, yielding the largest absolute bandwidth gap. Throughput scales nearly linearly with peak bandwidth across the full 0.86–7.7 TB/s range, confirming these kernels are memory-bandwidth-bound.\n**Table 7: Norm memory: measured allocation delta and theoretical reduction (fp32, H200). Measured reductions are smaller than theoretical because they include the rank-independent base-norm transient (§2.3).**",
+      "full_text": "11\n---\n<!-- page 12 mode: hybrid_paper -->\nCompose Kernel Speedup (bf16)\nL40S\nA100\nH200\n(a) Forward (Inference)\nSpeedup vs. Eager\n4\n3\n2\n1\n2k×512\n8k×512\n512×4k\n16k×8k\n32k×8k\n2k×12k\n2k×16k\n2k×28k\n8k×28k\n1×512\n2k×1k\n2k×3k\n2k×4k\n2k×6k\n2k×8k\n1×4k\n512\n2k\n4k\n8k\nActivation Shape\nRTX PRO 6000\nB200\nB300\n(b) Autograd (Training)\n5\nSpeedup vs. Eager\n4\n3\n2\n1\n2k×512\n8k×512\n512×4k\n16k×8k\n32k×8k\n2k×12k\n2k×16k\n2k×28k\n8k×28k\n1×512\n2k×1k\n2k×3k\n2k×4k\n2k×6k\n2k×8k\n1×4k\n512\n2k\n4k\n8k\nActivation Shape\nFigure 6: Compose kernel speedup vs. eager (bf16) across six GPUs. (a) Forward: 1.5–4.5×.\n(b) Autograd: gains compound with activation size.\n8000\nApprox. Bandwidth (GB/s)\n7000\n6000\n5000\n4000\n3000\n2000\n1000\n0\n2k×512\n8k×512\n512×4k\n1×512\n2k×1k\n2k×3k\n2k×4k\n1×4k\n512\n2k\nCompose Kernel Bandwidth Utilization (fp32)\n16k×8k\n32k×8k\n2k×12k\n2k×16k\n2k×28k\n8k×28k\n2k×6k\n2k×8k\n4k\n8k\nActivation Shape\nFigure 7: Bandwidth utilization (fp32, six GPUs). Fused approaches ∼50% of peak on all architectures; eager values are approximate lower bounds.\nBandwidth utilization.\nThe fused kernel achieves 3950–4070 GB/s on B200/B300 (∼53% of peak), 2490–2540 GB/s on H200 (∼53%), 1040–1050 GB/s on A100 (∼52%), 880–890 GB/s on RTX 6000 PRO (∼55%), and 460–470 GB/s on L40S (∼54%) at the largest shapes (Figure 7).\nOn B200, the eager path reaches only 17% of peak, yielding the largest absolute bandwidth gap. Throughput scales nearly linearly with peak bandwidth across the full 0.86–7.7 TB/s range, confirming these kernels are memory-bandwidth-bound.\n12\n---\n<!-- page 13 mode: hybrid_paper -->\n**Table 7: Norm memory: measured allocation delta and theoretical reduction (fp32, H200). Measured reductions are smaller than theoretical because they include the rank-independent base-norm transient (§2.3).**\n![Table 7](p110_assets/tables/p110_page_13_table_caption_1.png)",
+      "word_count": 139,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Backward Kernel Performance",
+      "normalized_heading_text": "backward kernel performance",
+      "level": 3,
+      "line_start": 346,
+      "line_end": 347,
+      "prose_text": "",
+      "full_text": "",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Norm Memory Reduction",
+      "normalized_heading_text": "norm memory reduction",
+      "level": 3,
+      "line_start": 348,
+      "line_end": 353,
+      "prose_text": "Figure 10: Norm latency vs. rank (RTX 6000 PRO, fp32). The PEFT time is constant in r; factored scales linearly. At r ≤128, factored matches the reference due to reduced memory traffic.",
+      "full_text": "---\n<!-- page 14 mode: hybrid_paper -->\nFigure 10: Norm latency vs. rank (RTX 6000 PRO, fp32). The PEFT time is constant in r; factored scales linearly. At r ≤128, factored matches the reference due to reduced memory traffic.\n5.7",
+      "word_count": 27,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Memory Profile",
+      "normalized_heading_text": "memory profile",
+      "level": 3,
+      "line_start": 354,
+      "line_end": 361,
+      "prose_text": "The fused backward path reduces forward peak VRAM by eliminating intermediate materialization while maintaining identical backward peak (Figure 11). At the model level (Table 8), fused uses 0.1–1.0 GB less peak VRAM than eager and 1.2–6.7 GB less than PEFT. Dense (B@A) uses more peak VRAM than fused on all models.\n**Table 8: Model-level peak VRAM (GB). Fused uses less than all baselines on every model. 32B models OOM on RTX 6000 PRO.**",
+      "full_text": "The fused backward path reduces forward peak VRAM by eliminating intermediate materialization while maintaining identical backward peak (Figure 11). At the model level (Table 8), fused uses 0.1–1.0 GB less peak VRAM than eager and 1.2–6.7 GB less than PEFT. Dense (B@A) uses more peak VRAM than fused on all models.\n14\n---\n<!-- page 15 mode: hybrid_paper -->\n**Table 8: Model-level peak VRAM (GB). Fused uses less than all baselines on every model. 32B models OOM on RTX 6000 PRO.**\n![Table 8](p110_assets/tables/p110_page_15_table_caption_1.png)",
+      "word_count": 65,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Cross-Architecture Consistency",
+      "normalized_heading_text": "cross architecture consistency",
+      "level": 3,
+      "line_start": 362,
+      "line_end": 369,
+      "prose_text": "**Table 9: Geometric mean microbenchmark speedups (all shapes, 200 repeats). Norm memory 0.8× in bf16 means factored uses more memory for the isolated norm due to fp32 accumulation transients (§2.3).**\n**Table 10: Multi-seed convergence: eager vs. fused training loss (Qwen3.5-9B-Base, r =384, 2000 steps). Grand mean per-step delta 7.1 × 10−4; final eval losses agree to < 1.5 × 10−4.**",
+      "full_text": "---\n<!-- page 16 mode: hybrid_paper -->\n**Table 9: Geometric mean microbenchmark speedups (all shapes, 200 repeats). Norm memory 0.8× in bf16 means factored uses more memory for the isolated norm due to fp32 accumulation transients (§2.3).**\n![Table 9](p110_assets/tables/p110_page_16_table_caption_1.png)\n**Table 10: Multi-seed convergence: eager vs. fused training loss (Qwen3.5-9B-Base, r =384, 2000 steps). Grand mean per-step delta 7.1 × 10−4; final eval losses agree to < 1.5 × 10−4.**\n![Table 10](p110_assets/tables/p110_page_16_table_caption_2.png)",
+      "word_count": 46,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Convergence Equivalence",
+      "normalized_heading_text": "convergence equivalence",
+      "level": 3,
+      "line_start": 370,
+      "line_end": 413,
+      "prose_text": "Qwen3.5-9B · DoRA r=384 · bf16 · 1×RTX 6000 PRO · seed 3 max |Δloss|=0.0041 · mean |Δloss|=0.0007113 · wall-clock −8.1%\nFigure 12: Convergence: eager vs. fused are visually indistinguishable (Qwen3.5-9B-Base, r=384, seed 3 of 3). (a) Training loss (25-step smoothing). (b) Eval loss (200-step intervals). (c) Gradient norms.",
+      "full_text": "---\n<!-- page 17 mode: hybrid_paper -->\n$$\nQwen3.5-9B · DoRA r=384 · bf16 · 1×RTX 6000 PRO · seed 3 max |Δloss|=0.0041 · mean |Δloss|=0.0007113 · wall-clock −8.1%\n$$\n(a) Training loss\n0.340\n0.55\n0.335\n0.50\n0.330\n0.45\n0.325\n0.40\nLoss\nLoss\n0.320\n0.35\n0.315\n0.30\n0.310\n0.25\n0.305\n0.20\n0 500 1000 1500 2000\nTraining step\nEager Fused\n(b) Eval loss\n(c) Gradient norm\n12\n10\n8\nNorm\n6\n4\n2\n500 1000 1500 2000\n0 500 1000 1500 2000\nTraining step\nTraining step\nFigure 12: Convergence: eager vs. fused are visually indistinguishable (Qwen3.5-9B-Base, r=384, seed 3 of 3). (a) Training loss (25-step smoothing). (b) Eval loss (200-step intervals). (c) Gradient norms.\n6",
+      "word_count": 33,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Discussion",
+      "normalized_heading_text": "discussion",
+      "level": 2,
+      "line_start": 414,
+      "line_end": 416,
+      "prose_text": "",
+      "full_text": "6.1",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Deployment Context",
+      "normalized_heading_text": "deployment context",
+      "level": 3,
+      "line_start": 417,
+      "line_end": 421,
+      "prose_text": "The factored norm is particularly valuable when training and inference compete for GPU memory.\nOur GRPO [Shao et al., 2024] pipeline co-locates vLLM [Kwon et al., 2023] (tensor-parallel inference) alongside DoRA fine-tuning (r = 384) of a 38B VLM on 4×B200 (192 GB each), with large global batches under ZeRO-2 and gradient checkpointing. After vLLM reserves its KV-cache allocation, training headroom per GPU is tight; the memory challenge is cumulative rather than catastrophic. Each of the 500+ adapted modules re-materializes its norm temporaries during gradient checkpointing recomputation, and the resulting transient allocations fragment the caching allocator. Cross-device bandwidth, already under pressure from gradient all-reduce and tensorparallel inference communication, leaves little margin for the additional memory traffic of dense per-module materialization. The factored norm eliminates these transients, and we observed no numerical drift attributable to fusion. (This is an illustrative anecdote and was not benchmarked under the methodology of §5.)",
+      "full_text": "The factored norm is particularly valuable when training and inference compete for GPU memory.\nOur GRPO [Shao et al., 2024] pipeline co-locates vLLM [Kwon et al., 2023] (tensor-parallel inference) alongside DoRA fine-tuning (r = 384) of a 38B VLM on 4×B200 (192 GB each), with large global batches under ZeRO-2 and gradient checkpointing. After vLLM reserves its KV-cache allocation, training headroom per GPU is tight; the memory challenge is cumulative rather than catastrophic. Each of the 500+ adapted modules re-materializes its norm temporaries during gradient checkpointing recomputation, and the resulting transient allocations fragment the caching allocator. Cross-device bandwidth, already under pressure from gradient all-reduce and tensorparallel inference communication, leaves little margin for the additional memory traffic of dense per-module materialization. The factored norm eliminates these transients, and we observed no numerical drift attributable to fusion. (This is an illustrative anecdote and was not benchmarked under the methodology of §5.)\n6.2",
+      "word_count": 139,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Tradeoffs and Limitations",
+      "normalized_heading_text": "tradeoffs and limitations",
+      "level": 3,
+      "line_start": 422,
+      "line_end": 435,
+      "prose_text": "Table 11 consolidates practitioner recommendations.\nWhere fusion offers no advantage.\nBelow ∼2048 × 6144 activations, launch latency dominates; the dispatch encodes this crossover conservatively. On non-CUDA platforms, Triton kernels are unavailable.\nFused backward VRAM.\nThe fused backward saves one activation-sized tensor (inner) per module, but the dual-output kernel also eliminates the forward-pass spike from sequential ops. Net effect: fused uses 0.1–1.0 GB less peak VRAM than eager at the model level. With frozen magnitude, inner is skipped entirely.\nAll PyTorch compose paths are bitwise identical. Triton preserves the same algebra but not bitwise equality (§4). Residual drift concentrates in dmag reductions rather\n**Table 11: Recommended configuration by scenario.**",
+      "full_text": "Table 11 consolidates practitioner recommendations.\nWhere fusion offers no advantage.\nBelow ∼2048 × 6144 activations, launch latency dominates; the dispatch encodes this crossover conservatively. On non-CUDA platforms, Triton kernels are unavailable.\nFused backward VRAM.\nThe fused backward saves one activation-sized tensor (inner) per module, but the dual-output kernel also eliminates the forward-pass spike from sequential ops. Net effect: fused uses 0.1–1.0 GB less peak VRAM than eager at the model level. With frozen magnitude, inner is skipped entirely.\nNumerical precision.\nAll PyTorch compose paths are bitwise identical. Triton preserves the same algebra but not bitwise equality (§4). Residual drift concentrates in dmag reductions rather\n17\n---\n<!-- page 18 mode: hybrid_paper -->\n**Table 11: Recommended configuration by scenario.**\n![Table 11](p110_assets/tables/p110_page_18_table_caption_1.png)",
+      "word_count": 101,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Related Work",
+      "normalized_heading_text": "related work",
+      "level": 2,
+      "line_start": 436,
+      "line_end": 448,
+      "prose_text": "Every major framework we checked (HF PEFT, torchtune, Unsloth, SWIFT, LLaMA-Factory, Axolotl) uses the same torch.eye materialization pattern.\nUnsloth explicitly disables its custom kernels when DoRA is active; orchestration frameworks delegate entirely to PEFT. As of February 2026, no existing framework avoids materializing the dense BA product (Appendix G).\nFlashAttention [Dao et al., 2022, Dao, 2024] demonstrated that tiled, fused kernels improve both speed and memory for attention. Liger Kernel [Hsu et al., 2024] applies similar principles to cross-entropy, SwiGLU, and RMSNorm. Our work targets the DoRA composition, a simpler (element-wise with broadcasting) but equally memory-bound pattern. The algebraic identity underlying the factored norm (expanding a sum-of-squares into base, cross, and Gram terms) is standard in numerical linear algebra; our contribution is its application to the DoRA-specific computation with dtype discipline, chunking, and integration into the fused pipeline.\nMeta’s KernelAgent [PyTorch, 2025] confirmed our compose kernel is near-roofline (89% memory bandwidth SOL, 1.5% improvement). For the backward, KernelAgent discovered a two-stage partial-reduction strategy that fuses the dmag reduction, achieving 3.58× over eager (88.5% SOL) vs. our 1.06–1.23×. Our release prioritizes drop-in compatibility and end-to-end wins across real models; integrating that pattern is a direct avenue for future work. KernelAgent’s generated listings are included in code/kernelagent_sols.",
+      "full_text": "18\n---\n<!-- page 19 mode: simple_text -->\nFramework implementations.\nEvery major framework we checked (HF PEFT, torchtune, Unsloth, SWIFT, LLaMA-Factory, Axolotl) uses the same torch.eye materialization pattern.\nUnsloth explicitly disables its custom kernels when DoRA is active; orchestration frameworks delegate entirely to PEFT. As of February 2026, no existing framework avoids materializing the dense BA product (Appendix G).\nKernel fusion.\nFlashAttention [Dao et al., 2022, Dao, 2024] demonstrated that tiled, fused kernels improve both speed and memory for attention. Liger Kernel [Hsu et al., 2024] applies similar principles to cross-entropy, SwiGLU, and RMSNorm. Our work targets the DoRA composition, a simpler (element-wise with broadcasting) but equally memory-bound pattern. The algebraic identity underlying the factored norm (expanding a sum-of-squares into base, cross, and Gram terms) is standard in numerical linear algebra; our contribution is its application to the DoRA-specific computation with dtype discipline, chunking, and integration into the fused pipeline.\nLLM-guided optimization.\nMeta’s KernelAgent [PyTorch, 2025] confirmed our compose kernel is near-roofline (89% memory bandwidth SOL, 1.5% improvement). For the backward, KernelAgent discovered a two-stage partial-reduction strategy that fuses the dmag reduction, achieving 3.58× over eager (88.5% SOL) vs. our 1.06–1.23×. Our release prioritizes drop-in compatibility and end-to-end wins across real models; integrating that pattern is a direct avenue for future work. KernelAgent’s generated listings are included in code/kernelagent_sols.\n8",
+      "word_count": 193,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Conclusion",
+      "normalized_heading_text": "conclusion",
+      "level": 2,
+      "line_start": 449,
+      "line_end": 454,
+      "prose_text": "We presented a systems implementation of DoRA: a factored norm that reduces working memory from O(dout × din) to O(dout × r + r2), and fused Triton kernels that collapse multi-step composition into single-pass GPU operations.\nOn six 8–32B VLMs, the fused implementation is 1.5–2.0× faster than HF PEFT’s DoRA implementation for inference, and 1.5–1.9× faster for gradient computation (optimizer step excluded), with up to 7 GB lower peak VRAM. Microbenchmarks on six GPUs spanning four architecture generations confirm 1.5–2.7× compose-kernel speedup. Fidelity holds at three levels: operator tests within quantization-aware bounds, final-logit cos > 0.9999, and matched training curves across seeds.\nFSDP2 is unsupported. Convergence validation covers two model families, two optimizers, and one dataset in the SFT regime; generalization to RL pipelines remains to be confirmed. Model-level benchmarks cover three of six GPUs; L40S, A100, and B300 have microbenchmark coverage only. The dispatch crossover is an empirical heuristic that may need retuning for future hardware.",
+      "full_text": "We presented a systems implementation of DoRA: a factored norm that reduces working memory from O(dout × din) to O(dout × r + r2), and fused Triton kernels that collapse multi-step composition into single-pass GPU operations.\nOn six 8–32B VLMs, the fused implementation is 1.5–2.0× faster than HF PEFT’s DoRA implementation for inference, and 1.5–1.9× faster for gradient computation (optimizer step excluded), with up to 7 GB lower peak VRAM. Microbenchmarks on six GPUs spanning four architecture generations confirm 1.5–2.7× compose-kernel speedup. Fidelity holds at three levels: operator tests within quantization-aware bounds, final-logit cos > 0.9999, and matched training curves across seeds.\nKnown limitations.\nFSDP2 is unsupported. Convergence validation covers two model families, two optimizers, and one dataset in the SFT regime; generalization to RL pipelines remains to be confirmed. Model-level benchmarks cover three of six GPUs; L40S, A100, and B300 have microbenchmark coverage only. The dispatch crossover is an empirical heuristic that may need retuning for future hardware.",
+      "word_count": 144,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Data Availability",
+      "normalized_heading_text": "data availability",
+      "level": 2,
+      "line_start": 455,
+      "line_end": 460,
+      "prose_text": "All source code, benchmark scripts, raw JSON results, Triton autotune caches, and figure generation scripts are available at https://github.com/sockeye44/dorafactors (tag v1.0). The convergence validation uses a public dataset (MMFineReason-SFT-123K; Lin et al. 2026) for fully reproducible confirmation. The authors declare no competing interests.",
+      "full_text": "All source code, benchmark scripts, raw JSON results, Triton autotune caches, and figure generation scripts are available at https://github.com/sockeye44/dorafactors (tag v1.0). The convergence validation uses a public dataset (MMFineReason-SFT-123K; Lin et al. 2026) for fully reproducible confirmation. The authors declare no competing interests.\n19\n---\n<!-- page 20 mode: simple_text -->",
+      "word_count": 45,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Acknowledgements",
+      "normalized_heading_text": "acknowledgements",
+      "level": 2,
+      "line_start": 461,
+      "line_end": 463,
+      "prose_text": "This work was developed through extensive collaborative programming with Claude Opus 4.6 (Anthropic), which contributed to kernel implementation, test design, numerical analysis, and iterative debugging. The authors take full responsibility for the accuracy and integrity of the work.",
+      "full_text": "This work was developed through extensive collaborative programming with Claude Opus 4.6 (Anthropic), which contributed to kernel implementation, test design, numerical analysis, and iterative debugging. The authors take full responsibility for the accuracy and integrity of the work.",
+      "word_count": 37,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "References",
+      "normalized_heading_text": "references",
+      "level": 2,
+      "line_start": 464,
+      "line_end": 500,
+      "prose_text": "Jason Ansel, Edward Yang, Horace He, Natalia Gimelshein, Animesh Jain, Michael Voznesensky, Bin Bao, Peter Bell, David Berard, Evgeni Burovski, et al. PyTorch 2: Faster machine learning through dynamic Python bytecode transformation and graph compilation. In Proceedings of the 29th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, volume 2 of ASPLOS ’24. ACM, 2024. doi: 10.1145/3620665.3640366.\nTianqi Chen, Bing Xu, Chiyuan Zhang, and Carlos Guestrin. Training deep nets with sublinear memory cost. arXiv preprint arXiv:1604.06174, 2016.\nTri Dao. FlashAttention-2: Faster attention with better parallelism and work partitioning. In International Conference on Learning Representations, 2024. arXiv:2307.08691.\nTri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, and Christopher Ré. FlashAttention: Fast and memory-efficient exact attention with IO-awareness. In Advances in Neural Information Processing Systems, volume 35, pages 16344–16359, 2022. arXiv:2205.14135.\nNghiem T. Diep, Hien Dang, Tuan Truong, Tan Dinh, Huy Nguyen, and Nhat Ho. DoRAN:\nStabilizing weight-decomposed low-rank adaptation via noise injection and auxiliary networks.\narXiv preprint arXiv:2510.04331, 2025.\nPin-Lun Hsu, Yun Dai, Vignesh Kothapalli, Qingquan Song, Shao Tang, Siyu Zhu, Steven Shimizu, Shivam Sahni, Haowen Ning, and Yanning Chen. Liger kernel: Efficient triton kernels for LLM training. arXiv preprint arXiv:2410.10989, 2024.\nEdward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. LoRA: Low-rank adaptation of large language models. In International Conference on Learning Representations, 2022. arXiv:2106.09685.\nDamjan Kalajdzievski. A rank stabilization scaling factor for fine-tuning with LoRA. arXiv preprint arXiv:2312.03732, 2023.\nWoosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E.\nGonzalez, Hao Zhang, and Ion Stoica. Efficient memory management for large language model serving with PagedAttention. In Proceedings of the 29th Symposium on Operating Systems Principles, SOSP ’23, pages 611–626. ACM, 2023. doi: 10.1145/3600006.3613165. arXiv:2309.06180.\nHonglin Lin, Zheng Liu, Yun Zhu, Chonghan Qin, Juekai Lin, Xiaoran Shang, Conghui He, Wentao Zhang, and Lijun Wu. MMFineReason: Closing the multimodal reasoning gap via open datacentric methods. arXiv preprint arXiv:2601.21821, 2026. https://mmfinereason.github.io/.\nShih-Yang Liu, Chien-Yi Wang, Hongxu Yin, Pavlo Molchanov, Yu-Chiang Frank Wang, Kwang-Ting Cheng, and Min-Hung Chen. DoRA: Weight-decomposed low-rank adaptation. In Proceedings of the 41st International Conference on Machine Learning, volume 235 of Proceedings of Machine Learning Research, pages 32100–32121. PMLR, 2024. arXiv:2402.09353.\nSourab Mangrulkar, Sylvain Gugger, Lysandre Debut, Younes Belkada, Sayak Paul, Benjamin Bossan, and Marian Tietz.\nPEFT: State-of-the-art parameter-efficient fine-tuning methods.\nhttps://github.com/huggingface/peft, 2022.\nArjun S. Nair. Chronicals: A high-performance framework for LLM fine-tuning with 3.51x speedup over unsloth. arXiv preprint arXiv:2601.02609, 2026.\nHamid Nasiri and Peter Garraghan. EDoRA: Efficient weight-decomposed low-rank adaptation via singular value decomposition. arXiv preprint arXiv:2501.12067, 2025.\nPyTorch. KernelAgent — multi-agent GPU kernel synthesis, 2025. URL https://github.com/ meta-pytorch/KernelAgent.\nSamyam Rajbhandari, Jeff Rasley, Olatunji Ruwase, and Yuxiong He. ZeRO: Memory optimizations toward training trillion parameter models. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis, SC ’20. IEEE Press, 2020. doi:\n10.5555/3433701.3433727. arXiv:1910.02054.\nZhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y. K. Li, Y. Wu, and Daya Guo. DeepSeekMath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300, 2024.\nPhilippe Tillet, H. T. Kung, and David Cox. Triton: An intermediate language and compiler for tiled neural network computations. In Proceedings of the 3rd ACM SIGPLAN International Workshop on Machine Learning and Programming Languages, MAPL 2019, pages 10–19. ACM, 2019. doi: 10.1145/3315508.3329973.\nYuze Zhao, Jintao Huang, Jinghan Hu, Xingjun Wang, Yunlin Mao, Daoze Zhang, Zeyinzi Jiang, Zhikai Wu, Baole Ai, Ang Wang, Wenmeng Zhou, and Yingda Chen.\nSWIFT: A scalable lightweight infrastructure for fine-tuning, 2024. URL https://arxiv.org/abs/2408.05517.\nZhanda Zhu, Qidong Su, Yaoyao Ding, Kevin Song, Shang Wang, and Gennady Pekhimenko.\nLoRAFusion: Efficient LoRA fine-tuning for LLMs. In Proceedings of the Nineteenth European Conference on Computer Systems, EuroSys ’26, 2026. arXiv:2510.00206.",
+      "full_text": "Jason Ansel, Edward Yang, Horace He, Natalia Gimelshein, Animesh Jain, Michael Voznesensky, Bin Bao, Peter Bell, David Berard, Evgeni Burovski, et al. PyTorch 2: Faster machine learning through dynamic Python bytecode transformation and graph compilation. In Proceedings of the 29th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, volume 2 of ASPLOS ’24. ACM, 2024. doi: 10.1145/3620665.3640366.\nTianqi Chen, Bing Xu, Chiyuan Zhang, and Carlos Guestrin. Training deep nets with sublinear memory cost. arXiv preprint arXiv:1604.06174, 2016.\nTri Dao. FlashAttention-2: Faster attention with better parallelism and work partitioning. In International Conference on Learning Representations, 2024. arXiv:2307.08691.\nTri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, and Christopher Ré. FlashAttention: Fast and memory-efficient exact attention with IO-awareness. In Advances in Neural Information Processing Systems, volume 35, pages 16344–16359, 2022. arXiv:2205.14135.\nNghiem T. Diep, Hien Dang, Tuan Truong, Tan Dinh, Huy Nguyen, and Nhat Ho. DoRAN:\nStabilizing weight-decomposed low-rank adaptation via noise injection and auxiliary networks.\narXiv preprint arXiv:2510.04331, 2025.\nPin-Lun Hsu, Yun Dai, Vignesh Kothapalli, Qingquan Song, Shao Tang, Siyu Zhu, Steven Shimizu, Shivam Sahni, Haowen Ning, and Yanning Chen. Liger kernel: Efficient triton kernels for LLM training. arXiv preprint arXiv:2410.10989, 2024.\nEdward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. LoRA: Low-rank adaptation of large language models. In International Conference on Learning Representations, 2022. arXiv:2106.09685.\nDamjan Kalajdzievski. A rank stabilization scaling factor for fine-tuning with LoRA. arXiv preprint arXiv:2312.03732, 2023.\nWoosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E.\nGonzalez, Hao Zhang, and Ion Stoica. Efficient memory management for large language model serving with PagedAttention. In Proceedings of the 29th Symposium on Operating Systems Principles, SOSP ’23, pages 611–626. ACM, 2023. doi: 10.1145/3600006.3613165. arXiv:2309.06180.\nHonglin Lin, Zheng Liu, Yun Zhu, Chonghan Qin, Juekai Lin, Xiaoran Shang, Conghui He, Wentao Zhang, and Lijun Wu. MMFineReason: Closing the multimodal reasoning gap via open datacentric methods. arXiv preprint arXiv:2601.21821, 2026. https://mmfinereason.github.io/.\nShih-Yang Liu, Chien-Yi Wang, Hongxu Yin, Pavlo Molchanov, Yu-Chiang Frank Wang, Kwang-Ting Cheng, and Min-Hung Chen. DoRA: Weight-decomposed low-rank adaptation. In Proceedings of the 41st International Conference on Machine Learning, volume 235 of Proceedings of Machine Learning Research, pages 32100–32121. PMLR, 2024. arXiv:2402.09353.\n20\n---\n<!-- page 21 mode: simple_text -->\nSourab Mangrulkar, Sylvain Gugger, Lysandre Debut, Younes Belkada, Sayak Paul, Benjamin Bossan, and Marian Tietz.\nPEFT: State-of-the-art parameter-efficient fine-tuning methods.\nhttps://github.com/huggingface/peft, 2022.\nArjun S. Nair. Chronicals: A high-performance framework for LLM fine-tuning with 3.51x speedup over unsloth. arXiv preprint arXiv:2601.02609, 2026.\nHamid Nasiri and Peter Garraghan. EDoRA: Efficient weight-decomposed low-rank adaptation via singular value decomposition. arXiv preprint arXiv:2501.12067, 2025.\nPyTorch. KernelAgent — multi-agent GPU kernel synthesis, 2025. URL https://github.com/ meta-pytorch/KernelAgent.\nSamyam Rajbhandari, Jeff Rasley, Olatunji Ruwase, and Yuxiong He. ZeRO: Memory optimizations toward training trillion parameter models. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis, SC ’20. IEEE Press, 2020. doi:\n10.5555/3433701.3433727. arXiv:1910.02054.\nZhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan Zhang, Y. K. Li, Y. Wu, and Daya Guo. DeepSeekMath: Pushing the limits of mathematical reasoning in open language models. arXiv preprint arXiv:2402.03300, 2024.\nPhilippe Tillet, H. T. Kung, and David Cox. Triton: An intermediate language and compiler for tiled neural network computations. In Proceedings of the 3rd ACM SIGPLAN International Workshop on Machine Learning and Programming Languages, MAPL 2019, pages 10–19. ACM, 2019. doi: 10.1145/3315508.3329973.\nYuze Zhao, Jintao Huang, Jinghan Hu, Xingjun Wang, Yunlin Mao, Daoze Zhang, Zeyinzi Jiang, Zhikai Wu, Baole Ai, Ang Wang, Wenmeng Zhou, and Yingda Chen.\nSWIFT: A scalable lightweight infrastructure for fine-tuning, 2024. URL https://arxiv.org/abs/2408.05517.\nZhanda Zhu, Qidong Su, Yaoyao Ding, Kevin Song, Shang Wang, and Gennady Pekhimenko.\nLoRAFusion: Efficient LoRA fine-tuning for LLMs. In Proceedings of the Nineteenth European Conference on Computer Systems, EuroSys ’26, 2026. arXiv:2510.00206.\n21\n---\n<!-- page 22 mode: simple_text -->\nA",
+      "word_count": 588,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Forward Contract and Execution Semantics",
+      "normalized_heading_text": "forward contract and execution semantics",
+      "level": 2,
+      "line_start": 501,
+      "line_end": 502,
+      "prose_text": "",
+      "full_text": "",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Module Interface & Compose Semantics",
+      "normalized_heading_text": "module interface compose semantics",
+      "level": 2,
+      "line_start": 503,
+      "line_end": 508,
+      "prose_text": "• Output: The module computes a delta ∆Y; the caller applies Y = Ybase + ∆Y.\n• Compose Equation: ∆Y = g ⊙(sXA⊤B⊤) + (g −1) ⊙Ybase.",
+      "full_text": "• Output: The module computes a delta ∆Y; the caller applies Y = Ybase + ∆Y.\n$$\n• Compose Equation: ∆Y = g ⊙(sXA⊤B⊤) + (g −1) ⊙Ybase.\n$$",
+      "word_count": 13,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Norm Policy",
+      "normalized_heading_text": "norm policy",
+      "level": 2,
+      "line_start": 509,
+      "line_end": 517,
+      "prose_text": "• Recomputed every forward pass; never cached across steps.\n• Detached (no gradient flow), per Liu et al. [2024] §4.3.\n• Accumulated in FP32 with autocast disabled.\n• ϵ = 10−12 (fp32/fp64) or 10−6 (bf16/fp16).\n• Bias subtracted before compose, re-added after.\nFormal contract for clean-room replication.",
+      "full_text": "• Recomputed every forward pass; never cached across steps.\n• Detached (no gradient flow), per Liu et al. [2024] §4.3.\n• Accumulated in FP32 with autocast disabled.\n• ϵ = 10−12 (fp32/fp64) or 10−6 (bf16/fp16).\n• Bias subtracted before compose, re-added after.\nFormal contract for clean-room replication.\nB",
+      "word_count": 38,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Implementation Details",
+      "normalized_heading_text": "implementation details",
+      "level": 2,
+      "line_start": 518,
+      "line_end": 543,
+      "prose_text": "The chunk size aligns to 64 elements on CUDA/XPU devices for Tensor Core MMA alignment on all NVIDIA architectures since Volta.\nPEFT_DORA_FUSED (0 = force eager), PEFT_DORA_FUSED_BACKWARD (1 = force fused bwd, 0 = disable, unset = auto), PEFT_DORA_NORM_CHUNK_MB and PEFT_DORA_FWD_ CHUNK_MB (override 256 MB defaults).\nScale-is-zero fast path.\nWhen s = 0, cross and ba_sq are skipped; U and G are not allocated.\n10−12 for fp32/fp64; 10−6 for bf16/fp16. For fp16 (max ≈65504), ε = 10−6\nlimits the quotient to ∼106, reducing saturation risk.\nCompose kernel autotuning.\nRPP=1 is selected in 95% of autotuned entries (1149/1206).\nExact config agreement between GPUs is ∼9%, confirming per-device autotuning is essential.\nChunked dropout path.\nWhen dropout is active, _compose_with_base_chunks iterates over output-dimension slices with adaptive sizing, decorated with @dynamo_disable to avoid runaway recompilations.\nMagnitude broadcast shape guard.\nA shape guard gates Triton kernel dispatch on whether the magnitude vector broadcasts exclusively along the last dimension of the activation tensor. The Triton compose kernel treats magnitude as a 1-D vector along the last dimension; Conv-style shapes like [1, C, 1, 1] applied to [N, C, H, W] activations would violate this assumption. The guard checks both element count and last-dimension alignment; failing shapes route to the PyTorch fallback.\nCustom op for torch.compile.\nThe registered backward uses PyTorch (not Triton) because AOTAutograd traces with FakeTensors. Eager training uses Triton for both forward and backward; compiled training uses Inductor to fuse the PyTorch backward graph.",
+      "full_text": "Chunk alignment.\nThe chunk size aligns to 64 elements on CUDA/XPU devices for Tensor Core MMA alignment on all NVIDIA architectures since Volta.\nEnvironment variables.\n```text\nPEFT_DORA_FUSED (0 = force eager), PEFT_DORA_FUSED_BACKWARD (1 = force fused bwd, 0 = disable, unset = auto), PEFT_DORA_NORM_CHUNK_MB and PEFT_DORA_FWD_ CHUNK_MB (override 256 MB defaults).\n```\nScale-is-zero fast path.\nWhen s = 0, cross and ba_sq are skipped; U and G are not allocated.\nDtype-aware epsilon.\n10−12 for fp32/fp64; 10−6 for bf16/fp16. For fp16 (max ≈65504), ε = 10−6\nlimits the quotient to ∼106, reducing saturation risk.\nCompose kernel autotuning.\nRPP=1 is selected in 95% of autotuned entries (1149/1206).\nExact config agreement between GPUs is ∼9%, confirming per-device autotuning is essential.\nChunked dropout path.\nWhen dropout is active, _compose_with_base_chunks iterates over output-dimension slices with adaptive sizing, decorated with @dynamo_disable to avoid runaway recompilations.\nMagnitude broadcast shape guard.\nA shape guard gates Triton kernel dispatch on whether the magnitude vector broadcasts exclusively along the last dimension of the activation tensor. The Triton compose kernel treats magnitude as a 1-D vector along the last dimension; Conv-style shapes like [1, C, 1, 1] applied to [N, C, H, W] activations would violate this assumption. The guard checks both element count and last-dimension alignment; failing shapes route to the PyTorch fallback.\nCustom op for torch.compile.\nThe registered backward uses PyTorch (not Triton) because AOTAutograd traces with FakeTensors. Eager training uses Triton for both forward and backward; compiled training uses Inductor to fuse the PyTorch backward graph.\n22\n---\n<!-- page 23 mode: simple_text -->\nC",
+      "word_count": 226,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Kernel Specifications",
+      "normalized_heading_text": "kernel specifications",
+      "level": 2,
+      "line_start": 544,
+      "line_end": 546,
+      "prose_text": "This appendix provides exact specifications for the three Triton kernels and the PyTorch magnitude division stage, including casting points, fused operations, shape constraints, and reduction ordering, to support a clean-room reimplementation.",
+      "full_text": "This appendix provides exact specifications for the three Triton kernels and the PyTorch magnitude division stage, including casting points, fused operations, shape constraints, and reduction ordering, to support a clean-room reimplementation.",
+      "word_count": 30,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Compose Forward kernel",
+      "normalized_heading_text": "compose forward kernel",
+      "level": 2,
+      "line_start": 547,
+      "line_end": 551,
+      "prose_text": "Fuses (g −1) ⊙base + g ⊙s ⊙lora in one pass. Inputs: base [bs, seq, dout], lora [bs, seq, dout], g [dout], s (scalar). Output: delta [bs, seq, dout]. All tensors in input dtype (fp16/bf16/fp32); no intermediate dtype cast. g is broadcast along all but the last dimension.",
+      "full_text": "```text\nFuses (g −1) ⊙base + g ⊙s ⊙lora in one pass. Inputs: base [bs, seq, dout], lora [bs, seq, dout], g [dout], s (scalar). Output: delta [bs, seq, dout]. All tensors in input dtype (fp16/bf16/fp32); no intermediate dtype cast. g is broadcast along all but the last dimension.\n```",
+      "word_count": 42,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Compose Backward kernel",
+      "normalized_heading_text": "compose backward kernel",
+      "level": 2,
+      "line_start": 552,
+      "line_end": 554,
+      "prose_text": "Fuses dlora = g·s·dout and dbase = (g−1)·dout in a single Triton pass. dmag is computed separately via a .sum() reduction over the batch/sequence dimensions on the inner activation; this avoids non-deterministic tl.atomic_add ordering.",
+      "full_text": "Fuses dlora = g·s·dout and dbase = (g−1)·dout in a single Triton pass. dmag is computed separately via a .sum() reduction over the batch/sequence dimensions on the inner activation; this avoids non-deterministic tl.atomic_add ordering.",
+      "word_count": 33,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Norm Assembly kernel (norm-only)",
+      "normalized_heading_text": "norm assembly kernel norm only",
+      "level": 2,
+      "line_start": 555,
+      "line_end": 560,
+      "prose_text": "Inputs: base_sq [dout], cross [dout], ba_sq [dout] (all fp32), two_s (scalar, = 2s, precomputed in fp64), s2 (scalar, = s2, precomputed in fp64). Computes wnorm = p\nmax(base_sq + two_s · cross + s2 · ba_sq, 0) in fp32 with store-reload barriers after each multiply-add to prevent FMA fusion, exactly reproducing PyTorch’s separate-kernel evaluation order. The clamp preserves NaN semantics (matching torch.clamp_min, which propagates NaNs per IEEE 754) rather than collapsing NaNs to zero. The square root uses inline PTX sqrt.rn.f32 for IEEE 754 correctly-rounded results (Triton’s tl.sqrt compiles to sqrt.approx.ftz.f32 on SM90). The kernel returns the result in the input dtype. In default mode, it uses a fixed block size of 256 (norm kernels are launch-latency bound; see Appendix B); comprehensive autotuning over 36 configurations (block sizes 32–2048) is available for new GPU architectures. If future Triton versions change the lowering of tl.sqrt to IEEE-compliant rounding, the inline PTX can be removed; the Tier-3 eager fallback provides a portable alternative on any platform.",
+      "full_text": "Inputs: base_sq [dout], cross [dout], ba_sq [dout] (all fp32), two_s (scalar, = 2s, precomputed in fp64), s2 (scalar, = s2, precomputed in fp64). Computes wnorm = p\n```text\nmax(base_sq + two_s · cross + s2 · ba_sq, 0) in fp32 with store-reload barriers after each multiply-add to prevent FMA fusion, exactly reproducing PyTorch’s separate-kernel evaluation order. The clamp preserves NaN semantics (matching torch.clamp_min, which propagates NaNs per IEEE 754) rather than collapsing NaNs to zero. The square root uses inline PTX sqrt.rn.f32 for IEEE 754 correctly-rounded results (Triton’s tl.sqrt compiles to sqrt.approx.ftz.f32 on SM90). The kernel returns the result in the input dtype. In default mode, it uses a fixed block size of 256 (norm kernels are launch-latency bound; see Appendix B); comprehensive autotuning over 36 configurations (block sizes 32–2048) is available for new GPU architectures. If future Triton versions change the lowering of tl.sqrt to IEEE-compliant rounding, the inline PTX can be removed; the Tier-3 eager fallback provides a portable alternative on any platform.\n```",
+      "word_count": 160,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Magnitude division (PyTorch)",
+      "normalized_heading_text": "magnitude division pytorch",
+      "level": 2,
+      "line_start": 561,
+      "line_end": 568,
+      "prose_text": "The division g = m/ max(wnorm, ε) is always computed in PyTorch after the norm assembly kernel returns. This ensures identical precision regardless of whether the Triton or PyTorch norm path was used, at the cost of one additional element-wise kernel launch (negligible relative to surrounding matmuls).\ndout must be divisible by BLOCK_SIZE (128). The magnitude vector must broadcast only along the last dimension of the activation; other broadcast shapes (e.g., [1, C, 1, 1] applied to [N, C, H, W]) route to the Tier-3 eager fallback. Non-contiguous input tensors also fall back to Tier 3.\nTested compatibility matrix.\nTable 12 summarizes the integration points explicitly tested, with notes on scope and caveats. “Tested” indicates the feature was exercised in benchmarks or convergence runs reported in this paper; “CI only” indicates coverage via the test suite (1041 tests) but not in model-level experiments.",
+      "full_text": "The division g = m/ max(wnorm, ε) is always computed in PyTorch after the norm assembly kernel returns. This ensures identical precision regardless of whether the Triton or PyTorch norm path was used, at the cost of one additional element-wise kernel launch (negligible relative to surrounding matmuls).\nShape constraints.\ndout must be divisible by BLOCK_SIZE (128). The magnitude vector must broadcast only along the last dimension of the activation; other broadcast shapes (e.g., [1, C, 1, 1] applied to [N, C, H, W]) route to the Tier-3 eager fallback. Non-contiguous input tensors also fall back to Tier 3.\nTested compatibility matrix.\nTable 12 summarizes the integration points explicitly tested, with notes on scope and caveats. “Tested” indicates the feature was exercised in benchmarks or convergence runs reported in this paper; “CI only” indicates coverage via the test suite (1041 tests) but not in model-level experiments.\nD",
+      "word_count": 128,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Reproducibility",
+      "normalized_heading_text": "reproducibility",
+      "level": 2,
+      "line_start": 569,
+      "line_end": 619,
+      "prose_text": "Code and data.\nAll source code, benchmark scripts, raw JSON results, Triton autotune caches, and figure generation scripts are available at https://github.com/sockeye44/dorafactors (tag v1.0). The patched PEFT module is included as a git submodule (vendor/dorafactors-peft,\n**Table 12: Compatibility matrix. Scope: Bench = model-level benchmarks, Conv = convergence runs, CI = operator-level test suite.**\n| # 200 repeats, extended shapes, bf16 |\n| python code/bench_dora_comprehensive.py \\ |\n| --shapes extended --repeats 200 --warmup 10 \\ |\n| --dtype bf16 --json-out results.json |\n• Qwen/Qwen2.5-VL-32B-Instruct • Qwen/Qwen3-VL-32B-Instruct • Qwen/Qwen3.5-27B • google/gemma-3-27b-it • unsloth/Mistral-Small-3.2-24B-Instruct-2506 • Qwen/Qwen3-VL-8B-Instruct\nConvergence validation dataset.\nThe convergence validation (§5.9) uses a token-length-filtered subset of OpenDataArena/ MMFineReason-SFT-123K-Qwen3-VL-235B-Thinking [Lin et al., 2026], repacked with mechanical field renames (question→query, qwen3vl_235b_thinking_response→response) and filtered to tok_len ≤4096. The repacked dataset is published at eyes-ml/\\protect\\penalty\\z@ {}MMFineReason-SFT-123K-\\protect\\penalty\\z@{}Qwen3-VL-235B-Thinking-QR-max4096 on Hugging Face Hub; the filtering script is included in the repository (code/scripts/ repack_mmfinereason_qr.py).\nConvergence validation environment. Training uses SWIFT [Zhao et al., 2024] (commit a807cb9) with PyTorch 2.10.0+cu130, Transformers 5.2.0, Triton 3.6.0, DeepSpeed 0.18.6, FlashAttention 2.8.3.\nThe full environment (including qwen-vl-utils, mamba_ssm, flash-linearattention) uses the same Docker image as the benchmarks (see Software environment above) with the additional training dependencies installed.\nModel benchmark reproduction.\n| # 6 models, r=384, loss_tokens=1024 |\n| python code/bench_dora_comprehensive.py \\ |\n| --suite models --rank 384 --batch 1 --seqlen 4096 \\ |\n| --grad-accum 8 --loss-tokens 1024 --repeats 20 \\ |\n| --json-out models.json |\nThis produces 13 PDF figures in paper/figures/ sourced from the code/bench_it6/ data directory (6 GPUs × 3 dtypes for microbenchmarks, 3 GPUs for model-level). The convergence figure (Figure 12) is generated separately from TensorBoard logs via python paper/generate_training_\n**Table 13: Model-level gradient-computation peak VRAM (GB) across three GPUs, all six models. Same setup as Table 8. Values from peak_vram_mb.**",
+      "full_text": "Code and data.\nAll source code, benchmark scripts, raw JSON results, Triton autotune caches, and figure generation scripts are available at https://github.com/sockeye44/dorafactors (tag v1.0). The patched PEFT module is included as a git submodule (vendor/dorafactors-peft,\n23\n---\n<!-- page 24 mode: hybrid_paper -->\n**Table 12: Compatibility matrix. Scope: Bench = model-level benchmarks, Conv = convergence runs, CI = operator-level test suite.**\n![Table 12](p110_assets/tables/p110_page_24_table_caption_1.png)\n24\n---\n<!-- page 25 mode: hybrid_paper -->\n**Table 1 (Page 25)**\n|  |\n$$\n|---|\n$$\n| # 200 repeats, extended shapes, bf16 |\n$$\n| python code/bench_dora_comprehensive.py \\ |\n| --shapes extended --repeats 200 --warmup 10 \\ |\n| --dtype bf16 --json-out results.json |\n$$\n|  |\n![Table 2 on Page 25](p110_assets/tables/p110_page_25_table_1.png)\n$$\n• Qwen/Qwen2.5-VL-32B-Instruct • Qwen/Qwen3-VL-32B-Instruct • Qwen/Qwen3.5-27B • google/gemma-3-27b-it • unsloth/Mistral-Small-3.2-24B-Instruct-2506 • Qwen/Qwen3-VL-8B-Instruct\n$$\nConvergence validation dataset.\nThe convergence validation (§5.9) uses a token-length-filtered subset of OpenDataArena/ MMFineReason-SFT-123K-Qwen3-VL-235B-Thinking [Lin et al., 2026], repacked with mechanical field renames (question→query, qwen3vl_235b_thinking_response→response) and filtered to tok_len ≤4096. The repacked dataset is published at eyes-ml/\\protect\\penalty\\z@ {}MMFineReason-SFT-123K-\\protect\\penalty\\z@{}Qwen3-VL-235B-Thinking-QR-max4096 on Hugging Face Hub; the filtering script is included in the repository (code/scripts/ repack_mmfinereason_qr.py).\nConvergence validation environment. Training uses SWIFT [Zhao et al., 2024] (commit a807cb9) with PyTorch 2.10.0+cu130, Transformers 5.2.0, Triton 3.6.0, DeepSpeed 0.18.6, FlashAttention 2.8.3.\nThe full environment (including qwen-vl-utils, mamba_ssm, flash-linearattention) uses the same Docker image as the benchmarks (see Software environment above) with the additional training dependencies installed.\nModel benchmark reproduction.\n**Table 2 (Page 25)**\n|  |\n$$\n|---|\n| # 6 models, r=384, loss_tokens=1024 |\n| python code/bench_dora_comprehensive.py \\ |\n| --suite models --rank 384 --batch 1 --seqlen 4096 \\ |\n| --grad-accum 8 --loss-tokens 1024 --repeats 20 \\ |\n| --json-out models.json |\n$$\n|  |\n![Table 3 on Page 25 #2](p110_assets/tables/p110_page_25_table_2.png)\nThis produces 13 PDF figures in paper/figures/ sourced from the code/bench_it6/ data directory (6 GPUs × 3 dtypes for microbenchmarks, 3 GPUs for model-level). The convergence figure (Figure 12) is generated separately from TensorBoard logs via python paper/generate_training_\n25\n---\n<!-- page 26 mode: hybrid_paper -->\n**Table 13: Model-level gradient-computation peak VRAM (GB) across three GPUs, all six models. Same setup as Table 8. Values from peak_vram_mb.**\n![Table 13](p110_assets/tables/p110_page_26_table_caption_1.png)",
+      "word_count": 273,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Full Model-Level Memory Table",
+      "normalized_heading_text": "full model level memory table",
+      "level": 2,
+      "line_start": 620,
+      "line_end": 627,
+      "prose_text": "**Table 14: Geometric mean microbenchmark speedups, fp32 (all shapes, 200 repeats). Complement to Table 9.**\n**Table 15: DoRA norm implementation in major fine-tuning frameworks (February 2026).**",
+      "full_text": "---\n<!-- page 27 mode: hybrid_paper -->\n**Table 14: Geometric mean microbenchmark speedups, fp32 (all shapes, 200 repeats). Complement to Table 9.**\n![Table 14](p110_assets/tables/p110_page_27_table_caption_1.png)\n**Table 15: DoRA norm implementation in major fine-tuning frameworks (February 2026).**\n![Table 15](p110_assets/tables/p110_page_27_table_caption_2.png)",
+      "word_count": 21,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Single-Layer E2E Decomposition",
+      "normalized_heading_text": "single layer e2e decomposition",
+      "level": 2,
+      "line_start": 628,
+      "line_end": 629,
+      "prose_text": "",
+      "full_text": "",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Framework Survey",
+      "normalized_heading_text": "framework survey",
+      "level": 2,
+      "line_start": 630,
+      "line_end": 684,
+      "prose_text": "Single-Layer E2E: B200, bf16, h=4096, bs=4, seq=2048\n(a) Step Time vs. Rank\nStep Time (ms)\n(b) Speedup vs. Rank\nSpeedup (Eager / Fused)\nFigure 13: Single-layer E2E overhead decomposition (B200, bf16, d = 4096, bs=4, seq=2048).\nSingle-layer E2E does not predict model-level speedup: compose gains compound across ∼500 DoRA modules while per-layer backward overhead is amortized.\nSingle-Layer Speedup (Eager / Fused)\nSingle-Layer E2E Speedup Across GPUs (bf16, h=4096)\nFigure 14: Single-layer E2E speedup (eager/fused) across six GPUs and ranks (bf16, d = 4096, bs=4, seq=2048). All GPUs show consistent improvement.",
+      "full_text": "---\n<!-- page 28 mode: hybrid_paper -->\n$$\nSingle-Layer E2E: B200, bf16, h=4096, bs=4, seq=2048\n$$\n(a) Step Time vs. Rank\n2.4\n2.3\nStep Time (ms)\n2.2\n2.1\n2.0\n1.9\n1.8\n1.7\n16 64 128 256 384 512\nLoRA Rank\n(b) Speedup vs. Rank\n1.250\n```text\nSpeedup (Eager / Fused)\n```\n1.225\n1.200\n1.175\n1.150\n1.125\n1.100\n1.075\n16 64 128 256 384 512\nLoRA Rank\n$$\nFigure 13: Single-layer E2E overhead decomposition (B200, bf16, d = 4096, bs=4, seq=2048).\n$$\nSingle-layer E2E does not predict model-level speedup: compose gains compound across ∼500 DoRA modules while per-layer backward overhead is amortized.\nSingle-Layer Speedup (Eager / Fused)\n1.35\n1.30\n1.25\n1.20\n1.15\n1.10\n1.05\n1.00\n0.95\nSingle-Layer E2E Speedup Across GPUs (bf16, h=4096)\n16 64 128 256 384 512\nLoRA Rank\nFigure 14: Single-layer E2E speedup (eager/fused) across six GPUs and ranks (bf16, d = 4096, bs=4, seq=2048). All GPUs show consistent improvement.\n28\n---\n<!-- page 29 mode: hybrid_paper -->\n29\n---",
+      "word_count": 76,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "The stable compose form achieves 3.0× lower peak error near g ≈1 (bf16, dout = 8192, din = 2048). The naive form g ⊙(s · lora + base) −base exhibits catastrophic cancellation; the stable form and fused kernel both remain near the bf16 quantization floor. Reference: fp64.",
+      "normalized_caption": "the stable compose form achieves 3 0 lower peak error near g 1 bf16 dout 8192 din 2048 the naive form g s lora base base exhibits catastrophic cancellation the stable form and fused kernel both remain near the bf16 quantization floor reference fp64",
+      "line_no": 155,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "Inference speedup: 1.5–2.0× over the HF PEFT DoRA baseline. All six models run on all three GPUs, including 32B on RTX 6000 PRO (96 GB) that OOM during gradient computation.",
+      "normalized_caption": "inference speedup 1 5 2 0 over the hf peft dora baseline all six models run on all three gpus including 32b on rtx 6000 pro 96 gb that oom during gradient computation",
+      "line_no": 221,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
+      "caption": "Compose kernel speedup vs. eager (bf16) across six GPUs. (a) Forward: 1.5–4.5×.",
+      "normalized_caption": "compose kernel speedup vs eager bf16 across six gpus a forward 1 5 4 5",
+      "line_no": 302,
+      "kind": "figure"
+    },
+    {
+      "number": 7,
+      "caption": "Bandwidth utilization (fp32, six GPUs). Fused approaches ∼50% of peak on all architectures; eager values are approximate lower bounds.",
+      "normalized_caption": "bandwidth utilization fp32 six gpus fused approaches 50 of peak on all architectures eager values are approximate lower bounds",
+      "line_no": 336,
+      "kind": "figure"
+    },
+    {
+      "number": 10,
+      "caption": "Norm latency vs. rank (RTX 6000 PRO, fp32). The PEFT time is constant in r; factored scales linearly. At r ≤128, factored matches the reference due to reduced memory traffic.",
+      "normalized_caption": "norm latency vs rank rtx 6000 pro fp32 the peft time is constant in r factored scales linearly at r 128 factored matches the reference due to reduced memory traffic",
+      "line_no": 351,
+      "kind": "figure"
+    },
+    {
+      "number": 12,
+      "caption": "Convergence: eager vs. fused are visually indistinguishable (Qwen3.5-9B-Base, r=384, seed 3 of 3). (a) Training loss (25-step smoothing). (b) Eval loss (200-step intervals). (c) Gradient norms.",
+      "normalized_caption": "convergence eager vs fused are visually indistinguishable qwen3 5 9b base r 384 seed 3 of 3 a training loss 25 step smoothing b eval loss 200 step intervals c gradient norms",
+      "line_no": 411,
+      "kind": "figure"
+    },
+    {
+      "number": 13,
+      "caption": "Single-layer E2E overhead decomposition (B200, bf16, d = 4096, bs=4, seq=2048).",
+      "normalized_caption": "single layer e2e overhead decomposition b200 bf16 d 4096 bs 4 seq 2048",
+      "line_no": 663,
+      "kind": "figure"
+    },
+    {
+      "number": 14,
+      "caption": "Single-layer E2E speedup (eager/fused) across six GPUs and ranks (bf16, d = 4096, bs=4, seq=2048). All GPUs show consistent improvement.",
+      "normalized_caption": "single layer e2e speedup eager fused across six gpus and ranks bf16 d 4096 bs 4 seq 2048 all gpus show consistent improvement",
+      "line_no": 679,
+      "kind": "figure"
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption": "(Page 2)",
+      "normalized_caption": "page 2",
+      "line_no": 25,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 2",
+      "normalized_caption": "on page 2",
+      "line_no": 34,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "compares asymptotic and concrete memory costs.",
+      "normalized_caption": "compares asymptotic and concrete memory costs",
+      "line_no": 97,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "The factored norm reduces rank-dependent persistent memory by 15× at d=8192, r=512 in fp32. Measured reductions are smaller (3.2×) because allocator deltas include the rank-independent base-norm transient (§2.3).",
+      "normalized_caption": "the factored norm reduces rank dependent persistent memory by 15 at d 8192 r 512 in fp32 measured reductions are smaller 3 2 because allocator deltas include the rank independent base norm transient 2 3",
+      "line_no": 104,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 105,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "Dispatch tiers and their selection criteria.",
+      "normalized_caption": "dispatch tiers and their selection criteria",
+      "line_no": 178,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 179,
+      "kind": "table"
+    },
+    {
+      "number": 4,
+      "caption": "summarizes the headline result: gradient-computation speedup across six 8–32B VLMs on three GPUs. The fused implementation is 1.46–1.87× faster than HF PEFT’s DoRA implementation and 1.18–1.24× faster than our own eager baseline, with 1.3–6.7 GB lower peak VRAM (Table 8).",
+      "normalized_caption": "summarizes the headline result gradient computation speedup across six 8 32b vlms on three gpus the fused implementation is 1 46 1 87 faster than hf peft s dora implementation and 1 18 1 24 faster than our own eager baseline with 1 3 6 7 gb lower peak vram table 8",
+      "line_no": 207,
+      "kind": "table"
+    },
+    {
+      "number": 3,
+      "caption": "Benchmark hardware. “Micro”: microbenchmark coverage. “Model”: full model-level gradient-computation and inference benchmarks.",
+      "normalized_caption": "benchmark hardware micro microbenchmark coverage model full model level gradient computation and inference benchmarks",
+      "line_no": 213,
+      "kind": "table"
+    },
+    {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 214,
+      "kind": "table"
+    },
+    {
+      "number": 4,
+      "caption": "Gradient-computation speedup on 8–32B VLMs (r = 384, bf16, seq=4096, bs=1, ga=8, loss tokens=1024, 20 repeats). The HF PEFT DoRA baseline takes 46–87% longer per iteration than fused. 32B models OOM on RTX 6000 PRO (96 GB) under all configurations. See Table 5 for absolute times.",
+      "normalized_caption": "gradient computation speedup on 8 32b vlms r 384 bf16 seq 4096 bs 1 ga 8 loss tokens 1024 20 repeats the hf peft dora baseline takes 46 87 longer per iteration than fused 32b models oom on rtx 6000 pro 96 gb under all configurations see table 5 for absolute times",
+      "line_no": 215,
+      "kind": "table"
+    },
+    {
+      "number": 4,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 216,
+      "kind": "table"
+    },
+    {
+      "number": 5,
+      "caption": "Absolute gradient-computation time (seconds). Each iteration covers 8 gradient- accumulation micro-steps; 32 768 tokens total. Standard deviations ≤0.13 s (CV < 1.7%).",
+      "normalized_caption": "absolute gradient computation time seconds each iteration covers 8 gradient accumulation micro steps 32 768 tokens total standard deviations 0 13 s cv 1 7",
+      "line_no": 217,
+      "kind": "table"
+    },
+    {
+      "number": 5,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 218,
+      "kind": "table"
+    },
+    {
+      "number": 6,
+      "caption": "validates the high-rank framing at r=384, 512, and 768. Speedup vs.",
+      "normalized_caption": "validates the high rank framing at r 384 512 and 768 speedup vs",
+      "line_no": 223,
+      "kind": "table"
+    },
+    {
+      "number": 6,
+      "caption": "Speedup vs. the HF PEFT DoRA baseline grows with rank; speedup vs. eager decreases modestly (H200, bf16, seq=4096, 20 repeats).",
+      "normalized_caption": "speedup vs the hf peft dora baseline grows with rank speedup vs eager decreases modestly h200 bf16 seq 4096 20 repeats",
+      "line_no": 231,
+      "kind": "table"
+    },
+    {
+      "number": 6,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 232,
+      "kind": "table"
+    },
+    {
+      "number": 7,
+      "caption": "Norm memory: measured allocation delta and theoretical reduction (fp32, H200). Measured reductions are smaller than theoretical because they include the rank-independent base-norm transient (§2.3).",
+      "normalized_caption": "norm memory measured allocation delta and theoretical reduction fp32 h200 measured reductions are smaller than theoretical because they include the rank independent base norm transient 2 3",
+      "line_no": 343,
+      "kind": "table"
+    },
+    {
+      "number": 7,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 344,
+      "kind": "table"
+    },
+    {
+      "number": 8,
+      "caption": "Model-level peak VRAM (GB). Fused uses less than all baselines on every model. 32B models OOM on RTX 6000 PRO.",
+      "normalized_caption": "model level peak vram gb fused uses less than all baselines on every model 32b models oom on rtx 6000 pro",
+      "line_no": 359,
+      "kind": "table"
+    },
+    {
+      "number": 8,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 360,
+      "kind": "table"
+    },
+    {
+      "number": 9,
+      "caption": "Geometric mean microbenchmark speedups (all shapes, 200 repeats). Norm memory 0.8× in bf16 means factored uses more memory for the isolated norm due to fp32 accumulation transients (§2.3).",
+      "normalized_caption": "geometric mean microbenchmark speedups all shapes 200 repeats norm memory 0 8 in bf16 means factored uses more memory for the isolated norm due to fp32 accumulation transients 2 3",
+      "line_no": 365,
+      "kind": "table"
+    },
+    {
+      "number": 9,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 366,
+      "kind": "table"
+    },
+    {
+      "number": 10,
+      "caption": "Multi-seed convergence: eager vs. fused training loss (Qwen3.5-9B-Base, r =384, 2000 steps). Grand mean per-step delta 7.1 × 10−4; final eval losses agree to < 1.5 × 10−4.",
+      "normalized_caption": "multi seed convergence eager vs fused training loss qwen3 5 9b base r 384 2000 steps grand mean per step delta 7 1 10 4 final eval losses agree to 1 5 10 4",
+      "line_no": 367,
+      "kind": "table"
+    },
+    {
+      "number": 10,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 368,
+      "kind": "table"
+    },
+    {
+      "number": 11,
+      "caption": "consolidates practitioner recommendations.",
+      "normalized_caption": "consolidates practitioner recommendations",
+      "line_no": 423,
+      "kind": "table"
+    },
+    {
+      "number": 11,
+      "caption": "Recommended configuration by scenario.",
+      "normalized_caption": "recommended configuration by scenario",
+      "line_no": 433,
+      "kind": "table"
+    },
+    {
+      "number": 11,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 434,
+      "kind": "table"
+    },
+    {
+      "number": 12,
+      "caption": "summarizes the integration points explicitly tested, with notes on scope and caveats. “Tested” indicates the feature was exercised in benchmarks or convergence runs reported in this paper; “CI only” indicates coverage via the test suite (1041 tests) but not in model-level experiments.",
+      "normalized_caption": "summarizes the integration points explicitly tested with notes on scope and caveats tested indicates the feature was exercised in benchmarks or convergence runs reported in this paper ci only indicates coverage via the test suite 1041 tests but not in model level experiments",
+      "line_no": 566,
+      "kind": "table"
+    },
+    {
+      "number": 12,
+      "caption": "Compatibility matrix. Scope: Bench = model-level benchmarks, Conv = convergence runs, CI = operator-level test suite.",
+      "normalized_caption": "compatibility matrix scope bench model level benchmarks conv convergence runs ci operator level test suite",
+      "line_no": 575,
+      "kind": "table"
+    },
+    {
+      "number": 12,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 576,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "(Page 25)",
+      "normalized_caption": "page 25",
+      "line_no": 580,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "on Page 25",
+      "normalized_caption": "on page 25",
+      "line_no": 592,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "(Page 25)",
+      "normalized_caption": "page 25",
+      "line_no": 601,
+      "kind": "table"
+    },
+    {
+      "number": 3,
+      "caption": "on Page 25 #2",
+      "normalized_caption": "on page 25 2",
+      "line_no": 612,
+      "kind": "table"
+    },
+    {
+      "number": 13,
+      "caption": "Model-level gradient-computation peak VRAM (GB) across three GPUs, all six models. Same setup as Table 8. Values from peak vram mb.",
+      "normalized_caption": "model level gradient computation peak vram gb across three gpus all six models same setup as table 8 values from peak vram mb",
+      "line_no": 617,
+      "kind": "table"
+    },
+    {
+      "number": 13,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 618,
+      "kind": "table"
+    },
+    {
+      "number": 14,
+      "caption": "Geometric mean microbenchmark speedups, fp32 (all shapes, 200 repeats). Complement to Table 9.",
+      "normalized_caption": "geometric mean microbenchmark speedups fp32 all shapes 200 repeats complement to table 9",
+      "line_no": 623,
+      "kind": "table"
+    },
+    {
+      "number": 14,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 624,
+      "kind": "table"
+    },
+    {
+      "number": 15,
+      "caption": "DoRA norm implementation in major fine-tuning frameworks (February 2026).",
+      "normalized_caption": "dora norm implementation in major fine tuning frameworks february 2026",
+      "line_no": 625,
+      "kind": "table"
+    },
+    {
+      "number": 15,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 626,
+      "kind": "table"
+    }
+  ],
+  "intrinsic_metrics": {
+    "heading_count": 44,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 8,
+    "table_caption_count": 41,
+    "duplicate_figure_caption_count": 0,
+    "duplicate_table_caption_count": 26,
+    "empty_section_count": 9,
+    "consecutive_heading_run_count": 9,
+    "max_consecutive_heading_run": 2
+  },
+  "run_metadata": {
+    "doc_id": "p110",
+    "system": "improved_ocr_agent",
+    "title": "Scaling DoRA: High-Rank Adaptation via Factored Norms and Fused Kernels",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/c4a536b15a8624a5.pdf",
+    "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p110/p110.pdf",
+    "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p110",
+    "ocr_backend": "ocr_server",
+    "use_pdf_page_ocr": false,
+    "document_mode": "hybrid_paper",
+    "asset_counts": {
+      "figures": 1,
+      "tables": 24,
+      "page_images": 0
+    },
+    "elapsed_ms": 3867.545,
+    "status": "success",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p110/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": true
+  }
+}

@@ -1,7 +1,7 @@
 {
   "doc_id": "p186",
   "system": "ia_phase1",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401186v1.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401186v1.pdf",
   "title": "From Validity to Inter-Subjectivity: An Argument for Reliability Signals in Search Environments",
   "status": "success",
   "markdown_line_count": 157,
@@ -104,7 +104,7 @@
     "system": "ia_phase1",
     "paper_id": 191918571886,
     "title": "From Validity to Inter-Subjectivity: An Argument for Reliability Signals in Search Environments",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401186v1.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401186v1.pdf",
     "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p186",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p186/paper.md",
     "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p186/manifest.json",
@@ -116,8 +116,8 @@
     "metadata": {
       "title": "From Validity to Inter-Subjectivity: An Argument for Reliability Signals in Search Environments",
       "paper_id": "191918571886",
-      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401186v1.pdf",
-      "generated_at": "2026-04-03T22:15:40.166130+00:00",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401186v1.pdf",
+      "generated_at": "2026-04-04T22:54:51.518031+00:00",
       "num_figures": "0",
       "num_tables": "0",
       "num_equations": "3",
@@ -211,7 +211,7 @@
       "issue_count": 0,
       "issues": []
     },
-    "elapsed_ms": 1351.326,
+    "elapsed_ms": 1365.476,
     "status": "success"
   }
 }

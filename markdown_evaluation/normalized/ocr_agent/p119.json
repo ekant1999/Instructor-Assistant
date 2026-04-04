@@ -1,7 +1,7 @@
 {
   "doc_id": "p119",
   "system": "ocr_agent",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/4a5ab78468782a40.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/4a5ab78468782a40.pdf",
   "title": "p119",
   "status": "success",
   "markdown_line_count": 625,
@@ -430,9 +430,23 @@
   "figures": [
     {
       "number": 1,
+      "caption": "on Page 4",
+      "normalized_caption": "on page 4",
+      "line_no": 151,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
       "caption": "Overview of VLA-OPD. Our framework unifies offline SFT and online RL through three phases. Phase 1 (Student Sampling): The student VLA policy interacts with the environment to collect on-policy trajectory rollouts (O →A →O). Phase 2 (Teacher Labeling): For each state visited by the student, a frozen expert teacher provides dense, token-level action labels ( ̂︀ A) without executing them in the environment. Phase 3 (Student Optimization):",
       "normalized_caption": "overview of vla opd our framework unifies offline sft and online rl through three phases phase 1 student sampling the student vla policy interacts with the environment to collect on policy trajectory rollouts o a o phase 2 teacher labeling for each state visited by the student a frozen expert teacher provides dense token level action labels a without executing them in the environment phase 3 student optimization",
       "line_no": 161,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 9",
+      "normalized_caption": "on page 9",
+      "line_no": 419,
       "kind": "figure"
     },
     {
@@ -447,6 +461,20 @@
       "caption": "Seen–Unseen Trade-off for Forgetting Analysis. Each point corresponds to a checkpoint during fine-tuning. The x-axis is the success rate on seen (target) tasks, and the y-axis is the success rate on a held-out unseen task. Offline SFT exhibits a strong collapse on unseen tasks as seen-task performance increases, while on-policy methods (RL and our distillation) better preserve unseen-task capability.",
       "normalized_caption": "seen unseen trade off for forgetting analysis each point corresponds to a checkpoint during fine tuning the x axis is the success rate on seen target tasks and the y axis is the success rate on a held out unseen task offline sft exhibits a strong collapse on unseen tasks as seen task performance increases while on policy methods rl and our distillation better preserve unseen task capability",
       "line_no": 455,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 11",
+      "normalized_caption": "on page 11",
+      "line_no": 457,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 12",
+      "normalized_caption": "on page 12",
+      "line_no": 467,
       "kind": "figure"
     },
     {
@@ -480,10 +508,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 429,
+      "kind": "table"
+    },
+    {
       "number": 3,
       "caption": "Evaluation on Selected RoboTwin2.0 Tasks. Following the setting in Li et al. (2025a), models are initialized with full-dataset SFT (1000 demos/task). We report success rates (%) on four representative tasks with varying horizon lengths. VLA-OPD consistently improves over the SFT initialization, especially in long-horizon tasks.",
       "normalized_caption": "evaluation on selected robotwin2 0 tasks following the setting in li et al 2025a models are initialized with full dataset sft 1000 demos task we report success rates on four representative tasks with varying horizon lengths vla opd consistently improves over the sft initialization especially in long horizon tasks",
       "line_no": 437,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 439,
       "kind": "table"
     }
   ],
@@ -491,10 +533,10 @@
     "heading_count": 22,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 5,
-    "table_caption_count": 3,
-    "duplicate_figure_caption_count": 0,
-    "duplicate_table_caption_count": 0,
+    "figure_caption_count": 9,
+    "table_caption_count": 5,
+    "duplicate_figure_caption_count": 4,
+    "duplicate_table_caption_count": 2,
     "empty_section_count": 3,
     "consecutive_heading_run_count": 3,
     "max_consecutive_heading_run": 2
@@ -503,10 +545,10 @@
     "doc_id": "p119",
     "system": "ocr_agent",
     "title": "VLA-OPD: Bridging Offline SFT and Online RL for Vision-Language-Action Models via On-Policy Distillation",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/4a5ab78468782a40.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/4a5ab78468782a40.pdf",
     "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p119/p119.pdf",
     "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p119",
-    "ocr_backend": "dummy",
+    "ocr_backend": "ocr_server",
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
@@ -514,8 +556,10 @@
       "tables": 2,
       "page_images": 0
     },
-    "elapsed_ms": 3307.967,
+    "elapsed_ms": 3863.345,
     "status": "success",
-    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p119/paper.md"
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p119/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
   }
 }

@@ -1,8 +1,8 @@
 ---
 title: "WRITEBACK-RAG: Training the Knowledge Base through Evidence Distillation and Write-Back Enrichment"
 paper_id: 118
-source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/699ede68aa0d6853.pdf"
-generated_at: "2026-04-03T22:15:01.458806+00:00"
+source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/699ede68aa0d6853.pdf"
+generated_at: "2026-04-04T22:54:27.146474+00:00"
 num_figures: 5
 num_tables: 6
 num_equations: 31

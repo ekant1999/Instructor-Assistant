@@ -1,0 +1,138 @@
+{
+  "doc_id": "a004",
+  "system": "improved_ocr_agent",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment4.pdf",
+  "title": "DATA 240 - Lab Report: Student Portal Log Analytics",
+  "status": "success",
+  "markdown_line_count": 29,
+  "headings": [
+    {
+      "level": 2,
+      "text": "Dataset and Goal",
+      "normalized_text": "dataset and goal",
+      "line_no": 8,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Latency and Response-Code Trends",
+      "normalized_text": "latency and response code trends",
+      "line_no": 13,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Tabular Findings",
+      "normalized_text": "tabular findings",
+      "line_no": 18,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Incident Notes and Conclusions",
+      "normalized_text": "incident notes and conclusions",
+      "line_no": 20,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "Dataset and Goal",
+      "normalized_heading_text": "dataset and goal",
+      "level": 2,
+      "line_start": 8,
+      "line_end": 12,
+      "prose_text": "",
+      "full_text": "![Figure 1 on Page 1](a004_assets/figures/a004_page_1_fig_1.png)\n---\n<!-- page 2 mode: hybrid_paper -->",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": true
+    },
+    {
+      "heading_text": "Latency and Response-Code Trends",
+      "normalized_heading_text": "latency and response code trends",
+      "level": 2,
+      "line_start": 13,
+      "line_end": 17,
+      "prose_text": "",
+      "full_text": "![Figure 2 on Page 2](a004_assets/figures/a004_page_2_fig_1.png)\n---\n<!-- page 3 mode: hybrid_paper -->",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": true
+    },
+    {
+      "heading_text": "Tabular Findings",
+      "normalized_heading_text": "tabular findings",
+      "level": 2,
+      "line_start": 18,
+      "line_end": 19,
+      "prose_text": "",
+      "full_text": "",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Incident Notes and Conclusions",
+      "normalized_heading_text": "incident notes and conclusions",
+      "level": 2,
+      "line_start": 20,
+      "line_end": 29,
+      "prose_text": "1. Traffic patterns were stable for most of the day, but the evening grade-release window amplified both\nconcurrency and latency.\n2. The fabricated 5xx spike coincided with an application rollout, which suggests that deployment timing\nmatters as much as raw capacity.\n3. Endpoints that depend on external payment services showed the broadest tail, so separate alert thresholds\nshould be used for third-party integrations.\n4. Even with dummy data, the report structure approximates the dense mix of screenshots, charts, and tables\noften seen in student analytics submissions.",
+      "full_text": "1. Traffic patterns were stable for most of the day, but the evening grade-release window amplified both\nconcurrency and latency.\n2. The fabricated 5xx spike coincided with an application rollout, which suggests that deployment timing\nmatters as much as raw capacity.\n3. Endpoints that depend on external payment services showed the broadest tail, so separate alert thresholds\nshould be used for third-party integrations.\n4. Even with dummy data, the report structure approximates the dense mix of screenshots, charts, and tables\noften seen in student analytics submissions.\n---",
+      "word_count": 82,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "on Page 1",
+      "normalized_caption": "on page 1",
+      "line_no": 9,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "on Page 2",
+      "normalized_caption": "on page 2",
+      "line_no": 14,
+      "kind": "figure"
+    }
+  ],
+  "tables": [],
+  "intrinsic_metrics": {
+    "heading_count": 4,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 2,
+    "table_caption_count": 0,
+    "duplicate_figure_caption_count": 0,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 3,
+    "consecutive_heading_run_count": 1,
+    "max_consecutive_heading_run": 4
+  },
+  "run_metadata": {
+    "doc_id": "a004",
+    "system": "improved_ocr_agent",
+    "title": "DATA 240 - Lab Report: Student Portal Log Analytics",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment4.pdf",
+    "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a004/a004.pdf",
+    "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a004",
+    "ocr_backend": "ocr_server",
+    "use_pdf_page_ocr": false,
+    "document_mode": "hybrid_paper",
+    "asset_counts": {
+      "figures": 2,
+      "tables": 0,
+      "page_images": 0
+    },
+    "elapsed_ms": 425.364,
+    "status": "success",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a004/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": true
+  }
+}

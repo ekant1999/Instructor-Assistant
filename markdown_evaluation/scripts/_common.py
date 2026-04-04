@@ -151,6 +151,12 @@ def temporary_environ(updates: Dict[str, Optional[str]]) -> Iterator[None]:
 
 _TEXT_NORMALIZE_RE = re.compile(r"\s+")
 _NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
+_NUMBERED_HEADING_PREFIX_RE = re.compile(
+    r"^(?:(?:\d{1,3}(?:\.\d{1,3})*)(?:\s*[.)])?\s+|(?:[A-Z]|[IVXLCDM]+)\s*[.)]\s+)+",
+    re.I,
+)
+_APPENDIX_LETTER_PREFIX_RE = re.compile(r"^(?P<prefix>[A-Z])\s+(?P<body>\S.*)$")
+_SPLIT_CAPITAL_TOKEN_RE = re.compile(r"\b([A-Z])\s+([A-Z][A-Z][A-Z0-9-]*)\b")
 
 
 def collapse_ws(text: str) -> str:
@@ -161,6 +167,41 @@ def normalize_match_text(text: str) -> str:
     collapsed = collapse_ws(text).lower()
     collapsed = _NON_ALNUM_RE.sub(" ", collapsed)
     return collapse_ws(collapsed)
+
+
+def normalize_heading_text(text: str) -> str:
+    cleaned = collapse_ws(text)
+    cleaned = cleaned.rstrip("# ").strip()
+    cleaned = re.sub(r"^[*_`]+|[*_`]+$", "", cleaned)
+    cleaned = collapse_ws(cleaned)
+    while True:
+        repaired = _SPLIT_CAPITAL_TOKEN_RE.sub(r"\1\2", cleaned)
+        if repaired == cleaned:
+            break
+        cleaned = repaired
+    cleaned = _NUMBERED_HEADING_PREFIX_RE.sub("", cleaned)
+    return normalize_match_text(cleaned)
+
+
+def heading_match_variants(text: str) -> List[str]:
+    cleaned = collapse_ws(text)
+    cleaned = cleaned.rstrip("# ").strip()
+    cleaned = re.sub(r"^[*_`]+|[*_`]+$", "", cleaned)
+    variants: List[str] = []
+
+    normalized = normalize_heading_text(cleaned)
+    if normalized:
+        variants.append(normalized)
+
+    appendix_match = _APPENDIX_LETTER_PREFIX_RE.match(cleaned)
+    if appendix_match:
+        body = collapse_ws(appendix_match.group("body"))
+        if len(body.split()) >= 2:
+            body_normalized = normalize_heading_text(body)
+            if body_normalized and body_normalized not in variants:
+                variants.append(body_normalized)
+
+    return variants
 
 
 def slugify(text: str) -> str:

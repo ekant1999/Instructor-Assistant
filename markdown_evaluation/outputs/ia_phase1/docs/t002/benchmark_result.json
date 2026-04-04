@@ -1,0 +1,67 @@
+{
+  "doc_id": "t002",
+  "system": "ia_phase1",
+  "paper_id": 261731869403,
+  "title": "Literature Digest Summary",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/TextHeavy/text_heavy_placeholder_literature_digest.pdf",
+  "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/t002",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/t002/paper.md",
+  "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/t002/manifest.json",
+  "asset_counts": {
+    "figures": 0,
+    "tables": 0,
+    "equations": 0
+  },
+  "metadata": {
+    "title": "Literature Digest Summary",
+    "paper_id": "261731869403",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/TextHeavy/text_heavy_placeholder_literature_digest.pdf",
+    "generated_at": "2026-04-04T22:55:09.731751+00:00",
+    "num_figures": "0",
+    "num_tables": "0",
+    "num_equations": "0",
+    "page_count": "7"
+  },
+  "render_mode": "normal",
+  "sectioning_strategy": "heuristic",
+  "sectioning_report": {
+    "strategy": "heuristic",
+    "candidate_headings": 1,
+    "matched_headings": 2,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 3,
+        "start_block_index": 0,
+        "end_block_index": 15
+      },
+      {
+        "index": 1,
+        "title": "Section 3: Structured Discussion",
+        "canonical": "discussion",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 3,
+        "end_page": 7,
+        "start_block_index": 16,
+        "end_block_index": 42
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 43
+  },
+  "audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": []
+  },
+  "elapsed_ms": 1356.196,
+  "status": "success"
+}

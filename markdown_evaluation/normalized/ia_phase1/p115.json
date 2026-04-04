@@ -1,7 +1,7 @@
 {
   "doc_id": "p115",
   "system": "ia_phase1",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8f8c9e275748b72e.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8f8c9e275748b72e.pdf",
   "title": "OccAny: Generalized Unconstrained Urban 3D Occupancy",
   "status": "success",
   "markdown_line_count": 439,
@@ -449,9 +449,23 @@
   "figures": [
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 13,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
       "caption": "OccAny is a generalized 3D occupancy model that is trained once and can operate on out-of-domain sequential, monoc- ular, or surround-view urban images. It produces SAM2-like fea- tures, enabling promptable segmentation.",
       "normalized_caption": "occany is a generalized 3d occupancy model that is trained once and can operate on out of domain sequential monoc ular or surround view urban images it produces sam2 like fea tures enabling promptable segmentation",
       "line_no": 15,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 37,
       "kind": "figure"
     },
     {
@@ -463,9 +477,23 @@
     },
     {
       "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 51,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
       "caption": "OccAny inference undergoes two stages: (i) 3D recon- struction to retrieve Nrec pointmaps with predicted camera poses {vi}Nrec i=1 , and (ii) novel-view rendering with TTVA sampled along the trajectory of {vi}Nrec i=1 . 3D occupancy is obtained by aggregat- ing all pointmaps and voxelizing them with trilinear interpolation.",
       "normalized_caption": "occany inference undergoes two stages i 3d recon struction to retrieve nrec pointmaps with predicted camera poses vi nrec i 1 and ii novel view rendering with ttva sampled along the trajectory of vi nrec i 1 3d occupancy is obtained by aggregat ing all pointmaps and voxelizing them with trilinear interpolation",
       "line_no": 53,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 78,
       "kind": "figure"
     },
     {
@@ -477,9 +505,23 @@
     },
     {
       "number": 5,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 98,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
       "caption": "Qualitative ablation shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 4. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.",
       "normalized_caption": "qualitative ablation shows the gains from segmentation forcing and novel view rendering voxel colorization follows fig 4 the two proposed strategies significantly improve the density and the accuracy of occupancy predictions",
       "line_no": 100,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 124,
       "kind": "figure"
     },
     {
@@ -491,9 +533,23 @@
     },
     {
       "number": 8,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 134,
+      "kind": "figure"
+    },
+    {
+      "number": 8,
       "caption": "Instance segmentation of cars with OccAny’s features.",
       "normalized_caption": "instance segmentation of cars with occany s features",
       "line_no": 136,
+      "kind": "figure"
+    },
+    {
+      "number": 7,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 138,
       "kind": "figure"
     },
     {
@@ -512,9 +568,23 @@
     },
     {
       "number": 9,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 421,
+      "kind": "figure"
+    },
+    {
+      "number": 9,
       "caption": "Occupancy predictions of OccAny and baselines on sequential data. We visualize here predicted voxels. For qualitative analysis, we overlay the semantic ground-truth colors on predicted voxels to better highlight class-wise gains. False positive voxels are painted in gray without any overlayed color. Compared to baselines, our occupancy predictions are denser and more accurate.",
       "normalized_caption": "occupancy predictions of occany and baselines on sequential data we visualize here predicted voxels for qualitative analysis we overlay the semantic ground truth colors on predicted voxels to better highlight class wise gains false positive voxels are painted in gray without any overlayed color compared to baselines our occupancy predictions are denser and more accurate",
       "line_no": 423,
+      "kind": "figure"
+    },
+    {
+      "number": 10,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 425,
       "kind": "figure"
     },
     {
@@ -526,6 +596,13 @@
     },
     {
       "number": 11,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 429,
+      "kind": "figure"
+    },
+    {
+      "number": 11,
       "caption": "Qualitative ablation on Semantic KITTI shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.",
       "normalized_caption": "qualitative ablation on semantic kitti shows the gains from segmentation forcing and novel view rendering voxel colorization follows fig 9 the two proposed strategies significantly improve the density and the accuracy of occupancy predictions",
       "line_no": 431,
@@ -533,9 +610,23 @@
     },
     {
       "number": 12,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 433,
+      "kind": "figure"
+    },
+    {
+      "number": 12,
       "caption": "Qualitative ablation on Occ3D-NuScenes shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.",
       "normalized_caption": "qualitative ablation on occ3d nuscenes shows the gains from segmentation forcing and novel view rendering voxel colorization follows fig 9 the two proposed strategies significantly improve the density and the accuracy of occupancy predictions",
       "line_no": 435,
+      "kind": "figure"
+    },
+    {
+      "number": 13,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 437,
       "kind": "figure"
     },
     {
@@ -636,9 +727,9 @@
     "heading_count": 23,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 14,
+    "figure_caption_count": 27,
     "table_caption_count": 12,
-    "duplicate_figure_caption_count": 1,
+    "duplicate_figure_caption_count": 14,
     "duplicate_table_caption_count": 0,
     "empty_section_count": 2,
     "consecutive_heading_run_count": 2,
@@ -649,7 +740,7 @@
     "system": "ia_phase1",
     "paper_id": 115,
     "title": "OccAny: Generalized Unconstrained Urban 3D Occupancy",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8f8c9e275748b72e.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8f8c9e275748b72e.pdf",
     "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p115",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p115/paper.md",
     "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p115/manifest.json",
@@ -661,8 +752,8 @@
     "metadata": {
       "title": "OccAny: Generalized Unconstrained Urban 3D Occupancy",
       "paper_id": "115",
-      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8f8c9e275748b72e.pdf",
-      "generated_at": "2026-04-03T22:14:42.392921+00:00",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8f8c9e275748b72e.pdf",
+      "generated_at": "2026-04-04T22:54:11.521138+00:00",
       "num_figures": "13",
       "num_tables": "11",
       "num_equations": "25",
@@ -806,7 +897,7 @@
         "suspicious headings detected (1)"
       ]
     },
-    "elapsed_ms": 94762.513,
+    "elapsed_ms": 42149.625,
     "status": "success"
   }
 }

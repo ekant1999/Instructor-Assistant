@@ -3,7 +3,7 @@
   "system": "ia_phase1",
   "paper_id": 937020923872,
   "title": "Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO",
-  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401213v1.pdf",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401213v1.pdf",
   "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p213",
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p213/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p213/manifest.json",
@@ -15,8 +15,8 @@
   "metadata": {
     "title": "Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO",
     "paper_id": "937020923872",
-    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401213v1.pdf",
-    "generated_at": "2026-04-03T22:15:46.197871+00:00",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401213v1.pdf",
+    "generated_at": "2026-04-04T22:54:56.939580+00:00",
     "num_figures": "3",
     "num_tables": "0",
     "num_equations": "21",
@@ -146,6 +146,6 @@
     "issue_count": 0,
     "issues": []
   },
-  "elapsed_ms": 6114.631,
+  "elapsed_ms": 5498.305,
   "status": "success"
 }

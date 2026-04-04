@@ -1,0 +1,78 @@
+{
+  "doc_id": "t006",
+  "title": "Technical Architecture Memorandum",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "non_academic",
+    "text_heavy",
+    "synthetic_report",
+    "pdf_type_textheavy"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Section 1: Context and Intent"
+    },
+    {
+      "level": 2,
+      "text": "Section 2: Problem Framing"
+    },
+    {
+      "level": 2,
+      "text": "Section 3: Structured Discussion"
+    },
+    {
+      "level": 2,
+      "text": "Section 4: Implementation Notes"
+    },
+    {
+      "level": 2,
+      "text": "Section 5: Risk and Constraint Review"
+    },
+    {
+      "level": 2,
+      "text": "Section 6: Narrative Continuity"
+    },
+    {
+      "level": 2,
+      "text": "Section 7: Extended Commentary"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "This synthetic paragraph focuses on service boundary and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 1: Context and Intent",
+      "position": "start"
+    },
+    {
+      "text": "This synthetic paragraph focuses on resource isolation and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 2: Problem Framing",
+      "position": "middle"
+    },
+    {
+      "text": "This synthetic paragraph focuses on request path and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 3: Structured Discussion",
+      "position": "middle"
+    },
+    {
+      "text": "This synthetic paragraph focuses on runtime behavior and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 4: Implementation Notes",
+      "position": "start"
+    },
+    {
+      "text": "This synthetic paragraph focuses on observability detail and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 5: Risk and Constraint Review",
+      "position": "middle"
+    },
+    {
+      "text": "This synthetic paragraph focuses on failure handling and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 6: Narrative Continuity",
+      "position": "middle"
+    }
+  ],
+  "figures": [],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/TextHeavy/text_heavy_placeholder_technical_memo.pdf on 2026-04-04 using pdftotext -layout. Section 7 exists in the source but was intentionally left without an anchor because its body repeats earlier focus phrases. No figures/tables in source."
+}

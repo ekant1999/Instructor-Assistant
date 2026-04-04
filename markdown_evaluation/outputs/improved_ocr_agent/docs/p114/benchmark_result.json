@@ -1,0 +1,21 @@
+{
+  "doc_id": "p114",
+  "system": "improved_ocr_agent",
+  "title": "End-to-End Training for Unified Tokenization and Latent Denoising",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8fc3e78ffd8b88ba.pdf",
+  "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p114/p114.pdf",
+  "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p114",
+  "ocr_backend": "ocr_server",
+  "use_pdf_page_ocr": false,
+  "document_mode": "hybrid_paper",
+  "asset_counts": {
+    "figures": 5,
+    "tables": 6,
+    "page_images": 0
+  },
+  "elapsed_ms": 13718.912,
+  "status": "success",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p114/paper.md",
+  "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
+  "postprocess_enabled": true
+}

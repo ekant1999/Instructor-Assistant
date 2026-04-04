@@ -1,8 +1,8 @@
 ---
 title: "A ROS 2 Wrapper for Florence-2: Multi-Mode Local Vision-Language Inference for Robotic Systems"
 paper_id: 560480445128
-source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401179v1.pdf"
-generated_at: "2026-04-03T22:15:38.808378+00:00"
+source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401179v1.pdf"
+generated_at: "2026-04-04T22:54:50.145077+00:00"
 num_figures: 1
 num_tables: 0
 num_equations: 3

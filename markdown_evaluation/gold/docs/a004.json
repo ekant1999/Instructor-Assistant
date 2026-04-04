@@ -1,0 +1,71 @@
+{
+  "doc_id": "a004",
+  "title": "DATA 240 - Lab Report: Student Portal Log Analytics",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "non_academic",
+    "student_assignment",
+    "figure_heavy",
+    "table_heavy",
+    "hybrid_pdf",
+    "pdf_type_hybrid"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Dataset and Goal"
+    },
+    {
+      "level": 2,
+      "text": "Latency and Response-Code Trends"
+    },
+    {
+      "level": 2,
+      "text": "Tabular Findings"
+    },
+    {
+      "level": 2,
+      "text": "Incident Notes and Conclusions"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "The dataset contains timestamp, endpoint, status code, latency, and client region fields.",
+      "expected_section": "Dataset and Goal",
+      "position": "start"
+    },
+    {
+      "text": "Figure 2. Fabricated latency trend from morning to late evening.",
+      "expected_section": "Latency and Response-Code Trends",
+      "position": "middle"
+    },
+    {
+      "text": "Most common error 401 Unauthorized",
+      "expected_section": "Tabular Findings",
+      "position": "middle"
+    },
+    {
+      "text": "Even with dummy data, the report structure approximates the dense mix of screenshots, charts, and tables",
+      "expected_section": "Incident Notes and Conclusions",
+      "position": "end"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": "Mock analytics dashboard summarizing portal traffic"
+    },
+    {
+      "number": 2,
+      "caption_contains": "Fabricated latency trend from morning to late evening"
+    },
+    {
+      "number": 3,
+      "caption_contains": "Status-code breakdown for the same observation window"
+    }
+  ],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/Hybrid/Assignment4.pdf on 2026-04-04 using pdftotext -layout and caption inspection. The table is unnumbered in the source, so tables are intentionally empty."
+}

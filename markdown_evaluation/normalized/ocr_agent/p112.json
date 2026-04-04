@@ -1,7 +1,7 @@
 {
   "doc_id": "p112",
   "system": "ocr_agent",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/987e7ff453578105.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/987e7ff453578105.pdf",
   "title": "p112",
   "status": "success",
   "markdown_line_count": 738,
@@ -135,63 +135,63 @@
     {
       "level": 3,
       "text": "2.1 Preliminaries: Masked Diffusion Language Models",
-      "normalized_text": "2 1 preliminaries masked diffusion language models",
+      "normalized_text": "preliminaries masked diffusion language models",
       "line_no": 173,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "2.2 Motivation: Quantifying Denoising Exposure Bias",
-      "normalized_text": "2 2 motivation quantifying denoising exposure bias",
+      "normalized_text": "motivation quantifying denoising exposure bias",
       "line_no": 202,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3.1 Bi-level Optimization for Denoising Simulation",
-      "normalized_text": "3 1 bi level optimization for denoising simulation",
+      "normalized_text": "bi level optimization for denoising simulation",
       "line_no": 274,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3.2 The Inner Loop: Anchor-Consistent Trajectories",
-      "normalized_text": "3 2 the inner loop anchor consistent trajectories",
+      "normalized_text": "the inner loop anchor consistent trajectories",
       "line_no": 284,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3.3 The Outer Loop: Conditioned Denoising",
-      "normalized_text": "3 3 the outer loop conditioned denoising",
+      "normalized_text": "the outer loop conditioned denoising",
       "line_no": 296,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.1 Experimental Setup",
-      "normalized_text": "4 1 experimental setup",
+      "normalized_text": "experimental setup",
       "line_no": 360,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.2 Main Results: Long-Context Information Retrieval",
-      "normalized_text": "4 2 main results long context information retrieval",
+      "normalized_text": "main results long context information retrieval",
       "line_no": 380,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.5 Understanding MemDLM During Inference",
-      "normalized_text": "4 5 understanding memdlm during inference",
+      "normalized_text": "understanding memdlm during inference",
       "line_no": 438,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.6 Ablation of Core Design Choices",
-      "normalized_text": "4 6 ablation of core design choices",
+      "normalized_text": "ablation of core design choices",
       "line_no": 444,
       "suspicious": false
     },
@@ -471,7 +471,7 @@
     },
     {
       "heading_text": "2.1 Preliminaries: Masked Diffusion Language Models",
-      "normalized_heading_text": "2 1 preliminaries masked diffusion language models",
+      "normalized_heading_text": "preliminaries masked diffusion language models",
       "level": 3,
       "line_start": 173,
       "line_end": 201,
@@ -483,7 +483,7 @@
     },
     {
       "heading_text": "2.2 Motivation: Quantifying Denoising Exposure Bias",
-      "normalized_heading_text": "2 2 motivation quantifying denoising exposure bias",
+      "normalized_heading_text": "motivation quantifying denoising exposure bias",
       "level": 3,
       "line_start": 202,
       "line_end": 273,
@@ -495,7 +495,7 @@
     },
     {
       "heading_text": "3.1 Bi-level Optimization for Denoising Simulation",
-      "normalized_heading_text": "3 1 bi level optimization for denoising simulation",
+      "normalized_heading_text": "bi level optimization for denoising simulation",
       "level": 3,
       "line_start": 274,
       "line_end": 283,
@@ -507,7 +507,7 @@
     },
     {
       "heading_text": "3.2 The Inner Loop: Anchor-Consistent Trajectories",
-      "normalized_heading_text": "3 2 the inner loop anchor consistent trajectories",
+      "normalized_heading_text": "the inner loop anchor consistent trajectories",
       "level": 3,
       "line_start": 284,
       "line_end": 295,
@@ -519,7 +519,7 @@
     },
     {
       "heading_text": "3.3 The Outer Loop: Conditioned Denoising",
-      "normalized_heading_text": "3 3 the outer loop conditioned denoising",
+      "normalized_heading_text": "the outer loop conditioned denoising",
       "level": 3,
       "line_start": 296,
       "line_end": 359,
@@ -531,7 +531,7 @@
     },
     {
       "heading_text": "4.1 Experimental Setup",
-      "normalized_heading_text": "4 1 experimental setup",
+      "normalized_heading_text": "experimental setup",
       "level": 3,
       "line_start": 360,
       "line_end": 379,
@@ -543,7 +543,7 @@
     },
     {
       "heading_text": "4.2 Main Results: Long-Context Information Retrieval",
-      "normalized_heading_text": "4 2 main results long context information retrieval",
+      "normalized_heading_text": "main results long context information retrieval",
       "level": 3,
       "line_start": 380,
       "line_end": 437,
@@ -555,7 +555,7 @@
     },
     {
       "heading_text": "4.5 Understanding MemDLM During Inference",
-      "normalized_heading_text": "4 5 understanding memdlm during inference",
+      "normalized_heading_text": "understanding memdlm during inference",
       "level": 3,
       "line_start": 438,
       "line_end": 443,
@@ -567,7 +567,7 @@
     },
     {
       "heading_text": "4.6 Ablation of Core Design Choices",
-      "normalized_heading_text": "4 6 ablation of core design choices",
+      "normalized_heading_text": "ablation of core design choices",
       "level": 3,
       "line_start": 444,
       "line_end": 457,
@@ -763,9 +763,23 @@
     },
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 188,
+      "kind": "table"
+    },
+    {
+      "number": 1,
       "caption": "Performance on challenging Needle-in-a-Haystack (NIAH) tasks from RULER and BABI- Long across increasing context lengths. We report results for two backbones under three settings: Standard MDLM, MemDLM (Train-Only), and MemDLM (Train & Inference). RULER columns correspond to the Multi-Value (MV), Variable Tracking (VT), and Common Words Extraction (CWE) sub-tasks. Bold indicates the best result within each backbone block.",
       "normalized_caption": "performance on challenging needle in a haystack niah tasks from ruler and babi long across increasing context lengths we report results for two backbones under three settings standard mdlm memdlm train only and memdlm train inference ruler columns correspond to the multi value mv variable tracking vt and common words extraction cwe sub tasks bold indicates the best result within each backbone block",
       "line_no": 390,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 392,
       "kind": "table"
     },
     {
@@ -776,10 +790,24 @@
       "kind": "table"
     },
     {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 396,
+      "kind": "table"
+    },
+    {
       "number": 3,
       "caption": "Performance on LongBench datasets. Standard MDLM is the baseline. MemDLM (Train-Only) uses Parametric Memory during training but disables it at inference. MemDLM (Train & Inference) reactivates the inner loop at inference time.",
       "normalized_caption": "performance on longbench datasets standard mdlm is the baseline memdlm train only uses parametric memory during training but disables it at inference memdlm train inference reactivates the inner loop at inference time",
       "line_no": 404,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 406,
       "kind": "table"
     }
   ],
@@ -788,9 +816,9 @@
     "duplicate_heading_count": 8,
     "suspicious_heading_count": 0,
     "figure_caption_count": 11,
-    "table_caption_count": 4,
+    "table_caption_count": 8,
     "duplicate_figure_caption_count": 2,
-    "duplicate_table_caption_count": 1,
+    "duplicate_table_caption_count": 5,
     "empty_section_count": 15,
     "consecutive_heading_run_count": 4,
     "max_consecutive_heading_run": 8
@@ -799,10 +827,10 @@
     "doc_id": "p112",
     "system": "ocr_agent",
     "title": "MemDLM: Memory-Enhanced DLM Training",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/987e7ff453578105.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/987e7ff453578105.pdf",
     "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p112/p112.pdf",
     "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p112",
-    "ocr_backend": "dummy",
+    "ocr_backend": "ocr_server",
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
@@ -810,8 +838,10 @@
       "tables": 4,
       "page_images": 0
     },
-    "elapsed_ms": 2058.269,
+    "elapsed_ms": 2486.977,
     "status": "success",
-    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p112/paper.md"
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p112/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
   }
 }

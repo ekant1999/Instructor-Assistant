@@ -1,0 +1,321 @@
+{
+  "doc_id": "a006",
+  "system": "ia_phase1",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment6.pdf",
+  "title": "CMPE 281 - Assignment: Serverless CRUD API with DynamoDB",
+  "status": "success",
+  "markdown_line_count": 98,
+  "headings": [
+    {
+      "level": 2,
+      "text": "Services Used",
+      "normalized_text": "services used",
+      "line_no": 11,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Lambda Handler",
+      "normalized_text": "lambda handler",
+      "line_no": 28,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "API Test Screenshots",
+      "normalized_text": "api test screenshots",
+      "line_no": 32,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "DynamoDB State and Functional Results",
+      "normalized_text": "dynamodb state and functional results",
+      "line_no": 50,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Edge Cases, Challenges, and Learnings",
+      "normalized_text": "edge cases challenges and learnings",
+      "line_no": 71,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "Services Used",
+      "normalized_heading_text": "services used",
+      "level": 2,
+      "line_start": 11,
+      "line_end": 27,
+      "prose_text": "AWS Lambda: Executes Python code without managing servers and scales automatically for intermittent\nAmazon DynamoDB: Stores student records in a key-value table with a string partition key named\nAmazon API Gateway: Exposes REST endpoints and forwards structured events to the Lambda handler.\n_Figure 1: Simplified request path from client to database._",
+      "full_text": "•\nAWS Lambda: Executes Python code without managing servers and scales automatically for intermittent\ntraffic.\n•\nAmazon DynamoDB: Stores student records in a key-value table with a string partition key named\nstudent_id.\n•\nAmazon API Gateway: Exposes REST endpoints and forwards structured events to the Lambda handler.\n![Figure 1](assets/figures/page_001_vec_001.png)\n_Figure 1: Simplified request path from client to database._",
+      "word_count": 48,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Lambda Handler",
+      "normalized_heading_text": "lambda handler",
+      "level": 2,
+      "line_start": 28,
+      "line_end": 31,
+      "prose_text": "The remaining PUT and DELETE branches follow the same event shape, updating or deleting the record after a key lookup.",
+      "full_text": "The remaining PUT and DELETE branches follow the same event shape, updating or deleting the record after a key lookup.",
+      "word_count": 19,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "API Test Screenshots",
+      "normalized_heading_text": "api test screenshots",
+      "level": 2,
+      "line_start": 32,
+      "line_end": 49,
+      "prose_text": "_Figure 2: Sample POST request used to add a new record._\n_Figure 3: Sample GET request retrieving the stored record._\n_Figure 4: PUT request used to update the course field._\n_Figure 5: DELETE request for removing the same record._",
+      "full_text": "![Figure 2](assets/figures/page_002_img_001.png)\n_Figure 2: Sample POST request used to add a new record._\n![Figure 3](assets/figures/page_003_img_001.png)\n_Figure 3: Sample GET request retrieving the stored record._\n![Figure 4](assets/figures/page_004_img_001.png)\n_Figure 4: PUT request used to update the course field._\n![Figure 5](assets/figures/page_004_img_002.png)\n_Figure 5: DELETE request for removing the same record._",
+      "word_count": 34,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "DynamoDB State and Functional Results",
+      "normalized_heading_text": "dynamodb state and functional results",
+      "level": 2,
+      "line_start": 50,
+      "line_end": 70,
+      "prose_text": "_Figure 6: Fabricated table snapshot after the update operation._\n/students?student_id=42\n> Equation 2 JSON: `assets/equations/equation_0002.json`\n> Equation 2 image: `assets/equations/equation_0002.png`\n/students?student_id=42 \\\\\n/students?student_id=100 missing key\n> Equation 3 JSON: `assets/equations/equation_0003.json`\n> Equation 3 image: `assets/equations/equation_0003.png`",
+      "full_text": "![Figure 6](assets/figures/page_005_vec_001.png)\n_Figure 6: Fabricated table snapshot after the update operation._\n$$\n/students?student_id=42\n$$\n> Equation 2 JSON: `assets/equations/equation_0002.json`\n> Equation 2 image: `assets/equations/equation_0002.png`\n$$\n\\begin{aligned}\n/students?student_id=42 \\\\\n/students?student_id=100 missing key\n\\end{aligned}\n$$\n> Equation 3 JSON: `assets/equations/equation_0003.json`\n> Equation 3 image: `assets/equations/equation_0003.png`",
+      "word_count": 43,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Edge Cases, Challenges, and Learnings",
+      "normalized_heading_text": "edge cases challenges and learnings",
+      "level": 2,
+      "line_start": 71,
+      "line_end": 98,
+      "prose_text": "Checked whether Item exists in the\nlookup response before serializing\nGET on missing student_id\nHandler returns 404 with a clear JSON\nDELETE on missing student_id Deletion is skipped and the client receives a user-facing error.\nAdded a pre-delete existence check to\navoid silent success.\nUnstructured event payload\nInitial testing failed because\nhttpMethod was missing.\nEnabled proxy-style integration so the handler receives the full REST event.\n• Serverless APIs are convenient for coursework because they eliminate persistent server setup while still exposing realistic cloud integration patterns.\n• DynamoDB favors access patterns around the partition key, so request design should align with the table schema from the start.\nReturning clear status codes for failure cases improves debugging and makes API behavior easier to validate",
+      "full_text": "Checked whether Item exists in the\nlookup response before serializing\noutput.\nGET on missing student_id\nHandler returns 404 with a clear JSON\nmessage.\nDELETE on missing student_id Deletion is skipped and the client receives a user-facing error.\nAdded a pre-delete existence check to\navoid silent success.\nUnstructured event payload\nInitial testing failed because\nhttpMethod was missing.\nEnabled proxy-style integration so the handler receives the full REST event.\n• Serverless APIs are convenient for coursework because they eliminate persistent server setup while still exposing realistic cloud integration patterns.\n• DynamoDB favors access patterns around the partition key, so request design should align with the table schema from the start.\n•\nReturning clear status codes for failure cases improves debugging and makes API behavior easier to validate\nin a report.",
+      "word_count": 118,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 24,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "Simplified request path from client to database.",
+      "normalized_caption": "simplified request path from client to database",
+      "line_no": 26,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 34,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "Sample POST request used to add a new record.",
+      "normalized_caption": "sample post request used to add a new record",
+      "line_no": 36,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 38,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "Sample GET request retrieving the stored record.",
+      "normalized_caption": "sample get request retrieving the stored record",
+      "line_no": 40,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 42,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "PUT request used to update the course field.",
+      "normalized_caption": "put request used to update the course field",
+      "line_no": 44,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 46,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
+      "caption": "DELETE request for removing the same record.",
+      "normalized_caption": "delete request for removing the same record",
+      "line_no": 48,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 52,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
+      "caption": "Fabricated table snapshot after the update operation.",
+      "normalized_caption": "fabricated table snapshot after the update operation",
+      "line_no": 54,
+      "kind": "figure"
+    }
+  ],
+  "tables": [],
+  "intrinsic_metrics": {
+    "heading_count": 5,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 12,
+    "table_caption_count": 0,
+    "duplicate_figure_caption_count": 6,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 0,
+    "consecutive_heading_run_count": 0,
+    "max_consecutive_heading_run": 0
+  },
+  "run_metadata": {
+    "doc_id": "a006",
+    "system": "ia_phase1",
+    "paper_id": 120022211085,
+    "title": "CMPE 281 - Assignment: Serverless CRUD API with DynamoDB",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment6.pdf",
+    "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a006",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a006/paper.md",
+    "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a006/manifest.json",
+    "asset_counts": {
+      "figures": 6,
+      "tables": 0,
+      "equations": 3
+    },
+    "metadata": {
+      "title": "CMPE 281 - Assignment: Serverless CRUD API with DynamoDB",
+      "paper_id": "120022211085",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment6.pdf",
+      "generated_at": "2026-04-04T22:55:06.504900+00:00",
+      "num_figures": "6",
+      "num_tables": "0",
+      "num_equations": "3",
+      "page_count": "6"
+    },
+    "render_mode": "normal",
+    "sectioning_strategy": "pdf_toc",
+    "sectioning_report": {
+      "strategy": "pdf_toc",
+      "candidate_headings": 5,
+      "matched_headings": 6,
+      "sections": [
+        {
+          "index": 0,
+          "title": "Front Matter",
+          "canonical": "front_matter",
+          "level": 1,
+          "source": "fallback",
+          "confidence": 0.4,
+          "start_page": 1,
+          "end_page": 1,
+          "start_block_index": 0,
+          "end_block_index": 4
+        },
+        {
+          "index": 1,
+          "title": "Services Used",
+          "canonical": "services_used",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 1,
+          "end_page": 1,
+          "start_block_index": 5,
+          "end_block_index": 9
+        },
+        {
+          "index": 2,
+          "title": "Lambda Handler",
+          "canonical": "lambda_handler",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 1,
+          "end_page": 2,
+          "start_block_index": 10,
+          "end_block_index": 13
+        },
+        {
+          "index": 3,
+          "title": "API Test Screenshots",
+          "canonical": "api_test_screenshots",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 2,
+          "end_page": 4,
+          "start_block_index": 14,
+          "end_block_index": 18
+        },
+        {
+          "index": 4,
+          "title": "DynamoDB State and Functional Results",
+          "canonical": "results",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 5,
+          "end_page": 5,
+          "start_block_index": 19,
+          "end_block_index": 26
+        },
+        {
+          "index": 5,
+          "title": "Edge Cases, Challenges, and Learnings",
+          "canonical": "edge_cases_challenges_and_learnings",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 5,
+          "end_page": 6,
+          "start_block_index": 27,
+          "end_block_index": 37
+        }
+      ],
+      "annotated_blocks": 0,
+      "total_blocks": 38
+    },
+    "audit": {
+      "conservative_recommended": false,
+      "issue_count": 0,
+      "issues": []
+    },
+    "elapsed_ms": 1264.058,
+    "status": "success"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "doc_id": "t005",
+  "title": "Project Proposal Narrative",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "non_academic",
+    "text_heavy",
+    "synthetic_report",
+    "pdf_type_textheavy"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Section 1: Context and Intent"
+    },
+    {
+      "level": 2,
+      "text": "Section 2: Problem Framing"
+    },
+    {
+      "level": 2,
+      "text": "Section 3: Structured Discussion"
+    },
+    {
+      "level": 2,
+      "text": "Section 4: Implementation Notes"
+    },
+    {
+      "level": 2,
+      "text": "Section 5: Risk and Constraint Review"
+    },
+    {
+      "level": 2,
+      "text": "Section 6: Narrative Continuity"
+    },
+    {
+      "level": 2,
+      "text": "Section 7: Extended Commentary"
+    },
+    {
+      "level": 2,
+      "text": "Section 8: Closing Discussion"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "This synthetic paragraph focuses on scope statement and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 1: Context and Intent",
+      "position": "start"
+    },
+    {
+      "text": "This synthetic paragraph focuses on timeline assumption and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 2: Problem Framing",
+      "position": "start"
+    },
+    {
+      "text": "This synthetic paragraph focuses on coordination need and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 3: Structured Discussion",
+      "position": "middle"
+    },
+    {
+      "text": "This synthetic paragraph focuses on approval path and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 4: Implementation Notes",
+      "position": "middle"
+    },
+    {
+      "text": "This synthetic paragraph focuses on resource estimate and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 5: Risk and Constraint Review",
+      "position": "start"
+    },
+    {
+      "text": "This synthetic paragraph focuses on review checkpoint and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 6: Narrative Continuity",
+      "position": "middle"
+    },
+    {
+      "text": "This synthetic paragraph focuses on risk posture and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 7: Extended Commentary",
+      "position": "middle"
+    },
+    {
+      "text": "This synthetic paragraph focuses on deliverable outline and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 8: Closing Discussion",
+      "position": "middle"
+    }
+  ],
+  "figures": [],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/TextHeavy/text_heavy_placeholder_project_proposal.pdf on 2026-04-04 using pdftotext -layout. No figures/tables in source."
+}

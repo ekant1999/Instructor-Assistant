@@ -1,0 +1,21 @@
+{
+  "doc_id": "a003",
+  "system": "improved_ocr_agent",
+  "title": "Assignment 2: Classification - Customer Churn Prediction Using Classification",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment3.pdf",
+  "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a003/a003.pdf",
+  "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a003",
+  "ocr_backend": "ocr_server",
+  "use_pdf_page_ocr": false,
+  "document_mode": "simple_text",
+  "asset_counts": {
+    "figures": 0,
+    "tables": 0,
+    "page_images": 0
+  },
+  "elapsed_ms": 116.417,
+  "status": "success",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a003/paper.md",
+  "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
+  "postprocess_enabled": true
+}

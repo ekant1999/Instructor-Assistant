@@ -1,0 +1,63 @@
+{
+  "doc_id": "a007",
+  "title": "CS 249 - Assignment: VM Resource Monitoring and Benchmarking",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "non_academic",
+    "student_assignment",
+    "figure_heavy",
+    "table_heavy",
+    "hybrid_pdf",
+    "systems_report",
+    "pdf_type_hybrid"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Test Environment"
+    },
+    {
+      "level": 2,
+      "text": "Benchmark Figures"
+    },
+    {
+      "level": 2,
+      "text": "Summary Table and Findings"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "Ubuntu 22.04 VM with 4 vCPUs and 8 GB RAM",
+      "expected_section": "Test Environment",
+      "position": "start"
+    },
+    {
+      "text": "Figure 3. Throughput and tail-latency progression across the test.",
+      "expected_section": "Benchmark Figures",
+      "position": "end"
+    },
+    {
+      "text": "The cache-enabled scenario produced the highest throughput without exhausting CPU or memory headroom.",
+      "expected_section": "Summary Table and Findings",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": "Mock terminal output during the load test"
+    },
+    {
+      "number": 2,
+      "caption_contains": "CPU and memory utilization observed across the benchmark"
+    },
+    {
+      "number": 3,
+      "caption_contains": "Throughput and tail-latency progression across the test"
+    }
+  ],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/Hybrid/Assignment7.pdf on 2026-04-04 using pdftotext -layout and caption inspection. The summary table is unnumbered in the source."
+}

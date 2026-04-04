@@ -6,7 +6,33 @@
 
 <!-- OCR page 1 -->
 
-![OCR Page 1](p213_page_1.png)
+Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO
+
+Matthias Rubio¹, Julia Richter¹, Hendrik Kolvenbach¹, and Marco Hutter¹
+
+Abstract—Efficient robotic extraterrestrial exploration requires robots with diverse capabilities, ranging from scientific measurement tools to advanced locomotion. A robotic team enables the distribution of tasks over multiple specialized subsystems, each providing specific expertise to complete the mission. The central challenge lies in efficiently coordinating the team to maximize utilization and the extraction of scientific value. Classical planning algorithms scale poorly with problem size, leading to long planning cycles and high inference costs due to the combinatorial growth of possible robot-target allocations and possible trajectories. Learning-based methods are a viable alternative that move the scaling concern from runtime to training time, setting a critical step towards achieving real-time planning. In this work, we present a collaborative planning strategy based on Multi-Agent Proximal Policy Optimization (MAPPO) to coordinate a team of heterogeneous robots to solve a complex target allocation and scheduling problem. We benchmark our approach against single-objective optimal solutions obtained through exhaustive search and evaluate its ability to perform online replanning in the context of a planetary exploration scenario.
+
+Index Terms—Path Planning for Multiple Mobile Robots or Agents; Space Robotics and Automation; Reinforcement Learning
+
+I. INTRODUCTION
+
+Unmanned surface exploration may require not only different locomotion techniques to overcome harsh terrain but also a variety of scientific equipment and specific devices for physical interaction with the environment. However, a single robot has only a limited capacity. Therefore, distributing task-specific components across a team of specialized robots allows multiple tasks to be performed in parallel, reducing overall mission time [1].
+
+In 2021, the Perseverance rover deployed the helicopter Ingenuity on Mars, achieving the first powered flight on another planet [2]. This groundbreaking mission proved that the use of multiple agents with alternative locomotion techniques has the potential to enhance future planetary exploration missions. Similarly, Arm et al. used a team of legged robots with complementary skills to perform an Earth-based resource prospecting study [3]. The team was able of performing different tasks in a short time frame, showing that collaboration increases efficiency compared to single-robot exploration [1].
+
+However, in the latter example, the task allocation and task sequence were determined manually by five human operators. As this becomes more complicated for more robots and tasks, especially under the communication delays and constraints of planetary missions, manual planning needs to be replaced by an algorithm that coordinates the team on a global scale.
+
+A. Challenges of Multi-Robot Planning
+
+For single-robot path planning, there are many possible algorithmic approaches which Sánchez-Ibáñez et al. systematically categorize [4]. Graph search algorithms, such as A*, make up a well-known subgroup in addition to sampling-based methods. Richter et al. show how to use a multi-objective A* global path planning algorithm for an exploration mission on the moon [5].
+
+However, single-robot path planning algorithms fail to address the additional complexities in multi-agent scenarios. Besides finding an efficient path, the algorithm also needs to
+
+Fig. 1: An illustrative plan for a collaborative robot fleet with different specializations, such as flying, walking, or driving. During the mission the drone and the legged robot find new tasks and replan to minimize mission time.
+
+![Illustrative plan for a collaborative robot fleet with different specializations, such as flying, walking, or driving.](p213_assets/figures/ocr_page_1_1092_370_1012_682.png)
+
+![Gantt chart showing the timeline for drone, rover, and legged robot, with replanning and waiting periods.](p213_assets/figures/ocr_page_1_1092_1092_1012_282.png)
 
 ---
 

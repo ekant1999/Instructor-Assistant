@@ -1,0 +1,21 @@
+{
+  "doc_id": "p120",
+  "system": "improved_ocr_agent",
+  "title": "Detailed Geometry and Appearance from Opportunistic Motion",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/41528b7825c49511.pdf",
+  "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p120/p120.pdf",
+  "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p120",
+  "ocr_backend": "ocr_server",
+  "use_pdf_page_ocr": false,
+  "document_mode": "hybrid_paper",
+  "asset_counts": {
+    "figures": 11,
+    "tables": 9,
+    "page_images": 0
+  },
+  "elapsed_ms": 5747.681,
+  "status": "success",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p120/paper.md",
+  "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
+  "postprocess_enabled": true
+}

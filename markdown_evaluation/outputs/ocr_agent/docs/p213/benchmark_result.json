@@ -2,18 +2,20 @@
   "doc_id": "p213",
   "system": "ocr_agent",
   "title": "Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO",
-  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401213v1.pdf",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401213v1.pdf",
   "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p213/p213.pdf",
   "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p213",
-  "ocr_backend": "dummy",
+  "ocr_backend": "ocr_server",
   "use_pdf_page_ocr": false,
   "document_mode": "hybrid_paper",
   "asset_counts": {
-    "figures": 0,
+    "figures": 2,
     "tables": 3,
     "page_images": 1
   },
-  "elapsed_ms": 1899.146,
+  "elapsed_ms": 34148.48,
   "status": "success",
-  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p213/paper.md"
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p213/paper.md",
+  "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+  "postprocess_enabled": false
 }

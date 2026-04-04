@@ -1,7 +1,7 @@
 {
   "doc_id": "p118",
   "system": "ia_phase1",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/699ede68aa0d6853.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/699ede68aa0d6853.pdf",
   "title": "WRITEBACK-RAG: Training the Knowledge Base through Evidence Distillation and Write-Back Enrichment",
   "status": "success",
   "markdown_line_count": 535,
@@ -149,14 +149,14 @@
     {
       "level": 2,
       "text": "W RITE B ACK-RAG Prevents Answer Leakage",
-      "normalized_text": "w rite b ack rag prevents answer leakage",
+      "normalized_text": "write back rag prevents answer leakage",
       "line_no": 402,
       "suspicious": false
     },
     {
       "level": 2,
       "text": "W RITE B ACK-RAG as a General Method for RAG",
-      "normalized_text": "w rite b ack rag as a general method for rag",
+      "normalized_text": "write back rag as a general method for rag",
       "line_no": 408,
       "suspicious": false
     },
@@ -460,7 +460,7 @@
     },
     {
       "heading_text": "W RITE B ACK-RAG Prevents Answer Leakage",
-      "normalized_heading_text": "w rite b ack rag prevents answer leakage",
+      "normalized_heading_text": "write back rag prevents answer leakage",
       "level": 2,
       "line_start": 402,
       "line_end": 407,
@@ -472,7 +472,7 @@
     },
     {
       "heading_text": "W RITE B ACK-RAG as a General Method for RAG",
-      "normalized_heading_text": "w rite b ack rag as a general method for rag",
+      "normalized_heading_text": "write back rag as a general method for rag",
       "level": 2,
       "line_start": 408,
       "line_end": 411,
@@ -582,9 +582,23 @@
   "figures": [
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 13,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
       "caption": "Standard RAG retrieves fragmented evidence from raw documents. WRITEBACK-RAG distills use- ful evidence into compact write-back documents that improve future retrieval and generation.",
       "normalized_caption": "standard rag retrieves fragmented evidence from raw documents writeback rag distills use ful evidence into compact write back documents that improve future retrieval and generation",
       "line_no": 15,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 50,
       "kind": "figure"
     },
     {
@@ -596,6 +610,13 @@
     },
     {
       "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 290,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
       "caption": "Retrieval-rank distribution of retained docu- ments. Each panel shows the fraction of retained docu- ments among the retrieved documents.",
       "normalized_caption": "retrieval rank distribution of retained docu ments each panel shows the fraction of retained docu ments among the retrieved documents",
       "line_no": 292,
@@ -603,9 +624,23 @@
     },
     {
       "number": 4,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 312,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
       "caption": "Cross-writeback robustness. Same-WB uses write-back knowledge from the same RAG method, while Cross-WB uses write-back knowledge from the other method. Numbers above the bars denote absolute gains over the No-WB baseline.",
       "normalized_caption": "cross writeback robustness same wb uses write back knowledge from the same rag method while cross wb uses write back knowledge from the other method numbers above the bars denote absolute gains over the no wb baseline",
       "line_no": 314,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 436,
       "kind": "figure"
     },
     {
@@ -699,9 +734,9 @@
     "heading_count": 30,
     "duplicate_heading_count": 2,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 6,
+    "figure_caption_count": 11,
     "table_caption_count": 10,
-    "duplicate_figure_caption_count": 1,
+    "duplicate_figure_caption_count": 6,
     "duplicate_table_caption_count": 4,
     "empty_section_count": 1,
     "consecutive_heading_run_count": 1,
@@ -712,7 +747,7 @@
     "system": "ia_phase1",
     "paper_id": 118,
     "title": "WRITEBACK-RAG: Training the Knowledge Base through Evidence Distillation and Write-Back Enrichment",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/699ede68aa0d6853.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/699ede68aa0d6853.pdf",
     "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p118",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p118/paper.md",
     "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p118/manifest.json",
@@ -724,8 +759,8 @@
     "metadata": {
       "title": "WRITEBACK-RAG: Training the Knowledge Base through Evidence Distillation and Write-Back Enrichment",
       "paper_id": "118",
-      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/699ede68aa0d6853.pdf",
-      "generated_at": "2026-04-03T22:15:01.458806+00:00",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/699ede68aa0d6853.pdf",
+      "generated_at": "2026-04-04T22:54:27.146474+00:00",
       "num_figures": "5",
       "num_tables": "6",
       "num_equations": "31",
@@ -903,7 +938,7 @@
       "issue_count": 0,
       "issues": []
     },
-    "elapsed_ms": 10913.867,
+    "elapsed_ms": 10761.414,
     "status": "success"
   }
 }

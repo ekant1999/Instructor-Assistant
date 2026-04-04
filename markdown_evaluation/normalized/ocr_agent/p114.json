@@ -1,7 +1,7 @@
 {
   "doc_id": "p114",
   "system": "ocr_agent",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8fc3e78ffd8b88ba.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8fc3e78ffd8b88ba.pdf",
   "title": "p114",
   "status": "success",
   "markdown_line_count": 719,
@@ -334,10 +334,31 @@
   ],
   "figures": [
     {
+      "number": 1,
+      "caption": "on Page 1",
+      "normalized_caption": "on page 1",
+      "line_no": 21,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 2",
+      "normalized_caption": "on page 2",
+      "line_no": 39,
+      "kind": "figure"
+    },
+    {
       "number": 3,
       "caption": "UNITE Training Pipeline uses two forward passes through the Generative Encoder: first, mapping (distilling) image patches into latent registers, and second, denoising a noised version of those latents, with weights shared across both passes. Training combines reconstruction losses with a denoising loss |˜ ˆ z0−sg(˜ z0)|.",
       "normalized_caption": "unite training pipeline uses two forward passes through the generative encoder first mapping distilling image patches into latent registers and second denoising a noised version of those latents with weights shared across both passes training combines reconstruction losses with a denoising loss z0 sg z0",
       "line_no": 117,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 5",
+      "normalized_caption": "on page 5",
+      "line_no": 133,
       "kind": "figure"
     },
     {
@@ -353,14 +374,42 @@
       "normalized_caption": "representation alignment between tokenization and generation pathways we measure alignment between tokenization and denoising activations using cka and cosine similarity given an input image we first record intermediate activations along the tokenization pathway then corrupt the encoded latent and record the corresponding denoising pathway activations left both the weight shared unite model and the separate encoder denoiser ablation exhibit strong alignment especially in later layers indicating that tokenization and denoising are intrinsically aligned tasks middle removing the stop gradient and backpropagating denoising gradients through the latent weakens late layer alignment even though the denoising objective still matches the final latent target right",
       "line_no": 225,
       "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 8",
+      "normalized_caption": "on page 8",
+      "line_no": 265,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 17",
+      "normalized_caption": "on page 17",
+      "line_no": 687,
+      "kind": "figure"
     }
   ],
   "tables": [
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 191,
+      "kind": "table"
+    },
+    {
+      "number": 1,
       "caption": "ImageNet 256×256 generation. Our approach out- performs both recent single-stage pixel baselines and standard two-stage latent diffusion frameworks by a large margin.",
       "normalized_caption": "imagenet 256 256 generation our approach out performs both recent single stage pixel baselines and standard two stage latent diffusion frameworks by a large margin",
       "line_no": 287,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 289,
       "kind": "table"
     },
     {
@@ -371,10 +420,24 @@
       "kind": "table"
     },
     {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 293,
+      "kind": "table"
+    },
+    {
       "number": 3,
       "caption": "QM9 molecule generation. UNITE-S achieves the best reconstruction accuracy (99.37% match) and uniqueness (99.71%) under single-stage training. Crystal generation results on MP20 are provided in Appendix C.2.",
       "normalized_caption": "qm9 molecule generation unite s achieves the best reconstruction accuracy 99 37 match and uniqueness 99 71 under single stage training crystal generation results on mp20 are provided in appendix c 2",
       "line_no": 307,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 309,
       "kind": "table"
     },
     {
@@ -413,10 +476,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 695,
+      "kind": "table"
+    },
+    {
       "number": 7,
       "caption": "Detailed architecture configurations for UNITE models.",
       "normalized_caption": "detailed architecture configurations for unite models",
       "line_no": 699,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 701,
       "kind": "table"
     },
     {
@@ -431,10 +508,10 @@
     "heading_count": 17,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 3,
-    "table_caption_count": 10,
-    "duplicate_figure_caption_count": 0,
-    "duplicate_table_caption_count": 2,
+    "figure_caption_count": 8,
+    "table_caption_count": 16,
+    "duplicate_figure_caption_count": 4,
+    "duplicate_table_caption_count": 8,
     "empty_section_count": 2,
     "consecutive_heading_run_count": 1,
     "max_consecutive_heading_run": 3
@@ -443,10 +520,10 @@
     "doc_id": "p114",
     "system": "ocr_agent",
     "title": "End-to-End Training for Unified Tokenization and Latent Denoising",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8fc3e78ffd8b88ba.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8fc3e78ffd8b88ba.pdf",
     "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p114/p114.pdf",
     "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p114",
-    "ocr_backend": "dummy",
+    "ocr_backend": "ocr_server",
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
@@ -454,8 +531,10 @@
       "tables": 6,
       "page_images": 0
     },
-    "elapsed_ms": 11559.751,
+    "elapsed_ms": 13308.785,
     "status": "success",
-    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p114/paper.md"
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p114/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
   }
 }

@@ -1,7 +1,7 @@
 {
   "doc_id": "p179",
   "system": "ocr_agent",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401179v1.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401179v1.pdf",
   "title": "p179",
   "status": "success",
   "markdown_line_count": 343,
@@ -313,16 +313,53 @@
       "asset_only": false
     }
   ],
-  "figures": [],
-  "tables": [],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "on Page 2",
+      "normalized_caption": "on page 2",
+      "line_no": 81,
+      "kind": "figure"
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption": "summarises the main interfaces. A noteworthy aspect of the design is the combination of generic and typed outputs. Since Florence-2 supports heterogeneous tasks whose outputs range from plain text to structured detections, a purely typed ROS representation would either be too narrow or would require a large number of bespoke message definitions. The present implementation therefore publishes a generic JSON representation for all tasks, while additionally providing a standard vision msgs/Detection2DArray binding and an annotated image for tasks that yield bounding boxes and labels.",
+      "normalized_caption": "summarises the main interfaces a noteworthy aspect of the design is the combination of generic and typed outputs since florence 2 supports heterogeneous tasks whose outputs range from plain text to structured detections a purely typed ros representation would either be too narrow or would require a large number of bespoke message definitions the present implementation therefore publishes a generic json representation for all tasks while additionally providing a standard vision msgs detection2darray binding and an annotated image for tasks that yield bounding boxes and labels",
+      "line_no": 95,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "MAIN ROS 2 INTERFACES EXPOSED BY THE WRAPPER.",
+      "normalized_caption": "main ros 2 interfaces exposed by the wrapper",
+      "line_no": 103,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "PERFORMANCE OBTAINED WITH DIFFERENT GRAPHIC CARDS FOR THE",
+      "normalized_caption": "performance obtained with different graphic cards for the",
+      "line_no": 153,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "presents these measurements. Different GPUs are used to execute the same oepration (OD) in continuous mode over the same rosbag. Since these cards correspond to different generations, we could not use the same drivers in all of them. Instead, the most recent driver as well as the latest version of CUDA compatible with each driver has been used with each one. As can be seen, an RTX 3060 Mobile would be needed to run the base model at around 10 FPS for this task.",
+      "normalized_caption": "presents these measurements different gpus are used to execute the same oepration od in continuous mode over the same rosbag since these cards correspond to different generations we could not use the same drivers in all of them instead the most recent driver as well as the latest version of cuda compatible with each driver has been used with each one as can be seen an rtx 3060 mobile would be needed to run the base model at around 10 fps for this task",
+      "line_no": 177,
+      "kind": "table"
+    }
+  ],
   "intrinsic_metrics": {
     "heading_count": 16,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 0,
-    "table_caption_count": 0,
+    "figure_caption_count": 1,
+    "table_caption_count": 4,
     "duplicate_figure_caption_count": 0,
-    "duplicate_table_caption_count": 0,
+    "duplicate_table_caption_count": 2,
     "empty_section_count": 3,
     "consecutive_heading_run_count": 3,
     "max_consecutive_heading_run": 2
@@ -331,10 +368,10 @@
     "doc_id": "p179",
     "system": "ocr_agent",
     "title": "A ROS 2 Wrapper for Florence-2: Multi-Mode Local Vision-Language Inference for Robotic Systems",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401179v1.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401179v1.pdf",
     "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p179/p179.pdf",
     "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p179",
-    "ocr_backend": "dummy",
+    "ocr_backend": "ocr_server",
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
@@ -342,8 +379,10 @@
       "tables": 0,
       "page_images": 0
     },
-    "elapsed_ms": 700.136,
+    "elapsed_ms": 805.747,
     "status": "success",
-    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p179/paper.md"
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p179/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
   }
 }

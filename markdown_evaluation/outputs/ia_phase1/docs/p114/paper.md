@@ -1,8 +1,8 @@
 ---
 title: "End-to-End Training for Unified Tokenization and Latent Denoising"
 paper_id: 114
-source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8fc3e78ffd8b88ba.pdf"
-generated_at: "2026-04-03T22:13:07.785595+00:00"
+source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8fc3e78ffd8b88ba.pdf"
+generated_at: "2026-04-04T22:53:29.496150+00:00"
 num_figures: 9
 num_tables: 7
 num_equations: 29

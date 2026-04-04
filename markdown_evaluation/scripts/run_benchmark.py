@@ -5,12 +5,15 @@ import argparse
 from markdown_evaluation.scripts.bootstrap_gold_templates import bootstrap_gold_templates
 from markdown_evaluation.scripts.normalize_outputs import normalize_system_outputs
 from markdown_evaluation.scripts.run_ia_phase1 import run_ia_phase1_exports
-from markdown_evaluation.scripts.run_ocr_agent import run_ocr_agent_exports
+from markdown_evaluation.scripts.run_ocr_agent import (
+    run_improved_ocr_agent_exports,
+    run_ocr_agent_exports,
+)
 from markdown_evaluation.scripts.score_outputs import score_outputs
 from markdown_evaluation.scripts._common import select_docs
 
 
-SYSTEMS = ("ia_phase1", "ocr_agent")
+SYSTEMS = ("ia_phase1", "ocr_agent", "improved_ocr_agent")
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -44,6 +47,16 @@ def main() -> int:
             )
         if "ocr_agent" in args.systems:
             run_ocr_agent_exports(
+                docs,
+                ocr_server=args.ocr_server,
+                ocr_model=args.ocr_model,
+                ocr_workspace=args.ocr_workspace,
+                use_pdf_page_ocr=bool(args.use_pdf_page_ocr),
+                timeout_seconds=int(args.timeout_seconds),
+                overwrite=bool(args.overwrite),
+            )
+        if "improved_ocr_agent" in args.systems:
+            run_improved_ocr_agent_exports(
                 docs,
                 ocr_server=args.ocr_server,
                 ocr_model=args.ocr_model,

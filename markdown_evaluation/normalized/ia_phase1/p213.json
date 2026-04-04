@@ -1,7 +1,7 @@
 {
   "doc_id": "p213",
   "system": "ia_phase1",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401213v1.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401213v1.pdf",
   "title": "Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO",
   "status": "success",
   "markdown_line_count": 214,
@@ -164,9 +164,23 @@
   "figures": [
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 15,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
       "caption": "An illustrative plan for a collaborative robot fleet with different specializations, such as flying, walking, or driving. During the mission the drone and the legged robot find new tasks and replan to minimize mission time.",
       "normalized_caption": "an illustrative plan for a collaborative robot fleet with different specializations such as flying walking or driving during the mission the drone and the legged robot find new tasks and replan to minimize mission time",
       "line_no": 17,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 71,
       "kind": "figure"
     },
     {
@@ -178,20 +192,56 @@
     },
     {
       "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 139,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
       "caption": "RL inference and training time measurements compared to the inference time of the ES approach with respect to the trained policies by number of solved targets.",
       "normalized_caption": "rl inference and training time measurements compared to the inference time of the es approach with respect to the trained policies by number of solved targets",
       "line_no": 141,
       "kind": "figure"
     }
   ],
-  "tables": [],
+  "tables": [
+    {
+      "number": 1,
+      "caption": "Activated rewards during training. AR: Attraction Reward, TR: Target Reward, WC: Wrong Target Cost, SC: Step Cost, TC: Solve Time Cost, BR: Bonus Reward",
+      "normalized_caption": "activated rewards during training ar attraction reward tr target reward wc wrong target cost sc step cost tc solve time cost br bonus reward",
+      "line_no": 101,
+      "kind": "table"
+    },
+    {
+      "number": 3,
+      "caption": "Reward weights for the baseline policy.",
+      "normalized_caption": "reward weights for the baseline policy",
+      "line_no": 113,
+      "kind": "table"
+    },
+    {
+      "number": 4,
+      "caption": "Performance comparison between three policies with a different number of targets, and the optimal solutions ES1 w.r.t. solve time (st) and ES2 w.r.t. the total team effort (tte). Optimal performance would be represented by a value of 1.",
+      "normalized_caption": "performance comparison between three policies with a different number of targets and the optimal solutions es1 w r t solve time st and es2 w r t the total team effort tte optimal performance would be represented by a value of 1",
+      "line_no": 123,
+      "kind": "table"
+    },
+    {
+      "number": 5,
+      "caption": "Baseline policy Π 5 T versus a policy Π 5 T 5 R that was trained including the possibility of obtaining new targets during an episode. Simulated over 1000 random (seed=10) environments with an episode length of 128.",
+      "normalized_caption": "baseline policy 5 t versus a policy 5 t 5 r that was trained including the possibility of obtaining new targets during an episode simulated over 1000 random seed 10 environments with an episode length of 128",
+      "line_no": 150,
+      "kind": "table"
+    }
+  ],
   "intrinsic_metrics": {
     "heading_count": 8,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 3,
-    "table_caption_count": 0,
-    "duplicate_figure_caption_count": 0,
+    "figure_caption_count": 6,
+    "table_caption_count": 4,
+    "duplicate_figure_caption_count": 3,
     "duplicate_table_caption_count": 0,
     "empty_section_count": 0,
     "consecutive_heading_run_count": 0,
@@ -202,7 +252,7 @@
     "system": "ia_phase1",
     "paper_id": 937020923872,
     "title": "Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401213v1.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401213v1.pdf",
     "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p213",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p213/paper.md",
     "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p213/manifest.json",
@@ -214,8 +264,8 @@
     "metadata": {
       "title": "Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO",
       "paper_id": "937020923872",
-      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401213v1.pdf",
-      "generated_at": "2026-04-03T22:15:46.197871+00:00",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401213v1.pdf",
+      "generated_at": "2026-04-04T22:54:56.939580+00:00",
       "num_figures": "3",
       "num_tables": "0",
       "num_equations": "21",
@@ -345,7 +395,7 @@
       "issue_count": 0,
       "issues": []
     },
-    "elapsed_ms": 6114.631,
+    "elapsed_ms": 5498.305,
     "status": "success"
   }
 }

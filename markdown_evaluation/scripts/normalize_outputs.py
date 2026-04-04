@@ -9,6 +9,7 @@ from markdown_evaluation.scripts._common import (
     BenchmarkDoc,
     collapse_ws,
     ensure_dirs,
+    normalize_heading_text,
     normalize_match_text,
     normalized_doc_path,
     read_json,
@@ -17,19 +18,16 @@ from markdown_evaluation.scripts._common import (
     write_json,
 )
 
-SYSTEMS = ("ia_phase1", "ocr_agent")
+SYSTEMS = ("ia_phase1", "ocr_agent", "improved_ocr_agent")
 _HEADING_RE = re.compile(r"^(#{1,6})\s+(.*\S)\s*$")
 _FRONTMATTER_RE = re.compile(r"\A---\n.*?\n---\n?", re.DOTALL)
-_FIGURE_LINE_RE = re.compile(r"^\s*(?:[_>*`-]+\s*)?(?:figure|fig)\.?\s+(\d+)\b[:.]?\s*(.*)$", re.I)
-_TABLE_LINE_RE = re.compile(r"^\s*(?:[_>*`-]+\s*)?table\s+(\d+)\b[:.]?\s*(.*)$", re.I)
+_FIGURE_LINE_RE = re.compile(r"^\s*(?:[_>*`-]+\s*)?(?:figure|fig)\.?\s+(\d+|[IVXLCDM]{1,8})\b[:.]?\s*(.*)$", re.I)
+_TABLE_LINE_RE = re.compile(r"^\s*(?:[_>*`-]+\s*)?table\s+(\d+|[IVXLCDM]{1,8})\b[:.]?\s*(.*)$", re.I)
+_IMAGE_LINK_RE = re.compile(r"!\[(?P<alt>[^\]]*)\]\((?P<target>[^)]*)\)")
 _HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 _SUSPICIOUS_HEADING_RE = re.compile(r"^(?:\d+(?:[.]\d+)*|[A-Z]|[ivxlcdm]+|[\W_]+)$", re.I)
 _PAGE_MODE_RE = re.compile(r"^\s*<!--\s*page\s+\d+\s+mode:", re.I)
 _ASSET_LINE_RE = re.compile(r"^\s*(?:!\[.*\]\(.*\)|>\s*(?:Table|Equation)\s+JSON:|\[OCR unavailable.*\])")
-_NUMBERED_HEADING_PREFIX_RE = re.compile(
-    r"^(?:(?:\d+(?:\.\d+)*|[A-Z]|[IVXLCDM]+)\s*[.)]\s+)+",
-    re.I,
-)
 
 
 def _strip_frontmatter(markdown: str) -> str:
@@ -44,10 +42,7 @@ def _clean_heading_text(text: str) -> str:
 
 
 def _normalize_heading_for_match(text: str) -> str:
-    cleaned = _clean_heading_text(text)
-    cleaned = _NUMBERED_HEADING_PREFIX_RE.sub("", cleaned)
-    normalized = normalize_match_text(cleaned)
-    return normalized
+    return normalize_heading_text(_clean_heading_text(text))
 
 
 def _strip_inline_markup(line: str) -> str:
@@ -75,6 +70,27 @@ def _line_has_meaningful_prose(line: str) -> bool:
         return False
     words = re.findall(r"[A-Za-z][A-Za-z0-9'\-]+", cleaned)
     return len(words) >= 3 or len(cleaned) >= 30
+
+
+def _parse_caption_number(raw_value: str) -> Optional[int]:
+    value = collapse_ws(raw_value).upper()
+    if not value:
+        return None
+    if value.isdigit():
+        return int(value)
+    if not re.fullmatch(r"[IVXLCDM]{1,8}", value):
+        return None
+    total = 0
+    prev = 0
+    roman_values = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+    for char in reversed(value):
+        current = roman_values[char]
+        if current < prev:
+            total -= current
+        else:
+            total += current
+            prev = current
+    return total if total > 0 else None
 
 
 def _extract_title(markdown: str, fallback: str) -> str:
@@ -165,11 +181,29 @@ def _build_sections(lines: Sequence[str], headings: Sequence[Dict[str, Any]]) ->
 def _extract_numbered_captions(lines: Sequence[str], pattern: re.Pattern[str], kind: str) -> List[Dict[str, Any]]:
     items: List[Dict[str, Any]] = []
     for line_no, raw_line in enumerate(lines, start=1):
-        cleaned = _strip_inline_markup(raw_line)
-        match = pattern.match(cleaned)
+        candidates = [_strip_inline_markup(raw_line)]
+        if not candidates[0]:
+            for match_obj in _IMAGE_LINK_RE.finditer(raw_line):
+                alt_text = collapse_ws(match_obj.group("alt"))
+                if not alt_text:
+                    continue
+                alt_lower = alt_text.lower()
+                if " on page " in alt_lower or len(alt_text.split()) >= 3 or alt_lower.startswith(("figure ", "fig ", "table ")):
+                    candidates.append(alt_text)
+
+        match = None
+        cleaned = ""
+        for candidate in candidates:
+            candidate_match = pattern.match(candidate)
+            if candidate_match:
+                match = candidate_match
+                cleaned = candidate
+                break
         if not match:
             continue
-        number = int(match.group(1))
+        number = _parse_caption_number(match.group(1))
+        if number is None:
+            continue
         caption = collapse_ws(match.group(2))
         items.append({
             "number": number,

@@ -11,7 +11,9 @@ from markdown_evaluation.scripts._common import (
     REPORT_DIR,
     RUN_DIR,
     ensure_dirs,
+    heading_match_variants,
     load_gold_doc,
+    normalize_heading_text,
     normalize_match_text,
     normalized_doc_path,
     read_json,
@@ -19,7 +21,7 @@ from markdown_evaluation.scripts._common import (
     write_json,
 )
 
-SYSTEMS = ("ia_phase1", "ocr_agent")
+SYSTEMS = ("ia_phase1", "ocr_agent", "improved_ocr_agent")
 
 
 def _safe_div(numerator: float, denominator: float) -> float:
@@ -28,19 +30,31 @@ def _safe_div(numerator: float, denominator: float) -> float:
     return numerator / denominator
 
 
+def _optional_recall(matched_count: int, gold_count: int) -> Optional[float]:
+    if gold_count <= 0:
+        return None
+    return matched_count / gold_count
+
+
 def _f1(precision: float, recall: float) -> float:
     if precision <= 0 or recall <= 0:
         return 0.0
     return 2.0 * precision * recall / (precision + recall)
 
 
-def _lcs_length(left: Sequence[str], right: Sequence[str]) -> int:
+def _heading_values_match(left: Any, right: Any) -> bool:
+    left_values = left if isinstance(left, (set, list, tuple)) else [left]
+    right_values = right if isinstance(right, (set, list, tuple)) else [right]
+    return bool(set(str(item) for item in left_values if item) & set(str(item) for item in right_values if item))
+
+
+def _lcs_length(left: Sequence[Any], right: Sequence[Any]) -> int:
     if not left or not right:
         return 0
     dp = [[0] * (len(right) + 1) for _ in range(len(left) + 1)]
     for i, lhs in enumerate(left, start=1):
         for j, rhs in enumerate(right, start=1):
-            if lhs == rhs:
+            if _heading_values_match(lhs, rhs):
                 dp[i][j] = dp[i - 1][j - 1] + 1
             else:
                 dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
@@ -54,13 +68,41 @@ def _multiset_overlap(left: Iterable[str], right: Iterable[str]) -> int:
     return sum(int(value) for value in overlap.values())
 
 
+def _multiset_variant_overlap(left: Sequence[Sequence[str]], right: Sequence[Sequence[str]]) -> int:
+    if not left or not right:
+        return 0
+
+    right_matches = [-1] * len(right)
+
+    def _dfs(left_index: int, seen: set[int]) -> bool:
+        for right_index, right_values in enumerate(right):
+            if right_index in seen:
+                continue
+            if not _heading_values_match(left[left_index], right_values):
+                continue
+            seen.add(right_index)
+            if right_matches[right_index] == -1 or _dfs(right_matches[right_index], seen):
+                right_matches[right_index] = left_index
+                return True
+        return False
+
+    matched = 0
+    for left_index in range(len(left)):
+        if _dfs(left_index, set()):
+            matched += 1
+    return matched
+
+
 def _score_heading_metrics(normalized: Dict[str, Any], gold: Dict[str, Any]) -> Dict[str, Any]:
-    gold_headings = [normalize_match_text(item.get("text") or "") for item in gold.get("headings") or []]
+    gold_headings = [heading_match_variants(item.get("text") or "") for item in gold.get("headings") or []]
     gold_headings = [item for item in gold_headings if item]
-    pred_headings = [str(item.get("normalized_text") or "") for item in normalized.get("headings") or []]
+    pred_headings = [
+        heading_match_variants(item.get("text") or item.get("normalized_text") or "")
+        for item in normalized.get("headings") or []
+    ]
     pred_headings = [item for item in pred_headings if item]
 
-    matched = _multiset_overlap(pred_headings, gold_headings)
+    matched = _multiset_variant_overlap(pred_headings, gold_headings)
     precision = _safe_div(matched, len(pred_headings))
     recall = _safe_div(matched, len(gold_headings))
     order_score = _safe_div(_lcs_length(pred_headings, gold_headings), len(gold_headings))
@@ -94,8 +136,8 @@ def _score_anchor_metrics(normalized: Dict[str, Any], gold: Dict[str, Any]) -> D
 
     for anchor in anchors:
         needle = normalize_match_text(anchor.get("text") or "")
-        expected_section = normalize_match_text(anchor.get("expected_section") or "")
-        if not needle or not expected_section:
+        expected_variants = heading_match_variants(anchor.get("expected_section") or "")
+        if not needle or not expected_variants:
             continue
         matches = []
         for section in sections:
@@ -106,12 +148,19 @@ def _score_anchor_metrics(normalized: Dict[str, Any], gold: Dict[str, Any]) -> D
             misses += 1
             continue
         found += 1
-        if any(normalize_match_text(section.get("heading_text") or "") == expected_section for section in matches):
+        if any(
+            _heading_values_match(heading_match_variants(section.get("heading_text") or ""), expected_variants)
+            for section in matches
+        ):
             correct += 1
         else:
             wrong_section += 1
 
-    total = len([anchor for anchor in anchors if normalize_match_text(anchor.get("text") or "") and normalize_match_text(anchor.get("expected_section") or "")])
+    total = len([
+        anchor
+        for anchor in anchors
+        if normalize_match_text(anchor.get("text") or "") and heading_match_variants(anchor.get("expected_section") or "")
+    ])
     return {
         "anchor_count": total,
         "anchor_recall": _safe_div(found, total),
@@ -128,8 +177,8 @@ def _score_asset_metrics(normalized: Dict[str, Any], gold: Dict[str, Any]) -> Di
     gold_table_numbers = {int(item.get("number")) for item in gold.get("tables") or [] if item.get("number") is not None}
 
     return {
-        "figure_recall": _safe_div(len(pred_figure_numbers & gold_figure_numbers), len(gold_figure_numbers)),
-        "table_recall": _safe_div(len(pred_table_numbers & gold_table_numbers), len(gold_table_numbers)),
+        "figure_recall": _optional_recall(len(pred_figure_numbers & gold_figure_numbers), len(gold_figure_numbers)),
+        "table_recall": _optional_recall(len(pred_table_numbers & gold_table_numbers), len(gold_table_numbers)),
         "gold_figure_count": len(gold_figure_numbers),
         "gold_table_count": len(gold_table_numbers),
     }
@@ -167,8 +216,14 @@ def score_normalized_doc(normalized: Dict[str, Any], gold: Optional[Dict[str, An
 
 
 def _mean(values: Iterable[float]) -> float:
-    values = [float(value) for value in values]
+    values = [float(value) for value in values if value is not None]
     return sum(values) / len(values) if values else 0.0
+
+
+def _format_optional_metric(value: Any) -> str:
+    if value is None:
+        return "n/a"
+    return f"{float(value):.3f}"
 
 
 def _aggregate_rows(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
@@ -265,12 +320,12 @@ def _render_markdown_report(rows: Sequence[Dict[str, Any]], summary: Dict[str, A
         if row.get("error_type"):
             lines.append(f"- Error: `{row.get('error_type')}: {row.get('error_message', '')}`")
         if row.get("gold_available"):
-            lines.append(f"- Heading F1: `{float(row.get('heading_f1', 0.0)):.3f}`")
-            lines.append(f"- Heading order score: `{float(row.get('heading_order_score', 0.0)):.3f}`")
-            lines.append(f"- Anchor recall: `{float(row.get('anchor_recall', 0.0)):.3f}`")
-            lines.append(f"- Anchor assignment accuracy: `{float(row.get('anchor_assignment_accuracy', 0.0)):.3f}`")
-            lines.append(f"- Figure recall: `{float(row.get('figure_recall', 0.0)):.3f}`")
-            lines.append(f"- Table recall: `{float(row.get('table_recall', 0.0)):.3f}`")
+            lines.append(f"- Heading F1: `{_format_optional_metric(row.get('heading_f1'))}`")
+            lines.append(f"- Heading order score: `{_format_optional_metric(row.get('heading_order_score'))}`")
+            lines.append(f"- Anchor recall: `{_format_optional_metric(row.get('anchor_recall'))}`")
+            lines.append(f"- Anchor assignment accuracy: `{_format_optional_metric(row.get('anchor_assignment_accuracy'))}`")
+            lines.append(f"- Figure recall: `{_format_optional_metric(row.get('figure_recall'))}`")
+            lines.append(f"- Table recall: `{_format_optional_metric(row.get('table_recall'))}`")
         intrinsic = row.get("intrinsic_metrics") or {}
         lines.append(f"- Duplicate headings: `{intrinsic.get('duplicate_heading_count', 0)}`")
         lines.append(f"- Empty sections: `{intrinsic.get('empty_section_count', 0)}`")

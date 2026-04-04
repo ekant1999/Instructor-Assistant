@@ -1,7 +1,7 @@
 {
   "doc_id": "p114",
   "system": "ia_phase1",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8fc3e78ffd8b88ba.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8fc3e78ffd8b88ba.pdf",
   "title": "End-to-End Training for Unified Tokenization and Latent Denoising",
   "status": "success",
   "markdown_line_count": 406,
@@ -506,9 +506,23 @@
   "figures": [
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 9,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
       "caption": "Unified Tokenization & Generation via Generative Encoder (UNITE): We propose a single-stage architecture that unifies tokenization and generation through shared parameters. The Generative Encoder operates in two modes: (top) as a tok- enizer, it processes image patches and register tokens to produce a latent representation z0; (bottom) as a generator/denoiser, it evolves latents along a flow-matching trajectory to synthesize z0 from Gaussian noise. The lat",
       "normalized_caption": "unified tokenization generation via generative encoder unite we propose a single stage architecture that unifies tokenization and generation through shared parameters the generative encoder operates in two modes top as a tok enizer it processes image patches and register tokens to produce a latent representation z0 bottom as a generator denoiser it evolves latents along a flow matching trajectory to synthesize z0 from gaussian noise the lat",
       "line_no": 11,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 27,
       "kind": "figure"
     },
     {
@@ -520,9 +534,23 @@
     },
     {
       "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 75,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
       "caption": "UNITE Training Pipeline uses two forward passes through the Generative Encoder: first, mapping (distilling) image patches into latent registers, and second, denoising a noised version of those latents, with weights shared across both passes. Training combines reconstruction losses with a denoising loss |˜ ˆ z0−sg(˜ z0)|.",
       "normalized_caption": "unite training pipeline uses two forward passes through the generative encoder first mapping distilling image patches into latent registers and second denoising a noised version of those latents with weights shared across both passes training combines reconstruction losses with a denoising loss z0 sg z0",
       "line_no": 77,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 121,
       "kind": "figure"
     },
     {
@@ -534,9 +562,23 @@
     },
     {
       "number": 5,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 150,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
       "caption": "Weight-shared vs. Separate Enc-Denoiser training. UNITE uses a single Generative Encoder, sharing weights between tokenization and generation. To isolate the effect of weight shar- ing, we keep the rest of the end-to-end training pipeline fixed, including the stop-gradient that prevents denoising gradients from flowing into the tokenized output. Both UNITE and the separate encoder-denoiser ablation attain competitive performance, with UNITE benefiting from",
       "normalized_caption": "weight shared vs separate enc denoiser training unite uses a single generative encoder sharing weights between tokenization and generation to isolate the effect of weight shar ing we keep the rest of the end to end training pipeline fixed including the stop gradient that prevents denoising gradients from flowing into the tokenized output both unite and the separate encoder denoiser ablation attain competitive performance with unite benefiting from",
       "line_no": 152,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 158,
       "kind": "figure"
     },
     {
@@ -548,6 +590,13 @@
     },
     {
       "number": 7,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 183,
+      "kind": "figure"
+    },
+    {
+      "number": 7,
       "caption": "Analyzing the denoising trajectory. Given an input image, we first encode it into latents, corrupt the latent with noise, and then decode the denoised prediction at different noise levels (first three columns). The final column shows direct decoding of the clean latent. Although all four models achieve competitive aggregate rFID/gFID, the stop-gradient variants (first two rows)–UNITE and the separate encoder-denoiser ablation–exhibit markedly cleaner inter",
       "normalized_caption": "analyzing the denoising trajectory given an input image we first encode it into latents corrupt the latent with noise and then decode the denoised prediction at different noise levels first three columns the final column shows direct decoding of the clean latent although all four models achieve competitive aggregate rfid gfid the stop gradient variants first two rows unite and the separate encoder denoiser ablation exhibit markedly cleaner inter",
       "line_no": 185,
@@ -555,9 +604,23 @@
     },
     {
       "number": 8,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 226,
+      "kind": "figure"
+    },
+    {
+      "number": 8,
       "caption": "Selected samples from UNITE-XL. Generated using 50 steps with CFG. This model achieves FID 1.75.",
       "normalized_caption": "selected samples from unite xl generated using 50 steps with cfg this model achieves fid 1 75",
       "line_no": 228,
+      "kind": "figure"
+    },
+    {
+      "number": 9,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 383,
       "kind": "figure"
     },
     {
@@ -637,9 +700,9 @@
     "heading_count": 26,
     "duplicate_heading_count": 2,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 9,
+    "figure_caption_count": 18,
     "table_caption_count": 9,
-    "duplicate_figure_caption_count": 0,
+    "duplicate_figure_caption_count": 9,
     "duplicate_table_caption_count": 1,
     "empty_section_count": 2,
     "consecutive_heading_run_count": 2,
@@ -650,7 +713,7 @@
     "system": "ia_phase1",
     "paper_id": 114,
     "title": "End-to-End Training for Unified Tokenization and Latent Denoising",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8fc3e78ffd8b88ba.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8fc3e78ffd8b88ba.pdf",
     "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p114",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p114/paper.md",
     "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p114/manifest.json",
@@ -662,8 +725,8 @@
     "metadata": {
       "title": "End-to-End Training for Unified Tokenization and Latent Denoising",
       "paper_id": "114",
-      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8fc3e78ffd8b88ba.pdf",
-      "generated_at": "2026-04-03T22:13:07.785595+00:00",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8fc3e78ffd8b88ba.pdf",
+      "generated_at": "2026-04-04T22:53:29.496150+00:00",
       "num_figures": "9",
       "num_tables": "7",
       "num_equations": "29",
@@ -901,7 +964,7 @@
       "issue_count": 0,
       "issues": []
     },
-    "elapsed_ms": 41810.903,
+    "elapsed_ms": 26983.9,
     "status": "success"
   }
 }

@@ -1,7 +1,7 @@
 {
   "doc_id": "p179",
   "system": "ia_phase1",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401179v1.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401179v1.pdf",
   "title": "A ROS 2 Wrapper for Florence-2: Multi-Mode Local Vision-Language Inference for Robotic Systems",
   "status": "success",
   "markdown_line_count": 171,
@@ -16,7 +16,7 @@
     {
       "level": 2,
       "text": "I NTRODUCTION",
-      "normalized_text": "i ntroduction",
+      "normalized_text": "introduction",
       "line_no": 7,
       "suspicious": false
     },
@@ -72,7 +72,7 @@
     {
       "level": 2,
       "text": "BJECT D ETECTION (OD) TASK",
-      "normalized_text": "bject d etection od task",
+      "normalized_text": "bject detection od task",
       "line_no": 100,
       "suspicious": false
     },
@@ -106,7 +106,7 @@
     },
     {
       "heading_text": "I NTRODUCTION",
-      "normalized_heading_text": "i ntroduction",
+      "normalized_heading_text": "introduction",
       "level": 2,
       "line_start": 7,
       "line_end": 20,
@@ -202,7 +202,7 @@
     },
     {
       "heading_text": "BJECT D ETECTION (OD) TASK",
-      "normalized_heading_text": "bject d etection od task",
+      "normalized_heading_text": "bject detection od task",
       "level": 2,
       "line_start": 100,
       "line_end": 120,
@@ -240,20 +240,42 @@
   "figures": [
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 31,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
       "caption": "Architecture of the proposed Florence-2 ROS 2 wrapper. Diagram showing the main node, its ROS 2 interfaces, and the flow from image acquisition to model inference and result publication.",
       "normalized_caption": "architecture of the proposed florence 2 ros 2 wrapper diagram showing the main node its ros 2 interfaces and the flow from image acquisition to model inference and result publication",
       "line_no": 33,
       "kind": "figure"
     }
   ],
-  "tables": [],
+  "tables": [
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 41,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 97,
+      "kind": "table"
+    }
+  ],
   "intrinsic_metrics": {
     "heading_count": 12,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 1,
-    "table_caption_count": 0,
-    "duplicate_figure_caption_count": 0,
+    "figure_caption_count": 2,
+    "table_caption_count": 2,
+    "duplicate_figure_caption_count": 1,
     "duplicate_table_caption_count": 0,
     "empty_section_count": 0,
     "consecutive_heading_run_count": 0,
@@ -264,7 +286,7 @@
     "system": "ia_phase1",
     "paper_id": 560480445128,
     "title": "A ROS 2 Wrapper for Florence-2: Multi-Mode Local Vision-Language Inference for Robotic Systems",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401179v1.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401179v1.pdf",
     "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p179",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p179/paper.md",
     "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p179/manifest.json",
@@ -276,8 +298,8 @@
     "metadata": {
       "title": "A ROS 2 Wrapper for Florence-2: Multi-Mode Local Vision-Language Inference for Robotic Systems",
       "paper_id": "560480445128",
-      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401179v1.pdf",
-      "generated_at": "2026-04-03T22:15:38.808378+00:00",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401179v1.pdf",
+      "generated_at": "2026-04-04T22:54:50.145077+00:00",
       "num_figures": "1",
       "num_tables": "0",
       "num_equations": "3",
@@ -419,7 +441,7 @@
       "issue_count": 0,
       "issues": []
     },
-    "elapsed_ms": 2604.138,
+    "elapsed_ms": 2497.068,
     "status": "success"
   }
 }

@@ -3,7 +3,7 @@
   "system": "ia_phase1",
   "paper_id": 404815770581,
   "title": "Performing CRUD operations in DynamoDB using AWS Lambda",
-  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment2.pdf",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment2.pdf",
   "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a002",
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a002/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a002/manifest.json",
@@ -15,8 +15,8 @@
   "metadata": {
     "title": "Performing CRUD operations in DynamoDB using AWS Lambda",
     "paper_id": "404815770581",
-    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment2.pdf",
-    "generated_at": "2026-04-03T22:15:36.038495+00:00",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment2.pdf",
+    "generated_at": "2026-04-04T22:55:03.228126+00:00",
     "num_figures": "0",
     "num_tables": "0",
     "num_equations": "7",
@@ -158,6 +158,6 @@
     "issue_count": 0,
     "issues": []
   },
-  "elapsed_ms": 4008.488,
+  "elapsed_ms": 3816.496,
   "status": "success"
 }

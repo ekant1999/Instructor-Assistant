@@ -3,7 +3,7 @@
   "system": "ia_phase1",
   "paper_id": 120,
   "title": "Detailed Geometry and Appearance from Opportunistic Motion",
-  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/41528b7825c49511.pdf",
   "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120",
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120/manifest.json",
@@ -15,8 +15,8 @@
   "metadata": {
     "title": "Detailed Geometry and Appearance from Opportunistic Motion",
     "paper_id": "120",
-    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf",
-    "generated_at": "2026-04-03T22:15:29.155927+00:00",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/41528b7825c49511.pdf",
+    "generated_at": "2026-04-04T22:54:47.514414+00:00",
     "num_figures": "18",
     "num_tables": "4",
     "num_equations": "19",
@@ -86,6 +86,6 @@
     "issue_count": 0,
     "issues": []
   },
-  "elapsed_ms": 18444.44,
+  "elapsed_ms": 12764.289,
   "status": "success"
 }

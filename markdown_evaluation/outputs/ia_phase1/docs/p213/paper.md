@@ -1,8 +1,8 @@
 ---
 title: "Collaborative Task and Path Planning for Heterogeneous Robotic Teams using Multi-Agent PPO"
 paper_id: 937020923872
-source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/260401213v1.pdf"
-generated_at: "2026-04-03T22:15:46.197871+00:00"
+source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/260401213v1.pdf"
+generated_at: "2026-04-04T22:54:56.939580+00:00"
 num_figures: 3
 num_tables: 0
 num_equations: 21

@@ -1,0 +1,163 @@
+{
+  "doc_id": "p037",
+  "system": "ia_phase1",
+  "paper_id": 660930833796,
+  "title": "Attention Is All You Need",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/10f9519a4068b56b.pdf",
+  "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p037",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p037/paper.md",
+  "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p037/manifest.json",
+  "asset_counts": {
+    "figures": 5,
+    "tables": 4,
+    "equations": 24
+  },
+  "metadata": {
+    "title": "Attention Is All You Need",
+    "paper_id": "660930833796",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/10f9519a4068b56b.pdf",
+    "generated_at": "2026-04-04T22:52:44.664786+00:00",
+    "num_figures": "5",
+    "num_tables": "4",
+    "num_equations": "24",
+    "page_count": "15"
+  },
+  "render_mode": "normal",
+  "sectioning_strategy": "pdf_toc",
+  "sectioning_report": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 9,
+    "matched_headings": 10,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 9
+      },
+      {
+        "index": 1,
+        "title": "Abstract",
+        "canonical": "abstract",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 10,
+        "end_block_index": 14
+      },
+      {
+        "index": 2,
+        "title": "Introduction",
+        "canonical": "introduction",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 2,
+        "start_block_index": 15,
+        "end_block_index": 19
+      },
+      {
+        "index": 3,
+        "title": "Background",
+        "canonical": "preliminaries",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 2,
+        "start_block_index": 20,
+        "end_block_index": 24
+      },
+      {
+        "index": 4,
+        "title": "Model Architecture",
+        "canonical": "model_architecture",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 6,
+        "start_block_index": 25,
+        "end_block_index": 78
+      },
+      {
+        "index": 5,
+        "title": "Why Self-Attention",
+        "canonical": "why_self_attention",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 6,
+        "end_page": 7,
+        "start_block_index": 79,
+        "end_block_index": 87
+      },
+      {
+        "index": 6,
+        "title": "Training",
+        "canonical": "training",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 7,
+        "end_page": 8,
+        "start_block_index": 88,
+        "end_block_index": 114
+      },
+      {
+        "index": 7,
+        "title": "Results",
+        "canonical": "results",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 8,
+        "end_page": 10,
+        "start_block_index": 115,
+        "end_block_index": 168
+      },
+      {
+        "index": 8,
+        "title": "Conclusion",
+        "canonical": "conclusion",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 10,
+        "end_page": 10,
+        "start_block_index": 169,
+        "end_block_index": 174
+      },
+      {
+        "index": 9,
+        "title": "References",
+        "canonical": "references",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 10,
+        "end_page": 15,
+        "start_block_index": 175,
+        "end_block_index": 511
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 512
+  },
+  "audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": []
+  },
+  "elapsed_ms": 9123.402,
+  "status": "success"
+}

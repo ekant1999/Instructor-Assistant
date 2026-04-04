@@ -1,7 +1,7 @@
 {
   "doc_id": "p120",
   "system": "ocr_agent",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/41528b7825c49511.pdf",
   "title": "p120",
   "status": "success",
   "markdown_line_count": 796,
@@ -23,35 +23,35 @@
     {
       "level": 3,
       "text": "4.1 Single-Frame 3D Reconstruction with Learned Priors",
-      "normalized_text": "4 1 single frame 3d reconstruction with learned priors",
+      "normalized_text": "single frame 3d reconstruction with learned priors",
       "line_no": 162,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.2 Motion-Aware Joint Optimization via Soft-Masked Transform",
-      "normalized_text": "4 2 motion aware joint optimization via soft masked transform",
+      "normalized_text": "motion aware joint optimization via soft masked transform",
       "line_no": 164,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.3 Motion-Aware Appearance Modeling via Radiance Probing",
-      "normalized_text": "4 3 motion aware appearance modeling via radiance probing",
+      "normalized_text": "motion aware appearance modeling via radiance probing",
       "line_no": 194,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.4 Meshing with Viewpoints from All Frames",
-      "normalized_text": "4 4 meshing with viewpoints from all frames",
+      "normalized_text": "meshing with viewpoints from all frames",
       "line_no": 273,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "5.2 Evaluation on Real-World Data",
-      "normalized_text": "5 2 evaluation on real world data",
+      "normalized_text": "evaluation on real world data",
       "line_no": 323,
       "suspicious": false
     },
@@ -97,7 +97,7 @@
     },
     {
       "heading_text": "4.1 Single-Frame 3D Reconstruction with Learned Priors",
-      "normalized_heading_text": "4 1 single frame 3d reconstruction with learned priors",
+      "normalized_heading_text": "single frame 3d reconstruction with learned priors",
       "level": 3,
       "line_start": 162,
       "line_end": 163,
@@ -109,7 +109,7 @@
     },
     {
       "heading_text": "4.2 Motion-Aware Joint Optimization via Soft-Masked Transform",
-      "normalized_heading_text": "4 2 motion aware joint optimization via soft masked transform",
+      "normalized_heading_text": "motion aware joint optimization via soft masked transform",
       "level": 3,
       "line_start": 164,
       "line_end": 193,
@@ -121,7 +121,7 @@
     },
     {
       "heading_text": "4.3 Motion-Aware Appearance Modeling via Radiance Probing",
-      "normalized_heading_text": "4 3 motion aware appearance modeling via radiance probing",
+      "normalized_heading_text": "motion aware appearance modeling via radiance probing",
       "level": 3,
       "line_start": 194,
       "line_end": 272,
@@ -133,7 +133,7 @@
     },
     {
       "heading_text": "4.4 Meshing with Viewpoints from All Frames",
-      "normalized_heading_text": "4 4 meshing with viewpoints from all frames",
+      "normalized_heading_text": "meshing with viewpoints from all frames",
       "level": 3,
       "line_start": 273,
       "line_end": 322,
@@ -145,7 +145,7 @@
     },
     {
       "heading_text": "5.2 Evaluation on Real-World Data",
-      "normalized_heading_text": "5 2 evaluation on real world data",
+      "normalized_heading_text": "evaluation on real world data",
       "level": 3,
       "line_start": 323,
       "line_end": 367,
@@ -196,6 +196,13 @@
       "kind": "figure"
     },
     {
+      "number": 1,
+      "caption": "on Page 12",
+      "normalized_caption": "on page 12",
+      "line_no": 317,
+      "kind": "figure"
+    },
+    {
       "number": 6,
       "caption": "Surface normals and mesh models recovered from real-world datasets.",
       "normalized_caption": "surface normals and mesh models recovered from real world datasets",
@@ -210,10 +217,24 @@
       "kind": "figure"
     },
     {
+      "number": 1,
+      "caption": "on Page 18",
+      "normalized_caption": "on page 18",
+      "line_no": 606,
+      "kind": "figure"
+    },
+    {
       "number": 9,
       "caption": "shows additional qualitative results of the surface normals recovered from the synthetic dataset. The drain cleaner has relatively simple geometry and can",
       "normalized_caption": "shows additional qualitative results of the surface normals recovered from the synthetic dataset the drain cleaner has relatively simple geometry and can",
       "line_no": 660,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 21",
+      "normalized_caption": "on page 21",
+      "line_no": 666,
       "kind": "figure"
     },
     {
@@ -238,10 +259,24 @@
       "kind": "figure"
     },
     {
+      "number": 1,
+      "caption": "on Page 22",
+      "normalized_caption": "on page 22",
+      "line_no": 688,
+      "kind": "figure"
+    },
+    {
       "number": 10,
       "caption": "Additional Novel View Synthesis Results. Our appearance model improves the fidelity of novel view synthesis on different objects. The ottoman (the second row) remains challenging due to its limited surface-normal variation.",
       "normalized_caption": "additional novel view synthesis results our appearance model improves the fidelity of novel view synthesis on different objects the ottoman the second row remains challenging due to its limited surface normal variation",
       "line_no": 690,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 23",
+      "normalized_caption": "on page 23",
+      "line_no": 706,
       "kind": "figure"
     },
     {
@@ -252,10 +287,38 @@
       "kind": "figure"
     },
     {
+      "number": 1,
+      "caption": "on Page 24",
+      "normalized_caption": "on page 24",
+      "line_no": 722,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 25",
+      "normalized_caption": "on page 25",
+      "line_no": 730,
+      "kind": "figure"
+    },
+    {
       "number": 14,
       "caption": "Visualization of specular and diffuse components. In the second column of the specular components, we show the results with increased brightness for better visibility. Our method successfully decomposes the object appearance into specular and diffuse components, except for the challenging case of the ottoman.",
       "normalized_caption": "visualization of specular and diffuse components in the second column of the specular components we show the results with increased brightness for better visibility our method successfully decomposes the object appearance into specular and diffuse components except for the challenging case of the ottoman",
       "line_no": 740,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 26",
+      "normalized_caption": "on page 26",
+      "line_no": 742,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 28",
+      "normalized_caption": "on page 28",
+      "line_no": 762,
       "kind": "figure"
     },
     {
@@ -266,10 +329,24 @@
       "kind": "figure"
     },
     {
+      "number": 1,
+      "caption": "on Page 29",
+      "normalized_caption": "on page 29",
+      "line_no": 778,
+      "kind": "figure"
+    },
+    {
       "number": 17,
       "caption": "Effectiveness of segmentation mask refinement. We compare our full method with a variant without mask refinement (“w/o Mask Refinement”), where the per-Gaussian mask values are fixed during optimization. Refining the mask values jointly with geometry and appearance is essential for converging to the true fine-scale geometry.",
       "normalized_caption": "effectiveness of segmentation mask refinement we compare our full method with a variant without mask refinement w o mask refinement where the per gaussian mask values are fixed during optimization refining the mask values jointly with geometry and appearance is essential for converging to the true fine scale geometry",
       "line_no": 780,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 30",
+      "normalized_caption": "on page 30",
+      "line_no": 790,
       "kind": "figure"
     },
     {
@@ -290,9 +367,30 @@
     },
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 136,
+      "kind": "table"
+    },
+    {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 235,
+      "kind": "table"
+    },
+    {
+      "number": 1,
       "caption": "Surface normal accuracy for synthetic data. We evaluate reconstruction quality on synthetic data using the mean, median, and 80th percentile errors against ground-truth surface normals. The results demonstrate that our proposed components significantly enhance the recovery of fine surface details. While simpler surfaces, such as the drain cleaner, can be handled by baseline methods, they do not fully reflect our method’s capability to reconstruct intricate geometric details.",
       "normalized_caption": "surface normal accuracy for synthetic data we evaluate reconstruction quality on synthetic data using the mean median and 80th percentile errors against ground truth surface normals the results demonstrate that our proposed components significantly enhance the recovery of fine surface details while simpler surfaces such as the drain cleaner can be handled by baseline methods they do not fully reflect our method s capability to reconstruct intricate geometric details",
       "line_no": 295,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 297,
       "kind": "table"
     },
     {
@@ -303,10 +401,31 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 305,
+      "kind": "table"
+    },
+    {
       "number": 3,
       "caption": "Surface mesh reconstruction on synthetic data. We evaluate geometric accuracy using Chamfer Distance (CD, ↓) and Normal Error (↓). The results demonstrate the superior precision of our reconstruction compared to baseline methods.",
       "normalized_caption": "surface mesh reconstruction on synthetic data we evaluate geometric accuracy using chamfer distance cd and normal error the results demonstrate the superior precision of our reconstruction compared to baseline methods",
       "line_no": 309,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 311,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 338,
       "kind": "table"
     },
     {
@@ -317,10 +436,31 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 352,
+      "kind": "table"
+    },
+    {
       "number": 5,
       "caption": "Comparison with per-Gaussian SH, a variant of our method that optimizes SH coefficients independently for each Gaussian. We report (a) surface normal accuracy and (b) novel view synthesis quality on synthetic data. Optimizing per-Gaussian SH can be unstable on complex objects (e.g., the bunny), leading to degraded performance.",
       "normalized_caption": "comparison with per gaussian sh a variant of our method that optimizes sh coefficients independently for each gaussian we report a surface normal accuracy and b novel view synthesis quality on synthetic data optimizing per gaussian sh can be unstable on complex objects e g the bunny leading to degraded performance",
       "line_no": 748,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 750,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 776,
       "kind": "table"
     }
   ],
@@ -328,10 +468,10 @@
     "heading_count": 9,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 14,
-    "table_caption_count": 6,
-    "duplicate_figure_caption_count": 4,
-    "duplicate_table_caption_count": 1,
+    "figure_caption_count": 25,
+    "table_caption_count": 15,
+    "duplicate_figure_caption_count": 15,
+    "duplicate_table_caption_count": 10,
     "empty_section_count": 1,
     "consecutive_heading_run_count": 1,
     "max_consecutive_heading_run": 2
@@ -340,10 +480,10 @@
     "doc_id": "p120",
     "system": "ocr_agent",
     "title": "Detailed Geometry and Appearance from Opportunistic Motion",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/41528b7825c49511.pdf",
     "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p120/p120.pdf",
     "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p120",
-    "ocr_backend": "dummy",
+    "ocr_backend": "ocr_server",
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
@@ -351,8 +491,10 @@
       "tables": 9,
       "page_images": 0
     },
-    "elapsed_ms": 5081.201,
+    "elapsed_ms": 5916.11,
     "status": "success",
-    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p120/paper.md"
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p120/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
   }
 }

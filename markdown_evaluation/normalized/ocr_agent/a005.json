@@ -1,0 +1,171 @@
+{
+  "doc_id": "a005",
+  "system": "ocr_agent",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+  "title": "a005",
+  "status": "success",
+  "markdown_line_count": 68,
+  "headings": [
+    {
+      "level": 1,
+      "text": "a005",
+      "normalized_text": "a005",
+      "line_no": 1,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Part 1: Environment Setup",
+      "normalized_text": "part 1 environment setup",
+      "line_no": 11,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Study",
+      "normalized_text": "study",
+      "line_no": 15,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Part 5: TCP 3-Way Handshake and Observations",
+      "normalized_text": "part 5 tcp 3 way handshake and observations",
+      "line_no": 52,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "4. Custom columns for ports, host, and URI made triage substantially faster when multiple protocols",
+      "normalized_text": "custom columns for ports host and uri made triage substantially faster when multiple protocols",
+      "line_no": 64,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "a005",
+      "normalized_heading_text": "a005",
+      "level": 1,
+      "line_start": 1,
+      "line_end": 10,
+      "prose_text": "Objective: Capture normal browser activity and inspect HTTP, DNS, TCP, and UDP traffic using a packet analyzer.\nThe report also summarizes delay, jitter, and handshake timing using dummy measurements.",
+      "full_text": "<!-- document_mode: hybrid_paper -->\n<!-- page 1 mode: hybrid_paper -->\nObjective: Capture normal browser activity and inspect HTTP, DNS, TCP, and UDP traffic using a packet analyzer.\nThe report also summarizes delay, jitter, and handshake timing using dummy measurements.",
+      "word_count": 28,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Part 1: Environment Setup",
+      "normalized_heading_text": "part 1 environment setup",
+      "level": 2,
+      "line_start": 11,
+      "line_end": 14,
+      "prose_text": "CMPE 286 – LAB – 3: Web Traffic Inspection and RTT",
+      "full_text": "CMPE 286 – LAB – 3: Web Traffic Inspection and RTT",
+      "word_count": 7,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Study",
+      "normalized_heading_text": "study",
+      "level": 2,
+      "line_start": 15,
+      "line_end": 51,
+      "prose_text": "Name: Alex Morgan | Student ID: 019845672\nGenerated sample submission with dummy data, tables, and figures for PDF extraction evaluation.\nPart 3: HTTP Request Summary\nThe following table summarizes sample requests identified from the filtered capture. All values below are fabricated for benchmarking purposes but follow realistic web-traffic patterns.\nHost Runs Median RTT (ms) P95 RTT (ms) Std Dev (ms) MAD Successive (ms)\nharvard.edu 10 21.7 98.2 27.3 18.4\nmit.edu 10 36.1 129.3 35.8 24.8",
+      "full_text": "Name: Alex Morgan | Student ID: 019845672\nGenerated sample submission with dummy data, tables, and figures for PDF extraction evaluation.\n![Figure 1 on Page 1](a005_assets/figures/a005_page_1_fig_1.png)\n---\n<!-- page 2 mode: hybrid_paper -->\n![Figure 1 on Page 2](a005_assets/figures/a005_page_2_fig_1.png)\n---\n<!-- page 3 mode: hybrid_paper -->\nPart 3: HTTP Request Summary\nThe following table summarizes sample requests identified from the filtered capture. All values below are fabricated for benchmarking purposes but follow realistic web-traffic patterns.\n![Figure 1 on Page 3](a005_assets/figures/a005_page_3_fig_1.png)\n---\n<!-- page 4 mode: hybrid_paper -->\nHost Runs Median RTT (ms) P95 RTT (ms) Std Dev (ms) MAD Successive (ms)\nharvard.edu 10 21.7 98.2 27.3 18.4\nmit.edu 10 36.1 129.3 35.8 24.8\n![Figure 1 on Page 4](a005_assets/figures/a005_page_4_fig_1.png)\n---\n<!-- page 5 mode: hybrid_paper -->",
+      "word_count": 64,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Part 5: TCP 3-Way Handshake and Observations",
+      "normalized_heading_text": "part 5 tcp 3 way handshake and observations",
+      "level": 2,
+      "line_start": 52,
+      "line_end": 63,
+      "prose_text": "A single connection was isolated and the time display was changed to “Seconds Since Previous Displayed Packet.” The sample handshake timings are shown below.\n1. Name resolution appeared before every application flow, reinforcing that DNS latency is on the critical path.\n2. The TCP and TLS filters highlighted the same sessions that later carried HTTP payloads.\n3. Domestic destinations showed tighter RTT distributions than overseas destinations, while long-tail spikes\nwere more visible in the remote host sample.",
+      "full_text": "A single connection was isolated and the time display was changed to “Seconds Since Previous Displayed Packet.” The sample handshake timings are shown below.\n1. Name resolution appeared before every application flow, reinforcing that DNS latency is on the critical path.\n2. The TCP and TLS filters highlighted the same sessions that later carried HTTP payloads.\n3. Domestic destinations showed tighter RTT distributions than overseas destinations, while long-tail spikes\nwere more visible in the remote host sample.",
+      "word_count": 73,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "4. Custom columns for ports, host, and URI made triage substantially faster when multiple protocols",
+      "normalized_heading_text": "custom columns for ports host and uri made triage substantially faster when multiple protocols",
+      "level": 3,
+      "line_start": 64,
+      "line_end": 68,
+      "prose_text": "interleaved in the same capture.",
+      "full_text": "interleaved in the same capture.\n---",
+      "word_count": 5,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "on Page 1",
+      "normalized_caption": "on page 1",
+      "line_no": 21,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 2",
+      "normalized_caption": "on page 2",
+      "line_no": 27,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 3",
+      "normalized_caption": "on page 3",
+      "line_no": 36,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 4",
+      "normalized_caption": "on page 4",
+      "line_no": 46,
+      "kind": "figure"
+    }
+  ],
+  "tables": [],
+  "intrinsic_metrics": {
+    "heading_count": 5,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 4,
+    "table_caption_count": 0,
+    "duplicate_figure_caption_count": 3,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 0,
+    "consecutive_heading_run_count": 0,
+    "max_consecutive_heading_run": 0
+  },
+  "run_metadata": {
+    "doc_id": "a005",
+    "system": "ocr_agent",
+    "title": "CMPE 286 - LAB - 3: Web Traffic Inspection and RTT Study",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+    "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a005/a005.pdf",
+    "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a005",
+    "ocr_backend": "ocr_server",
+    "use_pdf_page_ocr": false,
+    "document_mode": "hybrid_paper",
+    "asset_counts": {
+      "figures": 4,
+      "tables": 0,
+      "page_images": 0
+    },
+    "elapsed_ms": 942.93,
+    "status": "success",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a005/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
+  }
+}

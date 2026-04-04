@@ -1,0 +1,123 @@
+{
+  "doc_id": "a003",
+  "system": "improved_ocr_agent",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment3.pdf",
+  "title": "Assignment 2: Classification - Customer Churn Prediction Using Classification",
+  "status": "success",
+  "markdown_line_count": 42,
+  "headings": [
+    {
+      "level": 2,
+      "text": "Data Preprocessing",
+      "normalized_text": "data preprocessing",
+      "line_no": 19,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Train a Classification Model",
+      "normalized_text": "train a classification model",
+      "line_no": 26,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Model Evaluation",
+      "normalized_text": "model evaluation",
+      "line_no": 31,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Analysis",
+      "normalized_text": "analysis",
+      "line_no": 36,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "Data Preprocessing",
+      "normalized_heading_text": "data preprocessing",
+      "level": 2,
+      "line_start": 19,
+      "line_end": 25,
+      "prose_text": "o Load the dataset using Pandas.\no Convert any categorical variables (e.g., ContractType) into numerical values using\no Handle any missing data and scale the features if necessary.\no Split the data into training and test sets (e.g., 80% training, 20% testing).",
+      "full_text": "o Load the dataset using Pandas.\no Convert any categorical variables (e.g., ContractType) into numerical values using\none-hot encoding.\no Handle any missing data and scale the features if necessary.\no Split the data into training and test sets (e.g., 80% training, 20% testing).",
+      "word_count": 34,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Train a Classification Model",
+      "normalized_heading_text": "train a classification model",
+      "level": 2,
+      "line_start": 26,
+      "line_end": 30,
+      "prose_text": "o Choose a classification algorithm (e.g., Logistic Regression, Decision Tree, or\no Train the model to predict whether a customer will churn (Churn column).",
+      "full_text": "o Choose a classification algorithm (e.g., Logistic Regression, Decision Tree, or\nRandom Forest).\no Train the model to predict whether a customer will churn (Churn column).",
+      "word_count": 19,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Model Evaluation",
+      "normalized_heading_text": "model evaluation",
+      "level": 2,
+      "line_start": 31,
+      "line_end": 35,
+      "prose_text": "o Evaluate the model using metrics such as accuracy, precision, recall, F1-score,\nand the confusion matrix.\no Plot a ROC curve and calculate the AUC score to assess model performance.",
+      "full_text": "o Evaluate the model using metrics such as accuracy, precision, recall, F1-score,\nand the confusion matrix.\no Plot a ROC curve and calculate the AUC score to assess model performance.",
+      "word_count": 27,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Analysis",
+      "normalized_heading_text": "analysis",
+      "level": 2,
+      "line_start": 36,
+      "line_end": 42,
+      "prose_text": "o Write a short analysis explaining how well your model performed. Which features\nwere most important in predicting churn? Did the model produce any false positives or false negatives?\n• Jupyter notebook (.ipynb file) with your code, comments, and explanations.\n• A short report (1-2 pages) discussing model performance, feature importance, and any recommendations for improving customer retention.",
+      "full_text": "o Write a short analysis explaining how well your model performed. Which features\nwere most important in predicting churn? Did the model produce any false positives or false negatives?\nSubmission:\n• Jupyter notebook (.ipynb file) with your code, comments, and explanations.\n• A short report (1-2 pages) discussing model performance, feature importance, and any recommendations for improving customer retention.\n---",
+      "word_count": 52,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [],
+  "tables": [],
+  "intrinsic_metrics": {
+    "heading_count": 4,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 0,
+    "table_caption_count": 0,
+    "duplicate_figure_caption_count": 0,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 0,
+    "consecutive_heading_run_count": 0,
+    "max_consecutive_heading_run": 0
+  },
+  "run_metadata": {
+    "doc_id": "a003",
+    "system": "improved_ocr_agent",
+    "title": "Assignment 2: Classification - Customer Churn Prediction Using Classification",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment3.pdf",
+    "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a003/a003.pdf",
+    "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a003",
+    "ocr_backend": "ocr_server",
+    "use_pdf_page_ocr": false,
+    "document_mode": "simple_text",
+    "asset_counts": {
+      "figures": 0,
+      "tables": 0,
+      "page_images": 0
+    },
+    "elapsed_ms": 116.417,
+    "status": "success",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a003/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": true
+  }
+}

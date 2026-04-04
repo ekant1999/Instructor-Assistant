@@ -1,7 +1,7 @@
 {
   "doc_id": "p118",
   "system": "ocr_agent",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/699ede68aa0d6853.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/699ede68aa0d6853.pdf",
   "title": "p118",
   "status": "success",
   "markdown_line_count": 686,
@@ -30,63 +30,63 @@
     {
       "level": 3,
       "text": "2 Related Works",
-      "normalized_text": "2 related works",
+      "normalized_text": "related works",
       "line_no": 63,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "3 Problem Formulation",
-      "normalized_text": "3 problem formulation",
+      "normalized_text": "problem formulation",
       "line_no": 99,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.1 Overview",
-      "normalized_text": "4 1 overview",
+      "normalized_text": "overview",
       "line_no": 155,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.2 Utility Gate",
-      "normalized_text": "4 2 utility gate",
+      "normalized_text": "utility gate",
       "line_no": 261,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.3 Document Gate",
-      "normalized_text": "4 3 document gate",
+      "normalized_text": "document gate",
       "line_no": 271,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "4.4 Distillation",
-      "normalized_text": "4 4 distillation",
+      "normalized_text": "distillation",
       "line_no": 285,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "5.1 Datasets",
-      "normalized_text": "5 1 datasets",
+      "normalized_text": "datasets",
       "line_no": 309,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "6.2 RQ2: Selection and Compression",
-      "normalized_text": "6 2 rq2 selection and compression",
+      "normalized_text": "rq2 selection and compression",
       "line_no": 354,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "6.3 RQ3: Evidence Rank Distribution",
-      "normalized_text": "6 3 rq3 evidence rank distribution",
+      "normalized_text": "rq3 evidence rank distribution",
       "line_no": 360,
       "suspicious": false
     },
@@ -114,14 +114,14 @@
     {
       "level": 3,
       "text": "B WRITEBACK-RAG Prevents Answer Leakage",
-      "normalized_text": "b writeback rag prevents answer leakage",
+      "normalized_text": "bwriteback rag prevents answer leakage",
       "line_no": 532,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "C WRITEBACK-RAG as a General Method for RAG",
-      "normalized_text": "c writeback rag as a general method for rag",
+      "normalized_text": "cwriteback rag as a general method for rag",
       "line_no": 544,
       "suspicious": false
     },
@@ -172,7 +172,7 @@
     },
     {
       "heading_text": "2 Related Works",
-      "normalized_heading_text": "2 related works",
+      "normalized_heading_text": "related works",
       "level": 3,
       "line_start": 63,
       "line_end": 98,
@@ -184,7 +184,7 @@
     },
     {
       "heading_text": "3 Problem Formulation",
-      "normalized_heading_text": "3 problem formulation",
+      "normalized_heading_text": "problem formulation",
       "level": 3,
       "line_start": 99,
       "line_end": 154,
@@ -196,7 +196,7 @@
     },
     {
       "heading_text": "4.1 Overview",
-      "normalized_heading_text": "4 1 overview",
+      "normalized_heading_text": "overview",
       "level": 3,
       "line_start": 155,
       "line_end": 260,
@@ -208,7 +208,7 @@
     },
     {
       "heading_text": "4.2 Utility Gate",
-      "normalized_heading_text": "4 2 utility gate",
+      "normalized_heading_text": "utility gate",
       "level": 3,
       "line_start": 261,
       "line_end": 270,
@@ -220,7 +220,7 @@
     },
     {
       "heading_text": "4.3 Document Gate",
-      "normalized_heading_text": "4 3 document gate",
+      "normalized_heading_text": "document gate",
       "level": 3,
       "line_start": 271,
       "line_end": 284,
@@ -232,7 +232,7 @@
     },
     {
       "heading_text": "4.4 Distillation",
-      "normalized_heading_text": "4 4 distillation",
+      "normalized_heading_text": "distillation",
       "level": 3,
       "line_start": 285,
       "line_end": 308,
@@ -244,7 +244,7 @@
     },
     {
       "heading_text": "5.1 Datasets",
-      "normalized_heading_text": "5 1 datasets",
+      "normalized_heading_text": "datasets",
       "level": 3,
       "line_start": 309,
       "line_end": 353,
@@ -256,7 +256,7 @@
     },
     {
       "heading_text": "6.2 RQ2: Selection and Compression",
-      "normalized_heading_text": "6 2 rq2 selection and compression",
+      "normalized_heading_text": "rq2 selection and compression",
       "level": 3,
       "line_start": 354,
       "line_end": 359,
@@ -268,7 +268,7 @@
     },
     {
       "heading_text": "6.3 RQ3: Evidence Rank Distribution",
-      "normalized_heading_text": "6 3 rq3 evidence rank distribution",
+      "normalized_heading_text": "rq3 evidence rank distribution",
       "level": 3,
       "line_start": 360,
       "line_end": 389,
@@ -316,7 +316,7 @@
     },
     {
       "heading_text": "B WRITEBACK-RAG Prevents Answer Leakage",
-      "normalized_heading_text": "b writeback rag prevents answer leakage",
+      "normalized_heading_text": "bwriteback rag prevents answer leakage",
       "level": 3,
       "line_start": 532,
       "line_end": 543,
@@ -328,7 +328,7 @@
     },
     {
       "heading_text": "C WRITEBACK-RAG as a General Method for RAG",
-      "normalized_heading_text": "c writeback rag as a general method for rag",
+      "normalized_heading_text": "cwriteback rag as a general method for rag",
       "level": 3,
       "line_start": 544,
       "line_end": 651,
@@ -353,6 +353,13 @@
   ],
   "figures": [
     {
+      "number": 1,
+      "caption": "on Page 1",
+      "normalized_caption": "on page 1",
+      "line_no": 35,
+      "kind": "figure"
+    },
+    {
       "number": 2,
       "caption": "The WRITEBACK-RAG pipeline. During training (top), a two-stage gating mechanism identifies examples where retrieval helps and selects contributing documents. An LLM distiller fuses the selected evidence into a compact knowledge unit, which is indexed into a separate write-back corpus. During testing (bottom), the retriever searches combined knowledge source with no changes to the retriever or generator.",
       "normalized_caption": "the writeback rag pipeline during training top a two stage gating mechanism identifies examples where retrieval helps and selects contributing documents an llm distiller fuses the selected evidence into a compact knowledge unit which is indexed into a separate write back corpus during testing bottom the retriever searches combined knowledge source with no changes to the retriever or generator",
@@ -365,6 +372,27 @@
       "normalized_caption": "source evidence length versus distilled writeback knowledge length for six benchmarks",
       "line_no": 650,
       "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 13",
+      "normalized_caption": "on page 13",
+      "line_no": 672,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 14",
+      "normalized_caption": "on page 14",
+      "line_no": 678,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 15",
+      "normalized_caption": "on page 15",
+      "line_no": 684,
+      "kind": "figure"
     }
   ],
   "tables": [
@@ -376,10 +404,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 91,
+      "kind": "table"
+    },
+    {
       "number": 3,
       "caption": "(Page 3)",
       "normalized_caption": "page 3",
       "line_no": 121,
+      "kind": "table"
+    },
+    {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 127,
       "kind": "table"
     },
     {
@@ -391,9 +433,23 @@
     },
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 301,
+      "kind": "table"
+    },
+    {
+      "number": 1,
       "caption": "(Page 5)",
       "normalized_caption": "page 5",
       "line_no": 315,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 320,
       "kind": "table"
     },
     {
@@ -404,10 +460,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 344,
+      "kind": "table"
+    },
+    {
       "number": 2,
       "caption": "reports results for all 48 settings (4 RAG methods × 6 datasets × 2 LLMs). WRITEBACK- RAG shows improvement on every single setting, with an average gain of +2.14% (Prompts and Ex- amples can be found in Appendix G and H). The effect is not driven by any particular backbone or model scale: averaged over datasets and LLMs, Naive RAG gains +2.29%, RePlug +2.40%, Self- RAG +1.90%, and FLARE +1.99%; averaged over methods and datasets, Gemma-3-12B gains +1.92% and Llama-3.1-8B gains +2.36%. The size of the improvement varies across tasks in a way that aligns with the nature of the knowl- edge demand. FEVER (+4.79%) and NQ (+3.01%) benefit most, as both require locating specific",
       "normalized_caption": "reports results for all 48 settings 4 rag methods 6 datasets 2 llms writeback rag shows improvement on every single setting with an average gain of 2 14 prompts and ex amples can be found in appendix g and h the effect is not driven by any particular backbone or model scale averaged over datasets and llms naive rag gains 2 29 replug 2 40 self rag 1 90 and flare 1 99 averaged over methods and datasets gemma 3 12b gains 1 92 and llama 3 1 8b gains 2 36 the size of the improvement varies across tasks in a way that aligns with the nature of the knowl edge demand fever 4 79 and nq 3 01 benefit most as both require locating specific",
       "line_no": 346,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 348,
       "kind": "table"
     },
     {
@@ -419,9 +489,23 @@
     },
     {
       "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 352,
+      "kind": "table"
+    },
+    {
+      "number": 3,
       "caption": "Training-time write-back construction statistics. Selected Rate is the fraction of training examples written back to the KB. Retained Docs is the average number of retained documents after document filtering. Source Tokens and Distilled Tokens denote the average source and distilled token counts for selected examples. Compression is computed as source tokens divided by distilled tokens. Fallback Rate is the fraction of selected examples for which no document passed the document gate and the top-nmin fallback was used.",
       "normalized_caption": "training time write back construction statistics selected rate is the fraction of training examples written back to the kb retained docs is the average number of retained documents after document filtering source tokens and distilled tokens denote the average source and distilled token counts for selected examples compression is computed as source tokens divided by distilled tokens fallback rate is the fraction of selected examples for which no document passed the document gate and the top nmin fallback was used",
       "line_no": 364,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 366,
       "kind": "table"
     },
     {
@@ -432,10 +516,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 380,
+      "kind": "table"
+    },
+    {
       "number": 4,
       "caption": "Ablation study on the utility gate threshold τs, document gate threshold τdoc, and fallback size nmin. † marks the default configuration in the main experiments.",
       "normalized_caption": "ablation study on the utility gate threshold s document gate threshold doc and fallback size nmin marks the default configuration in the main experiments",
       "line_no": 382,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 384,
       "kind": "table"
     },
     {
@@ -446,10 +544,24 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 565,
+      "kind": "table"
+    },
+    {
       "number": 2,
       "caption": "(Page 12)",
       "normalized_caption": "page 12",
       "line_no": 567,
+      "kind": "table"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 572,
       "kind": "table"
     },
     {
@@ -460,10 +572,24 @@
       "kind": "table"
     },
     {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 579,
+      "kind": "table"
+    },
+    {
       "number": 4,
       "caption": "(Page 12)",
       "normalized_caption": "page 12",
       "line_no": 581,
+      "kind": "table"
+    },
+    {
+      "number": 4,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 586,
       "kind": "table"
     },
     {
@@ -474,10 +600,24 @@
       "kind": "table"
     },
     {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 602,
+      "kind": "table"
+    },
+    {
       "number": 5,
       "caption": "Detailed dataset statistics used in our experiments, following the FlashRAG benchmark release (Jin et al., 2025). All datasets use the FlashRAG-provided Wikipedia corpus (wiki18 100w) as external knowledge.",
       "normalized_caption": "detailed dataset statistics used in our experiments following the flashrag benchmark release jin et al 2025 all datasets use the flashrag provided wikipedia corpus wiki18 100w as external knowledge",
       "line_no": 604,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 606,
       "kind": "table"
     }
   ],
@@ -485,10 +625,10 @@
     "heading_count": 18,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 2,
-    "table_caption_count": 16,
-    "duplicate_figure_caption_count": 0,
-    "duplicate_table_caption_count": 10,
+    "figure_caption_count": 6,
+    "table_caption_count": 32,
+    "duplicate_figure_caption_count": 3,
+    "duplicate_table_caption_count": 26,
     "empty_section_count": 1,
     "consecutive_heading_run_count": 1,
     "max_consecutive_heading_run": 2
@@ -497,10 +637,10 @@
     "doc_id": "p118",
     "system": "ocr_agent",
     "title": "WRITEBACK-RAG: Training the Knowledge Base through Evidence Distillation and Write-Back Enrichment",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/699ede68aa0d6853.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/699ede68aa0d6853.pdf",
     "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p118/p118.pdf",
     "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p118",
-    "ocr_backend": "dummy",
+    "ocr_backend": "ocr_server",
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
@@ -508,8 +648,10 @@
       "tables": 16,
       "page_images": 0
     },
-    "elapsed_ms": 2779.184,
+    "elapsed_ms": 3128.921,
     "status": "success",
-    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p118/paper.md"
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p118/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
   }
 }

@@ -1,0 +1,197 @@
+{
+  "paper_id": 734343662850,
+  "generated_at": "2026-04-04T22:55:04.003321+00:00",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment4.pdf",
+  "markdown_file": "paper.md",
+  "metadata": {
+    "title": "DATA 240 - Lab Report: Student Portal Log Analytics",
+    "paper_id": 734343662850,
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment4.pdf",
+    "generated_at": "2026-04-04T22:55:03.997115+00:00",
+    "num_figures": 3,
+    "num_tables": 1,
+    "num_equations": 0,
+    "page_count": 3
+  },
+  "config": {
+    "asset_mode": "copy",
+    "asset_path_mode": "relative",
+    "include_frontmatter": true,
+    "include_page_markers": false,
+    "prefer_equation_latex": true,
+    "include_equation_fallback_assets": true,
+    "ensure_assets": true,
+    "overwrite": true,
+    "quality_audit_enabled": true,
+    "conservative_fallback": true,
+    "conservative_equations_as_assets_only": true
+  },
+  "render_mode": "normal",
+  "quality_audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": [],
+    "suspicious_headings": [],
+    "heading_counts": {
+      "dataset and goal": 1,
+      "incident notes and conclusions": 1,
+      "latency and response code trends": 1,
+      "tabular findings": 1
+    },
+    "total_headings": 4
+  },
+  "asset_counts": {
+    "figures": 3,
+    "tables": 1,
+    "equations": 0
+  },
+  "sectioning": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 4,
+    "matched_headings": 5,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 3
+      },
+      {
+        "index": 1,
+        "title": "Dataset and Goal",
+        "canonical": "datasets",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 4,
+        "end_block_index": 6
+      },
+      {
+        "index": 2,
+        "title": "Latency and Response-Code Trends",
+        "canonical": "latency_and_response_code_trends",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 2,
+        "start_block_index": 7,
+        "end_block_index": 9
+      },
+      {
+        "index": 3,
+        "title": "Tabular Findings",
+        "canonical": "results",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 3,
+        "end_page": 3,
+        "start_block_index": 10,
+        "end_block_index": 26
+      },
+      {
+        "index": 4,
+        "title": "Incident Notes and Conclusions",
+        "canonical": "conclusion",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 3,
+        "end_page": 3,
+        "start_block_index": 27,
+        "end_block_index": 35
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 36
+  },
+  "sections": [
+    {
+      "section_index": 0,
+      "section_canonical": "front_matter",
+      "section_title": "Front Matter",
+      "page_no": 1
+    },
+    {
+      "section_index": 1,
+      "section_canonical": "datasets",
+      "section_title": "Dataset and Goal",
+      "page_no": 1
+    },
+    {
+      "section_index": 2,
+      "section_canonical": "latency_and_response_code_trends",
+      "section_title": "Latency and Response-Code Trends",
+      "page_no": 2
+    },
+    {
+      "section_index": 3,
+      "section_canonical": "results",
+      "section_title": "Tabular Findings",
+      "page_no": 3
+    },
+    {
+      "section_index": 4,
+      "section_canonical": "conclusion",
+      "section_title": "Incident Notes and Conclusions",
+      "page_no": 3
+    }
+  ],
+  "assets": {
+    "figures": [
+      {
+        "id": 1,
+        "page_no": 1,
+        "file_name": "page_001_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "1",
+        "figure_body": "Mock analytics dashboard summarizing portal traffic.",
+        "figure_caption": "Figure 1. Mock analytics dashboard summarizing portal traffic.",
+        "section_canonical": "datasets",
+        "markdown_path": "assets/figures/page_001_img_001.png"
+      },
+      {
+        "id": 2,
+        "page_no": 2,
+        "file_name": "page_002_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "2",
+        "figure_body": "Fabricated latency trend from morning to late evening.",
+        "figure_caption": "Figure 2. Fabricated latency trend from morning to late evening.",
+        "section_canonical": "latency_and_response_code_trends",
+        "markdown_path": "assets/figures/page_002_img_001.png"
+      },
+      {
+        "id": 3,
+        "page_no": 2,
+        "file_name": "page_002_img_002.png",
+        "figure_type": "embedded",
+        "figure_number": "3",
+        "figure_body": "Status-code breakdown for the same observation window.",
+        "figure_caption": "Figure 3. Status-code breakdown for the same observation window.",
+        "section_canonical": "latency_and_response_code_trends",
+        "markdown_path": "assets/figures/page_002_img_002.png"
+      }
+    ],
+    "tables": [
+      {
+        "id": 1,
+        "page_no": 3,
+        "json_file": "table_0001.json",
+        "caption": "3. Tabular Findings",
+        "section_canonical": "results",
+        "markdown_json_path": "assets/tables/table_0001.json"
+      }
+    ],
+    "equations": []
+  }
+}

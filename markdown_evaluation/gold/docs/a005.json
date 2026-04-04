@@ -1,0 +1,93 @@
+{
+  "doc_id": "a005",
+  "title": "CMPE 286 - LAB - 3: Web Traffic Inspection and RTT Study",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "non_academic",
+    "student_assignment",
+    "figure_heavy",
+    "table_heavy",
+    "hybrid_pdf",
+    "network_analysis_report",
+    "pdf_type_hybrid"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Part 1: Environment Setup"
+    },
+    {
+      "level": 2,
+      "text": "Part 2: Protocol Filters"
+    },
+    {
+      "level": 2,
+      "text": "Part 3: HTTP Request Summary"
+    },
+    {
+      "level": 2,
+      "text": "Part 4: Delay and Jitter"
+    },
+    {
+      "level": 2,
+      "text": "Part 5: TCP 3-Way Handshake and Observations"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "A fresh capture profile was created with custom columns for source port, destination port, host, and URI.",
+      "expected_section": "Part 1: Environment Setup",
+      "position": "start"
+    },
+    {
+      "text": "Figure 5. UDP and QUIC packets that appeared alongside DNS traffic.",
+      "expected_section": "Part 2: Protocol Filters",
+      "position": "end"
+    },
+    {
+      "text": "The following table summarizes sample requests identified from the filtered capture.",
+      "expected_section": "Part 3: HTTP Request Summary",
+      "position": "start"
+    },
+    {
+      "text": "Figure 6. RTT histogram from three fabricated destination groups.",
+      "expected_section": "Part 4: Delay and Jitter",
+      "position": "middle"
+    },
+    {
+      "text": "A single connection was isolated and the time display was changed to \"Seconds Since Previous Displayed Packet.\"",
+      "expected_section": "Part 5: TCP 3-Way Handshake and Observations",
+      "position": "start"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": "Mock packet-analyzer workspace with a saved capture profile"
+    },
+    {
+      "number": 2,
+      "caption_contains": "HTTP filter results showing request and response entries"
+    },
+    {
+      "number": 3,
+      "caption_contains": "DNS queries and responses captured during page load"
+    },
+    {
+      "number": 4,
+      "caption_contains": "TCP/TLS packets associated with the same browsing session"
+    },
+    {
+      "number": 5,
+      "caption_contains": "UDP and QUIC packets that appeared alongside DNS traffic"
+    },
+    {
+      "number": 6,
+      "caption_contains": "RTT histogram from three fabricated destination groups"
+    }
+  ],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/Hybrid/Assignment5.pdf on 2026-04-04 using pdftotext -layout and caption inspection. Data tables are unnumbered in the source."
+}

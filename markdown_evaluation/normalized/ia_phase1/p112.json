@@ -1,7 +1,7 @@
 {
   "doc_id": "p112",
   "system": "ia_phase1",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/987e7ff453578105.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/987e7ff453578105.pdf",
   "title": "MemDLM: Memory-Enhanced DLM Training",
   "status": "success",
   "markdown_line_count": 398,
@@ -354,6 +354,13 @@
   "figures": [
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 9,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
       "caption": "Needle-in-a-Haystack results overview. Gray bars denote Standard MDLM and blue bars denote MemDLM. Left: detailed results on RULER-MV, RULER-VT, RULER-CWE, and BABILong for the LLaDA-MoE-7B-A1B-Base and LLaDA2.1-mini backbones. Right: mean absolute improvement of MemDLM over Standard MDLM for each task, averaged across the evaluated context lengths within each backbone.",
       "normalized_caption": "needle in a haystack results overview gray bars denote standard mdlm and blue bars denote memdlm left detailed results on ruler mv ruler vt ruler cwe and babilong for the llada moe 7b a1b base and llada2 1 mini backbones right mean absolute improvement of memdlm over standard mdlm for each task averaged across the evaluated context lengths within each backbone",
       "line_no": 11,
@@ -364,6 +371,13 @@
       "caption": "summarizes how MemDLM bridges the gap between static masked training and iterative",
       "normalized_caption": "summarizes how memdlm bridges the gap between static masked training and iterative",
       "line_no": 19,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 48,
       "kind": "figure"
     },
     {
@@ -382,9 +396,23 @@
     },
     {
       "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 125,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
       "caption": "Exposure Bias Ratio (REB) across denoising steps. Standard MDLM degrades rapidly, while MemDLM remains substan- tially flatter.",
       "normalized_caption": "exposure bias ratio reb across denoising steps standard mdlm degrades rapidly while memdlm remains substan tially flatter",
       "line_no": 127,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 247,
       "kind": "figure"
     },
     {
@@ -403,9 +431,23 @@
     },
     {
       "number": 5,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 266,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
       "caption": "Comparison with the untuned pre- trained LLaDA-MoE-7B-A1B-Base model across context lengths.",
       "normalized_caption": "comparison with the untuned pre trained llada moe 7b a1b base model across context lengths",
       "line_no": 268,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 272,
       "kind": "figure"
     },
     {
@@ -417,9 +459,23 @@
     },
     {
       "number": 7,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 276,
+      "kind": "figure"
+    },
+    {
+      "number": 7,
       "caption": "Adaptation scope analysis on the LLaDA-MoE, evaluated on BABILong-1K.",
       "normalized_caption": "adaptation scope analysis on the llada moe evaluated on babilong 1k",
       "line_no": 278,
+      "kind": "figure"
+    },
+    {
+      "number": 8,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 300,
       "kind": "figure"
     },
     {
@@ -431,6 +487,13 @@
     },
     {
       "number": 9,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 306,
+      "kind": "figure"
+    },
+    {
+      "number": 9,
       "caption": "Consistency of the trajectory design. Training loss for an inconsistent progressive-memory variant and our consis- tent design.",
       "normalized_caption": "consistency of the trajectory design training loss for an inconsistent progressive memory variant and our consis tent design",
       "line_no": 308,
@@ -438,9 +501,23 @@
     },
     {
       "number": 10,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 310,
+      "kind": "figure"
+    },
+    {
+      "number": 10,
       "caption": "Role of the two inner-loop stages. Training loss for pre-anchor-only, anchor-to- target-only, and two-stage variants on the LLaDA- MoE, evaluated on BABILong-1K.",
       "normalized_caption": "role of the two inner loop stages training loss for pre anchor only anchor to target only and two stage variants on the llada moe evaluated on babilong 1k",
       "line_no": 312,
+      "kind": "figure"
+    },
+    {
+      "number": 11,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 314,
       "kind": "figure"
     },
     {
@@ -478,9 +555,9 @@
     "heading_count": 18,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 14,
+    "figure_caption_count": 25,
     "table_caption_count": 3,
-    "duplicate_figure_caption_count": 3,
+    "duplicate_figure_caption_count": 14,
     "duplicate_table_caption_count": 0,
     "empty_section_count": 0,
     "consecutive_heading_run_count": 0,
@@ -491,7 +568,7 @@
     "system": "ia_phase1",
     "paper_id": 112,
     "title": "MemDLM: Memory-Enhanced DLM Training",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/987e7ff453578105.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/987e7ff453578105.pdf",
     "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p112",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p112/paper.md",
     "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p112/manifest.json",
@@ -503,8 +580,8 @@
     "metadata": {
       "title": "MemDLM: Memory-Enhanced DLM Training",
       "paper_id": "112",
-      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/987e7ff453578105.pdf",
-      "generated_at": "2026-04-03T22:12:25.982745+00:00",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/987e7ff453578105.pdf",
+      "generated_at": "2026-04-04T22:53:02.519662+00:00",
       "num_figures": "11",
       "num_tables": "3",
       "num_equations": "18",
@@ -634,7 +711,7 @@
       "issue_count": 0,
       "issues": []
     },
-    "elapsed_ms": 8130.238,
+    "elapsed_ms": 8327.643,
     "status": "success"
   }
 }

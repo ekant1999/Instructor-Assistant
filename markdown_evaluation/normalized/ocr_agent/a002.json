@@ -1,10 +1,10 @@
 {
   "doc_id": "a002",
   "system": "ocr_agent",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment2.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment2.pdf",
   "title": "a002",
   "status": "success",
-  "markdown_line_count": 199,
+  "markdown_line_count": 213,
   "headings": [
     {
       "level": 1,
@@ -66,14 +66,14 @@
       "level": 3,
       "text": "1. Challenges:",
       "normalized_text": "challenges",
-      "line_no": 159,
+      "line_no": 173,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "2. Learnings:",
       "normalized_text": "learnings",
-      "line_no": 179,
+      "line_no": 193,
       "suspicious": false
     }
   ],
@@ -167,10 +167,10 @@
       "normalized_heading_text": "if record is not present for the given student id return",
       "level": 1,
       "line_start": 105,
-      "line_end": 158,
-      "prose_text": "'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\nstudent_table.delete_item(Key={'student_id': student_id})\n'statusCode':200, 'body': json.dumps('Student record deleted successfully')\nChallenges and Learnings:",
-      "full_text": "'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\n}\nstudent_table.delete_item(Key={'student_id': student_id})\nreturn {\n'statusCode':200, 'body': json.dumps('Student record deleted successfully')\n}\n![Figure 1 on Page 3](a002_assets/figures/a002_page_3_fig_1.png)\n---\n<!-- page 4 mode: ocr -->\n<!-- OCR page 4 -->\n![OCR Page 4](a002_page_4.png)\n---\n<!-- page 5 mode: ocr -->\n<!-- OCR page 5 -->\n![OCR Page 5](a002_page_5.png)\n---\n<!-- page 6 mode: ocr -->\n<!-- OCR page 6 -->\n![OCR Page 6](a002_page_6.png)\n---\n<!-- page 7 mode: ocr -->\n<!-- OCR page 7 -->\n![OCR Page 7](a002_page_7.png)\n---\n<!-- page 8 mode: simple_text -->\nChallenges and Learnings:",
-      "word_count": 33,
+      "line_end": 172,
+      "prose_text": "'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\nstudent_table.delete_item(Key={'student_id': student_id})\n'statusCode':200, 'body': json.dumps('Student record deleted successfully')\n2. Fetching record by student_id (GET):\n3. Updating the data (PUT):\n4. Deleting a record (DELETE):\n5. Edge Case - Trying to fetch a record which does not exist:\n6. Edge Case - Trying to delete a record which does not exist:\nChallenges and Learnings:",
+      "full_text": "'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\n}\nstudent_table.delete_item(Key={'student_id': student_id})\nreturn {\n'statusCode':200, 'body': json.dumps('Student record deleted successfully')\n}\n![Figure 1 on Page 3](a002_assets/figures/a002_page_3_fig_1.png)\n---\n<!-- page 4 mode: ocr -->\n<!-- OCR page 4 -->\n2. Fetching record by student_id (GET):\n---\n<!-- page 5 mode: ocr -->\n<!-- OCR page 5 -->\n3. Updating the data (PUT):\n![Screenshot showing API request to update student data](a002_assets/figures/ocr_page_5_324_312_1567_682.png)\n![Screenshot showing DynamoDB scan results](a002_assets/figures/ocr_page_5_324_1092_1567_682.png)\n---\n<!-- page 6 mode: ocr -->\n<!-- OCR page 6 -->\n4. Deleting a record (DELETE):\n![Screenshot showing API request to delete a record from Student Records Management](a002_assets/figures/ocr_page_6_328_312_1568_799.png)\n![Screenshot showing DynamoDB scan results after deletion](a002_assets/figures/ocr_page_6_328_1207_1568_799.png)\n---\n<!-- page 7 mode: ocr -->\n<!-- OCR page 7 -->\n5. Edge Case - Trying to fetch a record which does not exist:\n![Screenshot showing an API request to fetch a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_328_370_1469_670.png)\n6. Edge Case - Trying to delete a record which does not exist:\n![Screenshot showing an API request to delete a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_328_1162_1469_670.png)\n---\n<!-- page 8 mode: simple_text -->\nChallenges and Learnings:",
+      "word_count": 66,
       "empty": false,
       "asset_only": false
     },
@@ -178,8 +178,8 @@
       "heading_text": "1. Challenges:",
       "normalized_heading_text": "challenges",
       "level": 3,
-      "line_start": 159,
-      "line_end": 178,
+      "line_start": 173,
+      "line_end": 192,
       "prose_text": "a. Problem: After building the lambda function and creating respective APIs for\nCRUD operations, when I tried to test the data in POSTMAN, I was getting a ‘KeyError’ - ‘httpMethod’\nObservation: After going through and debugging the code, I found out that the\n‘event’ object was empty.\nSolution: While creating the APIs, I turned on the ‘Lambda Proxy Integration’ in the ‘Integration request’ option which ensured that the API gateway would send the requests as a structured event.\nb. Problem: While testing various CRUD operations, when a student_id which is\nnon-existent is being given in the GET or DELETE request, an empty response was getting in return.\nObservation: Edge cases for GET and DELETE operations were not handled in the Lambda function.\nSolution: Added the code to first check if the given student_id exists in the database or not. If it does not exist, it should return a response which addresses the situation to the user.",
       "full_text": "a. Problem: After building the lambda function and creating respective APIs for\nCRUD operations, when I tried to test the data in POSTMAN, I was getting a ‘KeyError’ - ‘httpMethod’\nObservation: After going through and debugging the code, I found out that the\n‘event’ object was empty.\nSolution: While creating the APIs, I turned on the ‘Lambda Proxy Integration’ in the ‘Integration request’ option which ensured that the API gateway would send the requests as a structured event.\nb. Problem: While testing various CRUD operations, when a student_id which is\nnon-existent is being given in the GET or DELETE request, an empty response was getting in return.\nObservation: Edge cases for GET and DELETE operations were not handled in the Lambda function.\nSolution: Added the code to first check if the given student_id exists in the database or not. If it does not exist, it should return a response which addresses the situation to the user.",
       "word_count": 147,
@@ -190,8 +190,8 @@
       "heading_text": "2. Learnings:",
       "normalized_heading_text": "learnings",
       "level": 3,
-      "line_start": 179,
-      "line_end": 199,
+      "line_start": 193,
+      "line_end": 213,
       "prose_text": "a. Firstly I learnt about the serverless architecture, its pros and cons, and the use\ncases of a serverless architecture. I understood the applications and the best practices of using this architecture.\nb. I learnt how to set up and configure the AWS Lambda to trigger based on REST\nAPI calls and perform CRUD operations on DynamoDB.\nc. I researched about DynamoDB and its use cases and understood when a\nNoSQL database should be used. I got hands-on experience on performing various operations in the DynamoDB.\nd. I gained insights on creating REST APIs using the AWS API Gateway.\ne. I also understood the importance of cloud computing and various features like\nScalability, Availability, Security etc. which is an integral part of any Enterprise level software.",
       "full_text": "a. Firstly I learnt about the serverless architecture, its pros and cons, and the use\ncases of a serverless architecture. I understood the applications and the best practices of using this architecture.\nb. I learnt how to set up and configure the AWS Lambda to trigger based on REST\nAPI calls and perform CRUD operations on DynamoDB.\nc. I researched about DynamoDB and its use cases and understood when a\nNoSQL database should be used. I got hands-on experience on performing various operations in the DynamoDB.\nd. I gained insights on creating REST APIs using the AWS API Gateway.\ne. I also understood the importance of cloud computing and various features like\nScalability, Availability, Security etc. which is an integral part of any Enterprise level software.\n---",
       "word_count": 112,
@@ -199,13 +199,21 @@
       "asset_only": false
     }
   ],
-  "figures": [],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "on Page 3",
+      "normalized_caption": "on page 3",
+      "line_no": 119,
+      "kind": "figure"
+    }
+  ],
   "tables": [],
   "intrinsic_metrics": {
     "heading_count": 10,
     "duplicate_heading_count": 1,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 0,
+    "figure_caption_count": 1,
     "table_caption_count": 0,
     "duplicate_figure_caption_count": 0,
     "duplicate_table_caption_count": 0,
@@ -217,19 +225,21 @@
     "doc_id": "a002",
     "system": "ocr_agent",
     "title": "Performing CRUD operations in DynamoDB using AWS Lambda",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment2.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment2.pdf",
     "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a002/a002.pdf",
     "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a002",
-    "ocr_backend": "dummy",
+    "ocr_backend": "ocr_server",
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
-      "figures": 1,
+      "figures": 23,
       "tables": 0,
       "page_images": 4
     },
-    "elapsed_ms": 2052.421,
+    "elapsed_ms": 26926.924,
     "status": "success",
-    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a002/paper.md"
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a002/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
   }
 }

@@ -303,7 +303,7 @@ Similar to [5, 24], we use the standard 3D occupancy metrics Precision, Recall, 
 
 <!-- OCR page 6 -->
 
-![OCR Page 6](p115_page_6.png)
+[OCR unavailable for page 6]
 
 ---
 
@@ -311,7 +311,265 @@ Similar to [5, 24], we use the standard 3D occupancy metrics Precision, Recall, 
 
 <!-- OCR page 7 -->
 
-![OCR Page 7](p115_page_7.png)
+(a) Segmentation Forcing
+
+(b) Novel-View Rendering
+
+Figure 5. Qualitative ablation shows the gains from Segmentation Forcing and Novel-View Rendering. Voxel colorization follows Fig. 4. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.
+
+<table>
+  <tr>
+    <th>Test</th>
+    <th>Method</th>
+    <th>Venue</th>
+    <th>Res.</th>
+    <th>Prec.</th>
+    <th>Rec.</th>
+    <th>IoU</th>
+  </tr>
+  <tr>
+    <td rowspan="6">in-domain</td>
+    <td>SelfOcc [24]</td>
+    <td>CVPR’24</td>
+    <td>800x450</td>
+    <td>–</td>
+    <td>–</td>
+    <td>45.01</td>
+  </tr>
+  <tr>
+    <td>OccNeRF [83]</td>
+    <td>TIP’25</td>
+    <td>672x336</td>
+    <td>57.20</td>
+    <td>55.47</td>
+    <td>39.20</td>
+  </tr>
+  <tr>
+    <td>DistillNeRF [64]</td>
+    <td>NeuRIPS’24</td>
+    <td>400x228</td>
+    <td>–</td>
+    <td>–</td>
+    <td>29.11</td>
+  </tr>
+  <tr>
+    <td>SimpleOcc [14]</td>
+    <td>TIV’24</td>
+    <td>672x336</td>
+    <td>41.91</td>
+    <td>64.02</td>
+    <td>33.92</td>
+  </tr>
+  <tr>
+    <td>GaussTR [28]</td>
+    <td>CVPR’25</td>
+    <td>896x504</td>
+    <td>–</td>
+    <td>–</td>
+    <td>45.19</td>
+  </tr>
+  <tr>
+    <td>MUSt3R [3]</td>
+    <td>CVPR’25</td>
+    <td>512x288</td>
+    <td>20.79</td>
+    <td>28.29</td>
+    <td>13.61</td>
+  </tr>
+  <tr>
+    <td rowspan="9">out-of-domain</td>
+    <td>CUT3R [65]</td>
+    <td>CVPR’25</td>
+    <td>512x288</td>
+    <td>32.19</td>
+    <td>7.93</td>
+    <td>6.79</td>
+  </tr>
+  <tr>
+    <td>CUT3R* [65]</td>
+    <td>CVPR’25</td>
+    <td>512x288</td>
+    <td>40.60</td>
+    <td>26.73</td>
+    <td>19.21</td>
+  </tr>
+  <tr>
+    <td>VGGT† [63]</td>
+    <td>CVPR’25</td>
+    <td>518x294</td>
+    <td>41.56</td>
+    <td>28.64</td>
+    <td>20.42</td>
+  </tr>
+  <tr>
+    <td>AnySplat† [29]</td>
+    <td>TOG’25</td>
+    <td>518x294</td>
+    <td>29.35</td>
+    <td>40.80</td>
+    <td>20.59</td>
+  </tr>
+  <tr>
+    <td>AnySplat*† [29]</td>
+    <td>TOG’25</td>
+    <td>518x294</td>
+    <td>24.52</td>
+    <td>57.65</td>
+    <td>20.78</td>
+  </tr>
+  <tr>
+    <td>DA3 [36]</td>
+    <td>ICLR’26</td>
+    <td>518x294</td>
+    <td>53.26</td>
+    <td>23.75</td>
+    <td>19.65</td>
+  </tr>
+  <tr>
+    <td>OccAny<sub>base</sub></td>
+    <td>–</td>
+    <td>512x288</td>
+    <td><b>59.58</b></td>
+    <td>21.19</td>
+    <td>18.53</td>
+  </tr>
+  <tr>
+    <td><b>OccAny</b></td>
+    <td>–</td>
+    <td>512x288</td>
+    <td>45.04</td>
+    <td><b>58.54</b></td>
+    <td><b>34.15</b></td>
+  </tr>
+</table>
+
+*: use TTVA   †: scaled with Metric3Dv2 [22].
+OccAny<sub>base</sub>: w/o Segmentation Forcing & Novel-view Rendering.
+
+Table 3. Surround-view setting. More results are in Tab. 8.
+
+and Novel-View Rendering. The OccAny<sub>base</sub> variant, which is equivalent to fine-tuning MUSt3R on our datasets, was trained without the two proposed strategies and obtained only marginal improvements over baselines.
+
+Wrong metric reasoning leads to voxels predicted outside of the scene, significantly degrading the performance. The scale-invariant design of VGGT and AnySplat is not well-suited for the occupancy task, unlike OccAny with metric prediction by design. The Gaussian Splatting of AnySplat, while favorable for synthesizing compelling images, produces lots of geometric artifacts, thereby hallucinating lots of noises and harming geometry prediction. Fig. 4 visualizes the occupancy results.
+
+Monocular. In the more challenging Monocular set-
+
+<table>
+  <tr>
+    <th>Method</th>
+    <th>Venue</th>
+    <th colspan="2">Semantic KITTI sequence</th>
+    <th colspan="2">Occ3D-NuScenes surround-view</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th></th>
+    <th>Res.</th>
+    <th>mIoU</th>
+    <th>Res.</th>
+    <th>mIoU</th>
+  </tr>
+  <tr>
+    <td>MUSt3R [3] + SAM2 [47]</td>
+    <td>CVPR’25</td>
+    <td>512x160</td>
+    <td>3.22</td>
+    <td>5.96</td>
+    <td>512x288</td>
+    <td>2.43</td>
+    <td>3.84</td>
+  </tr>
+  <tr>
+    <td>CUT3R [65] + SAM2 [47]</td>
+    <td>CVPR’25</td>
+    <td>512x160</td>
+    <td>4.15</td>
+    <td>6.72</td>
+    <td>512x288</td>
+    <td>2.40</td>
+    <td>2.75</td>
+  </tr>
+  <tr>
+    <td>CUT3R* [65] + SAM2 [47]</td>
+    <td>CVPR’25</td>
+    <td>512x160</td>
+    <td>4.53</td>
+    <td>8.18</td>
+    <td>512x288</td>
+    <td>3.06</td>
+    <td>3.99</td>
+  </tr>
+  <tr>
+    <td>VGGT† [63] + SAM2 [47]</td>
+    <td>CVPR’25</td>
+    <td>518x294</td>
+    <td>3.47</td>
+    <td>6.76</td>
+    <td>518x294</td>
+    <td>4.39</td>
+    <td>6.49</td>
+  </tr>
+  <tr>
+    <td>AnySplat† [29]+ SAM2 [47]</td>
+    <td>TOG’25</td>
+    <td>518x168</td>
+    <td>3.37</td>
+    <td>6.83</td>
+    <td>518x294</td>
+    <td>3.96</td>
+    <td>5.97</td>
+  </tr>
+  <tr>
+    <td>AnySplat*† [29]+ SAM2 [47]</td>
+    <td>TOG’25</td>
+    <td>518x168</td>
+    <td>3.86</td>
+    <td>7.51</td>
+    <td>518x294</td>
+    <td>4.44</td>
+    <td>6.51</td>
+  </tr>
+  <tr>
+    <td>DA3 [36]+ SAM2 [47]</td>
+    <td>ICLR’26</td>
+    <td>518x168</td>
+    <td>4.92</td>
+    <td>9.56</td>
+    <td>518x294</td>
+    <td>4.55</td>
+    <td>6.29</td>
+  </tr>
+  <tr>
+    <td>OccAny w/o forcing + SAM2 [47]</td>
+    <td>–</td>
+    <td>512x160</td>
+    <td>6.83</td>
+    <td>12.01</td>
+    <td>512x288</td>
+    <td>6.17</td>
+    <td>8.96</td>
+  </tr>
+  <tr>
+    <td><b>OccAny</b></td>
+    <td>–</td>
+    <td>512x160</td>
+    <td><b>7.28</b></td>
+    <td><b>13.53</b></td>
+    <td>512x288</td>
+    <td><b>6.66</b></td>
+    <td><b>10.32</b></td>
+  </tr>
+</table>
+
+*: use TTVA   †: scaled with Metric3Dv2 [22].
+
+Table 4. Semantic Occupancy Prediction with GSAM2 [48].
+
+ting on SemanticKITTI (Tab. 2), OccAny demonstrates remarkable generalization. It achieves 24.03% IoU, outperforming all other zero-shot baselines by significant margins (*e.g.*, +11.00% IoU over CUT3R* w/ TTVA). Notably, it significantly surpasses several in-domain self-supervised methods like SceneRF (+10.19%); OccAny even surpasses self-supervised SOTAs SelfOcc (+2.06%) and OccNeRF (+1.22%), despite never been trained on SemanticKITTI.
+
+Surround-view. In the Surround-view setting on Occ3D-NuScenes Tab. 3, OccAny maintains its lead among zero-shot methods with 34.15% IoU, and achieves better performance than some in-domain approaches like Distill-NeRF/SimpleOcc, yet remains behind more recent methods.
+
+Semantic Occupancy. We further evaluate 3D semantic occupancy (Tab. 4) by applying Grounded SAM2 pipeline directly on OccAny’s segmentation features. OccAny achieves the highest mIoU and mIoU<sup>sc</sup> across both datasets, compared to baselines using a separated SAM2 model to produce segmentation features. The comparison with the variant “OccAny w/o forcing + SAM2” confirms that our Segmentation Forcing strategy leads to a unified and simpler solution to
 
 ---
 
@@ -785,7 +1043,7 @@ in Fig. 9, Fig. 10, Fig. 11, Fig. 12, and Fig. 13.
 
 <!-- OCR page 17 -->
 
-![OCR Page 17](p115_page_17.png)
+[OCR unavailable for page 17]
 
 ---
 
@@ -793,7 +1051,84 @@ in Fig. 9, Fig. 10, Fig. 11, Fig. 12, and Fig. 13.
 
 <!-- OCR page 18 -->
 
-![OCR Page 18](p115_page_18.png)
+<table>
+  <tr>
+    <th>Input</th>
+    <th>MUSt3R</th>
+    <th>VGGT<sup>†</sup></th>
+    <th>CUT3R*</th>
+    <th>AnySplat*<sup>†</sup></th>
+    <th>OccAny (ours)</th>
+    <th>GT</th>
+  </tr>
+  <tr>
+    <td rowspan="8">Surround-view</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+Figure 10. **Occupancy predictions** of OccAny and baselines on surround-view data. Voxel colorization follows Fig. 9. Compared to baselines, our occupancy predictions are denser and more accurate.
 
 ---
 
@@ -801,7 +1136,108 @@ in Fig. 9, Fig. 10, Fig. 11, Fig. 12, and Fig. 13.
 
 <!-- OCR page 19 -->
 
-![OCR Page 19](p115_page_19.png)
+<table>
+  <tr>
+    <th>Input</th>
+    <th>w/o forcing</th>
+    <th>w/ forcing</th>
+    <th>GT</th>
+    <th>Input</th>
+    <th>w/o NVR</th>
+    <th>w/ NVR</th>
+    <th>GT</th>
+  </tr>
+  <tr>
+    <td colspan="4">Sequence</td>
+    <td colspan="4">Sequence</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+(a) Segmentation Forcing
+
+(b) Novel-View Rendering
+
+Figure 11. **Qualitative ablation on Semantic KITTI** shows the gains from *Segmentation Forcing* and *Novel-View Rendering*. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.
 
 ---
 
@@ -809,7 +1245,7 @@ in Fig. 9, Fig. 10, Fig. 11, Fig. 12, and Fig. 13.
 
 <!-- OCR page 20 -->
 
-![OCR Page 20](p115_page_20.png)
+[OCR unavailable for page 20]
 
 ---
 

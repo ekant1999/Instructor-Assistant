@@ -1,8 +1,8 @@
 ---
 title: "Assignment 2: Classification - Customer Churn Prediction Using Classification"
 paper_id: 355052400973
-source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment3.pdf"
-generated_at: "2026-04-03T22:15:36.224688+00:00"
+source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment3.pdf"
+generated_at: "2026-04-04T22:55:03.421464+00:00"
 num_figures: 0
 num_tables: 0
 num_equations: 0

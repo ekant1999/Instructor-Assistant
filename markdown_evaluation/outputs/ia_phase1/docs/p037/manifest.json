@@ -1,0 +1,670 @@
+{
+  "paper_id": 660930833796,
+  "generated_at": "2026-04-04T22:52:44.773854+00:00",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/10f9519a4068b56b.pdf",
+  "markdown_file": "paper.md",
+  "metadata": {
+    "title": "Attention Is All You Need",
+    "paper_id": 660930833796,
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/10f9519a4068b56b.pdf",
+    "generated_at": "2026-04-04T22:52:44.664786+00:00",
+    "num_figures": 5,
+    "num_tables": 4,
+    "num_equations": 24,
+    "page_count": 15
+  },
+  "config": {
+    "asset_mode": "copy",
+    "asset_path_mode": "relative",
+    "include_frontmatter": true,
+    "include_page_markers": false,
+    "prefer_equation_latex": true,
+    "include_equation_fallback_assets": true,
+    "ensure_assets": true,
+    "overwrite": true,
+    "quality_audit_enabled": true,
+    "conservative_fallback": true,
+    "conservative_equations_as_assets_only": true
+  },
+  "render_mode": "normal",
+  "quality_audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": [],
+    "suspicious_headings": [],
+    "heading_counts": {
+      "abstract": 1,
+      "applications of attention in our model": 1,
+      "attention": 1,
+      "background": 1,
+      "conclusion": 1,
+      "embeddings and softmax": 1,
+      "encoder and decoder stacks": 1,
+      "english constituency parsing": 1,
+      "hardware and schedule": 1,
+      "introduction": 1,
+      "model architecture": 1,
+      "model variations": 1,
+      "multi head attention": 1,
+      "optimizer": 1,
+      "position wise feed forward networks": 1,
+      "references": 1,
+      "regularization": 1,
+      "results": 1,
+      "scaled dot product attention": 1,
+      "training": 1,
+      "training data and batching": 1,
+      "why self attention": 1
+    },
+    "total_headings": 22
+  },
+  "asset_counts": {
+    "figures": 5,
+    "tables": 4,
+    "equations": 24
+  },
+  "sectioning": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 9,
+    "matched_headings": 10,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 9
+      },
+      {
+        "index": 1,
+        "title": "Abstract",
+        "canonical": "abstract",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 10,
+        "end_block_index": 14
+      },
+      {
+        "index": 2,
+        "title": "Introduction",
+        "canonical": "introduction",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 2,
+        "start_block_index": 15,
+        "end_block_index": 19
+      },
+      {
+        "index": 3,
+        "title": "Background",
+        "canonical": "preliminaries",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 2,
+        "start_block_index": 20,
+        "end_block_index": 24
+      },
+      {
+        "index": 4,
+        "title": "Model Architecture",
+        "canonical": "model_architecture",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 6,
+        "start_block_index": 25,
+        "end_block_index": 78
+      },
+      {
+        "index": 5,
+        "title": "Why Self-Attention",
+        "canonical": "why_self_attention",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 6,
+        "end_page": 7,
+        "start_block_index": 79,
+        "end_block_index": 87
+      },
+      {
+        "index": 6,
+        "title": "Training",
+        "canonical": "training",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 7,
+        "end_page": 8,
+        "start_block_index": 88,
+        "end_block_index": 114
+      },
+      {
+        "index": 7,
+        "title": "Results",
+        "canonical": "results",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 8,
+        "end_page": 10,
+        "start_block_index": 115,
+        "end_block_index": 168
+      },
+      {
+        "index": 8,
+        "title": "Conclusion",
+        "canonical": "conclusion",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 10,
+        "end_page": 10,
+        "start_block_index": 169,
+        "end_block_index": 174
+      },
+      {
+        "index": 9,
+        "title": "References",
+        "canonical": "references",
+        "level": 1,
+        "source": "heuristic",
+        "confidence": 0.894,
+        "start_page": 10,
+        "end_page": 15,
+        "start_block_index": 175,
+        "end_block_index": 511
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 512
+  },
+  "sections": [
+    {
+      "section_index": 0,
+      "section_canonical": "front_matter",
+      "section_title": "Front Matter",
+      "page_no": 1
+    },
+    {
+      "section_index": 1,
+      "section_canonical": "abstract",
+      "section_title": "Abstract",
+      "page_no": 1
+    },
+    {
+      "section_index": 2,
+      "section_canonical": "introduction",
+      "section_title": "Introduction",
+      "page_no": 2
+    },
+    {
+      "section_index": 3,
+      "section_canonical": "preliminaries",
+      "section_title": "Background",
+      "page_no": 2
+    },
+    {
+      "section_index": 4,
+      "section_canonical": "model_architecture",
+      "section_title": "Model Architecture",
+      "page_no": 2
+    },
+    {
+      "section_index": 5,
+      "section_canonical": "why_self_attention",
+      "section_title": "Why Self-Attention",
+      "page_no": 6
+    },
+    {
+      "section_index": 6,
+      "section_canonical": "training",
+      "section_title": "Training",
+      "page_no": 7
+    },
+    {
+      "section_index": 7,
+      "section_canonical": "results",
+      "section_title": "Results",
+      "page_no": 8
+    },
+    {
+      "section_index": 8,
+      "section_canonical": "conclusion",
+      "section_title": "Conclusion",
+      "page_no": 10
+    },
+    {
+      "section_index": 9,
+      "section_canonical": "references",
+      "section_title": "References",
+      "page_no": 10
+    }
+  ],
+  "assets": {
+    "figures": [
+      {
+        "id": 1,
+        "page_no": 3,
+        "file_name": "page_003_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "1",
+        "figure_body": "The Transformer - model architecture.",
+        "figure_caption": "Figure 1: The Transformer - model architecture.",
+        "section_canonical": "model_architecture",
+        "markdown_path": "assets/figures/page_003_img_001.png"
+      },
+      {
+        "id": 2,
+        "page_no": 4,
+        "file_name": "page_004_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "2",
+        "figure_body": "(left) Scaled Dot-Product Attention. (right) Multi-Head Attention consists of several attention layers running in parallel.",
+        "figure_caption": "Figure 2: (left) Scaled Dot-Product Attention. (right) Multi-Head Attention consists of several attention layers running in parallel.",
+        "section_canonical": "model_architecture",
+        "markdown_path": "assets/figures/page_004_img_001.png"
+      },
+      {
+        "id": 3,
+        "page_no": 13,
+        "file_name": "page_013_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "3",
+        "figure_body": "An example of the attention mechanism following long-distance dependencies in the encoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of the verb ‘making’, completing the phrase ‘making...more difficult’. Attentions here shown only for the word ‘making’. Different colors represent different heads. Best viewed in color.",
+        "figure_caption": "Figure 3: An example of the attention mechanism following long-distance dependencies in the encoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of the verb ‘making’, completing the phrase ‘making...more difficult’. Attentions here shown only for the word ‘making’. Different colors represent different heads. Best viewed in color.",
+        "section_canonical": "references",
+        "markdown_path": "assets/figures/page_013_vec_001.png"
+      },
+      {
+        "id": 4,
+        "page_no": 14,
+        "file_name": "page_014_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "4",
+        "figure_body": "Two attention heads, also in layer 5 of 6, apparently involved in anaphora resolution. Top: Full attentions for head 5. Bottom: Isolated attentions from just the word ‘its’ for attention heads 5 and 6. Note that the attentions are very sharp for this word.",
+        "figure_caption": "Figure 4: Two attention heads, also in layer 5 of 6, apparently involved in anaphora resolution. Top: Full attentions for head 5. Bottom: Isolated attentions from just the word ‘its’ for attention heads 5 and 6. Note that the attentions are very sharp for this word.",
+        "section_canonical": "references",
+        "markdown_path": "assets/figures/page_014_vec_001.png"
+      },
+      {
+        "id": 5,
+        "page_no": 15,
+        "file_name": "page_015_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "5",
+        "figure_body": "Many of the attention heads exhibit behaviour that seems related to the structure of the sentence. We give two such examples above, from two different heads from the encoder self-attention at layer 5 of 6. The heads clearly learned to perform different tasks.",
+        "figure_caption": "Figure 5: Many of the attention heads exhibit behaviour that seems related to the structure of the sentence. We give two such examples above, from two different heads from the encoder self-attention at layer 5 of 6. The heads clearly learned to perform different tasks.",
+        "section_canonical": "references",
+        "markdown_path": "assets/figures/page_015_vec_001.png"
+      }
+    ],
+    "tables": [
+      {
+        "id": 1,
+        "page_no": 6,
+        "json_file": "table_0001.json",
+        "caption": "Table 1: Maximum path lengths, per-layer complexity and minimum number of sequential operations for different layer types. n is the sequence length, d is the representation dimension, k is the kernel size of convolutions and r the size of the neighborhood in restricted self-attention.",
+        "section_canonical": "model_architecture",
+        "markdown_json_path": "assets/tables/table_0001.json"
+      },
+      {
+        "id": 2,
+        "page_no": 8,
+        "json_file": "table_0002.json",
+        "caption": "Table 2: The Transformer achieves better BLEU scores than previous state-of-the-art models on the English-to-German and English-to-French newstest2014 tests at a fraction of the training cost.",
+        "section_canonical": "training",
+        "markdown_json_path": "assets/tables/table_0002.json"
+      },
+      {
+        "id": 3,
+        "page_no": 9,
+        "json_file": "table_0003.json",
+        "caption": "Table 3: Variations on the Transformer architecture. Unlisted values are identical to those of the base model. All metrics are on the English-to-German translation development set, newstest2013. Listed perplexities are per-wordpiece, according to our byte-pair encoding, and should not be compared to per-word perplexities.",
+        "section_canonical": "results",
+        "markdown_json_path": "assets/tables/table_0003.json"
+      },
+      {
+        "id": 4,
+        "page_no": 10,
+        "json_file": "table_0004.json",
+        "caption": "Table 4: The Transformer generalizes well to English constituency parsing (Results are on Section 23 of WSJ)",
+        "section_canonical": "results",
+        "markdown_json_path": "assets/tables/table_0004.json"
+      }
+    ],
+    "equations": [
+      {
+        "id": 1,
+        "page_no": 3,
+        "file_name": "equation_0001.png",
+        "json_file": "equation_0001.json",
+        "section_canonical": "model_architecture",
+        "latex": "layers, produce outputs of dimension d model = 512.",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0001.png",
+        "markdown_json_path": "assets/equations/equation_0001.json"
+      },
+      {
+        "id": 2,
+        "page_no": 4,
+        "equation_number": "1",
+        "file_name": "equation_0002.png",
+        "json_file": "equation_0002.json",
+        "section_canonical": "model_architecture",
+        "latex_source": "unavailable",
+        "latex_confidence": 0.0,
+        "render_mode": "image",
+        "markdown_image_path": "assets/equations/equation_0002.png",
+        "markdown_json_path": "assets/equations/equation_0002.json"
+      },
+      {
+        "id": 3,
+        "page_no": 5,
+        "equation_number": "2",
+        "file_name": "equation_0003.png",
+        "json_file": "equation_0003.json",
+        "section_canonical": "model_architecture",
+        "latex": "FFN(x) = max(0, xW 1 + b 1)W 2 + b 2\n\\tag{2}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0003.png",
+        "markdown_json_path": "assets/equations/equation_0003.json"
+      },
+      {
+        "id": 4,
+        "page_no": 5,
+        "file_name": "equation_0004.png",
+        "json_file": "equation_0004.json",
+        "section_canonical": "model_architecture",
+        "latex": "d ff = 2048.",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0004.png",
+        "markdown_json_path": "assets/equations/equation_0004.json"
+      },
+      {
+        "id": 5,
+        "page_no": 6,
+        "equation_number": "1",
+        "file_name": "equation_0005.png",
+        "json_file": "equation_0005.json",
+        "section_canonical": "model_architecture",
+        "latex": "O(1)\n\\tag{1}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0005.png",
+        "markdown_json_path": "assets/equations/equation_0005.json"
+      },
+      {
+        "id": 6,
+        "page_no": 6,
+        "equation_number": "1",
+        "file_name": "equation_0006.png",
+        "json_file": "equation_0006.json",
+        "section_canonical": "model_architecture",
+        "latex": "O(1)\n\\tag{1}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0006.png",
+        "markdown_json_path": "assets/equations/equation_0006.json"
+      },
+      {
+        "id": 7,
+        "page_no": 6,
+        "equation_number": "1",
+        "file_name": "equation_0007.png",
+        "json_file": "equation_0007.json",
+        "section_canonical": "model_architecture",
+        "latex": "O(1)\n\\tag{1}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0007.png",
+        "markdown_json_path": "assets/equations/equation_0007.json"
+      },
+      {
+        "id": 8,
+        "page_no": 6,
+        "equation_number": "1",
+        "file_name": "equation_0008.png",
+        "json_file": "equation_0008.json",
+        "section_canonical": "model_architecture",
+        "latex": "O(1)\n\\tag{1}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0008.png",
+        "markdown_json_path": "assets/equations/equation_0008.json"
+      },
+      {
+        "id": 9,
+        "page_no": 6,
+        "file_name": "equation_0009.png",
+        "json_file": "equation_0009.json",
+        "section_canonical": "why_self_attention",
+        "latex": "\\begin{aligned}\nPE(pos,2 i) = sin(pos/10000 2 i/d model) \\\\\nPE(pos,2 i+1) = cos(pos/10000 2 i/d model)\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0009.png",
+        "markdown_json_path": "assets/equations/equation_0009.json"
+      },
+      {
+        "id": 10,
+        "page_no": 7,
+        "equation_number": "3",
+        "file_name": "equation_0010.png",
+        "json_file": "equation_0010.json",
+        "section_canonical": "training",
+        "latex": "\\begin{aligned}\nlrate = d−0.5 \\\\\nmodel · min(step_num−0.5, step_num · warmup_steps−1.5)\n\\end{aligned}\n\\tag{3}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0010.png",
+        "markdown_json_path": "assets/equations/equation_0010.json"
+      },
+      {
+        "id": 11,
+        "page_no": 7,
+        "file_name": "equation_0011.png",
+        "json_file": "equation_0011.json",
+        "section_canonical": "training",
+        "latex": "warmup_steps = 4000.",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0011.png",
+        "markdown_json_path": "assets/equations/equation_0011.json"
+      },
+      {
+        "id": 12,
+        "page_no": 8,
+        "file_name": "equation_0012.png",
+        "json_file": "equation_0012.json",
+        "section_canonical": "results",
+        "latex": "P drop = 0.1.",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0012.png",
+        "markdown_json_path": "assets/equations/equation_0012.json"
+      },
+      {
+        "id": 13,
+        "page_no": 8,
+        "file_name": "equation_0013.png",
+        "json_file": "equation_0013.json",
+        "section_canonical": "results",
+        "latex": "dropout rate P drop = 0.1, instead of 0.3.",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0013.png",
+        "markdown_json_path": "assets/equations/equation_0013.json"
+      },
+      {
+        "id": 14,
+        "page_no": 10,
+        "file_name": "equation_0014.png",
+        "json_file": "equation_0014.json",
+        "section_canonical": "conclusion",
+        "latex": "\\begin{aligned}\nThe code we used to train and evaluate our models is available at https://github.com/ \\\\\ntensorflow/tensor2tensor.\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0014.png",
+        "markdown_json_path": "assets/equations/equation_0014.json"
+      },
+      {
+        "id": 15,
+        "page_no": 13,
+        "file_name": "equation_0015.png",
+        "json_file": "equation_0015.json",
+        "section_canonical": "references",
+        "latex": "\\begin{aligned}\n<EOS> \\\\\n<pad> \\\\\n<pad> \\\\\n<pad> \\\\\n<pad> \\\\\n<pad> \\\\\n<pad>\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0015.png",
+        "markdown_json_path": "assets/equations/equation_0015.json"
+      },
+      {
+        "id": 16,
+        "page_no": 13,
+        "file_name": "equation_0016.png",
+        "json_file": "equation_0016.json",
+        "section_canonical": "references",
+        "latex": "\\begin{aligned}\n<EOS> \\\\\n<pad> \\\\\n<pad> \\\\\n<pad> \\\\\n<pad> \\\\\n<pad> \\\\\n<pad>\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0016.png",
+        "markdown_json_path": "assets/equations/equation_0016.json"
+      },
+      {
+        "id": 17,
+        "page_no": 14,
+        "file_name": "equation_0017.png",
+        "json_file": "equation_0017.json",
+        "section_canonical": "references",
+        "latex": "\\begin{aligned}\n<EOS> \\\\\n<pad>\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0017.png",
+        "markdown_json_path": "assets/equations/equation_0017.json"
+      },
+      {
+        "id": 18,
+        "page_no": 14,
+        "file_name": "equation_0018.png",
+        "json_file": "equation_0018.json",
+        "section_canonical": "references",
+        "latex": "\\begin{aligned}\n<EOS> \\\\\n<pad>\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0018.png",
+        "markdown_json_path": "assets/equations/equation_0018.json"
+      },
+      {
+        "id": 19,
+        "page_no": 14,
+        "file_name": "equation_0019.png",
+        "json_file": "equation_0019.json",
+        "section_canonical": "references",
+        "latex": "\\begin{aligned}\n<EOS> \\\\\n<pad>\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0019.png",
+        "markdown_json_path": "assets/equations/equation_0019.json"
+      },
+      {
+        "id": 20,
+        "page_no": 14,
+        "file_name": "equation_0020.png",
+        "json_file": "equation_0020.json",
+        "section_canonical": "references",
+        "latex": "\\begin{aligned}\n<EOS> \\\\\n<pad>\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0020.png",
+        "markdown_json_path": "assets/equations/equation_0020.json"
+      },
+      {
+        "id": 21,
+        "page_no": 15,
+        "file_name": "equation_0021.png",
+        "json_file": "equation_0021.json",
+        "section_canonical": "references",
+        "latex": "\\begin{aligned}\n<EOS> \\\\\n<pad>\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0021.png",
+        "markdown_json_path": "assets/equations/equation_0021.json"
+      },
+      {
+        "id": 22,
+        "page_no": 15,
+        "file_name": "equation_0022.png",
+        "json_file": "equation_0022.json",
+        "section_canonical": "references",
+        "latex": "\\begin{aligned}\n<EOS> \\\\\n<pad>\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0022.png",
+        "markdown_json_path": "assets/equations/equation_0022.json"
+      },
+      {
+        "id": 23,
+        "page_no": 15,
+        "file_name": "equation_0023.png",
+        "json_file": "equation_0023.json",
+        "section_canonical": "references",
+        "latex": "\\begin{aligned}\n<EOS> \\\\\n<pad>\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0023.png",
+        "markdown_json_path": "assets/equations/equation_0023.json"
+      },
+      {
+        "id": 24,
+        "page_no": 15,
+        "file_name": "equation_0024.png",
+        "json_file": "equation_0024.json",
+        "section_canonical": "references",
+        "latex": "\\begin{aligned}\n<EOS> \\\\\n<pad>\n\\end{aligned}",
+        "latex_source": "text_fallback",
+        "latex_confidence": 0.46,
+        "render_mode": "latex",
+        "markdown_image_path": "assets/equations/equation_0024.png",
+        "markdown_json_path": "assets/equations/equation_0024.json"
+      }
+    ]
+  }
+}

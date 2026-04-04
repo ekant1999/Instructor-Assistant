@@ -1,0 +1,329 @@
+{
+  "doc_id": "a005",
+  "system": "ia_phase1",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+  "title": "CMPE 286 - LAB - 3: Web Traffic Inspection and RTT Study",
+  "status": "success",
+  "markdown_line_count": 60,
+  "headings": [
+    {
+      "level": 2,
+      "text": "Part 1: Environment Setup",
+      "normalized_text": "part 1 environment setup",
+      "line_no": 11,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Part 2: Protocol Filters",
+      "normalized_text": "part 2 protocol filters",
+      "line_no": 19,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Part 3: HTTP Request Summary",
+      "normalized_text": "part 3 http request summary",
+      "line_no": 37,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Part 4: Delay and Jitter",
+      "normalized_text": "part 4 delay and jitter",
+      "line_no": 41,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Part 5: TCP 3-Way Handshake and Observations",
+      "normalized_text": "part 5 tcp 3 way handshake and observations",
+      "line_no": 47,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "Part 1: Environment Setup",
+      "normalized_heading_text": "part 1 environment setup",
+      "level": 2,
+      "line_start": 11,
+      "line_end": 18,
+      "prose_text": "A fresh capture profile was created with custom columns for source port, destination port, host, and URI. The tool was configured to save traces in .pcapng format so that multiple protocol filters could be evaluated later.\n_Figure 1: Mock packet-analyzer workspace with a saved capture profile._",
+      "full_text": "A fresh capture profile was created with custom columns for source port, destination port, host, and URI. The tool was configured to save traces in .pcapng format so that multiple protocol filters could be evaluated later.\n![Figure 1](assets/figures/page_001_img_001.png)\n_Figure 1: Mock packet-analyzer workspace with a saved capture profile._",
+      "word_count": 43,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Part 2: Protocol Filters",
+      "normalized_heading_text": "part 2 protocol filters",
+      "level": 2,
+      "line_start": 19,
+      "line_end": 36,
+      "prose_text": "_Figure 2: HTTP filter results showing request and response entries._\n_Figure 3: DNS queries and responses captured during page load._\n_Figure 4: TCP/TLS packets associated with the same browsing session._\n_Figure 5: UDP and QUIC packets that appeared alongside DNS traffic._",
+      "full_text": "![Figure 2](assets/figures/page_002_img_001.png)\n_Figure 2: HTTP filter results showing request and response entries._\n![Figure 3](assets/figures/page_002_img_002.png)\n_Figure 3: DNS queries and responses captured during page load._\n![Figure 4](assets/figures/page_003_img_001.png)\n_Figure 4: TCP/TLS packets associated with the same browsing session._\n![Figure 5](assets/figures/page_003_img_002.png)\n_Figure 5: UDP and QUIC packets that appeared alongside DNS traffic._",
+      "word_count": 38,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Part 3: HTTP Request Summary",
+      "normalized_heading_text": "part 3 http request summary",
+      "level": 2,
+      "line_start": 37,
+      "line_end": 40,
+      "prose_text": "The following table summarizes sample requests identified from the filtered capture. All values below are fabricated for benchmarking purposes but follow realistic web-traffic patterns.",
+      "full_text": "The following table summarizes sample requests identified from the filtered capture. All values below are fabricated for benchmarking purposes but follow realistic web-traffic patterns.",
+      "word_count": 24,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Part 4: Delay and Jitter",
+      "normalized_heading_text": "part 4 delay and jitter",
+      "level": 2,
+      "line_start": 41,
+      "line_end": 46,
+      "prose_text": "_Figure 6: RTT histogram from three fabricated destination groups._",
+      "full_text": "![Figure 6](assets/figures/page_004_vec_001.png)\n_Figure 6: RTT histogram from three fabricated destination groups._",
+      "word_count": 8,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Part 5: TCP 3-Way Handshake and Observations",
+      "normalized_heading_text": "part 5 tcp 3 way handshake and observations",
+      "level": 2,
+      "line_start": 47,
+      "line_end": 60,
+      "prose_text": "> Table 1: A single connection was isolated and the time display was changed to “Seconds Since Previous Displayed Packet.” The sample handshake timings are shown below.\n1. Name resolution appeared before every application flow, reinforcing that DNS latency is on the critical path.\n2. The TCP and TLS filters highlighted the same sessions that later carried HTTP payloads.\n3. Domestic destinations showed tighter RTT distributions than overseas destinations, while long-tail spikes\nwere more visible in the remote host sample.\n4. Custom columns for ports, host, and URI made triage substantially faster when multiple protocols\ninterleaved in the same capture.",
+      "full_text": "> Table JSON: `assets/tables/table_0001.json`\n> Table 1: A single connection was isolated and the time display was changed to “Seconds Since Previous Displayed Packet.” The sample handshake timings are shown below.\n1. Name resolution appeared before every application flow, reinforcing that DNS latency is on the critical path.\n2. The TCP and TLS filters highlighted the same sessions that later carried HTTP payloads.\n3. Domestic destinations showed tighter RTT distributions than overseas destinations, while long-tail spikes\nwere more visible in the remote host sample.\n4. Custom columns for ports, host, and URI made triage substantially faster when multiple protocols\ninterleaved in the same capture.",
+      "word_count": 93,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 15,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "Mock packet-analyzer workspace with a saved capture profile.",
+      "normalized_caption": "mock packet analyzer workspace with a saved capture profile",
+      "line_no": 17,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 21,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "HTTP filter results showing request and response entries.",
+      "normalized_caption": "http filter results showing request and response entries",
+      "line_no": 23,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 25,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "DNS queries and responses captured during page load.",
+      "normalized_caption": "dns queries and responses captured during page load",
+      "line_no": 27,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 29,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "TCP/TLS packets associated with the same browsing session.",
+      "normalized_caption": "tcp tls packets associated with the same browsing session",
+      "line_no": 31,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 33,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
+      "caption": "UDP and QUIC packets that appeared alongside DNS traffic.",
+      "normalized_caption": "udp and quic packets that appeared alongside dns traffic",
+      "line_no": 35,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 43,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
+      "caption": "RTT histogram from three fabricated destination groups.",
+      "normalized_caption": "rtt histogram from three fabricated destination groups",
+      "line_no": 45,
+      "kind": "figure"
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption": "A single connection was isolated and the time display was changed to “Seconds Since Previous Displayed Packet.” The sample handshake timings are shown below.",
+      "normalized_caption": "a single connection was isolated and the time display was changed to seconds since previous displayed packet the sample handshake timings are shown below",
+      "line_no": 50,
+      "kind": "table"
+    }
+  ],
+  "intrinsic_metrics": {
+    "heading_count": 5,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 12,
+    "table_caption_count": 1,
+    "duplicate_figure_caption_count": 6,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 0,
+    "consecutive_heading_run_count": 0,
+    "max_consecutive_heading_run": 0
+  },
+  "run_metadata": {
+    "doc_id": "a005",
+    "system": "ia_phase1",
+    "paper_id": 504252236656,
+    "title": "CMPE 286 - LAB - 3: Web Traffic Inspection and RTT Study",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+    "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a005",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a005/paper.md",
+    "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a005/manifest.json",
+    "asset_counts": {
+      "figures": 6,
+      "tables": 1,
+      "equations": 0
+    },
+    "metadata": {
+      "title": "CMPE 286 - LAB - 3: Web Traffic Inspection and RTT Study",
+      "paper_id": "504252236656",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+      "generated_at": "2026-04-04T22:55:05.213900+00:00",
+      "num_figures": "6",
+      "num_tables": "1",
+      "num_equations": "0",
+      "page_count": "5"
+    },
+    "render_mode": "normal",
+    "sectioning_strategy": "pdf_toc",
+    "sectioning_report": {
+      "strategy": "pdf_toc",
+      "candidate_headings": 5,
+      "matched_headings": 6,
+      "sections": [
+        {
+          "index": 0,
+          "title": "Front Matter",
+          "canonical": "front_matter",
+          "level": 1,
+          "source": "fallback",
+          "confidence": 0.4,
+          "start_page": 1,
+          "end_page": 1,
+          "start_block_index": 0,
+          "end_block_index": 4
+        },
+        {
+          "index": 1,
+          "title": "Part 1: Environment Setup",
+          "canonical": "part_1_environment_setup",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 1,
+          "end_page": 1,
+          "start_block_index": 5,
+          "end_block_index": 7
+        },
+        {
+          "index": 2,
+          "title": "Part 2: Protocol Filters",
+          "canonical": "part_2_protocol_filters",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 2,
+          "end_page": 3,
+          "start_block_index": 8,
+          "end_block_index": 12
+        },
+        {
+          "index": 3,
+          "title": "Part 3: HTTP Request Summary",
+          "canonical": "part_3_http_request_summary",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 3,
+          "end_page": 4,
+          "start_block_index": 13,
+          "end_block_index": 19
+        },
+        {
+          "index": 4,
+          "title": "Part 4: Delay and Jitter",
+          "canonical": "part_4_delay_and_jitter",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.156,
+          "start_page": 4,
+          "end_page": 4,
+          "start_block_index": 20,
+          "end_block_index": 25
+        },
+        {
+          "index": 5,
+          "title": "Part 5: TCP 3-Way Handshake and Observations",
+          "canonical": "part_5_tcp_3_way_handshake_and_observations",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.117,
+          "start_page": 5,
+          "end_page": 5,
+          "start_block_index": 26,
+          "end_block_index": 35
+        }
+      ],
+      "annotated_blocks": 0,
+      "total_blocks": 36
+    },
+    "audit": {
+      "conservative_recommended": false,
+      "issue_count": 0,
+      "issues": []
+    },
+    "elapsed_ms": 1241.301,
+    "status": "success"
+  }
+}

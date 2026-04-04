@@ -1,8 +1,8 @@
 ---
 title: "CMPE 286 - LAB - 1"
 paper_id: 565476836086
-source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment1.pdf"
-generated_at: "2026-04-03T22:15:32.024945+00:00"
+source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment1.pdf"
+generated_at: "2026-04-04T22:54:59.422306+00:00"
 num_figures: 0
 num_tables: 0
 num_equations: 0

@@ -1,0 +1,115 @@
+{
+  "doc_id": "a005",
+  "system": "ia_phase1",
+  "paper_id": 504252236656,
+  "title": "CMPE 286 - LAB - 3: Web Traffic Inspection and RTT Study",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+  "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a005",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a005/paper.md",
+  "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a005/manifest.json",
+  "asset_counts": {
+    "figures": 6,
+    "tables": 1,
+    "equations": 0
+  },
+  "metadata": {
+    "title": "CMPE 286 - LAB - 3: Web Traffic Inspection and RTT Study",
+    "paper_id": "504252236656",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+    "generated_at": "2026-04-04T22:55:05.213900+00:00",
+    "num_figures": "6",
+    "num_tables": "1",
+    "num_equations": "0",
+    "page_count": "5"
+  },
+  "render_mode": "normal",
+  "sectioning_strategy": "pdf_toc",
+  "sectioning_report": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 5,
+    "matched_headings": 6,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 4
+      },
+      {
+        "index": 1,
+        "title": "Part 1: Environment Setup",
+        "canonical": "part_1_environment_setup",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 5,
+        "end_block_index": 7
+      },
+      {
+        "index": 2,
+        "title": "Part 2: Protocol Filters",
+        "canonical": "part_2_protocol_filters",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 3,
+        "start_block_index": 8,
+        "end_block_index": 12
+      },
+      {
+        "index": 3,
+        "title": "Part 3: HTTP Request Summary",
+        "canonical": "part_3_http_request_summary",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 3,
+        "end_page": 4,
+        "start_block_index": 13,
+        "end_block_index": 19
+      },
+      {
+        "index": 4,
+        "title": "Part 4: Delay and Jitter",
+        "canonical": "part_4_delay_and_jitter",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.156,
+        "start_page": 4,
+        "end_page": 4,
+        "start_block_index": 20,
+        "end_block_index": 25
+      },
+      {
+        "index": 5,
+        "title": "Part 5: TCP 3-Way Handshake and Observations",
+        "canonical": "part_5_tcp_3_way_handshake_and_observations",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.117,
+        "start_page": 5,
+        "end_page": 5,
+        "start_block_index": 26,
+        "end_block_index": 35
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 36
+  },
+  "audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": []
+  },
+  "elapsed_ms": 1241.301,
+  "status": "success"
+}

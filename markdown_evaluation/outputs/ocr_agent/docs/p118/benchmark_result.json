@@ -2,10 +2,10 @@
   "doc_id": "p118",
   "system": "ocr_agent",
   "title": "WRITEBACK-RAG: Training the Knowledge Base through Evidence Distillation and Write-Back Enrichment",
-  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/699ede68aa0d6853.pdf",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/699ede68aa0d6853.pdf",
   "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p118/p118.pdf",
   "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p118",
-  "ocr_backend": "dummy",
+  "ocr_backend": "ocr_server",
   "use_pdf_page_ocr": false,
   "document_mode": "hybrid_paper",
   "asset_counts": {
@@ -13,7 +13,9 @@
     "tables": 16,
     "page_images": 0
   },
-  "elapsed_ms": 2779.184,
+  "elapsed_ms": 3128.921,
   "status": "success",
-  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p118/paper.md"
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p118/paper.md",
+  "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+  "postprocess_enabled": false
 }

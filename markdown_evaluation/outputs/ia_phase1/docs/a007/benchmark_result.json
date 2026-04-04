@@ -1,0 +1,91 @@
+{
+  "doc_id": "a007",
+  "system": "ia_phase1",
+  "paper_id": 701530298732,
+  "title": "CS 249 - Assignment: VM Resource Monitoring and Benchmarking",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment7.pdf",
+  "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a007",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a007/paper.md",
+  "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a007/manifest.json",
+  "asset_counts": {
+    "figures": 3,
+    "tables": 1,
+    "equations": 0
+  },
+  "metadata": {
+    "title": "CS 249 - Assignment: VM Resource Monitoring and Benchmarking",
+    "paper_id": "701530298732",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment7.pdf",
+    "generated_at": "2026-04-04T22:55:07.071766+00:00",
+    "num_figures": "3",
+    "num_tables": "1",
+    "num_equations": "0",
+    "page_count": "3"
+  },
+  "render_mode": "normal",
+  "sectioning_strategy": "pdf_toc",
+  "sectioning_report": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 3,
+    "matched_headings": 4,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 4
+      },
+      {
+        "index": 1,
+        "title": "Test Environment",
+        "canonical": "test_environment",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 5,
+        "end_block_index": 10
+      },
+      {
+        "index": 2,
+        "title": "Benchmark Figures",
+        "canonical": "benchmark_figures",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 2,
+        "start_block_index": 11,
+        "end_block_index": 13
+      },
+      {
+        "index": 3,
+        "title": "Summary Table and Findings",
+        "canonical": "results",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 3,
+        "end_page": 3,
+        "start_block_index": 14,
+        "end_block_index": 27
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 28
+  },
+  "audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": []
+  },
+  "elapsed_ms": 568.613,
+  "status": "success"
+}

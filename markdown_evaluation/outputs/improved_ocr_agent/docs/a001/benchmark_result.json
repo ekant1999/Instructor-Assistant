@@ -1,0 +1,21 @@
+{
+  "doc_id": "a001",
+  "system": "improved_ocr_agent",
+  "title": "CMPE 286 - LAB - 1",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment1.pdf",
+  "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a001/a001.pdf",
+  "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a001",
+  "ocr_backend": "ocr_server",
+  "use_pdf_page_ocr": false,
+  "document_mode": "ocr",
+  "asset_counts": {
+    "figures": 15,
+    "tables": 0,
+    "page_images": 12
+  },
+  "elapsed_ms": 347350.527,
+  "status": "success",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a001/paper.md",
+  "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
+  "postprocess_enabled": true
+}

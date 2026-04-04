@@ -1,0 +1,185 @@
+{
+  "doc_id": "a006",
+  "system": "improved_ocr_agent",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment6.pdf",
+  "title": "CMPE 281 - Assignment: Serverless CRUD API with DynamoDB",
+  "status": "success",
+  "markdown_line_count": 46,
+  "headings": [
+    {
+      "level": 2,
+      "text": "Services Used",
+      "normalized_text": "services used",
+      "line_no": 9,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Lambda Handler",
+      "normalized_text": "lambda handler",
+      "line_no": 11,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "API Test Screenshots",
+      "normalized_text": "api test screenshots",
+      "line_no": 20,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "DynamoDB State and Functional Results",
+      "normalized_text": "dynamodb state and functional results",
+      "line_no": 34,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Edge Cases, Challenges, and Learnings",
+      "normalized_text": "edge cases challenges and learnings",
+      "line_no": 40,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "Services Used",
+      "normalized_heading_text": "services used",
+      "level": 2,
+      "line_start": 9,
+      "line_end": 10,
+      "prose_text": "",
+      "full_text": "",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Lambda Handler",
+      "normalized_heading_text": "lambda handler",
+      "level": 2,
+      "line_start": 11,
+      "line_end": 19,
+      "prose_text": "import json import boto3 dynamodb = boto3.resource('dynamodb') student_table = dynamodb.Table('StudentRecords') def lambda_handler(event, context): method = event['httpMethod']\nThe remaining PUT and DELETE branches follow the same event shape, updating or deleting the record after a key lookup.",
+      "full_text": "```text\nimport json import boto3 dynamodb = boto3.resource('dynamodb') student_table = dynamodb.Table('StudentRecords') def lambda_handler(event, context): method = event['httpMethod']\n```\n![Figure 1 on Page 1](a006_assets/figures/a006_page_1_fig_1.png)\n---\n<!-- page 2 mode: hybrid_paper -->\nThe remaining PUT and DELETE branches follow the same event shape, updating or deleting the record after a key lookup.",
+      "word_count": 40,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "API Test Screenshots",
+      "normalized_heading_text": "api test screenshots",
+      "level": 2,
+      "line_start": 20,
+      "line_end": 33,
+      "prose_text": "Figure 3. Sample GET request retrieving the stored record.\nFigure 4. PUT request used to update the course field.\nFigure 5. DELETE request for removing the same record.",
+      "full_text": "![Figure 2 on Page 2](a006_assets/figures/a006_page_2_fig_1.png)\n---\n<!-- page 3 mode: ocr -->\n<!-- OCR page 3 -->\nFigure 3. Sample GET request retrieving the stored record.\n---\n<!-- page 4 mode: ocr -->\n<!-- OCR page 4 -->\nFigure 4. PUT request used to update the course field.\nFigure 5. DELETE request for removing the same record.\n---\n<!-- page 5 mode: hybrid_paper -->",
+      "word_count": 25,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "DynamoDB State and Functional Results",
+      "normalized_heading_text": "dynamodb state and functional results",
+      "level": 2,
+      "line_start": 34,
+      "line_end": 39,
+      "prose_text": "Operation Endpoint Input Expected Result Observed Status\nPOST /students new JSON record insert new item 200 OK\nGET /students?student_id=42 existing key return matching item 200 OK",
+      "full_text": "Operation Endpoint Input Expected Result Observed Status\nPOST /students new JSON record insert new item 200 OK\nGET /students?student_id=42 existing key return matching item 200 OK\n![Figure 3 on Page 5](a006_assets/figures/a006_page_5_fig_1.png)",
+      "word_count": 26,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Edge Cases, Challenges, and Learnings",
+      "normalized_heading_text": "edge cases challenges and learnings",
+      "level": 2,
+      "line_start": 40,
+      "line_end": 46,
+      "prose_text": "• Serverless APIs are convenient for coursework because they eliminate persistent server setup while still exposing realistic cloud integration patterns.\n• DynamoDB favors access patterns around the partition key, so request design should align with the table schema from the start.\n• Returning clear status codes for failure cases improves debugging and makes API behavior easier to validate in a report.",
+      "full_text": "---\n<!-- page 6 mode: hybrid_paper -->\n• Serverless APIs are convenient for coursework because they eliminate persistent server setup while still exposing realistic cloud integration patterns.\n• DynamoDB favors access patterns around the partition key, so request design should align with the table schema from the start.\n• Returning clear status codes for failure cases improves debugging and makes API behavior easier to validate in a report.\n---",
+      "word_count": 57,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "on Page 1",
+      "normalized_caption": "on page 1",
+      "line_no": 15,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "on Page 2",
+      "normalized_caption": "on page 2",
+      "line_no": 21,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "Sample GET request retrieving the stored record.",
+      "normalized_caption": "sample get request retrieving the stored record",
+      "line_no": 25,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
+      "caption": "PUT request used to update the course field.",
+      "normalized_caption": "put request used to update the course field",
+      "line_no": 29,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
+      "caption": "DELETE request for removing the same record.",
+      "normalized_caption": "delete request for removing the same record",
+      "line_no": 30,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "on Page 5",
+      "normalized_caption": "on page 5",
+      "line_no": 38,
+      "kind": "figure"
+    }
+  ],
+  "tables": [],
+  "intrinsic_metrics": {
+    "heading_count": 5,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 6,
+    "table_caption_count": 0,
+    "duplicate_figure_caption_count": 1,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 1,
+    "consecutive_heading_run_count": 1,
+    "max_consecutive_heading_run": 2
+  },
+  "run_metadata": {
+    "doc_id": "a006",
+    "system": "improved_ocr_agent",
+    "title": "CMPE 281 - Assignment: Serverless CRUD API with DynamoDB",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment6.pdf",
+    "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a006/a006.pdf",
+    "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a006",
+    "ocr_backend": "ocr_server",
+    "use_pdf_page_ocr": false,
+    "document_mode": "hybrid_paper",
+    "asset_counts": {
+      "figures": 3,
+      "tables": 0,
+      "page_images": 2
+    },
+    "elapsed_ms": 5414.501,
+    "status": "success",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a006/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": true
+  }
+}

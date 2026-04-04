@@ -1,0 +1,21 @@
+{
+  "doc_id": "t005",
+  "system": "ocr_agent",
+  "title": "Project Proposal Narrative",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/TextHeavy/text_heavy_placeholder_project_proposal.pdf",
+  "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/t005/t005.pdf",
+  "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/t005",
+  "ocr_backend": "ocr_server",
+  "use_pdf_page_ocr": false,
+  "document_mode": "hybrid_paper",
+  "asset_counts": {
+    "figures": 0,
+    "tables": 0,
+    "page_images": 0
+  },
+  "elapsed_ms": 808.24,
+  "status": "success",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/t005/paper.md",
+  "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+  "postprocess_enabled": false
+}

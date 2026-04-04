@@ -1,8 +1,8 @@
 ---
 title: "MedObvious: Exposing the Medical Moravec’s Paradox in VLMs via Clinical Triage"
 paper_id: 116
-source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/3a4547b47fc90fc4.pdf"
-generated_at: "2026-04-03T22:14:50.603547+00:00"
+source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/3a4547b47fc90fc4.pdf"
+generated_at: "2026-04-04T22:54:16.464580+00:00"
 num_figures: 2
 num_tables: 3
 num_equations: 16

@@ -1,0 +1,249 @@
+{
+  "paper_id": 504252236656,
+  "generated_at": "2026-04-04T22:55:05.246274+00:00",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+  "markdown_file": "paper.md",
+  "metadata": {
+    "title": "CMPE 286 - LAB - 3: Web Traffic Inspection and RTT Study",
+    "paper_id": 504252236656,
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment5.pdf",
+    "generated_at": "2026-04-04T22:55:05.213900+00:00",
+    "num_figures": 6,
+    "num_tables": 1,
+    "num_equations": 0,
+    "page_count": 5
+  },
+  "config": {
+    "asset_mode": "copy",
+    "asset_path_mode": "relative",
+    "include_frontmatter": true,
+    "include_page_markers": false,
+    "prefer_equation_latex": true,
+    "include_equation_fallback_assets": true,
+    "ensure_assets": true,
+    "overwrite": true,
+    "quality_audit_enabled": true,
+    "conservative_fallback": true,
+    "conservative_equations_as_assets_only": true
+  },
+  "render_mode": "normal",
+  "quality_audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": [],
+    "suspicious_headings": [],
+    "heading_counts": {
+      "part 1 environment setup": 1,
+      "part 2 protocol filters": 1,
+      "part 3 http request summary": 1,
+      "part 4 delay and jitter": 1,
+      "part 5 tcp 3 way handshake and observations": 1
+    },
+    "total_headings": 5
+  },
+  "asset_counts": {
+    "figures": 6,
+    "tables": 1,
+    "equations": 0
+  },
+  "sectioning": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 5,
+    "matched_headings": 6,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 4
+      },
+      {
+        "index": 1,
+        "title": "Part 1: Environment Setup",
+        "canonical": "part_1_environment_setup",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 5,
+        "end_block_index": 7
+      },
+      {
+        "index": 2,
+        "title": "Part 2: Protocol Filters",
+        "canonical": "part_2_protocol_filters",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 3,
+        "start_block_index": 8,
+        "end_block_index": 12
+      },
+      {
+        "index": 3,
+        "title": "Part 3: HTTP Request Summary",
+        "canonical": "part_3_http_request_summary",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 3,
+        "end_page": 4,
+        "start_block_index": 13,
+        "end_block_index": 19
+      },
+      {
+        "index": 4,
+        "title": "Part 4: Delay and Jitter",
+        "canonical": "part_4_delay_and_jitter",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.156,
+        "start_page": 4,
+        "end_page": 4,
+        "start_block_index": 20,
+        "end_block_index": 25
+      },
+      {
+        "index": 5,
+        "title": "Part 5: TCP 3-Way Handshake and Observations",
+        "canonical": "part_5_tcp_3_way_handshake_and_observations",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.117,
+        "start_page": 5,
+        "end_page": 5,
+        "start_block_index": 26,
+        "end_block_index": 35
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 36
+  },
+  "sections": [
+    {
+      "section_index": 0,
+      "section_canonical": "front_matter",
+      "section_title": "Front Matter",
+      "page_no": 1
+    },
+    {
+      "section_index": 1,
+      "section_canonical": "part_1_environment_setup",
+      "section_title": "Part 1: Environment Setup",
+      "page_no": 1
+    },
+    {
+      "section_index": 2,
+      "section_canonical": "part_2_protocol_filters",
+      "section_title": "Part 2: Protocol Filters",
+      "page_no": 2
+    },
+    {
+      "section_index": 3,
+      "section_canonical": "part_3_http_request_summary",
+      "section_title": "Part 3: HTTP Request Summary",
+      "page_no": 3
+    },
+    {
+      "section_index": 4,
+      "section_canonical": "part_4_delay_and_jitter",
+      "section_title": "Part 4: Delay and Jitter",
+      "page_no": 4
+    },
+    {
+      "section_index": 5,
+      "section_canonical": "part_5_tcp_3_way_handshake_and_observations",
+      "section_title": "Part 5: TCP 3-Way Handshake and Observations",
+      "page_no": 5
+    }
+  ],
+  "assets": {
+    "figures": [
+      {
+        "id": 1,
+        "page_no": 1,
+        "file_name": "page_001_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "1",
+        "figure_body": "Mock packet-analyzer workspace with a saved capture profile.",
+        "figure_caption": "Figure 1. Mock packet-analyzer workspace with a saved capture profile.",
+        "section_canonical": "part_1_environment_setup",
+        "markdown_path": "assets/figures/page_001_img_001.png"
+      },
+      {
+        "id": 2,
+        "page_no": 2,
+        "file_name": "page_002_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "2",
+        "figure_body": "HTTP filter results showing request and response entries.",
+        "figure_caption": "Figure 2. HTTP filter results showing request and response entries.",
+        "section_canonical": "part_2_protocol_filters",
+        "markdown_path": "assets/figures/page_002_img_001.png"
+      },
+      {
+        "id": 3,
+        "page_no": 2,
+        "file_name": "page_002_img_002.png",
+        "figure_type": "embedded",
+        "figure_number": "3",
+        "figure_body": "DNS queries and responses captured during page load.",
+        "figure_caption": "Figure 3. DNS queries and responses captured during page load.",
+        "section_canonical": "part_2_protocol_filters",
+        "markdown_path": "assets/figures/page_002_img_002.png"
+      },
+      {
+        "id": 4,
+        "page_no": 3,
+        "file_name": "page_003_img_001.png",
+        "figure_type": "embedded",
+        "figure_number": "4",
+        "figure_body": "TCP/TLS packets associated with the same browsing session.",
+        "figure_caption": "Figure 4. TCP/TLS packets associated with the same browsing session.",
+        "section_canonical": "part_2_protocol_filters",
+        "markdown_path": "assets/figures/page_003_img_001.png"
+      },
+      {
+        "id": 5,
+        "page_no": 3,
+        "file_name": "page_003_img_002.png",
+        "figure_type": "embedded",
+        "figure_number": "5",
+        "figure_body": "UDP and QUIC packets that appeared alongside DNS traffic.",
+        "figure_caption": "Figure 5. UDP and QUIC packets that appeared alongside DNS traffic.",
+        "section_canonical": "part_2_protocol_filters",
+        "markdown_path": "assets/figures/page_003_img_002.png"
+      },
+      {
+        "id": 6,
+        "page_no": 4,
+        "file_name": "page_004_vec_001.png",
+        "figure_type": "vector",
+        "figure_number": "6",
+        "figure_body": "RTT histogram from three fabricated destination groups.",
+        "figure_caption": "Figure 6. RTT histogram from three fabricated destination groups.",
+        "section_canonical": "part_4_delay_and_jitter",
+        "markdown_path": "assets/figures/page_004_vec_001.png"
+      }
+    ],
+    "tables": [
+      {
+        "id": 1,
+        "page_no": 5,
+        "json_file": "table_0001.json",
+        "caption": "A single connection was isolated and the time display was changed to “Seconds Since Previous Displayed Packet.” The sample handshake timings are shown below.",
+        "section_canonical": "part_5_tcp_3_way_handshake_and_observations",
+        "markdown_json_path": "assets/tables/table_0001.json"
+      }
+    ],
+    "equations": []
+  }
+}

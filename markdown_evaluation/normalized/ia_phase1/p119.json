@@ -1,7 +1,7 @@
 {
   "doc_id": "p119",
   "system": "ia_phase1",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/4a5ab78468782a40.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/4a5ab78468782a40.pdf",
   "title": "VLA-OPD: Bridging Offline SFT and Online RL for Vision-Language-Action Models via On-Policy Distillation",
   "status": "success",
   "markdown_line_count": 276,
@@ -392,9 +392,23 @@
   "figures": [
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 68,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
       "caption": "Overview of VLA-OPD. Our framework unifies offline SFT and online RL through three phases. Phase 1 (Student Sampling): The student VLA policy interacts with the environment to collect on-policy trajectory rollouts (O →A →O). Phase 2 (Teacher Labeling): For each state visited by the student, a frozen expert teacher provides dense, token-level action labels ( ̂︀ A) without executing them in the environment. Phase 3 (Student Optimization): The student is opti",
       "normalized_caption": "overview of vla opd our framework unifies offline sft and online rl through three phases phase 1 student sampling the student vla policy interacts with the environment to collect on policy trajectory rollouts o a o phase 2 teacher labeling for each state visited by the student a frozen expert teacher provides dense token level action labels a without executing them in the environment phase 3 student optimization the student is opti",
       "line_no": 70,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 183,
       "kind": "figure"
     },
     {
@@ -406,6 +420,13 @@
     },
     {
       "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 218,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
       "caption": "Seen–Unseen Trade-off for Forgetting Analysis. Each point corresponds to a checkpoint during fine-tuning. The x-axis is the success rate on seen (target) tasks, and the y-axis is the success rate on a held-out unseen task. Offline SFT exhibits a strong collapse on unseen tasks as seen-task performance increases, while on-policy methods (RL and our distillation) better preserve unseen-task capability.",
       "normalized_caption": "seen unseen trade off for forgetting analysis each point corresponds to a checkpoint during fine tuning the x axis is the success rate on seen target tasks and the y axis is the success rate on a held out unseen task offline sft exhibits a strong collapse on unseen tasks as seen task performance increases while on policy methods rl and our distillation better preserve unseen task capability",
       "line_no": 220,
@@ -413,9 +434,23 @@
     },
     {
       "number": 4,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 228,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
       "caption": "Ablation study comparing Reverse KL, Forward KL, and Hard CE in an on-policy distillation setting, evaluated on the RoboTwin2.0 Beat Block Hammer task. (a) Forward KL suffers a severe early performance drop, and Hard CE plateaus at a suboptimal level, whereas Reverse KL shows steady and superior improvement. (b) These performance differences correlate directly with entropy extremes: Forward KL induces entropy explosion (mode-covering), while Hard CE causes",
       "normalized_caption": "ablation study comparing reverse kl forward kl and hard ce in an on policy distillation setting evaluated on the robotwin2 0 beat block hammer task a forward kl suffers a severe early performance drop and hard ce plateaus at a suboptimal level whereas reverse kl shows steady and superior improvement b these performance differences correlate directly with entropy extremes forward kl induces entropy explosion mode covering while hard ce causes",
       "line_no": 230,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 232,
       "kind": "figure"
     },
     {
@@ -453,9 +488,9 @@
     "heading_count": 20,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 5,
+    "figure_caption_count": 10,
     "table_caption_count": 3,
-    "duplicate_figure_caption_count": 0,
+    "duplicate_figure_caption_count": 5,
     "duplicate_table_caption_count": 0,
     "empty_section_count": 1,
     "consecutive_heading_run_count": 1,
@@ -466,7 +501,7 @@
     "system": "ia_phase1",
     "paper_id": 119,
     "title": "VLA-OPD: Bridging Offline SFT and Online RL for Vision-Language-Action Models via On-Policy Distillation",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/4a5ab78468782a40.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/4a5ab78468782a40.pdf",
     "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p119",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p119/paper.md",
     "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p119/manifest.json",
@@ -478,8 +513,8 @@
     "metadata": {
       "title": "VLA-OPD: Bridging Offline SFT and Online RL for Vision-Language-Action Models via On-Policy Distillation",
       "paper_id": "119",
-      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/4a5ab78468782a40.pdf",
-      "generated_at": "2026-04-03T22:15:10.786338+00:00",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/4a5ab78468782a40.pdf",
+      "generated_at": "2026-04-04T22:54:34.777104+00:00",
       "num_figures": "5",
       "num_tables": "2",
       "num_equations": "22",
@@ -599,7 +634,7 @@
         "suspicious headings detected (1)"
       ]
     },
-    "elapsed_ms": 9401.305,
+    "elapsed_ms": 7654.184,
     "status": "success"
   }
 }

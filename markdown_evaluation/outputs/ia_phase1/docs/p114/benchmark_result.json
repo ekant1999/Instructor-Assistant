@@ -3,7 +3,7 @@
   "system": "ia_phase1",
   "paper_id": 114,
   "title": "End-to-End Training for Unified Tokenization and Latent Denoising",
-  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8fc3e78ffd8b88ba.pdf",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8fc3e78ffd8b88ba.pdf",
   "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p114",
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p114/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p114/manifest.json",
@@ -15,8 +15,8 @@
   "metadata": {
     "title": "End-to-End Training for Unified Tokenization and Latent Denoising",
     "paper_id": "114",
-    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/8fc3e78ffd8b88ba.pdf",
-    "generated_at": "2026-04-03T22:13:07.785595+00:00",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/8fc3e78ffd8b88ba.pdf",
+    "generated_at": "2026-04-04T22:53:29.496150+00:00",
     "num_figures": "9",
     "num_tables": "7",
     "num_equations": "29",
@@ -254,6 +254,6 @@
     "issue_count": 0,
     "issues": []
   },
-  "elapsed_ms": 41810.903,
+  "elapsed_ms": 26983.9,
   "status": "success"
 }

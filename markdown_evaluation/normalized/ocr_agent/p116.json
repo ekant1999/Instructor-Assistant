@@ -1,7 +1,7 @@
 {
   "doc_id": "p116",
   "system": "ocr_agent",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/3a4547b47fc90fc4.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/3a4547b47fc90fc4.pdf",
   "title": "p116",
   "status": "success",
   "markdown_line_count": 356,
@@ -23,21 +23,21 @@
     {
       "level": 3,
       "text": "2 Khan et al",
-      "normalized_text": "2 khan et al",
+      "normalized_text": "khan et al",
       "line_no": 45,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "6 Khan et al",
-      "normalized_text": "6 khan et al",
+      "normalized_text": "khan et al",
       "line_no": 136,
       "suspicious": false
     },
     {
       "level": 3,
       "text": "8 Khan et al",
-      "normalized_text": "8 khan et al",
+      "normalized_text": "khan et al",
       "line_no": 174,
       "suspicious": false
     },
@@ -51,7 +51,7 @@
     {
       "level": 3,
       "text": "10 Khan et al",
-      "normalized_text": "10 khan et al",
+      "normalized_text": "khan et al",
       "line_no": 250,
       "suspicious": false
     }
@@ -83,7 +83,7 @@
     },
     {
       "heading_text": "2 Khan et al",
-      "normalized_heading_text": "2 khan et al",
+      "normalized_heading_text": "khan et al",
       "level": 3,
       "line_start": 45,
       "line_end": 135,
@@ -95,7 +95,7 @@
     },
     {
       "heading_text": "6 Khan et al",
-      "normalized_heading_text": "6 khan et al",
+      "normalized_heading_text": "khan et al",
       "level": 3,
       "line_start": 136,
       "line_end": 173,
@@ -107,7 +107,7 @@
     },
     {
       "heading_text": "8 Khan et al",
-      "normalized_heading_text": "8 khan et al",
+      "normalized_heading_text": "khan et al",
       "level": 3,
       "line_start": 174,
       "line_end": 205,
@@ -131,7 +131,7 @@
     },
     {
       "heading_text": "10 Khan et al",
-      "normalized_heading_text": "10 khan et al",
+      "normalized_heading_text": "khan et al",
       "level": 3,
       "line_start": 250,
       "line_end": 356,
@@ -149,6 +149,13 @@
       "normalized_caption": "qualitative medobvious examples for pre diagnostic visual triage each column corresponds to a grid in a c we report the task question ground truth and predictions from representative vlms",
       "line_no": 66,
       "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 4",
+      "normalized_caption": "on page 4",
+      "line_no": 98,
+      "kind": "figure"
     }
   ],
   "tables": [
@@ -161,9 +168,23 @@
     },
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 62,
+      "kind": "table"
+    },
+    {
+      "number": 1,
       "caption": "MedObvious composition. Tiers increase in clinical specificity.",
       "normalized_caption": "medobvious composition tiers increase in clinical specificity",
       "line_no": 118,
+      "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 120,
       "kind": "table"
     },
     {
@@ -174,21 +195,35 @@
       "kind": "table"
     },
     {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 140,
+      "kind": "table"
+    },
+    {
       "number": 3,
       "caption": "Per-tiers overall accuracy (%) for different VLMs.",
       "normalized_caption": "per tiers overall accuracy for different vlms",
       "line_no": 156,
       "kind": "table"
+    },
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 158,
+      "kind": "table"
     }
   ],
   "intrinsic_metrics": {
     "heading_count": 7,
-    "duplicate_heading_count": 0,
+    "duplicate_heading_count": 3,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 1,
-    "table_caption_count": 4,
-    "duplicate_figure_caption_count": 0,
-    "duplicate_table_caption_count": 1,
+    "figure_caption_count": 2,
+    "table_caption_count": 8,
+    "duplicate_figure_caption_count": 1,
+    "duplicate_table_caption_count": 5,
     "empty_section_count": 0,
     "consecutive_heading_run_count": 0,
     "max_consecutive_heading_run": 0
@@ -197,10 +232,10 @@
     "doc_id": "p116",
     "system": "ocr_agent",
     "title": "MedObvious: Exposing the Medical Moravec’s Paradox in VLMs via Clinical Triage",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/3a4547b47fc90fc4.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/3a4547b47fc90fc4.pdf",
     "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p116/p116.pdf",
     "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p116",
-    "ocr_backend": "dummy",
+    "ocr_backend": "ocr_server",
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
@@ -208,8 +243,10 @@
       "tables": 4,
       "page_images": 0
     },
-    "elapsed_ms": 1657.885,
+    "elapsed_ms": 1930.844,
     "status": "success",
-    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p116/paper.md"
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p116/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
   }
 }

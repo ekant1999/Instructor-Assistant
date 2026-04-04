@@ -1,0 +1,65 @@
+{
+  "doc_id": "t002",
+  "title": "Literature Digest Summary",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "non_academic",
+    "text_heavy",
+    "synthetic_report",
+    "pdf_type_textheavy"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Section 1: Context and Intent"
+    },
+    {
+      "level": 2,
+      "text": "Section 2: Problem Framing"
+    },
+    {
+      "level": 2,
+      "text": "Section 3: Structured Discussion"
+    },
+    {
+      "level": 2,
+      "text": "Section 4: Implementation Notes"
+    },
+    {
+      "level": 2,
+      "text": "Section 5: Risk and Constraint Review"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "This synthetic paragraph focuses on prior work and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 1: Context and Intent",
+      "position": "start"
+    },
+    {
+      "text": "This synthetic paragraph focuses on source perspective and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 2: Problem Framing",
+      "position": "middle"
+    },
+    {
+      "text": "This synthetic paragraph focuses on argument structure and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 3: Structured Discussion",
+      "position": "middle"
+    },
+    {
+      "text": "This synthetic paragraph focuses on comparative claim and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 4: Implementation Notes",
+      "position": "middle"
+    },
+    {
+      "text": "This synthetic paragraph focuses on research direction and is intentionally written in a dense, text-only style",
+      "expected_section": "Section 5: Risk and Constraint Review",
+      "position": "middle"
+    }
+  ],
+  "figures": [],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/TextHeavy/text_heavy_placeholder_literature_digest.pdf on 2026-04-04 using pdftotext -layout. No figures/tables in source."
+}

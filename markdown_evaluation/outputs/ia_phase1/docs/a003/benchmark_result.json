@@ -3,7 +3,7 @@
   "system": "ia_phase1",
   "paper_id": 355052400973,
   "title": "Assignment 2: Classification - Customer Churn Prediction Using Classification",
-  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment3.pdf",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment3.pdf",
   "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a003",
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a003/paper.md",
   "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a003/manifest.json",
@@ -15,8 +15,8 @@
   "metadata": {
     "title": "Assignment 2: Classification - Customer Churn Prediction Using Classification",
     "paper_id": "355052400973",
-    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Assignment3.pdf",
-    "generated_at": "2026-04-03T22:15:36.224688+00:00",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment3.pdf",
+    "generated_at": "2026-04-04T22:55:03.421464+00:00",
     "num_figures": "0",
     "num_tables": "0",
     "num_equations": "0",
@@ -98,6 +98,6 @@
     "issue_count": 0,
     "issues": []
   },
-  "elapsed_ms": 181.01,
+  "elapsed_ms": 171.742,
   "status": "success"
 }

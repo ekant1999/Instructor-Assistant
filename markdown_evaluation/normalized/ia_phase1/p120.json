@@ -1,7 +1,7 @@
 {
   "doc_id": "p120",
   "system": "ia_phase1",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/41528b7825c49511.pdf",
   "title": "Detailed Geometry and Appearance from Opportunistic Motion",
   "status": "success",
   "markdown_line_count": 465,
@@ -487,6 +487,13 @@
   "figures": [
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 11,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
       "caption": "We introduce a method to recover high-fidelity 3D geometry and appearance from sparse-view static videos. By leveraging “virtual viewpoints” induced by opportunistic object motion, our method jointly optimizes object pose and geometry through a motion-aware appearance representation to capture detailed surface structure.",
       "normalized_caption": "we introduce a method to recover high fidelity 3d geometry and appearance from sparse view static videos by leveraging virtual viewpoints induced by opportunistic object motion our method jointly optimizes object pose and geometry through a motion aware appearance representation to capture detailed surface structure",
       "line_no": 13,
@@ -494,9 +501,23 @@
     },
     {
       "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 41,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
       "caption": "Method Overview. Given sparse multi-view videos and an initial set of canonical 2D Gaussians (a), our framework recovers per-frame object poses while iteratively refining the Gaussian geometry via differentiable rendering. To ensure robust convergence under sparse supervision, we employ an alternating optimization that switches between 6-DoF object pose estimation (b) and canonical Gaussian refinement (c) using the aggregated temporal information from all",
       "normalized_caption": "method overview given sparse multi view videos and an initial set of canonical 2d gaussians a our framework recovers per frame object poses while iteratively refining the gaussian geometry via differentiable rendering to ensure robust convergence under sparse supervision we employ an alternating optimization that switches between 6 dof object pose estimation b and canonical gaussian refinement c using the aggregated temporal information from all",
       "line_no": 43,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 75,
       "kind": "figure"
     },
     {
@@ -515,9 +536,23 @@
     },
     {
       "number": 4,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 142,
+      "kind": "figure"
+    },
+    {
+      "number": 4,
       "caption": "Visualization of recovered surface normals. The error maps on the right visualize per-pixel estimation discrepancies. These results demonstrate that proper appearance modeling is essential for effectively leveraging radiometric cues to reconstruct fine surface details.",
       "normalized_caption": "visualization of recovered surface normals the error maps on the right visualize per pixel estimation discrepancies these results demonstrate that proper appearance modeling is essential for effectively leveraging radiometric cues to reconstruct fine surface details",
       "line_no": 144,
+      "kind": "figure"
+    },
+    {
+      "number": 5,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 146,
       "kind": "figure"
     },
     {
@@ -529,6 +564,13 @@
     },
     {
       "number": 6,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 152,
+      "kind": "figure"
+    },
+    {
+      "number": 6,
       "caption": "Surface normals and mesh models recovered from real-world datasets. Qualitative results on HO3D [14] and HODome [47] demonstrate the effectiveness and robustness of our method across diverse human-object interaction scenarios.",
       "normalized_caption": "surface normals and mesh models recovered from real world datasets qualitative results on ho3d 14 and hodome 47 demonstrate the effectiveness and robustness of our method across diverse human object interaction scenarios",
       "line_no": 154,
@@ -536,9 +578,23 @@
     },
     {
       "number": 7,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 156,
+      "kind": "figure"
+    },
+    {
+      "number": 7,
       "caption": "Visualization of alternating estimation progress. We show the recovered geometry and object poses (represented as effective camera views) at several timesteps. As the temporal window expands and the effective camera coverage becomes more informative, the geometric accuracy of the reconstruction progressively improves.",
       "normalized_caption": "visualization of alternating estimation progress we show the recovered geometry and object poses represented as effective camera views at several timesteps as the temporal window expands and the effective camera coverage becomes more informative the geometric accuracy of the reconstruction progressively improves",
       "line_no": 158,
+      "kind": "figure"
+    },
+    {
+      "number": 8,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 367,
       "kind": "figure"
     },
     {
@@ -557,6 +613,13 @@
     },
     {
       "number": 9,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 402,
+      "kind": "figure"
+    },
+    {
+      "number": 9,
       "caption": "Additional Visualization of Recovered Surface Normals. Our recovered surface normals are at least comparable to those of the baselines, suggesting the robustness of our method.",
       "normalized_caption": "additional visualization of recovered surface normals our recovered surface normals are at least comparable to those of the baselines suggesting the robustness of our method",
       "line_no": 404,
@@ -564,9 +627,23 @@
     },
     {
       "number": 10,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 412,
+      "kind": "figure"
+    },
+    {
+      "number": 10,
       "caption": "Additional Novel View Synthesis Results. Our appearance model im- proves the fidelity of novel view synthesis on different objects. The ottoman (the second row) remains challenging due to its limited surface-normal variation.",
       "normalized_caption": "additional novel view synthesis results our appearance model im proves the fidelity of novel view synthesis on different objects the ottoman the second row remains challenging due to its limited surface normal variation",
       "line_no": 414,
+      "kind": "figure"
+    },
+    {
+      "number": 11,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 422,
       "kind": "figure"
     },
     {
@@ -585,9 +662,23 @@
     },
     {
       "number": 12,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 436,
+      "kind": "figure"
+    },
+    {
+      "number": 12,
       "caption": "Effectiveness of diffuse and specular components for surface normal recovery. Modeling both diffuse and specular components is critical for recovering accurate surface normals on objects with diverse material properties, where view- dependent effects can otherwise bias the reconstruction.",
       "normalized_caption": "effectiveness of diffuse and specular components for surface normal recovery modeling both diffuse and specular components is critical for recovering accurate surface normals on objects with diverse material properties where view dependent effects can otherwise bias the reconstruction",
       "line_no": 438,
+      "kind": "figure"
+    },
+    {
+      "number": 13,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 440,
       "kind": "figure"
     },
     {
@@ -599,9 +690,23 @@
     },
     {
       "number": 14,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 444,
+      "kind": "figure"
+    },
+    {
+      "number": 14,
       "caption": "Visualization of specular and diffuse components. In the second column of the specular components, we show the results with increased brightness for better visibility. Our method successfully decomposes the object appearance into specular and diffuse components, except for the challenging case of the ottoman.",
       "normalized_caption": "visualization of specular and diffuse components in the second column of the specular components we show the results with increased brightness for better visibility our method successfully decomposes the object appearance into specular and diffuse components except for the challenging case of the ottoman",
       "line_no": 446,
+      "kind": "figure"
+    },
+    {
+      "number": 15,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 451,
       "kind": "figure"
     },
     {
@@ -613,6 +718,13 @@
     },
     {
       "number": 16,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 455,
+      "kind": "figure"
+    },
+    {
+      "number": 16,
       "caption": "Comparison with our method without alternating estimation (“w/o Alternating Estimation”). In the “10 frames,” “15 frames,” and “29 frames” settings, the object rotates by approximately 39, 26, and 13 degrees, respectively, between adjacent frames. Our full method successfully recovers geometry and appearance even in the temporally sparsest setting.",
       "normalized_caption": "comparison with our method without alternating estimation w o alternating estimation in the 10 frames 15 frames and 29 frames settings the object rotates by approximately 39 26 and 13 degrees respectively between adjacent frames our full method successfully recovers geometry and appearance even in the temporally sparsest setting",
       "line_no": 457,
@@ -620,9 +732,23 @@
     },
     {
       "number": 17,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 459,
+      "kind": "figure"
+    },
+    {
+      "number": 17,
       "caption": "Effectiveness of segmentation mask refinement. We compare our full method with a variant without mask refinement (“w/o Mask Refinement”), where the per-Gaussian mask values are fixed during optimization. Refining the mask values jointly with geometry and appearance is essential for converging to the true fine-scale geometry.",
       "normalized_caption": "effectiveness of segmentation mask refinement we compare our full method with a variant without mask refinement w o mask refinement where the per gaussian mask values are fixed during optimization refining the mask values jointly with geometry and appearance is essential for converging to the true fine scale geometry",
       "line_no": 461,
+      "kind": "figure"
+    },
+    {
+      "number": 18,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 463,
       "kind": "figure"
     },
     {
@@ -674,9 +800,9 @@
     "heading_count": 25,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 21,
+    "figure_caption_count": 39,
     "table_caption_count": 5,
-    "duplicate_figure_caption_count": 3,
+    "duplicate_figure_caption_count": 21,
     "duplicate_table_caption_count": 0,
     "empty_section_count": 3,
     "consecutive_heading_run_count": 3,
@@ -687,7 +813,7 @@
     "system": "ia_phase1",
     "paper_id": 120,
     "title": "Detailed Geometry and Appearance from Opportunistic Motion",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/41528b7825c49511.pdf",
     "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120/paper.md",
     "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p120/manifest.json",
@@ -699,8 +825,8 @@
     "metadata": {
       "title": "Detailed Geometry and Appearance from Opportunistic Motion",
       "paper_id": "120",
-      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/41528b7825c49511.pdf",
-      "generated_at": "2026-04-03T22:15:29.155927+00:00",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/41528b7825c49511.pdf",
+      "generated_at": "2026-04-04T22:54:47.514414+00:00",
       "num_figures": "18",
       "num_tables": "4",
       "num_equations": "19",
@@ -770,7 +896,7 @@
       "issue_count": 0,
       "issues": []
     },
-    "elapsed_ms": 18444.44,
+    "elapsed_ms": 12764.289,
     "status": "success"
   }
 }

@@ -1,0 +1,233 @@
+{
+  "doc_id": "a004",
+  "system": "ocr_agent",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment4.pdf",
+  "title": "a004",
+  "status": "success",
+  "markdown_line_count": 49,
+  "headings": [
+    {
+      "level": 1,
+      "text": "a004",
+      "normalized_text": "a004",
+      "line_no": 1,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "1. Dataset and Goal",
+      "normalized_text": "dataset and goal",
+      "line_no": 7,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "DATA 240 – Lab Report: Student Portal Log Analytics",
+      "normalized_text": "data 240 lab report student portal log analytics",
+      "line_no": 9,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "3. Tabular Findings",
+      "normalized_text": "tabular findings",
+      "line_no": 29,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "4. Incident Notes and Conclusions",
+      "normalized_text": "incident notes and conclusions",
+      "line_no": 31,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "1. Traffic patterns were stable for most of the day, but the evening grade-release window amplified both",
+      "normalized_text": "traffic patterns were stable for most of the day but the evening grade release window amplified both",
+      "line_no": 33,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "2. The fabricated 5xx spike coincided with an application rollout, which suggests that deployment timing",
+      "normalized_text": "the fabricated 5xx spike coincided with an application rollout which suggests that deployment timing",
+      "line_no": 37,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "3. Endpoints that depend on external payment services showed the broadest tail, so separate alert thresholds",
+      "normalized_text": "endpoints that depend on external payment services showed the broadest tail so separate alert thresholds",
+      "line_no": 41,
+      "suspicious": false
+    },
+    {
+      "level": 3,
+      "text": "4. Even with dummy data, the report structure approximates the dense mix of screenshots, charts, and tables",
+      "normalized_text": "even with dummy data the report structure approximates the dense mix of screenshots charts and tables",
+      "line_no": 45,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "a004",
+      "normalized_heading_text": "a004",
+      "level": 1,
+      "line_start": 1,
+      "line_end": 6,
+      "prose_text": "",
+      "full_text": "<!-- document_mode: hybrid_paper -->\n<!-- page 1 mode: hybrid_paper -->",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "1. Dataset and Goal",
+      "normalized_heading_text": "dataset and goal",
+      "level": 2,
+      "line_start": 7,
+      "line_end": 8,
+      "prose_text": "",
+      "full_text": "",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "DATA 240 – Lab Report: Student Portal Log Analytics",
+      "normalized_heading_text": "data 240 lab report student portal log analytics",
+      "level": 2,
+      "line_start": 9,
+      "line_end": 28,
+      "prose_text": "Name: Jordan Lee | Student ID: 018563244\nGenerated sample submission with dummy data, tables, and figures for PDF extraction evaluation.\nThis mock assignment analyzes one day of student-portal access logs. The document includes generated dashboards, summary tables, and fabricated incident notes so it can be used as a realistic PDF-to-Markdown test input.",
+      "full_text": "Name: Jordan Lee | Student ID: 018563244\nGenerated sample submission with dummy data, tables, and figures for PDF extraction evaluation.\nThis mock assignment analyzes one day of student-portal access logs. The document includes generated dashboards, summary tables, and fabricated incident notes so it can be used as a realistic PDF-to-Markdown test input.\n![Figure 1 on Page 1](a004_assets/figures/a004_page_1_fig_1.png)\n---\n<!-- page 2 mode: hybrid_paper -->\n![Figure 1 on Page 2](a004_assets/figures/a004_page_2_fig_1.png)\n---\n<!-- page 3 mode: hybrid_paper -->",
+      "word_count": 49,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "3. Tabular Findings",
+      "normalized_heading_text": "tabular findings",
+      "level": 2,
+      "line_start": 29,
+      "line_end": 30,
+      "prose_text": "",
+      "full_text": "",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "4. Incident Notes and Conclusions",
+      "normalized_heading_text": "incident notes and conclusions",
+      "level": 2,
+      "line_start": 31,
+      "line_end": 32,
+      "prose_text": "",
+      "full_text": "",
+      "word_count": 0,
+      "empty": true,
+      "asset_only": false
+    },
+    {
+      "heading_text": "1. Traffic patterns were stable for most of the day, but the evening grade-release window amplified both",
+      "normalized_heading_text": "traffic patterns were stable for most of the day but the evening grade release window amplified both",
+      "level": 3,
+      "line_start": 33,
+      "line_end": 36,
+      "prose_text": "concurrency and latency.",
+      "full_text": "concurrency and latency.",
+      "word_count": 3,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "2. The fabricated 5xx spike coincided with an application rollout, which suggests that deployment timing",
+      "normalized_heading_text": "the fabricated 5xx spike coincided with an application rollout which suggests that deployment timing",
+      "level": 3,
+      "line_start": 37,
+      "line_end": 40,
+      "prose_text": "matters as much as raw capacity.",
+      "full_text": "matters as much as raw capacity.",
+      "word_count": 6,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "3. Endpoints that depend on external payment services showed the broadest tail, so separate alert thresholds",
+      "normalized_heading_text": "endpoints that depend on external payment services showed the broadest tail so separate alert thresholds",
+      "level": 3,
+      "line_start": 41,
+      "line_end": 44,
+      "prose_text": "should be used for third-party integrations.",
+      "full_text": "should be used for third-party integrations.",
+      "word_count": 6,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "4. Even with dummy data, the report structure approximates the dense mix of screenshots, charts, and tables",
+      "normalized_heading_text": "even with dummy data the report structure approximates the dense mix of screenshots charts and tables",
+      "level": 3,
+      "line_start": 45,
+      "line_end": 49,
+      "prose_text": "often seen in student analytics submissions.",
+      "full_text": "often seen in student analytics submissions.\n---",
+      "word_count": 6,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "on Page 1",
+      "normalized_caption": "on page 1",
+      "line_no": 17,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "on Page 2",
+      "normalized_caption": "on page 2",
+      "line_no": 23,
+      "kind": "figure"
+    }
+  ],
+  "tables": [],
+  "intrinsic_metrics": {
+    "heading_count": 9,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 2,
+    "table_caption_count": 0,
+    "duplicate_figure_caption_count": 1,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 4,
+    "consecutive_heading_run_count": 2,
+    "max_consecutive_heading_run": 3
+  },
+  "run_metadata": {
+    "doc_id": "a004",
+    "system": "ocr_agent",
+    "title": "DATA 240 - Lab Report: Student Portal Log Analytics",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment4.pdf",
+    "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a004/a004.pdf",
+    "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a004",
+    "ocr_backend": "ocr_server",
+    "use_pdf_page_ocr": false,
+    "document_mode": "hybrid_paper",
+    "asset_counts": {
+      "figures": 2,
+      "tables": 0,
+      "page_images": 0
+    },
+    "elapsed_ms": 424.811,
+    "status": "success",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a004/paper.md",
+    "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
+    "postprocess_enabled": false
+  }
+}

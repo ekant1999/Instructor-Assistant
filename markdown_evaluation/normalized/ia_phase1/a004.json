@@ -1,0 +1,248 @@
+{
+  "doc_id": "a004",
+  "system": "ia_phase1",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment4.pdf",
+  "title": "DATA 240 - Lab Report: Student Portal Log Analytics",
+  "status": "success",
+  "markdown_line_count": 87,
+  "headings": [
+    {
+      "level": 2,
+      "text": "Dataset and Goal",
+      "normalized_text": "dataset and goal",
+      "line_no": 7,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Latency and Response-Code Trends",
+      "normalized_text": "latency and response code trends",
+      "line_no": 15,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Tabular Findings",
+      "normalized_text": "tabular findings",
+      "line_no": 25,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Incident Notes and Conclusions",
+      "normalized_text": "incident notes and conclusions",
+      "line_no": 71,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "Dataset and Goal",
+      "normalized_heading_text": "dataset and goal",
+      "level": 2,
+      "line_start": 7,
+      "line_end": 14,
+      "prose_text": "The dataset contains timestamp, endpoint, status code, latency, and client region fields. The goal of the analysis is to identify high-volume endpoints, observe latency patterns, and surface short-lived error spikes.\n_Figure 1: Mock analytics dashboard summarizing portal traffic._",
+      "full_text": "The dataset contains timestamp, endpoint, status code, latency, and client region fields. The goal of the analysis is to identify high-volume endpoints, observe latency patterns, and surface short-lived error spikes.\n![Figure 1](assets/figures/page_001_img_001.png)\n_Figure 1: Mock analytics dashboard summarizing portal traffic._",
+      "word_count": 37,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Latency and Response-Code Trends",
+      "normalized_heading_text": "latency and response code trends",
+      "level": 2,
+      "line_start": 15,
+      "line_end": 24,
+      "prose_text": "_Figure 2: Fabricated latency trend from morning to late evening._\n_Figure 3: Status-code breakdown for the same observation window._",
+      "full_text": "![Figure 2](assets/figures/page_002_img_001.png)\n_Figure 2: Fabricated latency trend from morning to late evening._\n![Figure 3](assets/figures/page_002_img_002.png)\n_Figure 3: Status-code breakdown for the same observation window._",
+      "word_count": 17,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Tabular Findings",
+      "normalized_heading_text": "tabular findings",
+      "level": 2,
+      "line_start": 25,
+      "line_end": 70,
+      "prose_text": "Traffic increased after\nScale read replicas\nintroduced the largest\nAdd timeout budget\nand async retry\nTypically triggered by\nPrompt token refresh\nin client app.\nShort 5xx burst lasted\nStagger deploys and",
+      "full_text": "Metric\nValue\nNotes\nSeverity\nAction\nTraffic increased after\ngrade release\nnotifications.\nScale read replicas\nbefore scheduled\nannouncements.\nMedium\nPayment callback\nintroduced the largest\ntail latency.\nAdd timeout budget\nand async retry\nhandling.\nHigh\nTypically triggered by\nexpired mobile\nsessions.\nLow\nPrompt token refresh\nin client app.\nShort 5xx burst lasted\n11 minutes during\ndeployment.\nStagger deploys and\nwarm application\ninstances.\nHigh",
+      "word_count": 31,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Incident Notes and Conclusions",
+      "normalized_heading_text": "incident notes and conclusions",
+      "level": 2,
+      "line_start": 71,
+      "line_end": 87,
+      "prose_text": "1. Traffic patterns were stable for most of the day, but the evening grade-release window amplified both\nconcurrency and latency.\n2. The fabricated 5xx spike coincided with an application rollout, which suggests that deployment timing\nmatters as much as raw capacity.\n3. Endpoints that depend on external payment services showed the broadest tail, so separate alert thresholds\nshould be used for third-party integrations.\n4. Even with dummy data, the report structure approximates the dense mix of screenshots, charts, and tables\noften seen in student analytics submissions.",
+      "full_text": "1. Traffic patterns were stable for most of the day, but the evening grade-release window amplified both\nconcurrency and latency.\n2. The fabricated 5xx spike coincided with an application rollout, which suggests that deployment timing\nmatters as much as raw capacity.\n3. Endpoints that depend on external payment services showed the broadest tail, so separate alert thresholds\nshould be used for third-party integrations.\n4. Even with dummy data, the report structure approximates the dense mix of screenshots, charts, and tables\noften seen in student analytics submissions.",
+      "word_count": 82,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 11,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "Mock analytics dashboard summarizing portal traffic.",
+      "normalized_caption": "mock analytics dashboard summarizing portal traffic",
+      "line_no": 13,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 17,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "Fabricated latency trend from morning to late evening.",
+      "normalized_caption": "fabricated latency trend from morning to late evening",
+      "line_no": 19,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 21,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "Status-code breakdown for the same observation window.",
+      "normalized_caption": "status code breakdown for the same observation window",
+      "line_no": 23,
+      "kind": "figure"
+    }
+  ],
+  "tables": [],
+  "intrinsic_metrics": {
+    "heading_count": 4,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 6,
+    "table_caption_count": 0,
+    "duplicate_figure_caption_count": 3,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 0,
+    "consecutive_heading_run_count": 0,
+    "max_consecutive_heading_run": 0
+  },
+  "run_metadata": {
+    "doc_id": "a004",
+    "system": "ia_phase1",
+    "paper_id": 734343662850,
+    "title": "DATA 240 - Lab Report: Student Portal Log Analytics",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment4.pdf",
+    "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a004",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a004/paper.md",
+    "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a004/manifest.json",
+    "asset_counts": {
+      "figures": 3,
+      "tables": 1,
+      "equations": 0
+    },
+    "metadata": {
+      "title": "DATA 240 - Lab Report: Student Portal Log Analytics",
+      "paper_id": "734343662850",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment4.pdf",
+      "generated_at": "2026-04-04T22:55:03.997115+00:00",
+      "num_figures": "3",
+      "num_tables": "1",
+      "num_equations": "0",
+      "page_count": "3"
+    },
+    "render_mode": "normal",
+    "sectioning_strategy": "pdf_toc",
+    "sectioning_report": {
+      "strategy": "pdf_toc",
+      "candidate_headings": 4,
+      "matched_headings": 5,
+      "sections": [
+        {
+          "index": 0,
+          "title": "Front Matter",
+          "canonical": "front_matter",
+          "level": 1,
+          "source": "fallback",
+          "confidence": 0.4,
+          "start_page": 1,
+          "end_page": 1,
+          "start_block_index": 0,
+          "end_block_index": 3
+        },
+        {
+          "index": 1,
+          "title": "Dataset and Goal",
+          "canonical": "datasets",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 1,
+          "end_page": 1,
+          "start_block_index": 4,
+          "end_block_index": 6
+        },
+        {
+          "index": 2,
+          "title": "Latency and Response-Code Trends",
+          "canonical": "latency_and_response_code_trends",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 2,
+          "end_page": 2,
+          "start_block_index": 7,
+          "end_block_index": 9
+        },
+        {
+          "index": 3,
+          "title": "Tabular Findings",
+          "canonical": "results",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 3,
+          "end_page": 3,
+          "start_block_index": 10,
+          "end_block_index": 26
+        },
+        {
+          "index": 4,
+          "title": "Incident Notes and Conclusions",
+          "canonical": "conclusion",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 3,
+          "end_page": 3,
+          "start_block_index": 27,
+          "end_block_index": 35
+        }
+      ],
+      "annotated_blocks": 0,
+      "total_blocks": 36
+    },
+    "audit": {
+      "conservative_recommended": false,
+      "issue_count": 0,
+      "issues": []
+    },
+    "elapsed_ms": 574.657,
+    "status": "success"
+  }
+}

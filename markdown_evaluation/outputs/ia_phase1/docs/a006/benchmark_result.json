@@ -1,0 +1,115 @@
+{
+  "doc_id": "a006",
+  "system": "ia_phase1",
+  "paper_id": 120022211085,
+  "title": "CMPE 281 - Assignment: Serverless CRUD API with DynamoDB",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment6.pdf",
+  "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a006",
+  "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a006/paper.md",
+  "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a006/manifest.json",
+  "asset_counts": {
+    "figures": 6,
+    "tables": 0,
+    "equations": 3
+  },
+  "metadata": {
+    "title": "CMPE 281 - Assignment: Serverless CRUD API with DynamoDB",
+    "paper_id": "120022211085",
+    "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment6.pdf",
+    "generated_at": "2026-04-04T22:55:06.504900+00:00",
+    "num_figures": "6",
+    "num_tables": "0",
+    "num_equations": "3",
+    "page_count": "6"
+  },
+  "render_mode": "normal",
+  "sectioning_strategy": "pdf_toc",
+  "sectioning_report": {
+    "strategy": "pdf_toc",
+    "candidate_headings": 5,
+    "matched_headings": 6,
+    "sections": [
+      {
+        "index": 0,
+        "title": "Front Matter",
+        "canonical": "front_matter",
+        "level": 1,
+        "source": "fallback",
+        "confidence": 0.4,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 0,
+        "end_block_index": 4
+      },
+      {
+        "index": 1,
+        "title": "Services Used",
+        "canonical": "services_used",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 1,
+        "end_page": 1,
+        "start_block_index": 5,
+        "end_block_index": 9
+      },
+      {
+        "index": 2,
+        "title": "Lambda Handler",
+        "canonical": "lambda_handler",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 1,
+        "end_page": 2,
+        "start_block_index": 10,
+        "end_block_index": 13
+      },
+      {
+        "index": 3,
+        "title": "API Test Screenshots",
+        "canonical": "api_test_screenshots",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 2,
+        "end_page": 4,
+        "start_block_index": 14,
+        "end_block_index": 18
+      },
+      {
+        "index": 4,
+        "title": "DynamoDB State and Functional Results",
+        "canonical": "results",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 5,
+        "end_page": 5,
+        "start_block_index": 19,
+        "end_block_index": 26
+      },
+      {
+        "index": 5,
+        "title": "Edge Cases, Challenges, and Learnings",
+        "canonical": "edge_cases_challenges_and_learnings",
+        "level": 1,
+        "source": "pdf_toc",
+        "confidence": 1.297,
+        "start_page": 5,
+        "end_page": 6,
+        "start_block_index": 27,
+        "end_block_index": 37
+      }
+    ],
+    "annotated_blocks": 0,
+    "total_blocks": 38
+  },
+  "audit": {
+    "conservative_recommended": false,
+    "issue_count": 0,
+    "issues": []
+  },
+  "elapsed_ms": 1264.058,
+  "status": "success"
+}

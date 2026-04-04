@@ -1,0 +1,225 @@
+{
+  "doc_id": "a007",
+  "system": "ia_phase1",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment7.pdf",
+  "title": "CS 249 - Assignment: VM Resource Monitoring and Benchmarking",
+  "status": "success",
+  "markdown_line_count": 58,
+  "headings": [
+    {
+      "level": 2,
+      "text": "Test Environment",
+      "normalized_text": "test environment",
+      "line_no": 11,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Benchmark Figures",
+      "normalized_text": "benchmark figures",
+      "line_no": 29,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Summary Table and Findings",
+      "normalized_text": "summary table and findings",
+      "line_no": 39,
+      "suspicious": false
+    }
+  ],
+  "sections": [
+    {
+      "heading_text": "Test Environment",
+      "normalized_heading_text": "test environment",
+      "level": 2,
+      "line_start": 11,
+      "line_end": 28,
+      "prose_text": "Ubuntu 22.04 VM with 4 vCPUs and 8 GB RAM\nPython service exposed on localhost:8080\nLoad driver issuing mixed read/write requests for 15 minutes\nMonitoring via htop, vmstat, and custom latency logs\n_Figure 1: Mock terminal output during the load test._",
+      "full_text": "•\nUbuntu 22.04 VM with 4 vCPUs and 8 GB RAM\n•\nPython service exposed on localhost:8080\n•\nLoad driver issuing mixed read/write requests for 15 minutes\n•\nMonitoring via htop, vmstat, and custom latency logs\n![Figure 1](assets/figures/page_001_img_001.png)\n_Figure 1: Mock terminal output during the load test._",
+      "word_count": 37,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Benchmark Figures",
+      "normalized_heading_text": "benchmark figures",
+      "level": 2,
+      "line_start": 29,
+      "line_end": 38,
+      "prose_text": "_Figure 2: CPU and memory utilization observed across the benchmark._\n_Figure 3: Throughput and tail-latency progression across the test._",
+      "full_text": "![Figure 2](assets/figures/page_002_img_001.png)\n_Figure 2: CPU and memory utilization observed across the benchmark._\n![Figure 3](assets/figures/page_002_img_002.png)\n_Figure 3: Throughput and tail-latency progression across the test._",
+      "word_count": 17,
+      "empty": false,
+      "asset_only": false
+    },
+    {
+      "heading_text": "Summary Table and Findings",
+      "normalized_heading_text": "summary table and findings",
+      "level": 2,
+      "line_start": 39,
+      "line_end": 58,
+      "prose_text": "> Table 1: 3. Summary Table and Findings\n1. The cache-enabled scenario produced the highest throughput without exhausting CPU or memory\n2. Tail latency increased sharply during the write-burst phase, which is consistent with queue buildup inside\nthe Python service.\n3. Reducing worker count lowered resource usage slightly but pushed response times beyond the acceptable\n4. A mix of console screenshots, charts, and compact summary tables makes this document useful for PDF",
+      "full_text": "> Table JSON: `assets/tables/table_0001.json`\n> Table 1: 3. Summary Table and Findings\n1. The cache-enabled scenario produced the highest throughput without exhausting CPU or memory\nheadroom.\n2. Tail latency increased sharply during the write-burst phase, which is consistent with queue buildup inside\nthe Python service.\n3. Reducing worker count lowered resource usage slightly but pushed response times beyond the acceptable\nthreshold.\n4. A mix of console screenshots, charts, and compact summary tables makes this document useful for PDF\nextraction testing.",
+      "word_count": 64,
+      "empty": false,
+      "asset_only": false
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 25,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
+      "caption": "Mock terminal output during the load test.",
+      "normalized_caption": "mock terminal output during the load test",
+      "line_no": 27,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 31,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "CPU and memory utilization observed across the benchmark.",
+      "normalized_caption": "cpu and memory utilization observed across the benchmark",
+      "line_no": 33,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 35,
+      "kind": "figure"
+    },
+    {
+      "number": 3,
+      "caption": "Throughput and tail-latency progression across the test.",
+      "normalized_caption": "throughput and tail latency progression across the test",
+      "line_no": 37,
+      "kind": "figure"
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "caption": "3. Summary Table and Findings",
+      "normalized_caption": "3 summary table and findings",
+      "line_no": 42,
+      "kind": "table"
+    }
+  ],
+  "intrinsic_metrics": {
+    "heading_count": 3,
+    "duplicate_heading_count": 0,
+    "suspicious_heading_count": 0,
+    "figure_caption_count": 6,
+    "table_caption_count": 1,
+    "duplicate_figure_caption_count": 3,
+    "duplicate_table_caption_count": 0,
+    "empty_section_count": 0,
+    "consecutive_heading_run_count": 0,
+    "max_consecutive_heading_run": 0
+  },
+  "run_metadata": {
+    "doc_id": "a007",
+    "system": "ia_phase1",
+    "paper_id": 701530298732,
+    "title": "CS 249 - Assignment: VM Resource Monitoring and Benchmarking",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment7.pdf",
+    "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a007",
+    "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a007/paper.md",
+    "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/a007/manifest.json",
+    "asset_counts": {
+      "figures": 3,
+      "tables": 1,
+      "equations": 0
+    },
+    "metadata": {
+      "title": "CS 249 - Assignment: VM Resource Monitoring and Benchmarking",
+      "paper_id": "701530298732",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment7.pdf",
+      "generated_at": "2026-04-04T22:55:07.071766+00:00",
+      "num_figures": "3",
+      "num_tables": "1",
+      "num_equations": "0",
+      "page_count": "3"
+    },
+    "render_mode": "normal",
+    "sectioning_strategy": "pdf_toc",
+    "sectioning_report": {
+      "strategy": "pdf_toc",
+      "candidate_headings": 3,
+      "matched_headings": 4,
+      "sections": [
+        {
+          "index": 0,
+          "title": "Front Matter",
+          "canonical": "front_matter",
+          "level": 1,
+          "source": "fallback",
+          "confidence": 0.4,
+          "start_page": 1,
+          "end_page": 1,
+          "start_block_index": 0,
+          "end_block_index": 4
+        },
+        {
+          "index": 1,
+          "title": "Test Environment",
+          "canonical": "test_environment",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 1,
+          "end_page": 1,
+          "start_block_index": 5,
+          "end_block_index": 10
+        },
+        {
+          "index": 2,
+          "title": "Benchmark Figures",
+          "canonical": "benchmark_figures",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 2,
+          "end_page": 2,
+          "start_block_index": 11,
+          "end_block_index": 13
+        },
+        {
+          "index": 3,
+          "title": "Summary Table and Findings",
+          "canonical": "results",
+          "level": 1,
+          "source": "pdf_toc",
+          "confidence": 1.297,
+          "start_page": 3,
+          "end_page": 3,
+          "start_block_index": 14,
+          "end_block_index": 27
+        }
+      ],
+      "annotated_blocks": 0,
+      "total_blocks": 28
+    },
+    "audit": {
+      "conservative_recommended": false,
+      "issue_count": 0,
+      "issues": []
+    },
+    "elapsed_ms": 568.613,
+    "status": "success"
+  }
+}

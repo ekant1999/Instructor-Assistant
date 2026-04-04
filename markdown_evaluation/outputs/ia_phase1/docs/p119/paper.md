@@ -1,8 +1,8 @@
 ---
 title: "VLA-OPD: Bridging Offline SFT and Online RL for Vision-Language-Action Models via On-Policy Distillation"
 paper_id: 119
-source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/4a5ab78468782a40.pdf"
-generated_at: "2026-04-03T22:15:10.786338+00:00"
+source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/4a5ab78468782a40.pdf"
+generated_at: "2026-04-04T22:54:34.777104+00:00"
 num_figures: 5
 num_tables: 2
 num_equations: 22

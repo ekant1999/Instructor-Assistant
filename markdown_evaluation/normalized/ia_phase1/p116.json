@@ -1,7 +1,7 @@
 {
   "doc_id": "p116",
   "system": "ia_phase1",
-  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/3a4547b47fc90fc4.pdf",
+  "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/3a4547b47fc90fc4.pdf",
   "title": "MedObvious: Exposing the Medical Moravec’s Paradox in VLMs via Clinical Triage",
   "status": "success",
   "markdown_line_count": 138,
@@ -126,9 +126,23 @@
   "figures": [
     {
       "number": 1,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 13,
+      "kind": "figure"
+    },
+    {
+      "number": 1,
       "caption": "Qualitative MedObvious examples for pre-diagnostic visual triage. Each column corresponds to a grid in (a)–(c). We report the task ques- tion, ground truth, and predictions from representative VLMs.",
       "normalized_caption": "qualitative medobvious examples for pre diagnostic visual triage each column corresponds to a grid in a c we report the task ques tion ground truth and predictions from representative vlms",
       "line_no": 15,
+      "kind": "figure"
+    },
+    {
+      "number": 2,
+      "caption": "",
+      "normalized_caption": "",
+      "line_no": 23,
       "kind": "figure"
     },
     {
@@ -166,9 +180,9 @@
     "heading_count": 6,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 2,
+    "figure_caption_count": 4,
     "table_caption_count": 3,
-    "duplicate_figure_caption_count": 0,
+    "duplicate_figure_caption_count": 2,
     "duplicate_table_caption_count": 0,
     "empty_section_count": 0,
     "consecutive_heading_run_count": 0,
@@ -179,7 +193,7 @@
     "system": "ia_phase1",
     "paper_id": 116,
     "title": "MedObvious: Exposing the Medical Moravec’s Paradox in VLMs via Clinical Triage",
-    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/3a4547b47fc90fc4.pdf",
+    "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/3a4547b47fc90fc4.pdf",
     "bundle_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p116",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p116/paper.md",
     "manifest_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ia_phase1/docs/p116/manifest.json",
@@ -191,8 +205,8 @@
     "metadata": {
       "title": "MedObvious: Exposing the Medical Moravec’s Paradox in VLMs via Clinical Triage",
       "paper_id": "116",
-      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/.ia_phase1_data/pdfs/3a4547b47fc90fc4.pdf",
-      "generated_at": "2026-04-03T22:14:50.603547+00:00",
+      "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/3a4547b47fc90fc4.pdf",
+      "generated_at": "2026-04-04T22:54:16.464580+00:00",
       "num_figures": "2",
       "num_tables": "3",
       "num_equations": "16",
@@ -298,7 +312,7 @@
       "issue_count": 0,
       "issues": []
     },
-    "elapsed_ms": 7993.805,
+    "elapsed_ms": 4756.735,
     "status": "success"
   }
 }

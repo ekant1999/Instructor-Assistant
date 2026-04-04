@@ -1,0 +1,94 @@
+{
+  "doc_id": "a006",
+  "title": "CMPE 281 - Assignment: Serverless CRUD API with DynamoDB",
+  "validated": true,
+  "layout_type": "one_column",
+  "doc_tags": [
+    "born_digital",
+    "non_academic",
+    "student_assignment",
+    "figure_heavy",
+    "table_heavy",
+    "code_heavy",
+    "hybrid_pdf",
+    "cloud_report",
+    "pdf_type_hybrid"
+  ],
+  "headings": [
+    {
+      "level": 2,
+      "text": "Services Used"
+    },
+    {
+      "level": 2,
+      "text": "Lambda Handler"
+    },
+    {
+      "level": 2,
+      "text": "API Test Screenshots"
+    },
+    {
+      "level": 2,
+      "text": "DynamoDB State and Functional Results"
+    },
+    {
+      "level": 2,
+      "text": "Edge Cases, Challenges, and Learnings"
+    }
+  ],
+  "section_anchors": [
+    {
+      "text": "AWS Lambda: Executes Python code without managing servers and scales automatically for intermittent traffic.",
+      "expected_section": "Services Used",
+      "position": "start"
+    },
+    {
+      "text": "The remaining PUT and DELETE branches follow the same event shape, updating or deleting the record after a key lookup.",
+      "expected_section": "Lambda Handler",
+      "position": "end"
+    },
+    {
+      "text": "Figure 2. Sample POST request used to add a new record.",
+      "expected_section": "API Test Screenshots",
+      "position": "start"
+    },
+    {
+      "text": "GET /students?student_id=100 missing key error message 404 Not Found",
+      "expected_section": "DynamoDB State and Functional Results",
+      "position": "end"
+    },
+    {
+      "text": "Returning clear status codes for failure cases improves debugging and makes API behavior easier to validate in a report.",
+      "expected_section": "Edge Cases, Challenges, and Learnings",
+      "position": "end"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption_contains": "Simplified request path from client to database"
+    },
+    {
+      "number": 2,
+      "caption_contains": "Sample POST request used to add a new record"
+    },
+    {
+      "number": 3,
+      "caption_contains": "Sample GET request retrieving the stored record"
+    },
+    {
+      "number": 4,
+      "caption_contains": "PUT request used to update the course field"
+    },
+    {
+      "number": 5,
+      "caption_contains": "DELETE request for removing the same record"
+    },
+    {
+      "number": 6,
+      "caption_contains": "Fabricated table snapshot after the update operation"
+    }
+  ],
+  "tables": [],
+  "notes": "Manually validated against markdown_evaluation/pdfs/Hybrid/Assignment6.pdf on 2026-04-04 using pdftotext -layout and caption inspection. Result tables are unnumbered in the source."
+}
