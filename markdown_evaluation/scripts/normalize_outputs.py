@@ -18,7 +18,7 @@ from markdown_evaluation.scripts._common import (
     write_json,
 )
 
-SYSTEMS = ("ia_phase1", "ocr_agent", "improved_ocr_agent")
+SYSTEMS = ("ia_phase1", "ocr_agent", "improved_ocr_agent", "improved_ocr_agent_marker")
 _HEADING_RE = re.compile(r"^(#{1,6})\s+(.*\S)\s*$")
 _FRONTMATTER_RE = re.compile(r"\A---\n.*?\n---\n?", re.DOTALL)
 _FIGURE_LINE_RE = re.compile(r"^\s*(?:[_>*`-]+\s*)?(?:figure|fig)\.?\s+(\d+|[IVXLCDM]{1,8})\b[:.]?\s*(.*)$", re.I)

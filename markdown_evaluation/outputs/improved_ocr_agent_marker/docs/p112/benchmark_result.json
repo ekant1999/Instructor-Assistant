@@ -1,0 +1,20 @@
+{
+  "doc_id": "p112",
+  "system": "improved_ocr_agent_marker",
+  "title": "MemDLM: Memory-Enhanced DLM Training",
+  "pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/987e7ff453578105.pdf",
+  "local_pdf_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent_marker/docs/p112/p112.pdf",
+  "doc_dir": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent_marker/docs/p112",
+  "ocr_backend": "marker",
+  "use_pdf_page_ocr": false,
+  "document_mode": "marker",
+  "asset_counts": {
+    "figures": 0,
+    "tables": 0,
+    "page_images": 0
+  },
+  "elapsed_ms": 600167.238,
+  "status": "timeout",
+  "error_type": "TimeoutExpired",
+  "error_message": "improved_ocr_agent_marker exceeded 600s for p112"
+}

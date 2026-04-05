@@ -21,7 +21,7 @@ from markdown_evaluation.scripts._common import (
     write_json,
 )
 
-SYSTEMS = ("ia_phase1", "ocr_agent", "improved_ocr_agent")
+SYSTEMS = ("ia_phase1", "ocr_agent", "improved_ocr_agent", "improved_ocr_agent_marker")
 
 
 def _safe_div(numerator: float, denominator: float) -> float:

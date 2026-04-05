@@ -122,20 +122,20 @@ class DummyOCRBackend(OCRBackendBase):
 
 class HybridPDFExtractor:
     """
-    Adaptive PDF -> Markdown extractor with 3 modes:
-      - simple_text
-      - hybrid_paper
-      - ocr
+    Adaptive PDF -> Markdown extractor.
 
-    Strategy:
-      1. Analyze document/page properties
-      2. Route each page to one of:
-         - simple text parsing
-         - hybrid extraction
-         - OCR
-      3. Save figures/tables as assets and reference them in Markdown
+    Supports two backend modes selected via the *backend* parameter:
 
-    Output:
+    ``"marker"`` (default)
+        Uses the Marker deep-learning pipeline for the entire document.
+        Bypasses per-page classification, PyMuPDF text extraction,
+        pdfplumber tables, and olmOCR calls entirely.
+
+    ``"legacy"``
+        The original three-mode pipeline (simple_text / hybrid_paper / ocr)
+        using PyMuPDF, pdfplumber, and an optional VLM OCR backend.
+
+    Output layout (both modes):
       - <pdf_name>.md
       - <pdf_name>_assets/
           - figures/
@@ -150,6 +150,9 @@ class HybridPDFExtractor:
         image_dpi: int = 180,
         ocr_dpi: int = 180,
         use_pdf_page_ocr: bool = False,
+        backend: str = "marker",
+        force_ocr: bool = False,
+        use_llm: bool = False,
     ):
         self.pdf_path = os.path.abspath(pdf_path)
         self.output_dir = os.path.dirname(self.pdf_path)
@@ -169,6 +172,9 @@ class HybridPDFExtractor:
         self.image_dpi = image_dpi
         self.ocr_dpi = ocr_dpi
         self.use_pdf_page_ocr = use_pdf_page_ocr
+        self.backend = backend if backend in ("marker", "legacy") else "marker"
+        self.force_ocr = force_ocr
+        self.use_llm = use_llm
         self._figure_fallback_counter = 0
         self._table_fallback_counter = 0
 
@@ -1824,10 +1830,35 @@ class HybridPDFExtractor:
         return md.strip()
 
     # -------------------------------------------------------------------------
+    # Marker backend
+    # -------------------------------------------------------------------------
+
+    def _extract_with_marker(self) -> str:
+        from .marker_backend import convert_pdf
+
+        result = convert_pdf(
+            self.pdf_path,
+            output_dir=self.output_dir,
+            force_ocr=self.force_ocr,
+            use_llm=self.use_llm,
+        )
+        md = result["markdown"]
+
+        if normalize_markdown is not None:
+            try:
+                md = normalize_markdown(md, title_hint=self.pdf_name).strip()
+            except Exception as exc:
+                print(f"[HybridPDFExtractor] marker post-processing skipped: {exc}")
+        return md
+
+    # -------------------------------------------------------------------------
     # Main public APIs
     # -------------------------------------------------------------------------
 
     def extract_to_markdown(self) -> str:
+        if self.backend == "marker":
+            return self._extract_with_marker()
+
         doc_fitz = fitz.open(self.pdf_path)
         doc_plumber = pdfplumber.open(self.pdf_path)
         base_size = self._get_base_font_size(doc_fitz)
@@ -1958,6 +1989,12 @@ def build_argparser() -> argparse.ArgumentParser:
         help="One or more PDF paths, glob patterns, or directories.",
     )
     parser.add_argument(
+        "--backend",
+        choices=["marker", "legacy"],
+        default="marker",
+        help="Extraction backend: 'marker' (deep-learning, default) or 'legacy' (PyMuPDF/pdfplumber/OCR).",
+    )
+    parser.add_argument(
         "--output-dir",
         default=None,
         help="Directory to save markdown outputs. Defaults to each PDF's own folder.",
@@ -1993,6 +2030,16 @@ def build_argparser() -> argparse.ArgumentParser:
         type=int,
         default=180,
         help="DPI used for OCR page image rendering.",
+    )
+    parser.add_argument(
+        "--force-ocr",
+        action="store_true",
+        help="(Marker backend) Force OCR on all pages via surya.",
+    )
+    parser.add_argument(
+        "--use-llm",
+        action="store_true",
+        help="(Marker backend) Enable Ollama LLM enhancement for higher quality.",
     )
     parser.add_argument(
         "--dummy-ocr",
@@ -2106,17 +2153,20 @@ def run_cli(args) -> int:
         print("No PDF files found.")
         return 1
 
-    backend = make_backend_from_cli(args)
+    ocr_backend = make_backend_from_cli(args) if args.backend == "legacy" else DummyOCRBackend()
 
     failed = 0
     for pdf_path in pdf_paths:
         try:
             extractor = HybridPDFExtractor(
                 pdf_path=pdf_path,
-                ocr_backend=backend,
+                ocr_backend=ocr_backend,
                 image_dpi=args.image_dpi,
                 ocr_dpi=args.ocr_dpi,
                 use_pdf_page_ocr=args.use_pdf_page_ocr,
+                backend=args.backend,
+                force_ocr=args.force_ocr,
+                use_llm=args.use_llm,
             )
 
             if args.output_dir:

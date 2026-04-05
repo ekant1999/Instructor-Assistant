@@ -7,13 +7,14 @@ from markdown_evaluation.scripts.normalize_outputs import normalize_system_outpu
 from markdown_evaluation.scripts.run_ia_phase1 import run_ia_phase1_exports
 from markdown_evaluation.scripts.run_ocr_agent import (
     run_improved_ocr_agent_exports,
+    run_improved_ocr_agent_marker_exports,
     run_ocr_agent_exports,
 )
 from markdown_evaluation.scripts.score_outputs import score_outputs
 from markdown_evaluation.scripts._common import select_docs
 
 
-SYSTEMS = ("ia_phase1", "ocr_agent", "improved_ocr_agent")
+SYSTEMS = ("ia_phase1", "ocr_agent", "improved_ocr_agent", "improved_ocr_agent_marker")
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -30,6 +31,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--ocr-model", default="allenai/olmOCR-2-7B-1025-FP8")
     parser.add_argument("--ocr-workspace", default="./tmp_ocr")
     parser.add_argument("--use-pdf-page-ocr", action="store_true", default=False)
+    parser.add_argument("--force-ocr", action="store_true", default=False, help="(Marker) Force OCR on all pages.")
+    parser.add_argument("--use-llm", action="store_true", default=False, help="(Marker) Enable Ollama LLM enhancement.")
     parser.add_argument("--timeout-seconds", type=int, default=180)
     return parser
 
@@ -62,6 +65,14 @@ def main() -> int:
                 ocr_model=args.ocr_model,
                 ocr_workspace=args.ocr_workspace,
                 use_pdf_page_ocr=bool(args.use_pdf_page_ocr),
+                timeout_seconds=int(args.timeout_seconds),
+                overwrite=bool(args.overwrite),
+            )
+        if "improved_ocr_agent_marker" in args.systems:
+            run_improved_ocr_agent_marker_exports(
+                docs,
+                force_ocr=bool(args.force_ocr),
+                use_llm=bool(args.use_llm),
                 timeout_seconds=int(args.timeout_seconds),
                 overwrite=bool(args.overwrite),
             )

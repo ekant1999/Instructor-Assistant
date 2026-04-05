@@ -39,7 +39,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--doc-ids", nargs="*", help="Optional subset of benchmark doc_ids.")
     parser.add_argument(
         "--system-name",
-        choices=["ocr_agent", "improved_ocr_agent"],
+        choices=["ocr_agent", "improved_ocr_agent", "improved_ocr_agent_marker"],
         default="ocr_agent",
         help="Which OCR agent package/output namespace to benchmark.",
     )
@@ -47,6 +47,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--ocr-model", default="allenai/olmOCR-2-7B-1025-FP8")
     parser.add_argument("--ocr-workspace", default="./tmp_ocr")
     parser.add_argument("--use-pdf-page-ocr", action="store_true", default=False)
+    parser.add_argument("--force-ocr", action="store_true", default=False, help="(Marker) Force OCR on all pages.")
+    parser.add_argument("--use-llm", action="store_true", default=False, help="(Marker) Enable Ollama LLM enhancement.")
     parser.add_argument("--timeout-seconds", type=int, default=180, help="Per-document timeout for ocr_agent extraction.")
     parser.add_argument("--overwrite", action="store_true", default=False)
     return parser
@@ -348,20 +350,175 @@ def run_improved_ocr_agent_exports(
     )
 
 
+# ---------------------------------------------------------------------------
+# Marker-backed improved_ocr_agent
+# ---------------------------------------------------------------------------
+
+def _worker_marker_extract_doc(
+    *,
+    local_pdf_path: str,
+    markdown_path: str,
+    force_ocr: bool,
+    use_llm: bool,
+    result_queue: "mp.Queue[Dict[str, Any]]",
+) -> None:
+    try:
+        _ensure_repo_import_root()
+        from improved_ocr_agent.hybrid_pdf_extractor import HybridPDFExtractor
+
+        doc_dir = Path(markdown_path).parent
+        extractor = HybridPDFExtractor(
+            pdf_path=local_pdf_path,
+            backend="marker",
+            force_ocr=force_ocr,
+            use_llm=use_llm,
+        )
+        start = time.perf_counter()
+        saved_path = extractor.save_markdown(output_path=markdown_path)
+        elapsed_ms = round((time.perf_counter() - start) * 1000.0, 3)
+        result_queue.put(
+            {
+                "status": "success",
+                "markdown_path": str(Path(saved_path).resolve()),
+                "ocr_backend": "marker",
+                "use_pdf_page_ocr": False,
+                "document_mode": "marker",
+                "elapsed_ms": elapsed_ms,
+            }
+        )
+    except Exception as exc:
+        result_queue.put(
+            {
+                "status": "error",
+                "error_type": type(exc).__name__,
+                "error_message": str(exc),
+                "traceback": traceback.format_exc(limit=20),
+            }
+        )
+
+
+def run_improved_ocr_agent_marker_exports(
+    docs: Sequence[BenchmarkDoc],
+    *,
+    force_ocr: bool = False,
+    use_llm: bool = False,
+    timeout_seconds: int = 600,
+    overwrite: bool = False,
+) -> List[Dict[str, Any]]:
+    """Run the Marker-backed improved_ocr_agent on benchmark documents."""
+    system_name = "improved_ocr_agent_marker"
+    ensure_dirs()
+    root = system_root(system_name)
+    rows: List[Dict[str, Any]] = []
+
+    for idx, doc in enumerate(docs, start=1):
+        doc_dir = system_doc_dir(system_name, doc.doc_id)
+        doc_dir.mkdir(parents=True, exist_ok=True)
+        local_pdf_path = doc_dir / f"{doc.doc_id}.pdf"
+        markdown_path = doc_dir / "paper.md"
+        if local_pdf_path.exists() and not overwrite:
+            pass
+        else:
+            shutil.copy2(doc.pdf_path, local_pdf_path)
+
+        print(f"[{system_name}] [{idx}/{len(docs)}] start {doc.doc_id}", flush=True)
+        result_queue: "mp.Queue[Dict[str, Any]]" = mp.Queue()
+        process = mp.get_context("spawn").Process(
+            target=_worker_marker_extract_doc,
+            kwargs={
+                "local_pdf_path": str(local_pdf_path),
+                "markdown_path": str(markdown_path),
+                "force_ocr": force_ocr,
+                "use_llm": use_llm,
+                "result_queue": result_queue,
+            },
+        )
+        started_at = time.perf_counter()
+        process.start()
+        process.join(timeout_seconds)
+
+        worker_result: Dict[str, Any]
+        if process.is_alive():
+            process.terminate()
+            process.join(5)
+            worker_result = {
+                "status": "timeout",
+                "error_type": "TimeoutExpired",
+                "error_message": f"{system_name} exceeded {timeout_seconds}s for {doc.doc_id}",
+                "elapsed_ms": round((time.perf_counter() - started_at) * 1000.0, 3),
+                "ocr_backend": "marker",
+                "document_mode": "marker",
+            }
+        elif not result_queue.empty():
+            worker_result = result_queue.get()
+        else:
+            worker_result = {
+                "status": "error",
+                "error_type": "NoResultError",
+                "error_message": f"{system_name} exited without returning a result for {doc.doc_id}",
+                "elapsed_ms": round((time.perf_counter() - started_at) * 1000.0, 3),
+                "ocr_backend": "marker",
+                "document_mode": "marker",
+            }
+
+        row: Dict[str, Any] = {
+            "doc_id": doc.doc_id,
+            "system": system_name,
+            "title": doc.title,
+            "pdf_path": str(doc.pdf_path),
+            "local_pdf_path": str(local_pdf_path),
+            "doc_dir": str(doc_dir),
+            "ocr_backend": "marker",
+            "use_pdf_page_ocr": False,
+            "document_mode": str(worker_result.get("document_mode") or "marker"),
+            "asset_counts": _count_assets(doc_dir, doc.doc_id),
+            "elapsed_ms": float(worker_result.get("elapsed_ms") or round((time.perf_counter() - started_at) * 1000.0, 3)),
+            "status": str(worker_result.get("status") or "error"),
+        }
+        if worker_result.get("markdown_path"):
+            row["markdown_path"] = str(worker_result["markdown_path"])
+        if worker_result.get("error_type"):
+            row["error_type"] = str(worker_result["error_type"])
+        if worker_result.get("error_message"):
+            row["error_message"] = str(worker_result["error_message"])
+        if worker_result.get("traceback"):
+            row["traceback"] = str(worker_result["traceback"])
+        write_json(doc_dir / "benchmark_result.json", row)
+        print(
+            f"[{system_name}] [{idx}/{len(docs)}] {doc.doc_id} -> {row['status']} "
+            f"({row['elapsed_ms']:.1f} ms)",
+            flush=True,
+        )
+        rows.append(row)
+
+    write_jsonl(root / "run_manifest.jsonl", rows)
+    write_json(RUN_DIR / f"latest_{system_name}.json", {"system": system_name, "documents": rows})
+    return rows
+
+
 def main() -> int:
     args = _build_parser().parse_args()
     docs = select_docs(args.doc_ids)
-    rows = run_ocr_agent_exports(
-        docs,
-        system_name=args.system_name,
-        package_name=args.system_name,
-        ocr_server=args.ocr_server,
-        ocr_model=args.ocr_model,
-        ocr_workspace=args.ocr_workspace,
-        use_pdf_page_ocr=bool(args.use_pdf_page_ocr),
-        timeout_seconds=int(args.timeout_seconds),
-        overwrite=bool(args.overwrite),
-    )
+    if args.system_name == "improved_ocr_agent_marker":
+        rows = run_improved_ocr_agent_marker_exports(
+            docs,
+            force_ocr=bool(args.force_ocr),
+            use_llm=bool(args.use_llm),
+            timeout_seconds=int(args.timeout_seconds),
+            overwrite=bool(args.overwrite),
+        )
+    else:
+        rows = run_ocr_agent_exports(
+            docs,
+            system_name=args.system_name,
+            package_name=args.system_name,
+            ocr_server=args.ocr_server,
+            ocr_model=args.ocr_model,
+            ocr_workspace=args.ocr_workspace,
+            use_pdf_page_ocr=bool(args.use_pdf_page_ocr),
+            timeout_seconds=int(args.timeout_seconds),
+            overwrite=bool(args.overwrite),
+        )
     print(f"[{args.system_name}] exported {len(rows)} document(s)")
     return 0
 
