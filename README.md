@@ -159,6 +159,7 @@ The ChatGPT SDK widget lives in `chatgpt-sdk-app/`. Follow `chatgpt-sdk-app/READ
 - **Downloaded PDFs**: `backend/data/pdfs/`
 - **Exports**: `backend/exports/`
 - **Search Benchmark Workspace**: `search_evaluation/`
+- **Markdown Benchmark Workspace**: `markdown_evaluation/`
 - **MinIO Storage Notes**: `docs/storage/minio.md`
 
 These are local artifacts and are not meant to be committed.
@@ -171,6 +172,7 @@ Instructor-Assistant/
 ├── client/                # React + Vite SPA
 ├── docs/                  # Architecture and operational notes
 ├── modules/               # Reusable Python package(s), including ia_phase1
+├── markdown_evaluation/   # PDF-to-Markdown benchmark workspace
 ├── search_evaluation/     # Isolated search benchmark workspace
 ├── chatgpt-sdk-app/       # ChatGPT Apps SDK widget (optional)
 └── attached_assets/       # Static assets for the frontend
@@ -186,6 +188,12 @@ Instructor-Assistant/
 
 - `search_evaluation/` contains the isolated benchmark corpus, curated queries/gold labels, scripts, and reports for evaluating the active library search pipeline.
 - Start with `search_evaluation/README.md` for the benchmark workflow.
+
+## 📄 Markdown Benchmarking
+
+- `markdown_evaluation/` contains the benchmark corpus, gold annotations, scripts, and reports for evaluating PDF-to-Markdown extraction across `ia_phase1`, `ocr_agent`, and `improved_ocr_agent`.
+- Start with `markdown_evaluation/README.md` for the benchmark workflow.
+- `improved_ocr_agent/README.md` documents the revised OCR package and its `ia_phase1` dependencies.
 
 ## 📝 API Overview
 

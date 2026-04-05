@@ -1,9 +1,10 @@
 # Markdown Evaluation
 
-This workspace benchmarks PDF-to-Markdown extraction quality across two systems:
+This workspace benchmarks PDF-to-Markdown extraction quality across three systems:
 
 - `ia_phase1`: the current project pipeline under `modules/phase1-python/src/ia_phase1`
 - `ocr_agent`: the alternative hybrid extractor added under `ocr_agent/`
+- `improved_ocr_agent`: the revised hybrid extractor under `improved_ocr_agent/`
 
 The benchmark is designed to answer three questions:
 
@@ -26,7 +27,7 @@ The benchmark is designed to answer three questions:
 
 This benchmark does not compare raw markdown strings directly. Instead it:
 
-1. runs both extraction systems
+1. runs the selected extraction systems
 2. normalizes their outputs into a common JSON schema
 3. scores them against gold annotations when gold exists
 4. always reports intrinsic markdown quality metrics even when gold is missing
@@ -125,10 +126,37 @@ Use a unique `doc_id` for each document. `paper_id` is optional.
 
 ### 3. Run extraction + normalization + scoring
 
-This runs both systems, rewrites outputs, regenerates normalized JSON, and updates reports:
+This runs all three systems by default, rewrites outputs, regenerates normalized JSON, and updates reports:
 
 ```bash
 PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/run_benchmark.py \
+  --overwrite \
+  --ensure-assets
+```
+
+If you want OCR-backed evaluation for `ocr_agent` and `improved_ocr_agent`, pass a live OCR server:
+
+```bash
+PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/run_benchmark.py \
+  --overwrite \
+  --ensure-assets \
+  --ocr-server https://<your-server>/v1
+```
+
+If you want to benchmark only a subset of systems:
+
+```bash
+PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/run_benchmark.py \
+  --systems ia_phase1 improved_ocr_agent \
+  --overwrite \
+  --ensure-assets
+```
+
+If you want to benchmark only a subset of documents:
+
+```bash
+PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/run_benchmark.py \
+  --doc-ids p114 p119 a004 t001 \
   --overwrite \
   --ensure-assets
 ```
@@ -140,6 +168,9 @@ Outputs are written to:
 - `markdown_evaluation/reports/summary.md`
 - `markdown_evaluation/reports/summary.json`
 - `markdown_evaluation/runs/latest_scores.json`
+- `markdown_evaluation/runs/latest_ia_phase1.json`
+- `markdown_evaluation/runs/latest_ocr_agent.json`
+- `markdown_evaluation/runs/latest_improved_ocr_agent.json`
 
 ### 4. Bootstrap gold templates for newly added docs
 
@@ -235,6 +266,15 @@ Then open:
 
 - `markdown_evaluation/reports/gold_curation.md`
 
+The reports now include:
+
+- overall system means
+- per-document scores
+- PDF type breakdowns such as:
+  - `pdf_type_research`
+  - `pdf_type_hybrid`
+  - `pdf_type_textheavy`
+
 ## Individual helper commands
 
 Run only the project pipeline:
@@ -245,10 +285,29 @@ PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/run_ia_phase
   --ensure-assets
 ```
 
-Run only the hybrid extractor:
+Run only the original OCR-backed hybrid extractor:
 
 ```bash
 PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/run_ocr_agent.py \
+  --overwrite \
+  --timeout-seconds 180
+```
+
+Run only `improved_ocr_agent`:
+
+```bash
+PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/run_ocr_agent.py \
+  --system-name improved_ocr_agent \
+  --overwrite \
+  --timeout-seconds 180
+```
+
+Run either OCR-based system with a live OCR server:
+
+```bash
+PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/run_ocr_agent.py \
+  --system-name improved_ocr_agent \
+  --ocr-server https://<your-server>/v1 \
   --overwrite \
   --timeout-seconds 180
 ```
@@ -259,11 +318,48 @@ Normalize previously generated outputs:
 PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/normalize_outputs.py
 ```
 
+Normalize only selected systems:
+
+```bash
+PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/normalize_outputs.py \
+  --systems ia_phase1 improved_ocr_agent
+```
+
 Score normalized outputs:
 
 ```bash
 PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/score_outputs.py
 ```
+
+Score only selected systems:
+
+```bash
+PYTHONPATH=. backend/.webenv/bin/python markdown_evaluation/scripts/score_outputs.py \
+  --systems ia_phase1 ocr_agent improved_ocr_agent
+```
+
+## OCR-specific notes
+
+- If `--ocr-server` is omitted, `ocr_agent` and `improved_ocr_agent` run without a live OCR backend.
+- OCR-backed runs can be substantially slower on OCR-heavy PDFs such as scanned or hybrid assignments.
+- A document can still complete successfully even if a few OCR pages fall back after request failures.
+
+## `improved_ocr_agent` routing metadata
+
+For `improved_ocr_agent`, each document-level `benchmark_result.json` can include routing observability fields such as:
+
+- `non_ocr_document_handler`
+- `non_ocr_runs`
+- `ia_score`
+- `native_score`
+- `non_ocr_page_handlers`
+- `non_ocr_scores`
+
+These fields are useful when debugging the revised routing strategy:
+
+- research / structured visual non-OCR pages -> `ia_phase1`
+- text-heavy report/manual non-OCR pages -> native `ocr_agent`
+- OCR pages -> unchanged OCR path
 
 ## Current pilot corpus
 
