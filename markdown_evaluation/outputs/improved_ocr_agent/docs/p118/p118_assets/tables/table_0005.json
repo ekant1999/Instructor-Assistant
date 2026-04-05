@@ -1,0 +1,50 @@
+{
+  "paper_id": 686086342880,
+  "page_no": 12,
+  "bbox": {
+    "x0": 72.61900329589844,
+    "y0": 74.79200744628906,
+    "x1": 522.656005859375,
+    "y1": 210.3627471923828
+  },
+  "caption": "Table 5: Detailed dataset statistics used in our experiments, following the FlashRAG benchmark release (Jin et al., 2025). All datasets use the FlashRAG-provided Wikipedia corpus (wiki18_100w) as external knowledge.",
+  "n_rows": 2,
+  "n_cols": 6,
+  "headers": [
+    "Dataset",
+    "Task",
+    "Description",
+    "Train",
+    "Test",
+    "Metric"
+  ],
+  "rows": [
+    [
+      "BoolQ",
+      "Yes or No QA",
+      "Naturally occurring Yes or No questions paired with supporting\ndocuments.",
+      "9,427",
+      "3,270",
+      "Acc"
+    ],
+    [
+      "zsRE",
+      "Slot filling",
+      "Relation extraction framed as answering natural-language rela-\ntion queries over factual knowledge.",
+      "147,909",
+      "3,724",
+      "Acc"
+    ]
+  ],
+  "markdown": "| Dataset | Task | Description | Train | Test | Metric |\n| --- | --- | --- | --- | --- | --- |\n| BoolQ | Yes or No QA | Naturally occurring Yes or No questions paired with supporting<br/>documents. | 9,427 | 3,270 | Acc |\n| zsRE | Slot filling | Relation extraction framed as answering natural-language rela-<br/>tion queries over factual knowledge. | 147,909 | 3,724 | Acc |",
+  "csv_text": "Dataset,Task,Description,Train,Test,Metric\r\nBoolQ,Yes or No QA,\"Naturally occurring Yes or No questions paired with supporting\ndocuments.\",\"9,427\",\"3,270\",Acc\r\nzsRE,Slot filling,\"Relation extraction framed as answering natural-language rela-\ntion queries over factual knowledge.\",\"147,909\",\"3,724\",Acc",
+  "section_canonical": "ethical_consideration",
+  "section_title": "Ethical Consideration",
+  "section_source": "arxiv_source",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 4,
+  "detection_strategy": "caption_guided_native",
+  "id": 5,
+  "json_file": "table_0005.json"
+}

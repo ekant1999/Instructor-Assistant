@@ -1,0 +1,53 @@
+{
+  "paper_id": 836157733902,
+  "page_no": 9,
+  "bbox": {
+    "x0": 153.68299865722656,
+    "y0": 526.4142456054688,
+    "x1": 458.3161926269531,
+    "y1": 553.3634643554688
+  },
+  "caption": "Table 2: Main Results: Policy Efficacy on LIBERO. We report the success rate (%). We compare VLA-OPD (trained on 1-traj) against two groups of baselines: (1) Full-Dataset Methods: Models trained on the complete expert dataset (50 demos/task), representing the data-abundant upper bound. (2) Data-Scarce Methods: Models trained on the same 1-traj split. VLA-OPD achieves performance comparable to Full-Dataset methods, significantly outperforming other data-scarce approaches.",
+  "n_rows": 2,
+  "n_cols": 7,
+  "headers": [
+    "OpenVLA",
+    "OFT Kim et al. (2025) (Student Init.)",
+    "63.6",
+    "54.9",
+    "59.6",
+    "17.3",
+    "48.9"
+  ],
+  "rows": [
+    [
+      "VLA-OPD",
+      "(Ours) (Distill)",
+      "84.3",
+      "93.8",
+      "92.5",
+      "78.9",
+      "87.4"
+    ],
+    [
+      "VLA-OPD",
+      "(Ours) (Distill + GRPO)",
+      "93.4",
+      "95.3",
+      "94.5",
+      "90.2",
+      "93.4"
+    ]
+  ],
+  "markdown": "| OpenVLA | OFT Kim et al. (2025) (Student Init.) | 63.6 | 54.9 | 59.6 | 17.3 | 48.9 |\n| --- | --- | --- | --- | --- | --- | --- |\n| VLA-OPD | (Ours) (Distill) | 84.3 | 93.8 | 92.5 | 78.9 | 87.4 |\n| VLA-OPD | (Ours) (Distill + GRPO) | 93.4 | 95.3 | 94.5 | 90.2 | 93.4 |",
+  "csv_text": "OpenVLA,OFT Kim et al. (2025) (Student Init.),63.6,54.9,59.6,17.3,48.9\r\nVLA-OPD,(Ours) (Distill),84.3,93.8,92.5,78.9,87.4\r\nVLA-OPD,(Ours) (Distill + GRPO),93.4,95.3,94.5,90.2,93.4",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": "Figure 2: Training Efficiency Comparison. We compare our method with the baseline GRPO across two benchmarks. The red line (Ours (Distill)) demonstrates superior sample efficiency in the early stages, achieving high success rates with significantly fewer steps. The dashed orange line (Ours (Distill + GRPO)) shows that further RL fine-tuning breaks the performance bottleneck, surpassing the baseline’s final convergence. Notably, on LIBERO-Long (b), our method achieves near 80% success rate in just 50 steps, whereas the baseline requires over 150 steps, representing a 3× speedup.",
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 1,
+  "json_file": "table_0001.json"
+}

@@ -1,83 +1,148 @@
-a001
-<!-- document_mode: ocr -->
-<!-- page 1 mode: hybrid_paper -->
-Name: Siddhant Abhijit Raje
-Student ID: 018179954
-Part 2:
-HTTP Traffic:
-![Figure 1 on Page 1](a001_assets/figures/a001_page_1_fig_1.png)
----
-<!-- page 2 mode: ocr -->
-<!-- OCR page 2 -->
-DNS Traffic:
-![Screenshot of a network traffic capture showing HTTP requests and responses](a001_assets/figures/ocr_page_2_324_186_1536_495.png)
-![Screenshot of a network traffic capture showing DNS requests and responses](a001_assets/figures/ocr_page_2_324_1092_1536_495.png)
----
-<!-- page 3 mode: ocr -->
-<!-- OCR page 3 -->
-TCP Traffic:
-![Screenshot of a network traffic capture showing TCP traffic analysis](a001_assets/figures/ocr_page_3_312_374_1568_693.png)
-UDP Traffic:
----
-<!-- page 4 mode: hybrid_paper -->
-Normal browsing instantly produces DNS lookups, then TCP/TLS or UDP/QUIC connections, followed by application data. Background traffic (e.g., mDNS, DHCPv6, ARP/ND) is typical on LANs and may appear even when you aren’t actively browsing.
-![Figure 2 on Page 4](a001_assets/figures/a001_page_4_fig_1.png)
+# Name: Siddhant Abhijit Raje
 
-## Part 3: Identify HTTP Requests and Responses
+<!-- document_mode: ocr -->
+
+<!-- page 1 mode: hybrid_paper -->
+
+CMPE 286 – LAB – 1
+
+Student ID: 018179954
+
+Part 1: Installation
+
+Part 2:
+
+HTTP Traffic:
+
+---
+
+<!-- page 2 mode: ocr -->
+
+<!-- OCR page 2 -->
+
+DNS Traffic:
+
+![Screenshot of DNS traffic capture showing network packets and protocol analysis](a001_assets/figures/ocr_page_2_184_120_1760_355.png)
+
+![Screenshot of DNS traffic capture showing network packets and protocol analysis](a001_assets/figures/ocr_page_2_184_1200_1760_355.png)
+
+---
+
+<!-- page 3 mode: ocr -->
+
+<!-- OCR page 3 -->
+
+TCP Traffic:
+
+![Screenshot of a network traffic capture showing TCP traffic analysis](a001_assets/figures/ocr_page_3_324_370_1568_693.png)
+
+UDP Traffic:
+
+---
+
+<!-- page 4 mode: hybrid_paper -->
+
+Normal browsing instantly produces DNS lookups, then TCP/TLS or UDP/QUIC connections, followed by application data. Background traffic (e.g., mDNS, DHCPv6, ARP/ND) is typical on LANs and may appear even when you aren’t actively browsing.
+
+Part 3: Identify HTTP Requests and Responses:
+
 - Filter for HTTP packets and identify GET and POST requests (any one request is fine).
+
 - Click on a packet and expand the Hypertext Transfer Protocol section to see details of the request (like
+
 the URL, Host, and User-Agent).
+
 ---
+
 <!-- page 5 mode: ocr -->
+
 <!-- OCR page 5 -->
+
 Analyze DNS Packets:
+
 ---
+
 <!-- page 6 mode: ocr -->
+
 <!-- OCR page 6 -->
 
-## Part 4: Custom Columns
-![Screenshot of a network traffic capture tool showing custom columns and HTTP requests](a001_assets/figures/ocr_page_6_328_357_1867_693.png)
+Part 4: Custom Columns:
+
+![Screenshot of a network traffic capture tool showing custom columns and HTTP requests](a001_assets/figures/ocr_page_6_328_312_1568_799.png)
+
 Custom Coloring rules:
+
 HTTP:
+
 ---
+
 <!-- page 7 mode: ocr -->
+
 <!-- OCR page 7 -->
+
 DNS:
-![Screenshot of a network traffic capture showing HTTP requests and DNS queries](page_246_370_1598_370.png)
-![Screenshot of a network traffic capture showing DNS requests](a001_assets/figures/ocr_page_7_246_1042_1598_370.png)
+
+![Screenshot of a network capture showing HTTP traffic](a001_assets/figures/ocr_page_7_256_184_1792_384.png)
+
+![Screenshot of a network capture showing DNS traffic](a001_assets/figures/ocr_page_7_256_1024_1792_384.png)
+
 ---
+
 <!-- page 8 mode: ocr -->
+
 <!-- OCR page 8 -->
 
-## Part 5: Advanced Analysis
+Part 5: Advanced Analysis
+
 Protocol Hierarchy:
-![Wireshark Protocol Hierarchy Statistics screenshot](a001_assets/figures/ocr_page_8_374_382_1762_1092.png)
+
+![Wireshark Protocol Hierarchy Statistics screenshot](a001_assets/figures/ocr_page_8_324_370_1836_1092.png)
+
 TCP Stream:
+
 ---
+
 <!-- page 9 mode: hybrid_paper -->
 
-## Part 6: Delay and Jitter
+Part 6: Delay and Jitter
+
 Hosts selected:
-Harvard.edu 2. Mit.edu 3. Utexas.edu 4. www.ust.hk 5. Ethz.ch
-![Figure 3 on Page 9](a001_assets/figures/a001_page_9_fig_1.png)
+
+## Harvard.edu
+
 MIT Pings:
+
 ---
+
 <!-- page 10 mode: ocr -->
+
 <!-- OCR page 10 -->
+
 UTexas Pings:
+
 ---
+
 <!-- page 11 mode: ocr -->
+
 <!-- OCR page 11 -->
+
 Histogram of RTT:
+
 Harvard.edu:
+
 ---
+
 <!-- page 12 mode: ocr -->
+
 <!-- OCR page 12 -->
+
 RTT Histogram - Combined
-![RTT Histogram - Combined](a001_assets/figures/ocr_page_12_324_186_1572_1092.png)
+
+![RTT Histogram - Combined](a001_assets/figures/ocr_page_12_328_186_1472_1092.png)
+
 Stats:
+
 <table>
-$$
   <tr>
     <th>file</th>
     <th>count</th>
@@ -233,15 +298,20 @@ $$
     <td>23.190262626262600</td>
   </tr>
 </table>
-$$
+
 Mit.edu:
+
 ---
+
 <!-- page 13 mode: ocr -->
+
 <!-- OCR page 13 -->
-![RTT Histogram - Combined](a001_assets/figures/ocr_page_13_324_186_1536_1092.png)
+
+![RTT Histogram - Combined](a001_assets/figures/ocr_page_13_324_186_1572_1092.png)
+
 Stats:
+
 <table>
-$$
   <tr>
     <th>file</th>
     <th>count</th>
@@ -397,15 +467,20 @@ $$
     <td>24.806030303030300</td>
   </tr>
 </table>
-$$
+
 Utexas.edu:
+
 ---
+
 <!-- page 14 mode: ocr -->
+
 <!-- OCR page 14 -->
-![RTT Histogram - Combined](a001_assets/figures/ocr_page_14_324_186_1572_1092.png)
+
+![RTT Histogram - Combined](a001_assets/figures/ocr_page_14_324_186_1597_1042.png)
+
 Stats:
+
 <table>
-$$
   <tr>
     <th>file</th>
     <th>count</th>
@@ -561,15 +636,20 @@ $$
     <td>20.368898989899000</td>
   </tr>
 </table>
-$$
+
 UST:
+
 ---
+
 <!-- page 15 mode: ocr -->
+
 <!-- OCR page 15 -->
-![RTT Histogram - Combined](a001_assets/figures/ocr_page_15_256_184_1792_1040.png)
+
+![RTT Histogram - Combined](a001_assets/figures/ocr_page_15_312_246_1527_1092.png)
+
 Stats:
+
 <table>
-$$
   <tr>
     <th>file</th>
     <th>count</th>
@@ -725,36 +805,62 @@ $$
     <td>22.096656565656600</td>
   </tr>
 </table>
-$$
+
 Ethz:
+
 ---
+
 <!-- page 16 mode: hybrid_paper -->
-![Figure 4 on Page 16](a001_assets/figures/a001_page_16_fig_1.png)
+
+Stats:
+
 Observation: U.S. destinations generally have lower RTTs than overseas ones; transoceanic links produce the largest hop-to-hop increases in traceroute. Wireless links and last-mile congestion raise jitter. Larger ICMP payloads may slightly increase RTT and variability due to serialization time and buffering.
+
 ---
+
 <!-- page 17 mode: hybrid_paper -->
-1st Entry : SYN
-2nd Entry: SYN, ACK
-3rd Entry: ACK
-![Figure 5 on Page 17](a001_assets/figures/a001_page_17_fig_1.png)
+
+Part 7: TCP 3-Way Handshake and Packet Timing
+
+## rd Entry: ACK
+
 Time between SYN and SYN, ACK: 0.025380
+
 Time between SYN, ACK and ACK: 0.000256
-(Changed the time view as: Set View -> Time Display Format -> Seconds Since Previous Displayed Packet)
+
+(Changed the time view as: Set View -> Time Display Format -> Seconds Since Previous
+Displayed Packet)
+
 Final Observations:
+
+## Protocol mix &
+
 1. Protocol mix & encryption. The capture shows a contemporary web stack where
+
 encryption and UDP-based transports are first-class: DNS to map names to IPs, then either TLS over TCP (HTTPS) or QUIC over UDP (HTTP/3). QUIC’s presence
+
 ---
+
 <!-- page 18 mode: simple_text -->
+
 under the generic udp filter explains why DNS and QUIC co-appear; protocol hierarchy confirms their relative shares.
+
+## Name resolution
+
 2. Name resolution precedes data flows. For each site, DNS queries precede
+
 connection establishment. Cached domains reduce or eliminate network DNS lookups. Where DNS is slow or fails, application flows stall, a reminder that name resolution is on the critical path.
+
+## Latency, jitter, and
+
 3. Latency, jitter, and paths. Repeated 100-ping batches reveal that where the server is
-(and when you measure) matters: nearby U.S. hosts exhibit low median RTTs and tight dispersion, while overseas hosts have higher medians with larger tails.
-Traceroute highlights the longest link(s)-often a transoceanic or inter-regional backbone, and occasional path changes across runs.
-$$
-### 4. TCP handshake timing. The SYN->SYN,ACK interval aligns with end-to-end RTT;
-$$
+
+(and when you measure) matters: nearby U.S. hosts exhibit low median RTTs and tight dispersion, while overseas hosts have higher medians with larger tails. Traceroute highlights the longest link(s)-often a transoceanic or inter-regional backbone, and occasional path changes across runs.
+
 SYN,ACK->ACK is almost entirely host processing. ECN flags (ECE/CWR) may appear during handshake on networks that negotiate congestion-experienced signaling.
+
 5. Practical analysis aids. Custom columns for ports and HTTP fields, plus simple
+
 coloring rules, significantly speed up triage-particularly when QUIC, DNS, and TLS traffic interleave. Protocol Hierarchy and “Follow TCP Stream” provide fast summaries and per-flow clarity, respectively.
+
 ---

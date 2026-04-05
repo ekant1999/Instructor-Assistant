@@ -1,0 +1,70 @@
+{
+  "paper_id": 893555535508,
+  "page_no": 8,
+  "bbox": {
+    "x0": 60.98881149291992,
+    "y0": 75.12222290039062,
+    "x1": 281.95263671875,
+    "y1": 225.74395751953125
+  },
+  "caption": "Table 6. Ablation results on SemanticKitti. The “geo-aware” stands for applying geometry confidence maps C in the segmenta- tion forcing loss (cf. Eq. (3)).",
+  "n_rows": 3,
+  "n_cols": 9,
+  "headers": [
+    "Method",
+    "Sema",
+    "nt",
+    "ic KITTI",
+    "sequence",
+    "Occ",
+    "3D-Nu",
+    "Scene",
+    "s surround-view"
+  ],
+  "rows": [
+    [
+      "Res.",
+      "Pre.",
+      "",
+      "Rec. Io",
+      "U mIoU mIoUsc",
+      "Res.",
+      "Pre.",
+      "Rec.",
+      "IoU mIoU mI"
+    ],
+    [
+      "OccAny 512x16",
+      "0 36.7",
+      "9",
+      "46.70 25.",
+      "91 7.28 13.53",
+      "512x288",
+      "45.04",
+      "58.54",
+      "34.15 6.66 1"
+    ],
+    [
+      "OccAny+ 512x16",
+      "0 38.1",
+      "2",
+      "49.14 27.",
+      "33 6.48 13.30",
+      "512x288",
+      "46.38",
+      "54.66",
+      "33.49 7.20 1"
+    ]
+  ],
+  "markdown": "| Method | Sema | nt | ic KITTI | sequence | Occ | 3D-Nu | Scene | s surround-view |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| Res. | Pre. |  | Rec. Io | U mIoU mIoUsc | Res. | Pre. | Rec. | IoU mIoU mI |\n| OccAny 512x16 | 0 36.7 | 9 | 46.70 25. | 91 7.28 13.53 | 512x288 | 45.04 | 58.54 | 34.15 6.66 1 |\n| OccAny+ 512x16 | 0 38.1 | 2 | 49.14 27. | 33 6.48 13.30 | 512x288 | 46.38 | 54.66 | 33.49 7.20 1 |",
+  "csv_text": "Method,Sema,nt,ic KITTI,sequence,Occ,3D-Nu,Scene,s surround-view\r\nRes.,Pre.,,Rec. Io,U mIoU mIoUsc,Res.,Pre.,Rec.,IoU mIoU mI\r\nOccAny 512x16,0 36.7,9,46.70 25.,91 7.28 13.53,512x288,45.04,58.54,34.15 6.66 1\r\nOccAny+ 512x16,0 38.1,2,49.14 27.,33 6.48 13.30,512x288,46.38,54.66,33.49 7.20 1",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": "Figure 7. PCA visualization of our segmentation features of multi-view sequences. Low-resolution features capture high-level semantics (e.g., separating cars, buildings, and roads), while high- resolution features capture low-level details such as boundaries and textures. Features remain consistent across different views.",
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 1,
+  "json_file": "table_0001.json"
+}

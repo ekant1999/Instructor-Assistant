@@ -1,0 +1,161 @@
+{
+  "paper_id": 860930833796,
+  "page_no": 8,
+  "bbox": {
+    "x0": 108.0,
+    "y0": 106.9554214477539,
+    "x1": 504.0014953613281,
+    "y1": 352.1602478027344
+  },
+  "caption": "Table 2: The Transformer achieves better BLEU scores than previous state-of-the-art models on the English-to-German and English-to-French newstest2014 tests at a fraction of the training cost.",
+  "n_rows": 14,
+  "n_cols": 7,
+  "headers": [
+    "",
+    "Model",
+    "BLEU",
+    "U T",
+    "Training Co",
+    "ost (FL",
+    "LOPs)"
+  ],
+  "rows": [
+    [
+      "",
+      "Model",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "",
+      "EN-DE",
+      "EN-FR",
+      "EN-DE",
+      "EN",
+      "-FR"
+    ],
+    [
+      "",
+      "ByteNet [18]",
+      "23.75",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "20"
+    ],
+    [
+      "",
+      "Deep-Att + P osUnk [39]",
+      "",
+      "39.2",
+      "",
+      "1.0\n·",
+      "10"
+    ],
+    [
+      "",
+      "GNMT + RL [38]",
+      "24.6",
+      "39.92",
+      "2.3 1019\n·",
+      "1.4\n·",
+      "1020"
+    ],
+    [
+      "",
+      "ConvS2S [9]",
+      "25.16",
+      "40.46",
+      "9.6 1018\n·",
+      "1.5\n·",
+      "1020"
+    ],
+    [
+      "",
+      "MoE [32]",
+      "26.03",
+      "40.56",
+      "2.0 1019\n·",
+      "1.2\n·",
+      "1020"
+    ],
+    [
+      "",
+      "Deep-Att + P osUnk Ense mble [39]",
+      "",
+      "40.4",
+      "",
+      "8.0\n·",
+      "1020"
+    ],
+    [
+      "",
+      "GNMT + RL Ensemble [3 8]",
+      "26.30",
+      "41.16",
+      "1.8 1020\n·",
+      "1.1\n·",
+      "1021"
+    ],
+    [
+      "",
+      "ConvS2S Ens emble [9]",
+      "26.36",
+      "41.29",
+      "7.7 1019\n·",
+      "1.2\n·",
+      "1021"
+    ],
+    [
+      "",
+      "Transformer ( base model)",
+      "27.3",
+      "38.1",
+      "3.3 ·",
+      "1018",
+      ""
+    ],
+    [
+      "",
+      "Transformer ( big)",
+      "28.4",
+      "41.8",
+      "2.3\n·",
+      "1019",
+      ""
+    ],
+    [
+      "Residu",
+      "al Dropout We apply dr opout [3 3] t",
+      "o the outpu",
+      "t of each sub-",
+      "layer, befor",
+      "e it is",
+      "added t o the"
+    ]
+  ],
+  "markdown": "|Col1|Model|Col3|Col4|Col5|BLEU|U T|Training Co|ost (FL|LOPs)|Col11|\n|---|---|---|---|---|---|---|---|---|---|---|\n||Model||||||||||\n||||||EN&amp;#45;DE|EN&amp;#45;FR|EN&amp;#45;DE|EN|&amp;#45;FR||\n||ByteNet [18]||||23.75||||||\n||||||||||20||\n||Deep&amp;#45;Att + P|osUnk [39]||||39.2||1.0 ·|10||\n||GNMT + RL|[38]|||24.6|39.92|2.3 1019 ·|1.4 ·|1020||\n||ConvS2S [9]||||25.16|40.46|9.6 1018 ·|1.5 ·|1020||\n||MoE [32]||||26.03|40.56|2.0 1019 ·|1.2 ·|1020||\n||Deep&amp;#45;Att + P|osUnk Ense|mble [39]|||40.4||8.0 ·|1020||\n||GNMT + RL|Ensemble [3|8]||26.30|41.16|1.8 1020 ·|1.1 ·|1021||\n||ConvS2S Ens|emble [9]|||26.36|41.29|7.7 1019 ·|1.2 ·|1021||\n||Transformer (|base model)|||27.3|38.1|3.3 ·|1018|||\n||Transformer (|big)|||28.4|41.8|2.3 ·|1019|||\n||||||||||||\n|Residu|al Dropout|We apply dr|opout [3|3] t|o the outpu|t of each sub&amp;#45;|layer, befor|e it is|added t|o the|\n|sub&amp;#45;lay|er input and n|ormalized. I|n additio|n, w|e apply dr|opout to the su|ms of the e|mbedd|ings an|d the|\n|positio|nal encodings|in both the|encoder|and|decoder s|tacks. For the|base mode|l, we|use a ra|te of|\n||||||||||||\n|P drop|= 0.1.||||||||||\n||||||||||||\n||||||||||||\n|Label|Smoothing|During train|ing, we|em|ployed lab|el smoothing|of value ϵ l|= 0. s|1 [36].|This|\n|hurts p|erplexity, as th|e model lea|rns to be|mo|re unsure,|but improves|accuracy an|d BL|EU scor|e.|",
+  "csv_text": ",Model,BLEU,U T,Training Co,ost (FL,LOPs)\r\n,Model,,,,,\r\n,,EN-DE,EN-FR,EN-DE,EN,-FR\r\n,ByteNet [18],23.75,,,,\r\n,,,,,,20\r\n,Deep-Att + P osUnk [39],,39.2,,\"1.0\n·\",10\r\n,GNMT + RL [38],24.6,39.92,\"2.3 1019\n·\",\"1.4\n·\",1020\r\n,ConvS2S [9],25.16,40.46,\"9.6 1018\n·\",\"1.5\n·\",1020\r\n,MoE [32],26.03,40.56,\"2.0 1019\n·\",\"1.2\n·\",1020\r\n,Deep-Att + P osUnk Ense mble [39],,40.4,,\"8.0\n·\",1020\r\n,GNMT + RL Ensemble [3 8],26.30,41.16,\"1.8 1020\n·\",\"1.1\n·\",1021\r\n,ConvS2S Ens emble [9],26.36,41.29,\"7.7 1019\n·\",\"1.2\n·\",1021\r\n,Transformer ( base model),27.3,38.1,3.3 ·,1018,\r\n,Transformer ( big),28.4,41.8,\"2.3\n·\",1019,\r\nResidu,al Dropout We apply dr opout [3 3] t,o the outpu,t of each sub-,\"layer, befor\",e it is,added t o the",
+  "section_canonical": "training",
+  "section_title": "Training",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "text_caption_fallback",
+  "id": 2,
+  "json_file": "table_0002.json"
+}

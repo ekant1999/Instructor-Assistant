@@ -1,0 +1,89 @@
+{
+  "paper_id": 893555535508,
+  "page_no": 13,
+  "bbox": {
+    "x0": 59.68971252441406,
+    "y0": 75.51130676269531,
+    "x1": 281.7574768066406,
+    "y1": 241.8094940185547
+  },
+  "caption": "Table 7. Using pretrained segmentation features to boost seman- tic performance. OccAny+ is the variant using DA3 and SAM3 base models. Parameter counts reflect the forward path from the input to the predicted pointmaps and segmentation features. Note that using \"pretrained\" semantic features incurs a higher parameter cost due to the use of pretrained encoder.",
+  "n_rows": 6,
+  "n_cols": 7,
+  "headers": [
+    "",
+    "",
+    "Semantic KITTI",
+    "sequence",
+    "Occ3D-N",
+    "uScenes su",
+    "rround-"
+  ],
+  "rows": [
+    [
+      "Method Sem. feat.",
+      "Params",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "",
+      "Res. mIoU",
+      "mIoUsc",
+      "Res.",
+      "mIoU",
+      "mIoUsc"
+    ],
+    [
+      "OccAny Distilled",
+      "623M",
+      "512x160 7.28",
+      "13.53",
+      "512x288",
+      "6.66",
+      "10.32"
+    ],
+    [
+      "OccAny+ Distilled",
+      "651M",
+      "512x160 6.48",
+      "13.30",
+      "512x288",
+      "7.20",
+      "11.50"
+    ],
+    [
+      "OccAny Pretrained",
+      "864M",
+      "512x160 7.67",
+      "13.75",
+      "512x288",
+      "7.42",
+      "10.78"
+    ],
+    [
+      "OccAny+ Pretrained",
+      "1.08B",
+      "512x160 8.03",
+      "13.17",
+      "512x288",
+      "9.45",
+      "12.22"
+    ]
+  ],
+  "markdown": "|  |  | Semantic KITTI | sequence | Occ3D-N | uScenes su | rround- |\n| --- | --- | --- | --- | --- | --- | --- |\n| Method Sem. feat. | Params |  |  |  |  |  |\n|  |  | Res. mIoU | mIoUsc | Res. | mIoU | mIoUsc |\n| OccAny Distilled | 623M | 512x160 7.28 | 13.53 | 512x288 | 6.66 | 10.32 |\n| OccAny+ Distilled | 651M | 512x160 6.48 | 13.30 | 512x288 | 7.20 | 11.50 |\n| OccAny Pretrained | 864M | 512x160 7.67 | 13.75 | 512x288 | 7.42 | 10.78 |\n| OccAny+ Pretrained | 1.08B | 512x160 8.03 | 13.17 | 512x288 | 9.45 | 12.22 |",
+  "csv_text": ",,Semantic KITTI,sequence,Occ3D-N,uScenes su,rround-\r\nMethod Sem. feat.,Params,,,,,\r\n,,Res. mIoU,mIoUsc,Res.,mIoU,mIoUsc\r\nOccAny Distilled,623M,512x160 7.28,13.53,512x288,6.66,10.32\r\nOccAny+ Distilled,651M,512x160 6.48,13.30,512x288,7.20,11.50\r\nOccAny Pretrained,864M,512x160 7.67,13.75,512x288,7.42,10.78\r\nOccAny+ Pretrained,1.08B,512x160 8.03,13.17,512x288,9.45,12.22",
+  "section_canonical": "conclusion",
+  "section_title": "Conclusion",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 3,
+  "json_file": "table_0003.json"
+}

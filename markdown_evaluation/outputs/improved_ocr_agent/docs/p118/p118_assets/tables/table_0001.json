@@ -1,0 +1,68 @@
+{
+  "paper_id": 686086342880,
+  "page_no": 5,
+  "bbox": {
+    "x0": 313.4989929199219,
+    "y0": 75.14974212646484,
+    "x1": 517.0543212890625,
+    "y1": 149.1099090576172
+  },
+  "caption": "Table 1: Main evaluation datasets. Detailed descriptions and split statistics are given in Appendix Table 5.",
+  "n_rows": 5,
+  "n_cols": 5,
+  "headers": [
+    "Dataset NQ",
+    "Task Open-domain QA",
+    "Metric Acc",
+    "Train 79,168",
+    "Test 3,610"
+  ],
+  "rows": [
+    [
+      "BoolQ",
+      "Yes/No QA",
+      "Acc",
+      "9,427",
+      "3,270"
+    ],
+    [
+      "FEVER",
+      "Fact verification",
+      "F1",
+      "104,966",
+      "10,444"
+    ],
+    [
+      "zsRE",
+      "Slot filling",
+      "Acc",
+      "147,909",
+      "3,724"
+    ],
+    [
+      "HotpotQA",
+      "Multi-hop QA",
+      "Acc",
+      "90,447",
+      "7,405"
+    ],
+    [
+      "SQuAD",
+      "Extractive QA",
+      "EM",
+      "87,599",
+      "10,570"
+    ]
+  ],
+  "markdown": "| Dataset NQ | Task Open-domain QA | Metric Acc | Train 79,168 | Test 3,610 |\n| --- | --- | --- | --- | --- |\n| BoolQ | Yes/No QA | Acc | 9,427 | 3,270 |\n| FEVER | Fact verification | F1 | 104,966 | 10,444 |\n| zsRE | Slot filling | Acc | 147,909 | 3,724 |\n| HotpotQA | Multi-hop QA | Acc | 90,447 | 7,405 |\n| SQuAD | Extractive QA | EM | 87,599 | 10,570 |",
+  "csv_text": "Dataset NQ,Task Open-domain QA,Metric Acc,\"Train 79,168\",\"Test 3,610\"\r\nBoolQ,Yes/No QA,Acc,\"9,427\",\"3,270\"\r\nFEVER,Fact verification,F1,\"104,966\",\"10,444\"\r\nzsRE,Slot filling,Acc,\"147,909\",\"3,724\"\r\nHotpotQA,Multi-hop QA,Acc,\"90,447\",\"7,405\"\r\nSQuAD,Extractive QA,EM,\"87,599\",\"10,570\"",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "arxiv_source",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 1,
+  "json_file": "table_0001.json"
+}

@@ -16,7 +16,7 @@
         "tables": 2,
         "page_images": 0
       },
-      "elapsed_ms": 3317.352,
+      "elapsed_ms": 3215.954,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p037/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -37,7 +37,7 @@
         "tables": 24,
         "page_images": 0
       },
-      "elapsed_ms": 3758.685,
+      "elapsed_ms": 3591.55,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p110/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -58,7 +58,7 @@
         "tables": 4,
         "page_images": 0
       },
-      "elapsed_ms": 2486.977,
+      "elapsed_ms": 2429.538,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p112/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -79,7 +79,7 @@
         "tables": 6,
         "page_images": 0
       },
-      "elapsed_ms": 13308.785,
+      "elapsed_ms": 12746.737,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p114/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -100,7 +100,7 @@
         "tables": 12,
         "page_images": 6
       },
-      "elapsed_ms": 311871.395,
+      "elapsed_ms": 330319.849,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p115/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -121,7 +121,7 @@
         "tables": 4,
         "page_images": 0
       },
-      "elapsed_ms": 1930.844,
+      "elapsed_ms": 1813.439,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p116/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -142,7 +142,7 @@
         "tables": 16,
         "page_images": 0
       },
-      "elapsed_ms": 3128.921,
+      "elapsed_ms": 3019.346,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p118/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -163,7 +163,7 @@
         "tables": 2,
         "page_images": 0
       },
-      "elapsed_ms": 3863.345,
+      "elapsed_ms": 3631.26,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p119/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -184,7 +184,7 @@
         "tables": 9,
         "page_images": 0
       },
-      "elapsed_ms": 5916.11,
+      "elapsed_ms": 5667.635,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p120/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -205,7 +205,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 805.747,
+      "elapsed_ms": 745.379,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p179/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -226,7 +226,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 780.832,
+      "elapsed_ms": 728.746,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p186/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -243,11 +243,11 @@
       "use_pdf_page_ocr": false,
       "document_mode": "hybrid_paper",
       "asset_counts": {
-        "figures": 2,
+        "figures": 4,
         "tables": 3,
         "page_images": 1
       },
-      "elapsed_ms": 34148.48,
+      "elapsed_ms": 30520.347,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p213/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -264,11 +264,11 @@
       "use_pdf_page_ocr": false,
       "document_mode": "ocr",
       "asset_counts": {
-        "figures": 34,
+        "figures": 48,
         "tables": 0,
         "page_images": 12
       },
-      "elapsed_ms": 370110.79,
+      "elapsed_ms": 366324.404,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a001/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -285,11 +285,11 @@
       "use_pdf_page_ocr": false,
       "document_mode": "hybrid_paper",
       "asset_counts": {
-        "figures": 23,
+        "figures": 28,
         "tables": 0,
         "page_images": 4
       },
-      "elapsed_ms": 26926.924,
+      "elapsed_ms": 26890.586,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a002/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -310,7 +310,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 91.289,
+      "elapsed_ms": 87.171,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a003/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -331,7 +331,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 424.811,
+      "elapsed_ms": 410.19,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a004/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -352,7 +352,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 942.93,
+      "elapsed_ms": 880.23,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a005/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -373,7 +373,7 @@
         "tables": 0,
         "page_images": 2
       },
-      "elapsed_ms": 8990.277,
+      "elapsed_ms": 8872.442,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a006/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -394,7 +394,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 420.157,
+      "elapsed_ms": 417.337,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a007/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -415,7 +415,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 702.786,
+      "elapsed_ms": 645.725,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/t001/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -436,7 +436,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 703.08,
+      "elapsed_ms": 644.781,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/t002/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -457,7 +457,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 898.629,
+      "elapsed_ms": 735.448,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/t003/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -478,7 +478,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 704.622,
+      "elapsed_ms": 662.831,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/t004/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -499,7 +499,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 808.24,
+      "elapsed_ms": 742.641,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/t005/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",
@@ -520,7 +520,7 @@
         "tables": 0,
         "page_images": 0
       },
-      "elapsed_ms": 824.988,
+      "elapsed_ms": 761.257,
       "status": "success",
       "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/t006/paper.md",
       "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",

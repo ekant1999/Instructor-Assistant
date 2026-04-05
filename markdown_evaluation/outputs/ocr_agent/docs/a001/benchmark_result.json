@@ -9,11 +9,11 @@
   "use_pdf_page_ocr": false,
   "document_mode": "ocr",
   "asset_counts": {
-    "figures": 34,
+    "figures": 48,
     "tables": 0,
     "page_images": 12
   },
-  "elapsed_ms": 370110.79,
+  "elapsed_ms": 366324.404,
   "status": "success",
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a001/paper.md",
   "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",

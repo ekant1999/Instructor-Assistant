@@ -1,0 +1,78 @@
+{
+  "paper_id": 712909389019,
+  "page_no": 14,
+  "bbox": {
+    "x0": 34.018001556396484,
+    "y0": 93.8245112101237,
+    "x1": 377.7282409667969,
+    "y1": 124.9696044921875
+  },
+  "caption": "Table 4: Quantitative results on real-world datasets. Our method achieves better geometry accuracy and novel view synthesis quality than the baselines.",
+  "n_rows": 3,
+  "n_cols": 11,
+  "headers": [
+    "",
+    "CD ↓",
+    "PSNR ↑",
+    "L1 ↓",
+    "SSIM ↑",
+    "LPIPS ↓",
+    "CD ↓",
+    "PSNR ↑",
+    "L1 ↓",
+    "SSIM ↑",
+    "LPIPS ↓"
+  ],
+  "rows": [
+    [
+      "Single-Frame\nw/o Motion-Aware Appearance",
+      "0.011",
+      "27.60",
+      "0.01017",
+      "0.9565",
+      "0.0412",
+      "0.024",
+      "39.00",
+      "0.00101",
+      "0.9946",
+      "0.0062"
+    ],
+    [
+      "",
+      "0.004",
+      "27.09",
+      "0.01344",
+      "0.9580",
+      "0.0345",
+      "0.017",
+      "38.04",
+      "0.00127",
+      "0.9951",
+      "0.0057"
+    ],
+    [
+      "Ours",
+      "0.004",
+      "28.11",
+      "0.01017",
+      "0.9625",
+      "0.0296",
+      "0.016",
+      "39.71",
+      "0.00099",
+      "0.9957",
+      "0.0056"
+    ]
+  ],
+  "markdown": "|Col1|CD ↓|PSNR ↑|L1 ↓|SSIM ↑|LPIPS ↓|CD ↓|PSNR ↑|L1 ↓|SSIM ↑|LPIPS ↓|\n|---|---|---|---|---|---|---|---|---|---|---|\n|Single&amp;#45;Frame w/o Motion&amp;#45;Aware Appearance|0.011|27.60|0.01017|0.9565|0.0412|0.024|39.00|0.00101|0.9946|0.0062|\n||0.004|27.09|0.01344|0.9580|0.0345|0.017|38.04|0.00127|0.9951|0.0057|\n|Ours|0.004|28.11|0.01017|0.9625|0.0296|0.016|39.71|0.00099|0.9957|0.0056|",
+  "csv_text": ",CD ↓,PSNR ↑,L1 ↓,SSIM ↑,LPIPS ↓,CD ↓,PSNR ↑,L1 ↓,SSIM ↑,LPIPS ↓\r\n\"Single-Frame\nw/o Motion-Aware Appearance\",0.011,27.60,0.01017,0.9565,0.0412,0.024,39.00,0.00101,0.9946,0.0062\r\n,0.004,27.09,0.01344,0.9580,0.0345,0.017,38.04,0.00127,0.9951,0.0057\r\nOurs,0.004,28.11,0.01017,0.9625,0.0296,0.016,39.71,0.00099,0.9957,0.0056",
+  "section_canonical": "detailed_geometry_and_appearance_from_opportunistic_motion",
+  "section_title": "Detailed Geometry and Appearance from Opportunistic Motion",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_native",
+  "id": 3,
+  "json_file": "table_0003.json"
+}

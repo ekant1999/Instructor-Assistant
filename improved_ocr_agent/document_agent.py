@@ -25,14 +25,8 @@ except ImportError:
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-try:
-    from .hybrid_pdf_extractor import HybridPDFExtractor, PipelineCustomOCRBackend
-    from .pipeline_custom import make_ocr_args
-    from .sectioning import build_document_model
-except ImportError:
-    from BatchAgent.ocr_agent.hybrid_pdf_extractor import HybridPDFExtractor, PipelineCustomOCRBackend
-    from BatchAgent.ocr_agent.pipeline_custom import make_ocr_args
-    build_document_model = None
+from .hybrid_pdf_extractor import HybridPDFExtractor, PipelineCustomOCRBackend
+from .pipeline_custom import make_ocr_args
 
 
 # =============================================================================
@@ -242,58 +236,12 @@ class SectionIndex:
         return text[:max_len] + ("..." if len(text) > max_len else "")
 
     def _build(self):
+        lines = self.raw_text.splitlines()
+
         root = SectionNode(id="root", title="Document Root", level=0)
         self.sections[root.id] = root
         self.tree.append(root)
 
-        if build_document_model is None:
-            self._build_legacy()
-            return
-
-        model = build_document_model(self.raw_text)
-        stack: List[SectionNode] = [root]
-        section_counter = 1
-
-        for model_section in model.sections:
-            sec_id = f"sec_{section_counter}"
-            section_counter += 1
-
-            node = SectionNode(
-                id=sec_id,
-                title=model_section.title,
-                level=model_section.level,
-                pages={
-                    page
-                    for page in (model_section.page_start, model_section.page_end)
-                    if page and page > 0
-                } or {1},
-            )
-            node.content = "\n".join(
-                block.text
-                for block in model_section.blocks
-                if block.kind in {"text", "asset"} and block.text.strip() and block.text.strip() != "---"
-            ).strip()
-            for block in model_section.blocks:
-                if block.page_num and block.page_num > 0:
-                    node.pages.add(block.page_num)
-
-            while stack and stack[-1].level >= node.level:
-                stack.pop()
-            parent = stack[-1] if stack else root
-            node.parent_id = parent.id
-            parent.children.append(node)
-            self.sections[sec_id] = node
-            stack.append(node)
-
-        for sec_id, sec in self.sections.items():
-            if sec_id == "root":
-                continue
-            first_para = self._first_paragraph(sec.content)
-            sec.preview = self._clean_preview_text(first_para)
-
-    def _build_legacy(self):
-        lines = self.raw_text.splitlines()
-        root = self.sections["root"]
         stack: List[SectionNode] = [root]
         current_section = root
         section_counter = 1
@@ -315,7 +263,7 @@ class SectionIndex:
 
             numbered_heading = re.match(
                 r"^(\d+(\.\d+)*|[A-Z]|[IVXLC]+)[\.\)]?\s+[A-Z].*$",
-                line.strip(),
+                line.strip()
             )
 
             if heading_match or pseudo_heading or numbered_heading:
@@ -353,6 +301,13 @@ class SectionIndex:
                     continue
                 current_section.content += line + "\n"
                 current_section.pages.add(current_page)
+                
+                
+        for sec_id, sec in self.sections.items():
+            if sec_id == "root":
+                continue
+            first_para = self._first_paragraph(sec.content)
+            sec.preview = self._clean_preview_text(first_para)
 
     def _first_paragraph(self, text: str) -> str:
         paras = [p.strip() for p in re.split(r"\n\s*\n", text) if p.strip()]

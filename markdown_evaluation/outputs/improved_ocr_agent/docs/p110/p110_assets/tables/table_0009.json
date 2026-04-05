@@ -1,0 +1,90 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 16,
+  "bbox": {
+    "x0": 136.76100158691406,
+    "y0": 127.9985122680664,
+    "x1": 456.91900634765625,
+    "y1": 242.4208221435547
+  },
+  "caption": "Table 9: Geometric mean microbenchmark speedups (all shapes, 200 repeats). Norm memory 0.8× in bf16 means factored uses more memory for the isolated norm due to fp32 accumulation transients (§2.3).",
+  "n_rows": 7,
+  "n_cols": 6,
+  "headers": [
+    "",
+    "Compose fwd",
+    "Backward",
+    "E2E",
+    "Norm mem",
+    "Norm mem"
+  ],
+  "rows": [
+    [
+      "L40S",
+      "bf16",
+      "1.47×",
+      "1.06×",
+      "1.05×",
+      "0.8×"
+    ],
+    [
+      "A100",
+      "bf16",
+      "1.73×",
+      "1.16×",
+      "1.07×",
+      "0.8×"
+    ],
+    [
+      "RTX",
+      "6000 PRO bf16",
+      "1.92×",
+      "1.22×",
+      "1.08×",
+      "0.8×"
+    ],
+    [
+      "H200",
+      "bf16",
+      "2.00×",
+      "1.08×",
+      "1.06×",
+      "0.8×"
+    ],
+    [
+      "B200",
+      "bf16",
+      "2.70×",
+      "1.23×",
+      "1.08×",
+      "0.8×"
+    ],
+    [
+      "B300",
+      "bf16",
+      "2.62×",
+      "1.22×",
+      "1.08×",
+      "0.8×"
+    ],
+    [
+      "fp32 r",
+      "ows in Appendix F.",
+      "",
+      "",
+      "",
+      ""
+    ]
+  ],
+  "markdown": "|  | Compose fwd | Backward | E2E | Norm mem | Norm mem |\n| --- | --- | --- | --- | --- | --- |\n| L40S | bf16 | 1.47× | 1.06× | 1.05× | 0.8× |\n| A100 | bf16 | 1.73× | 1.16× | 1.07× | 0.8× |\n| RTX | 6000 PRO bf16 | 1.92× | 1.22× | 1.08× | 0.8× |\n| H200 | bf16 | 2.00× | 1.08× | 1.06× | 0.8× |\n| B200 | bf16 | 2.70× | 1.23× | 1.08× | 0.8× |\n| B300 | bf16 | 2.62× | 1.22× | 1.08× | 0.8× |\n| fp32 r | ows in Appendix F. |  |  |  |  |",
+  "csv_text": ",Compose fwd,Backward,E2E,Norm mem,Norm mem\r\nL40S,bf16,1.47×,1.06×,1.05×,0.8×\r\nA100,bf16,1.73×,1.16×,1.07×,0.8×\r\nRTX,6000 PRO bf16,1.92×,1.22×,1.08×,0.8×\r\nH200,bf16,2.00×,1.08×,1.06×,0.8×\r\nB200,bf16,2.70×,1.23×,1.08×,0.8×\r\nB300,bf16,2.62×,1.22×,1.08×,0.8×\r\nfp32 r,ows in Appendix F.,,,,",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 9,
+  "json_file": "table_0009.json"
+}

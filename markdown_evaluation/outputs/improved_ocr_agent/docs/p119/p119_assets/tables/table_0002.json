@@ -1,0 +1,106 @@
+{
+  "paper_id": 836157733902,
+  "page_no": 10,
+  "bbox": {
+    "x0": 53.858001708984375,
+    "y0": 135.918212890625,
+    "x1": 550.0419311523438,
+    "y1": 362.88055419921875
+  },
+  "caption": "Table 3: Evaluation on Selected RoboTwin2.0 Tasks. Following the setting in Li et al. (2025a), models are initialized with full-dataset SFT (1000 demos/task). We report success rates (%) on four representative tasks with varying horizon lengths. VLA-OPD consistently improves over the SFT initialization, especially in long-horizon tasks.",
+  "n_rows": 9,
+  "n_cols": 6,
+  "headers": [
+    "",
+    "",
+    "Short M",
+    "edium",
+    "Long",
+    "Long"
+  ],
+  "rows": [
+    [
+      "Method",
+      "",
+      "Pick dual bottles Place",
+      "Empty Cup Hand",
+      "over Block Stack",
+      "Bowls Two Avg."
+    ],
+    [
+      "Teacher (Refere",
+      "nce)",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "SimpleVLA-RL",
+      "Li et al. (2025a)",
+      "68.3",
+      "94.2",
+      "57.8",
+      "75.8 74.0"
+    ],
+    [
+      "Baselines",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "π0 Black et al.",
+      "(2024)",
+      "50.0",
+      "60.0",
+      "39.0",
+      "53.0 50.5"
+    ],
+    [
+      "RDT Liu et al.",
+      "(2024)",
+      "18.0",
+      "42.0",
+      "26.0",
+      "42.0 32.0"
+    ],
+    [
+      "OpenVLA-OFT",
+      "Kim et al. (2025) (Student Init.)",
+      "29.7",
+      "77.3",
+      "33.1",
+      "40.6 45.2"
+    ],
+    [
+      "VLA-OPD (Ou",
+      "rs) (Distill)",
+      "66.4",
+      "90.6",
+      "52.3",
+      "75.0 71.1"
+    ],
+    [
+      "tabletop task",
+      "s, we extend our evaluation",
+      "to the RoboTwin2.0",
+      "bench mark, w",
+      "hich features co",
+      "mplex dua l-ar"
+    ]
+  ],
+  "markdown": "|Col1|Col2|Col3|Short M|edium|Col6|Long|Long|Col9|\n|---|---|---|---|---|---|---|---|---|\n||Method||Pick dual bottles Place|Empty|Cup Hand|over Block Stack|Bowls Two|Avg.|\n||||||||||\n||Teacher (Refere|nce)|||||||\n||SimpleVLA&amp;#45;RL|Li et al. (2025a)|68.3|94.2||57.8|75.8|74.0|\n||||||||||\n||Baselines||||||||\n||π0 Black et al.|(2024)|50.0|60.0||39.0|53.0|50.5|\n||RDT Liu et al.|(2024)|18.0|42.0||26.0|42.0|32.0|\n||||||||||\n||OpenVLA&amp;#45;OFT|Kim et al. (2025) (Student Init.)|29.7|77.3||33.1|40.6|45.2|\n||VLA&amp;#45;OPD (Ou|rs) (Distill)|66.4|90.6||52.3|75.0|71.1|\n||||||||||\n|ta|bletop task|s, we extend our evaluation|to the RoboTwin2.0|bench|mark, w|hich features co|mplex dua|l&amp;#45;ar|\n|co|ordination|tasks. As shown in Table 3|, despite being initia|lized|with 1,0|00 demonstrati|ons per ta|sk v|\n|si|ngle&amp;#45;task SF|T (OpenVLA&amp;#45;OFT), the stud|ent still struggles si|gnifci a|ntly due|to the increase|d morphol|ogic|\n|co|mplexity, a|veraging only 45.2% success|. However, by applyi|ng ou|r distillat|ion framework|(Ours (Dis|till)|\n|th|e student’s|average success rate surges|to 71.1%, nearly ma|tching|the Teac|her’s performa|nce (74.0%|) an|\n||||||||||\n|su|bstantially|outperforming other baseli|nes such as π Black 0|et al.|(2024) a|nd RDT Liu et|al. (2024)|. Th|\n|co|nfirms the|efcfi acy and morphological|generalization of VL|A&amp;#45;OPD|in highl|y complex envi|ronments.||",
+  "csv_text": ",,Short M,edium,Long,Long\r\nMethod,,Pick dual bottles Place,Empty Cup Hand,over Block Stack,Bowls Two Avg.\r\nTeacher (Refere,nce),,,,\r\nSimpleVLA-RL,Li et al. (2025a),68.3,94.2,57.8,75.8 74.0\r\nBaselines,,,,,\r\nπ0 Black et al.,(2024),50.0,60.0,39.0,53.0 50.5\r\nRDT Liu et al.,(2024),18.0,42.0,26.0,42.0 32.0\r\nOpenVLA-OFT,Kim et al. (2025) (Student Init.),29.7,77.3,33.1,40.6 45.2\r\nVLA-OPD (Ou,rs) (Distill),66.4,90.6,52.3,75.0 71.1\r\ntabletop task,\"s, we extend our evaluation\",to the RoboTwin2.0,\"bench mark, w\",hich features co,mplex dua l-ar",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "text_caption_fallback",
+  "id": 2,
+  "json_file": "table_0002.json"
+}

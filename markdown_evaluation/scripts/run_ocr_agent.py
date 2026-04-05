@@ -192,6 +192,7 @@ def _worker_extract_doc(
                 "use_pdf_page_ocr": bool(use_pdf_page_ocr),
                 "document_mode": document_mode,
                 "elapsed_ms": elapsed_ms,
+                "non_ocr_routing": dict(getattr(extractor, "last_routing_info", {}) or {}),
             }
         )
     except Exception as exc:  # pragma: no cover - exercised through benchmark runs
@@ -306,6 +307,14 @@ def run_ocr_agent_exports(
             row["extractor_module_path"] = str(worker_result["extractor_module_path"])
         if "postprocess_enabled" in worker_result:
             row["postprocess_enabled"] = bool(worker_result["postprocess_enabled"])
+        if worker_result.get("non_ocr_routing"):
+            routing = dict(worker_result["non_ocr_routing"])
+            row["non_ocr_document_handler"] = str(routing.get("document_handler") or "unknown")
+            row["non_ocr_runs"] = list(routing.get("runs") or [])
+            row["ia_score"] = routing.get("ia_score")
+            row["native_score"] = routing.get("native_score")
+            row["non_ocr_page_handlers"] = dict(routing.get("page_handlers") or {})
+            row["non_ocr_scores"] = dict(routing.get("scores") or {})
         if worker_result.get("error_type"):
             row["error_type"] = str(worker_result["error_type"])
         if worker_result.get("error_message"):

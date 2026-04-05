@@ -1,0 +1,74 @@
+{
+  "paper_id": 843158947465,
+  "page_no": 19,
+  "bbox": {
+    "x0": 70.06999969482422,
+    "y0": 338.91864013671875,
+    "x1": 437.012451171875,
+    "y1": 461.3595886230469
+  },
+  "caption": "Table 8. Training configuration for ImageNet-256 experiments. All models trained with mixed precision BF16 & gradient clipping at 3.0.",
+  "n_rows": 7,
+  "n_cols": 4,
+  "headers": [
+    "Hyperparameter",
+    "Value",
+    "Hyperparameter",
+    "Value"
+  ],
+  "rows": [
+    [
+      "",
+      "4",
+      "",
+      ""
+    ],
+    [
+      "Base Learning Rate",
+      "1 10−\n×",
+      "Warmup Epochs",
+      "20"
+    ],
+    [
+      "Global Batch Size",
+      "1024",
+      "Total Epochs",
+      "240"
+    ],
+    [
+      "Optimizer",
+      "Muon",
+      "LR Schedule",
+      "Cosine"
+    ],
+    [
+      "AdamW Betas",
+      "(0.9, 0.999)",
+      "Min LR",
+      "1 10\n×"
+    ],
+    [
+      "Weight Decay",
+      "0",
+      "Gradient Clip",
+      "3.0"
+    ],
+    [
+      "Reconstruction Noise (σ)",
+      "0.7",
+      "EMA Decay",
+      "0.9978"
+    ]
+  ],
+  "markdown": "| Hyperparameter | Value | Hyperparameter | Value |\n| --- | --- | --- | --- |\n|  | 4 |  |  |\n| Base Learning Rate | 1 10−<br/>× | Warmup Epochs | 20 |\n| Global Batch Size | 1024 | Total Epochs | 240 |\n| Optimizer | Muon | LR Schedule | Cosine |\n| AdamW Betas | (0.9, 0.999) | Min LR | 1 10<br/>× |\n| Weight Decay | 0 | Gradient Clip | 3.0 |\n| Reconstruction Noise (σ) | 0.7 | EMA Decay | 0.9978 |",
+  "csv_text": "Hyperparameter,Value,Hyperparameter,Value\r\n,4,,\r\nBase Learning Rate,\"1 10−\n×\",Warmup Epochs,20\r\nGlobal Batch Size,1024,Total Epochs,240\r\nOptimizer,Muon,LR Schedule,Cosine\r\nAdamW Betas,\"(0.9, 0.999)\",Min LR,\"1 10\n×\"\r\nWeight Decay,0,Gradient Clip,3.0\r\nReconstruction Noise (σ),0.7,EMA Decay,0.9978",
+  "section_canonical": "results",
+  "section_title": "Additional Results",
+  "section_source": "heuristic",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 7,
+  "json_file": "table_0007.json"
+}

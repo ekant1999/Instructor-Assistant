@@ -1,0 +1,134 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 24,
+  "bbox": {
+    "x0": 122.08300018310547,
+    "y0": 114.47486114501953,
+    "x1": 466.482421875,
+    "y1": 340.6145935058594
+  },
+  "caption": "Table 12: Compatibility matrix. Scope: Bench = model-level benchmarks, Conv = convergence runs, CI = operator-level test suite.",
+  "n_rows": 17,
+  "n_cols": 4,
+  "headers": [
+    "Feature Mixed-precision bf16",
+    "Status ✓",
+    "Scope Bench+Conv",
+    "Notes All model benchmark s and"
+  ],
+  "rows": [
+    [
+      "",
+      "",
+      "",
+      "convergence runs"
+    ],
+    [
+      "Mixed-precision fp16",
+      "✓",
+      "CI",
+      "Operator tests only; no"
+    ],
+    [
+      "",
+      "",
+      "",
+      "model-level fp16 runs"
+    ],
+    [
+      "Gradient checkpointing",
+      "✓",
+      "Bench+Conv",
+      "All model benchmark s use"
+    ],
+    [
+      "",
+      "",
+      "",
+      "gradient checkpointin g"
+    ],
+    [
+      "ZeRO-2",
+      "✓",
+      "Conv",
+      "All convergence runs use Ze"
+    ],
+    [
+      "ZeRO-3",
+      "✓",
+      "CI",
+      "Parameter gathering tested;"
+    ],
+    [
+      "",
+      "",
+      "",
+      "model-level runs"
+    ],
+    [
+      "FSDP1",
+      "✓",
+      "CI",
+      "summon_full_params path t"
+    ],
+    [
+      "FSDP2 / DTensor",
+      "✗",
+      "—",
+      "Not supported; see §6"
+    ],
+    [
+      "torch.compile",
+      "✓",
+      "CI",
+      "Graph-break-free whe n p=0"
+    ],
+    [
+      "",
+      "",
+      "",
+      "§6"
+    ],
+    [
+      "Linear layers",
+      "✓",
+      "Bench+Conv",
+      "Primary target; all b enchma"
+    ],
+    [
+      "Conv1d / Conv2d / Conv3d",
+      "✓",
+      "CI",
+      "Correctness tests; no perf"
+    ],
+    [
+      "",
+      "",
+      "",
+      "benchmarks"
+    ],
+    [
+      "Embedding layers",
+      "✓",
+      "CI",
+      "Formula correction (§ 6); no"
+    ],
+    [
+      "",
+      "",
+      "",
+      "benchmarks"
+    ]
+  ],
+  "markdown": "| Feature Mixed-precision bf16 | Status ✓ | Scope Bench+Conv | Notes All model benchmark s and |\n| --- | --- | --- | --- |\n|  |  |  | convergence runs |\n| Mixed-precision fp16 | ✓ | CI | Operator tests only; no |\n|  |  |  | model-level fp16 runs |\n| Gradient checkpointing | ✓ | Bench+Conv | All model benchmark s use |\n|  |  |  | gradient checkpointin g |\n| ZeRO-2 | ✓ | Conv | All convergence runs use Ze |\n| ZeRO-3 | ✓ | CI | Parameter gathering tested; |\n|  |  |  | model-level runs |\n| FSDP1 | ✓ | CI | summon_full_params path t |\n| FSDP2 / DTensor | ✗ | — | Not supported; see §6 |\n| torch.compile | ✓ | CI | Graph-break-free whe n p=0 |\n|  |  |  | §6 |\n| Linear layers | ✓ | Bench+Conv | Primary target; all b enchma |\n| Conv1d / Conv2d / Conv3d | ✓ | CI | Correctness tests; no perf |\n|  |  |  | benchmarks |\n| Embedding layers | ✓ | CI | Formula correction (§ 6); no |\n|  |  |  | benchmarks |",
+  "csv_text": "Feature Mixed-precision bf16,Status ✓,Scope Bench+Conv,Notes All model benchmark s and\r\n,,,convergence runs\r\nMixed-precision fp16,✓,CI,Operator tests only; no\r\n,,,model-level fp16 runs\r\nGradient checkpointing,✓,Bench+Conv,All model benchmark s use\r\n,,,gradient checkpointin g\r\nZeRO-2,✓,Conv,All convergence runs use Ze\r\nZeRO-3,✓,CI,Parameter gathering tested;\r\n,,,model-level runs\r\nFSDP1,✓,CI,summon_full_params path t\r\nFSDP2 / DTensor,✗,—,Not supported; see §6\r\ntorch.compile,✓,CI,Graph-break-free whe n p=0\r\n,,,§6\r\nLinear layers,✓,Bench+Conv,Primary target; all b enchma\r\nConv1d / Conv2d / Conv3d,✓,CI,Correctness tests; no perf\r\n,,,benchmarks\r\nEmbedding layers,✓,CI,Formula correction (§ 6); no\r\n,,,benchmarks",
+  "section_canonical": "reproducibility",
+  "section_title": "Reproducibility",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 13,
+  "json_file": "table_0013.json"
+}

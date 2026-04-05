@@ -2,7 +2,7 @@
 title: "Detailed Geometry and Appearance from Opportunistic Motion"
 paper_id: 120
 source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/41528b7825c49511.pdf"
-generated_at: "2026-04-04T22:54:47.514414+00:00"
+generated_at: "2026-04-05T20:58:12.269734+00:00"
 num_figures: 18
 num_tables: 4
 num_equations: 19

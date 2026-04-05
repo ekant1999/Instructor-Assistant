@@ -1,0 +1,62 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 27,
+  "bbox": {
+    "x0": 124.44499969482422,
+    "y0": 526.6318359375,
+    "x1": 461.4203186035156,
+    "y1": 624.9464111328125
+  },
+  "caption": "Table 15: DoRA norm implementation in major fine-tuning frameworks (February 2026).",
+  "n_rows": 5,
+  "n_cols": 4,
+  "headers": [
+    "Framework HF PEFT",
+    "Version 20a9829",
+    "File Path peft/tuners/lora/dora.py",
+    "Pattern torch.eye"
+  ],
+  "rows": [
+    [
+      "torchtune",
+      "v0.5.0",
+      "modules/peft/dora.py",
+      "Same algori thm"
+    ],
+    [
+      "Unsloth",
+      "2026.3.7",
+      "Disables custom kernels",
+      "Falls back t o PE"
+    ],
+    [
+      "SWIFT (ms-swift)",
+      "a807cb9",
+      "Defers to PEFT/Unsloth",
+      "No custom code"
+    ],
+    [
+      "LLaMA-Factory",
+      "v0.9.3",
+      "Delegates to PEFT",
+      "No custom code"
+    ],
+    [
+      "Axolotl",
+      "v0.6.0",
+      "Delegates to PEFT",
+      "No custom code"
+    ]
+  ],
+  "markdown": "| Framework HF PEFT | Version 20a9829 | File Path peft/tuners/lora/dora.py | Pattern torch.eye |\n| --- | --- | --- | --- |\n| torchtune | v0.5.0 | modules/peft/dora.py | Same algori thm |\n| Unsloth | 2026.3.7 | Disables custom kernels | Falls back t o PE |\n| SWIFT (ms-swift) | a807cb9 | Defers to PEFT/Unsloth | No custom code |\n| LLaMA-Factory | v0.9.3 | Delegates to PEFT | No custom code |\n| Axolotl | v0.6.0 | Delegates to PEFT | No custom code |",
+  "csv_text": "Framework HF PEFT,Version 20a9829,File Path peft/tuners/lora/dora.py,Pattern torch.eye\r\ntorchtune,v0.5.0,modules/peft/dora.py,Same algori thm\r\nUnsloth,2026.3.7,Disables custom kernels,Falls back t o PE\r\nSWIFT (ms-swift),a807cb9,Defers to PEFT/Unsloth,No custom code\r\nLLaMA-Factory,v0.9.3,Delegates to PEFT,No custom code\r\nAxolotl,v0.6.0,Delegates to PEFT,No custom code",
+  "section_canonical": "full_model_level_memory_table",
+  "section_title": "Full Model-Level Memory Table",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 15,
+  "json_file": "table_0015.json"
+}

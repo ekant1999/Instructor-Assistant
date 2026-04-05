@@ -1,0 +1,89 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 9,
+  "bbox": {
+    "x0": 151.4329833984375,
+    "y0": 298.4488525390625,
+    "x1": 460.5751953125,
+    "y1": 398.7807922363281
+  },
+  "caption": "Table 4: Gradient-computation speedup on 8–32B VLMs (r = 384, bf16, seq=4096, bs=1, ga=8, loss_tokens=1024, 20 repeats). The HF PEFT DoRA baseline takes 46–87% longer per iteration than fused. 32B models OOM on RTX 6000 PRO (96 GB) under all configurations. See Table 5 for absolute times.",
+  "n_rows": 6,
+  "n_cols": 7,
+  "headers": [
+    "Model",
+    "Speedup vs. PEFT DoRA RTX",
+    "Speedup vs. PEFT DoRA H200",
+    "Speedup vs. PEFT DoRA B200",
+    "Speedup vs. Eager RTX",
+    "Speedup vs. Eager H200",
+    "Speedup vs. Eager B200"
+  ],
+  "rows": [
+    [
+      "Qwen2.5-VL-32B",
+      "OOM",
+      "1.73×",
+      "1.74×",
+      "OOM",
+      "1.20×",
+      "1.22×"
+    ],
+    [
+      "Qwen3-VL-32B",
+      "OOM",
+      "1.66×",
+      "1.67×",
+      "OOM",
+      "1.18×",
+      "1.21×"
+    ],
+    [
+      "Qwen3.5-27B",
+      "1.51×",
+      "1.57×",
+      "1.57×",
+      "1.22×",
+      "1.21×",
+      "1.23×"
+    ],
+    [
+      "Gemma3-27B",
+      "1.53×",
+      "1.61×",
+      "1.56×",
+      "1.20×",
+      "1.19×",
+      "1.21×"
+    ],
+    [
+      "Mistral-Sm-24B",
+      "1.66×",
+      "1.87×",
+      "1.87×",
+      "1.22×",
+      "1.21×",
+      "1.23×"
+    ],
+    [
+      "Qwen3-VL-8B",
+      "1.46×",
+      "1.50×",
+      "1.47×",
+      "1.23×",
+      "1.21×",
+      "1.24×"
+    ]
+  ],
+  "markdown": "| Model | Speedup vs. PEFT DoRA RTX | Speedup vs. PEFT DoRA H200 | Speedup vs. PEFT DoRA B200 | Speedup vs. Eager RTX | Speedup vs. Eager H200 | Speedup vs. Eager B200 |\n| --- | --- | --- | --- | --- | --- | --- |\n| Qwen2.5-VL-32B | OOM | 1.73× | 1.74× | OOM | 1.20× | 1.22× |\n| Qwen3-VL-32B | OOM | 1.66× | 1.67× | OOM | 1.18× | 1.21× |\n| Qwen3.5-27B | 1.51× | 1.57× | 1.57× | 1.22× | 1.21× | 1.23× |\n| Gemma3-27B | 1.53× | 1.61× | 1.56× | 1.20× | 1.19× | 1.21× |\n| Mistral-Sm-24B | 1.66× | 1.87× | 1.87× | 1.22× | 1.21× | 1.23× |\n| Qwen3-VL-8B | 1.46× | 1.50× | 1.47× | 1.23× | 1.21× | 1.24× |",
+  "csv_text": "Model,Speedup vs. PEFT DoRA RTX,Speedup vs. PEFT DoRA H200,Speedup vs. PEFT DoRA B200,Speedup vs. Eager RTX,Speedup vs. Eager H200,Speedup vs. Eager B200\r\nQwen2.5-VL-32B,OOM,1.73×,1.74×,OOM,1.20×,1.22×\r\nQwen3-VL-32B,OOM,1.66×,1.67×,OOM,1.18×,1.21×\r\nQwen3.5-27B,1.51×,1.57×,1.57×,1.22×,1.21×,1.23×\r\nGemma3-27B,1.53×,1.61×,1.56×,1.20×,1.19×,1.21×\r\nMistral-Sm-24B,1.66×,1.87×,1.87×,1.22×,1.21×,1.23×\r\nQwen3-VL-8B,1.46×,1.50×,1.47×,1.23×,1.21×,1.24×",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 4,
+  "json_file": "table_0004.json"
+}

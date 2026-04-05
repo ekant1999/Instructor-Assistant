@@ -8,7 +8,7 @@ import re
 from datetime import datetime, timezone
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 import pymupdf
 
@@ -2155,6 +2155,7 @@ def extract_and_store_paper_tables(
     pdf_path: Path,
     paper_id: int,
     blocks: Iterable[Dict[str, Any]],
+    page_allowlist: Optional[Sequence[int]] = None,
 ) -> Dict[str, Any]:
     """
     Extract structured tables and store a per-paper manifest.
@@ -2165,6 +2166,19 @@ def extract_and_store_paper_tables(
     pdf_path = Path(pdf_path).expanduser().resolve()
     if not pdf_path.exists():
         raise FileNotFoundError(f"PDF not found: {pdf_path}")
+
+    allowed_pages: Optional[Set[int]] = None
+    if page_allowlist:
+        allowed_pages = set()
+        for value in page_allowlist:
+            try:
+                page_no = int(value)
+            except (TypeError, ValueError):
+                continue
+            if page_no > 0:
+                allowed_pages.add(page_no)
+        if not allowed_pages:
+            allowed_pages = None
 
     page_blocks = _prepare_page_blocks(blocks)
     output_dir = _paper_dir(paper_id)
@@ -2189,6 +2203,8 @@ def extract_and_store_paper_tables(
         for page_index in range(len(doc)):
             page = doc.load_page(page_index)
             page_no = page_index + 1
+            if allowed_pages is not None and page_no not in allowed_pages:
+                continue
             if not hasattr(page, "find_tables"):
                 logger.warning("PyMuPDF build does not support page.find_tables(); skipping table extraction.")
                 break

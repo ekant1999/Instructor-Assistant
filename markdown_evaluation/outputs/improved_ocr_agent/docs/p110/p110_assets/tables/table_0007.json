@@ -1,0 +1,107 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 13,
+  "bbox": {
+    "x0": 148.20899963378906,
+    "y0": 379.49249267578125,
+    "x1": 452.1279602050781,
+    "y1": 502.0270080566406
+  },
+  "caption": "Table 7: Norm memory: measured allocation delta and theoretical reduction (fp32, H200). Measured reductions are smaller than theoretical because they include the rank-independent base-norm transient (§2.3).",
+  "n_rows": 8,
+  "n_cols": 7,
+  "headers": [
+    "Shape",
+    "",
+    "Rank",
+    "PEFT",
+    "Factored Me",
+    "as. × Th",
+    "eory"
+  ],
+  "rows": [
+    [
+      "4096\n×",
+      "4096",
+      "64",
+      "192 MB",
+      "65 MB",
+      "3.0×",
+      "63×"
+    ],
+    [
+      "4096\n×",
+      "4096",
+      "384",
+      "192 MB",
+      "71 MB",
+      "2.7×",
+      "9.8×"
+    ],
+    [
+      "4096\n×",
+      "4096",
+      "512",
+      "192 MB",
+      "73 MB",
+      "2.6×",
+      "7.1×"
+    ],
+    [
+      "8192\n×",
+      "8192",
+      "384",
+      "768 MB",
+      "245 MB",
+      "3.1×",
+      "20.4×"
+    ],
+    [
+      "8192\n×",
+      "8192",
+      "512",
+      "768 MB",
+      "241 MB",
+      "3.2×",
+      "15.1×"
+    ],
+    [
+      "8192\n×",
+      "8192",
+      "768",
+      "768 MB",
+      "236 MB",
+      "3.2×",
+      "9.8×"
+    ],
+    [
+      "4096\n×",
+      "11008",
+      "384",
+      "516 MB",
+      "179 MB",
+      "2.9×",
+      "26.2×"
+    ],
+    [
+      "8192\n×",
+      "28672",
+      "384 2",
+      "688 MB",
+      "245 MB",
+      "11.0×",
+      "71.3×"
+    ]
+  ],
+  "markdown": "| Shape |  | Rank | PEFT | Factored Me | as. × Th | eory |\n| --- | --- | --- | --- | --- | --- | --- |\n| 4096<br/>× | 4096 | 64 | 192 MB | 65 MB | 3.0× | 63× |\n| 4096<br/>× | 4096 | 384 | 192 MB | 71 MB | 2.7× | 9.8× |\n| 4096<br/>× | 4096 | 512 | 192 MB | 73 MB | 2.6× | 7.1× |\n| 8192<br/>× | 8192 | 384 | 768 MB | 245 MB | 3.1× | 20.4× |\n| 8192<br/>× | 8192 | 512 | 768 MB | 241 MB | 3.2× | 15.1× |\n| 8192<br/>× | 8192 | 768 | 768 MB | 236 MB | 3.2× | 9.8× |\n| 4096<br/>× | 11008 | 384 | 516 MB | 179 MB | 2.9× | 26.2× |\n| 8192<br/>× | 28672 | 384 2 | 688 MB | 245 MB | 11.0× | 71.3× |",
+  "csv_text": "Shape,,Rank,PEFT,Factored Me,as. × Th,eory\r\n\"4096\n×\",4096,64,192 MB,65 MB,3.0×,63×\r\n\"4096\n×\",4096,384,192 MB,71 MB,2.7×,9.8×\r\n\"4096\n×\",4096,512,192 MB,73 MB,2.6×,7.1×\r\n\"8192\n×\",8192,384,768 MB,245 MB,3.1×,20.4×\r\n\"8192\n×\",8192,512,768 MB,241 MB,3.2×,15.1×\r\n\"8192\n×\",8192,768,768 MB,236 MB,3.2×,9.8×\r\n\"4096\n×\",11008,384,516 MB,179 MB,2.9×,26.2×\r\n\"8192\n×\",28672,384 2,688 MB,245 MB,11.0×,71.3×",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": "Figure 8: Backward speedup (bf16). Below ∼4096 × 4096, launch overhead dominates; above ∼8192 × 8192, fused wins on all GPUs.",
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 7,
+  "json_file": "table_0007.json"
+}

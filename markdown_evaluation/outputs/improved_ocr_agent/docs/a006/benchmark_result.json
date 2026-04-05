@@ -13,9 +13,46 @@
     "tables": 0,
     "page_images": 2
   },
-  "elapsed_ms": 5414.501,
+  "elapsed_ms": 5742.968,
   "status": "success",
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a006/paper.md",
   "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
-  "postprocess_enabled": true
+  "postprocess_enabled": false,
+  "non_ocr_document_handler": "ia_phase1",
+  "non_ocr_runs": [
+    {
+      "handler": "ia_phase1",
+      "page_numbers": [
+        1,
+        2,
+        5,
+        6
+      ]
+    }
+  ],
+  "ia_score": 29,
+  "native_score": 2,
+  "non_ocr_page_handlers": {
+    "1": "ia_phase1",
+    "2": "ia_phase1",
+    "5": "ia_phase1",
+    "6": "ia_phase1"
+  },
+  "non_ocr_scores": {
+    "ia_score": 29,
+    "native_score": 2,
+    "scholarly_score": 15,
+    "structured_visual_score": 14,
+    "report_score": 2,
+    "repeated_header_pages": 0,
+    "repeated_footer_pages": 0,
+    "prose_dominant_pages": 0,
+    "total_citations": 0,
+    "total_visual_captions": 3,
+    "total_academic_headings": 0,
+    "total_numbered_scholarly_headings": 10,
+    "total_roman_headings": 0,
+    "total_equation_lines": 12,
+    "affiliation_pages": 0
+  }
 }

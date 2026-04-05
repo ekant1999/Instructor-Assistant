@@ -42,5 +42,6 @@ class MarkdownSectionNode:
 @dataclass(slots=True)
 class MarkdownDocumentModel:
     front_matter: List[str] = field(default_factory=list)
+    front_matter_pages: List[int] = field(default_factory=list)
     sections: List[MarkdownSectionNode] = field(default_factory=list)
     inferred_title: Optional[str] = None

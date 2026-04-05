@@ -10,7 +10,7 @@ from dataclasses import asdict
 from datetime import datetime, timezone
 from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from ..equations import extract_and_store_paper_equations, load_paper_equation_manifest
 from ..figures import extract_and_store_paper_figures, load_paper_figure_manifest
@@ -29,12 +29,80 @@ from .models import MarkdownExportConfig, MarkdownExportResult
 from .quality import audit_rendered_markdown
 
 
+def _normalize_page_allowlist(page_allowlist: Optional[Sequence[int]]) -> Optional[Set[int]]:
+    if not page_allowlist:
+        return None
+    allowed: Set[int] = set()
+    for value in page_allowlist:
+        try:
+            page_no = int(value)
+        except (TypeError, ValueError):
+            continue
+        if page_no > 0:
+            allowed.add(page_no)
+    return allowed or None
+
+
+def _filter_blocks_by_page_allowlist(
+    blocks: Iterable[Dict[str, Any]],
+    allowed_pages: Optional[Set[int]],
+) -> List[Dict[str, Any]]:
+    if not allowed_pages:
+        return [block for block in blocks if isinstance(block, dict)]
+    filtered: List[Dict[str, Any]] = []
+    for block in blocks:
+        if not isinstance(block, dict):
+            continue
+        try:
+            page_no = int(block.get("page_no") or 0)
+        except (TypeError, ValueError):
+            page_no = 0
+        if page_no in allowed_pages:
+            filtered.append(block)
+    return filtered
+
+
+def _filter_manifest_records_by_page_allowlist(
+    manifest: Dict[str, Any],
+    *,
+    key: str,
+    allowed_pages: Optional[Set[int]],
+) -> Dict[str, Any]:
+    if not allowed_pages or not isinstance(manifest, dict):
+        return manifest
+    records = manifest.get(key)
+    if not isinstance(records, list):
+        return manifest
+
+    filtered_records = []
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        try:
+            page_no = int(record.get("page_no") or 0)
+        except (TypeError, ValueError):
+            page_no = 0
+        if page_no in allowed_pages:
+            filtered_records.append(record)
+
+    filtered_manifest = dict(manifest)
+    filtered_manifest[key] = filtered_records
+    if key == "images":
+        filtered_manifest["num_images"] = len(filtered_records)
+    elif key == "tables":
+        filtered_manifest["num_tables"] = len(filtered_records)
+    elif key == "equations":
+        filtered_manifest["num_equations"] = len(filtered_records)
+    return filtered_manifest
+
+
 def export_pdf_to_markdown(
     pdf_path: str | Path,
     *,
     paper_id: int,
     output_dir: str | Path | None = None,
     blocks: Optional[List[Dict[str, Any]]] = None,
+    page_allowlist: Optional[Sequence[int]] = None,
     source_url: Optional[str] = None,
     metadata: Optional[Dict[str, Any]] = None,
     config: Optional[MarkdownExportConfig] = None,
@@ -47,7 +115,10 @@ def export_pdf_to_markdown(
     bundle_dir = _resolve_bundle_dir(paper_id, output_dir)
     _prepare_bundle_dir(bundle_dir, overwrite=config.overwrite)
 
-    working_blocks = deepcopy(blocks) if blocks is not None else extract_text_blocks(pdf_path)
+    allowed_pages = _normalize_page_allowlist(page_allowlist)
+    working_blocks = deepcopy(blocks) if blocks is not None else extract_text_blocks(pdf_path, page_allowlist=allowed_pages)
+    if allowed_pages is not None:
+        working_blocks = _filter_blocks_by_page_allowlist(working_blocks, allowed_pages)
     sectioning_report = _ensure_section_metadata(working_blocks, pdf_path=pdf_path, source_url=source_url) or {
         "strategy": "unknown",
         "candidate_headings": 0,
@@ -56,13 +127,25 @@ def export_pdf_to_markdown(
     }
 
     if config.ensure_assets:
-        extract_and_store_paper_figures(pdf_path, paper_id=paper_id, blocks=working_blocks)
-        extract_and_store_paper_tables(pdf_path, paper_id=paper_id, blocks=working_blocks)
-        extract_and_store_paper_equations(pdf_path, paper_id=paper_id, blocks=working_blocks)
+        extract_and_store_paper_figures(pdf_path, paper_id=paper_id, blocks=working_blocks, page_allowlist=allowed_pages)
+        extract_and_store_paper_tables(pdf_path, paper_id=paper_id, blocks=working_blocks, page_allowlist=allowed_pages)
+        extract_and_store_paper_equations(pdf_path, paper_id=paper_id, blocks=working_blocks, page_allowlist=allowed_pages)
 
-    figure_manifest = load_paper_figure_manifest(paper_id)
-    table_manifest = load_paper_table_manifest(paper_id)
-    equation_manifest = load_paper_equation_manifest(paper_id)
+    figure_manifest = _filter_manifest_records_by_page_allowlist(
+        load_paper_figure_manifest(paper_id),
+        key="images",
+        allowed_pages=allowed_pages,
+    )
+    table_manifest = _filter_manifest_records_by_page_allowlist(
+        load_paper_table_manifest(paper_id),
+        key="tables",
+        allowed_pages=allowed_pages,
+    )
+    equation_manifest = _filter_manifest_records_by_page_allowlist(
+        load_paper_equation_manifest(paper_id),
+        key="equations",
+        allowed_pages=allowed_pages,
+    )
     bundled_assets = prepare_asset_bundle(
         paper_id=paper_id,
         bundle_dir=bundle_dir,
@@ -310,7 +393,7 @@ def _build_markdown_document_model(
             if _should_preserve_front_matter_block(block, text=text):
                 rendered_text = _normalize_block_text_for_markdown(block=block, text=text, render_state=render_state)
                 if rendered_text and not _is_redundant_section_text(rendered_text, current_section=current_section):
-                    _append_front_matter_line(model, rendered_text)
+                    _append_front_matter_line(model, rendered_text, page_no=page_no)
                 idx += 1
                 continue
 
@@ -331,7 +414,7 @@ def _build_markdown_document_model(
             event_section_level = max(2, _safe_int(event.get("section_level"), 2))
 
             if _should_treat_as_front_matter(block, current_section=current_section):
-                _append_front_matter_line(model, rendered_text)
+                _append_front_matter_line(model, rendered_text, page_no=page_no)
                 idx += 1
                 continue
             if _is_redundant_section_text(rendered_text, current_section=current_section):
@@ -458,15 +541,35 @@ def _render_markdown_document_model(
     current_page: Optional[int] = None
     metadata_title_norm = _normalize_heading_line(str(metadata.get("title") or ""))
 
-    for line in model.front_matter:
+    for idx, line in enumerate(model.front_matter):
         if metadata_title_norm and _normalize_heading_line(line) == metadata_title_norm:
             continue
-        if config.include_page_markers and current_page is None:
-            current_page = 1
+        front_matter_page = (
+            model.front_matter_pages[idx]
+            if idx < len(model.front_matter_pages)
+            else 0
+        )
+        if config.include_page_markers and front_matter_page and front_matter_page != current_page:
+            if lines and lines[-1] != "":
+                lines.append("")
+            lines.append(f"<!-- page:{front_matter_page} -->")
+            lines.append("")
+            current_page = front_matter_page
         lines.append(_escape_markdown_text(line))
         lines.append("")
 
     for section in model.sections:
+        section_page = section.page_start or next(
+            (int(_element_page_no(element) or 0) for element in section.elements if _element_page_no(element)),
+            0,
+        )
+        if config.include_page_markers and section_page and section_page != current_page:
+            if lines and lines[-1] != "":
+                lines.append("")
+            lines.append(f"<!-- page:{section_page} -->")
+            lines.append("")
+            current_page = section_page
+
         if _should_emit_section_heading(
             section_canonical=section.canonical,
             section_title=section.title,
@@ -789,7 +892,7 @@ def _dedupe_section_elements(section: MarkdownSectionNode) -> None:
     section.elements = deduped
 
 
-def _append_front_matter_line(model: MarkdownDocumentModel, text: str) -> None:
+def _append_front_matter_line(model: MarkdownDocumentModel, text: str, *, page_no: int = 0) -> None:
     compact = " ".join(str(text or "").split()).strip()
     if not compact:
         return
@@ -798,6 +901,7 @@ def _append_front_matter_line(model: MarkdownDocumentModel, text: str) -> None:
         if prev == compact:
             return
     model.front_matter.append(compact)
+    model.front_matter_pages.append(max(0, int(page_no or 0)))
 
 
 def _should_treat_as_front_matter(

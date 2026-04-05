@@ -2,137 +2,118 @@
   "doc_id": "a002",
   "system": "improved_ocr_agent",
   "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/Hybrid/Assignment2.pdf",
-  "title": "create student record student_record = json.loads(event['body']) student_table.put_item(Item = student_record)",
+  "title": "Performing CRUD operations in DynamoDB using AWS Lambda",
   "status": "success",
-  "markdown_line_count": 111,
+  "markdown_line_count": 195,
   "headings": [
     {
       "level": 1,
-      "text": "create student record student_record = json.loads(event['body']) student_table.put_item(Item = student_record)",
-      "normalized_text": "create student record student record json loads event body student table put item item student record",
-      "line_no": 18,
-      "suspicious": false
-    },
-    {
-      "level": 1,
-      "text": "update student record by student id student_record = json.loads(event['body'])",
-      "normalized_text": "update student record by student id student record json loads event body",
-      "line_no": 35,
-      "suspicious": false
-    },
-    {
-      "level": 1,
-      "text": "delete student record student_id = event['queryStringParameters']['student_id']",
-      "normalized_text": "delete student record student id event querystringparameters student id",
-      "line_no": 47,
+      "text": "Performing CRUD operations in DynamoDB using AWS Lambda",
+      "normalized_text": "performing crud operations in dynamodb using aws lambda",
+      "line_no": 1,
       "suspicious": false
     },
     {
       "level": 2,
-      "text": "Fetching record by student_id (GET)",
-      "normalized_text": "fetching record by student id get",
-      "line_no": 64,
+      "text": "Lambda: AWS Lambda",
+      "normalized_text": "lambda aws lambda",
+      "line_no": 11,
       "suspicious": false
     },
     {
       "level": 2,
-      "text": "Updating the data (PUT)",
-      "normalized_text": "updating the data put",
-      "line_no": 69,
+      "text": "DynamoDB: DynamoDB",
+      "normalized_text": "dynamodb dynamodb",
+      "line_no": 17,
       "suspicious": false
     },
     {
       "level": 2,
-      "text": "Deleting a record (DELETE)",
-      "normalized_text": "deleting a record delete",
-      "line_no": 76,
+      "text": "API Gateway: API Gateway",
+      "normalized_text": "api gateway api gateway",
+      "line_no": 22,
+      "suspicious": false
+    },
+    {
+      "level": 2,
+      "text": "Adding records (POST)",
+      "normalized_text": "adding records post",
+      "line_no": 100,
       "suspicious": false
     },
     {
       "level": 2,
       "text": "Challenges",
       "normalized_text": "challenges",
-      "line_no": 90,
+      "line_no": 154,
       "suspicious": false
     },
     {
       "level": 2,
       "text": "Learnings",
       "normalized_text": "learnings",
-      "line_no": 101,
+      "line_no": 177,
       "suspicious": false
     }
   ],
   "sections": [
     {
-      "heading_text": "create student record student_record = json.loads(event['body']) student_table.put_item(Item = student_record)",
-      "normalized_heading_text": "create student record student record json loads event body student table put item item student record",
+      "heading_text": "Performing CRUD operations in DynamoDB using AWS Lambda",
+      "normalized_heading_text": "performing crud operations in dynamodb using aws lambda",
       "level": 1,
-      "line_start": 18,
-      "line_end": 34,
-      "prose_text": "'statusCode': 200, 'body': json.dumps('Student record added successfully')\nelif event['httpMethod'] == 'GET':\nfetch student record by student id\nstudent_id = event['queryStringParameters']['student_id'] response = student_table.get_item(Key={'student_id': student_id})\nif 'Item' not in response:\nif record is not present for the given student id return {\n'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\n'statusCode': 200, 'body': json.dumps(response['Item'])\nelif event['httpMethod'] == 'PUT':",
-      "full_text": "return {\n'statusCode': 200, 'body': json.dumps('Student record added successfully')\n}\nelif event['httpMethod'] == 'GET':\nfetch student record by student id\n---\n<!-- page 2 mode: simple_text -->\nstudent_id = event['queryStringParameters']['student_id'] response = student_table.get_item(Key={'student_id': student_id})\nif 'Item' not in response:\nif record is not present for the given student id return {\n'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\n}\nreturn {\n'statusCode': 200, 'body': json.dumps(response['Item'])\n}\nelif event['httpMethod'] == 'PUT':",
-      "word_count": 73,
+      "line_start": 1,
+      "line_end": 10,
+      "prose_text": "In this assignment I have created a lambda function in AWS which gets triggered by the API gateway to perform the CRUD operations (POST, GET, PUT, DELETE) in DynamoDB.\nAWS Services used:",
+      "full_text": "<!-- document_mode: hybrid_paper -->\n<!-- page 1 mode: simple_text -->\nIn this assignment I have created a lambda function in AWS which gets triggered by the API gateway to perform the CRUD operations (POST, GET, PUT, DELETE) in DynamoDB.\nAWS Services used:",
+      "word_count": 30,
       "empty": false,
       "asset_only": false
     },
     {
-      "heading_text": "update student record by student id student_record = json.loads(event['body'])",
-      "normalized_heading_text": "update student record by student id student record json loads event body",
-      "level": 1,
-      "line_start": 35,
-      "line_end": 46,
-      "prose_text": "student_table.update_item(\nKey={'student_id': student_record['student_id']}, UpdateExpression=\"set #name=:n, #course=:c\", ExpressionAttributeNames={\n'#name': 'name', '#course': 'course'\n}, ExpressionAttributeValues={\n':n': student_record['name'], ':c': student_record['course']\n'statusCode':200, 'body': json.dumps('Student record updated successfully')\nelif event['httpMethod'] == 'DELETE':",
-      "full_text": "student_table.update_item(\nKey={'student_id': student_record['student_id']}, UpdateExpression=\"set #name=:n, #course=:c\", ExpressionAttributeNames={\n'#name': 'name', '#course': 'course'\n}, ExpressionAttributeValues={\n':n': student_record['name'], ':c': student_record['course']\n}\n)\nreturn {\n'statusCode':200, 'body': json.dumps('Student record updated successfully')\n}\nelif event['httpMethod'] == 'DELETE':",
-      "word_count": 41,
+      "heading_text": "Lambda: AWS Lambda",
+      "normalized_heading_text": "lambda aws lambda",
+      "level": 2,
+      "line_start": 11,
+      "line_end": 16,
+      "prose_text": "1. Lambda: AWS Lambda is a serverless function which is event-driven and does not need\npre-provisioned servers to execute the code. It gets triggered in response to certain events\nwhile automatically managing the computing resources.",
+      "full_text": "1. Lambda: AWS Lambda is a serverless function which is event-driven and does not need\npre-provisioned servers to execute the code. It gets triggered in response to certain events\nwhile automatically managing the computing resources.",
+      "word_count": 33,
       "empty": false,
       "asset_only": false
     },
     {
-      "heading_text": "delete student record student_id = event['queryStringParameters']['student_id']",
-      "normalized_heading_text": "delete student record student id event querystringparameters student id",
-      "level": 1,
-      "line_start": 47,
-      "line_end": 63,
-      "prose_text": "response = student_table.get_item(Key={'student_id': student_id})\nif 'Item' not in response:\nif record is not present for the given student id return {\n'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\nstudent_table.delete_item(Key={'student_id': student_id})\n'statusCode':200, 'body': json.dumps('Student record deleted successfully')",
-      "full_text": "response = student_table.get_item(Key={'student_id': student_id})\n---\n<!-- page 3 mode: hybrid_paper -->\nif 'Item' not in response:\nif record is not present for the given student id return {\n'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\n}\nstudent_table.delete_item(Key={'student_id': student_id})\nreturn {\n'statusCode':200, 'body': json.dumps('Student record deleted successfully')\n}\n![Figure 1 on Page 3](a002_assets/figures/a002_page_3_fig_1.png)\n---\n<!-- page 4 mode: ocr -->\n<!-- OCR page 4 -->",
-      "word_count": 56,
+      "heading_text": "DynamoDB: DynamoDB",
+      "normalized_heading_text": "dynamodb dynamodb",
+      "level": 2,
+      "line_start": 17,
+      "line_end": 21,
+      "prose_text": "2. DynamoDB: DynamoDB is a serverless NoSQL database which is highly scalable and can\nhandle a varied amount of traffic. It is a key-value datastore with built-in support for replication.",
+      "full_text": "2. DynamoDB: DynamoDB is a serverless NoSQL database which is highly scalable and can\nhandle a varied amount of traffic. It is a key-value datastore with built-in support for replication.",
+      "word_count": 26,
       "empty": false,
       "asset_only": false
     },
     {
-      "heading_text": "Fetching record by student_id (GET)",
-      "normalized_heading_text": "fetching record by student id get",
+      "heading_text": "API Gateway: API Gateway",
+      "normalized_heading_text": "api gateway api gateway",
       "level": 2,
-      "line_start": 64,
-      "line_end": 68,
-      "prose_text": "",
-      "full_text": "---\n<!-- page 5 mode: ocr -->\n<!-- OCR page 5 -->",
-      "word_count": 0,
-      "empty": true,
+      "line_start": 22,
+      "line_end": 99,
+      "prose_text": "3. API Gateway: API Gateway is a service which is used to build and monitor scalable APIs to\nconnect the applications to various backend services.\nLambda function Code:\nlambda_function.py:\nfrom boto3.dynamodb.conditions import Key\ndynamodb = boto3.resource('dynamodb')\nstudent_table = dynamodb.Table('StudentRecords')\ndef lambda_handler(event, context):\nif event['httpMethod'] == 'POST':\n> Equation 2 JSON: `a002_assets/equations/equation_0002.json`\n> Equation 2 image: `a002_assets/equations/equation_0002.png`\n\\# create student record student_record = json.loads(event['body']) student_table.put_item(Item = student_record)\n'body': json.dumps('Student record added successfully')\nelif event['httpMethod'] == 'GET':\n> Equation 3 JSON: `a002_assets/equations/equation_0003.json`\n> Equation 3 image: `a002_assets/equations/equation_0003.png`\nelif event['httpMethod'] == 'GET':\n\\# fetch student record by student id\nelif event['httpMethod'] == 'PUT':\n> Equation 4 JSON: `a002_assets/equations/equation_0004.json`\n> Equation 4 image: `a002_assets/equations/equation_0004.png`\nelif event['httpMethod'] == 'PUT':\n\\# update student record by student id student_record = json.loads(event['body'])\nstudent_table.update_item(\n'body': json.dumps('Student record updated successfully')\nelif event['httpMethod'] == 'DELETE':\n> Equation 7 JSON: `a002_assets/equations/equation_0007.json`\n> Equation 7 image: `a002_assets/equations/equation_0007.png`\nelif event['httpMethod'] == 'DELETE':\n\\# delete student record\nstudent_id = event['queryStringParameters']['student_id']\n'body': json.dumps('Student record deleted successfully')",
+      "full_text": "3. API Gateway: API Gateway is a service which is used to build and monitor scalable APIs to\nconnect the applications to various backend services.\nLambda function Code:\nlambda_function.py:\nimport json\nimport boto3\nfrom boto3.dynamodb.conditions import Key\ndynamodb = boto3.resource('dynamodb')\nstudent_table = dynamodb.Table('StudentRecords')\ndef lambda_handler(event, context):\n$$\nif event['httpMethod'] == 'POST':\n$$\n> Equation 2 JSON: `a002_assets/equations/equation_0002.json`\n> Equation 2 image: `a002_assets/equations/equation_0002.png`\n\\# create student record student_record = json.loads(event['body']) student_table.put_item(Item = student_record)\n'statusCode': 200,\n'body': json.dumps('Student record added successfully')\n$$\nelif event['httpMethod'] == 'GET':\n$$\n> Equation 3 JSON: `a002_assets/equations/equation_0003.json`\n> Equation 3 image: `a002_assets/equations/equation_0003.png`\nelif event['httpMethod'] == 'GET':\n\\# fetch student record by student id\n---\n<!-- page 2 mode: simple_text -->\n$$\nelif event['httpMethod'] == 'PUT':\n$$\n> Equation 4 JSON: `a002_assets/equations/equation_0004.json`\n> Equation 4 image: `a002_assets/equations/equation_0004.png`\nelif event['httpMethod'] == 'PUT':\n\\# update student record by student id student_record = json.loads(event['body'])\nstudent_table.update_item(\n'statusCode':200,\n'body': json.dumps('Student record updated successfully')\n$$\nelif event['httpMethod'] == 'DELETE':\n$$\n> Equation 7 JSON: `a002_assets/equations/equation_0007.json`\n> Equation 7 image: `a002_assets/equations/equation_0007.png`\nelif event['httpMethod'] == 'DELETE':\n\\# delete student record\nstudent_id = event['queryStringParameters']['student_id']\n---\n<!-- page 3 mode: hybrid_paper -->\n'statusCode':200,\n'body': json.dumps('Student record deleted successfully')\nScreenshots:",
+      "word_count": 201,
+      "empty": false,
       "asset_only": false
     },
     {
-      "heading_text": "Updating the data (PUT)",
-      "normalized_heading_text": "updating the data put",
+      "heading_text": "Adding records (POST)",
+      "normalized_heading_text": "adding records post",
       "level": 2,
-      "line_start": 69,
-      "line_end": 75,
-      "prose_text": "",
-      "full_text": "![Screenshot showing API request to update student data using PUT method](a002_assets/figures/ocr_page_5_246_256_1719_896.png)\n![Screenshot showing DynamoDB scan results for StudentRecords table](a002_assets/figures/ocr_page_5_246_1280_1719_896.png)\n---\n<!-- page 6 mode: ocr -->\n<!-- OCR page 6 -->",
-      "word_count": 0,
-      "empty": true,
-      "asset_only": true
-    },
-    {
-      "heading_text": "Deleting a record (DELETE)",
-      "normalized_heading_text": "deleting a record delete",
-      "level": 2,
-      "line_start": 76,
-      "line_end": 89,
-      "prose_text": "5. Edge Case - Trying to fetch a record which does not exist:\n6. Edge Case - Trying to delete a record which does not exist:\nChallenges and Learnings:",
-      "full_text": "![Screenshot showing API request to delete a record from Student Records Management](a002_assets/figures/ocr_page_6_328_312_1568_799.png)\n![Screenshot showing DynamoDB scan results after deletion](a002_assets/figures/ocr_page_6_328_1206_1568_799.png)\n---\n<!-- page 7 mode: ocr -->\n<!-- OCR page 7 -->\n5. Edge Case - Trying to fetch a record which does not exist:\n![Screenshot showing a GET request to fetch a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_370_286_1749_682.png)\n6. Edge Case - Trying to delete a record which does not exist:\n![Screenshot showing a DELETE request to delete a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_370_1092_1749_682.png)\n---\n<!-- page 8 mode: simple_text -->\nChallenges and Learnings:",
-      "word_count": 23,
+      "line_start": 100,
+      "line_end": 153,
+      "prose_text": "2. Fetching record by student_id (GET):\n3. Updating the data (PUT):\n4. Deleting a record (DELETE):\n5. Edge Case - Trying to fetch a record which does not exist:\n6. Edge Case - Trying to delete a record which does not exist:\nChallenges and Learnings:",
+      "full_text": "---\n<!-- page 4 mode: ocr -->\n<!-- OCR page 4 -->\n2. Fetching record by student_id (GET):\n---\n<!-- page 5 mode: ocr -->\n<!-- OCR page 5 -->\n3. Updating the data (PUT):\n![Screenshot showing API request to update student data in DynamoDB](a002_assets/figures/ocr_page_5_256_287_1497_670.png)\n![Screenshot showing DynamoDB console displaying updated student records](a002_assets/figures/ocr_page_5_256_1047_1497_670.png)\n---\n<!-- page 6 mode: ocr -->\n<!-- OCR page 6 -->\n4. Deleting a record (DELETE):\n![Screenshot showing API request to delete a record from Student Records Management](a002_assets/figures/ocr_page_6_370_286_1757_693.png)\n![Screenshot showing DynamoDB scan results after deletion](a002_assets/figures/ocr_page_6_370_1092_1757_693.png)\n---\n<!-- page 7 mode: ocr -->\n<!-- OCR page 7 -->\n5. Edge Case - Trying to fetch a record which does not exist:\n![Screenshot showing API request to fetch a record which does not exist](a002_assets/figures/ocr_page_7_312_349_1836_749.png)\n6. Edge Case - Trying to delete a record which does not exist:\n![Screenshot showing API request to delete a record which does not exist](a002_assets/figures/ocr_page_7_312_1162_1836_749.png)\n---\n<!-- page 8 mode: simple_text -->\nChallenges and Learnings:",
+      "word_count": 36,
       "empty": false,
       "asset_only": false
     },
@@ -140,11 +121,11 @@
       "heading_text": "Challenges",
       "normalized_heading_text": "challenges",
       "level": 2,
-      "line_start": 90,
-      "line_end": 100,
-      "prose_text": "a. Problem: After building the lambda function and creating respective APIs for\nCRUD operations, when I tried to test the data in POSTMAN, I was getting a ‘KeyError’ - ‘httpMethod’\nObservation: After going through and debugging the code, I found out that the\n‘event’ object was empty.\nSolution: While creating the APIs, I turned on the ‘Lambda Proxy Integration’ in the ‘Integration request’ option which ensured that the API gateway would send the requests as a structured event.\nb. Problem: While testing various CRUD operations, when a student_id which is\nnon-existent is being given in the GET or DELETE request, an empty response was getting in return.\nObservation: Edge cases for GET and DELETE operations were not handled in the Lambda function.\nSolution: Added the code to first check if the given student_id exists in the database or not. If it does not exist, it should return a response which addresses the situation to the user.",
-      "full_text": "a. Problem: After building the lambda function and creating respective APIs for\nCRUD operations, when I tried to test the data in POSTMAN, I was getting a ‘KeyError’ - ‘httpMethod’\nObservation: After going through and debugging the code, I found out that the\n‘event’ object was empty.\nSolution: While creating the APIs, I turned on the ‘Lambda Proxy Integration’ in the ‘Integration request’ option which ensured that the API gateway would send the requests as a structured event.\nb. Problem: While testing various CRUD operations, when a student_id which is\nnon-existent is being given in the GET or DELETE request, an empty response was getting in return.\nObservation: Edge cases for GET and DELETE operations were not handled in the Lambda function.\nSolution: Added the code to first check if the given student_id exists in the database or not. If it does not exist, it should return a response which addresses the situation to the user.",
-      "word_count": 147,
+      "line_start": 154,
+      "line_end": 176,
+      "prose_text": "a. Problem: After building the lambda function and creating respective APIs for\nCRUD operations, when I tried to test the data in POSTMAN, I was getting a\nObservation: After going through and debugging the code, I found out that the\n‘event’ object was empty.\nSolution: While creating the APIs, I turned on the ‘Lambda Proxy Integration’ in the ‘Integration request’ option which ensured that the API gateway would send the requests as a structured event.\nb. Problem: While testing various CRUD operations, when a student_id which is\nnon-existent is being given in the GET or DELETE request, an empty response\nwas getting in return.\nObservation: Edge cases for GET and DELETE operations were not handled in\nthe Lambda function.\nSolution: Added the code to first check if the given student_id exists in the database or not. If it does not exist, it should return a response which addresses the situation to the user.",
+      "full_text": "a. Problem: After building the lambda function and creating respective APIs for\nCRUD operations, when I tried to test the data in POSTMAN, I was getting a\n‘KeyError’ - ‘httpMethod’\nObservation: After going through and debugging the code, I found out that the\n‘event’ object was empty.\nSolution: While creating the APIs, I turned on the ‘Lambda Proxy Integration’ in the ‘Integration request’ option which ensured that the API gateway would send the requests as a structured event.\nb. Problem: While testing various CRUD operations, when a student_id which is\nnon-existent is being given in the GET or DELETE request, an empty response\nwas getting in return.\nObservation: Edge cases for GET and DELETE operations were not handled in\nthe Lambda function.\nSolution: Added the code to first check if the given student_id exists in the database or not. If it does not exist, it should return a response which addresses the situation to the user.",
+      "word_count": 145,
       "empty": false,
       "asset_only": false
     },
@@ -152,36 +133,28 @@
       "heading_text": "Learnings",
       "normalized_heading_text": "learnings",
       "level": 2,
-      "line_start": 101,
-      "line_end": 111,
-      "prose_text": "a. Firstly I learnt about the serverless architecture, its pros and cons, and the use\ncases of a serverless architecture. I understood the applications and the best practices of using this architecture.\nb. I learnt how to set up and configure the AWS Lambda to trigger based on REST\nAPI calls and perform CRUD operations on DynamoDB.\nc. I researched about DynamoDB and its use cases and understood when a\nNoSQL database should be used. I got hands-on experience on performing various operations in the DynamoDB.\nd. I gained insights on creating REST APIs using the AWS API Gateway.\ne. I also understood the importance of cloud computing and various features like\nScalability, Availability, Security etc. which is an integral part of any Enterprise level software.",
-      "full_text": "a. Firstly I learnt about the serverless architecture, its pros and cons, and the use\ncases of a serverless architecture. I understood the applications and the best practices of using this architecture.\nb. I learnt how to set up and configure the AWS Lambda to trigger based on REST\nAPI calls and perform CRUD operations on DynamoDB.\nc. I researched about DynamoDB and its use cases and understood when a\nNoSQL database should be used. I got hands-on experience on performing various operations in the DynamoDB.\nd. I gained insights on creating REST APIs using the AWS API Gateway.\ne. I also understood the importance of cloud computing and various features like\nScalability, Availability, Security etc. which is an integral part of any Enterprise level software.\n---",
+      "line_start": 177,
+      "line_end": 195,
+      "prose_text": "a. Firstly I learnt about the serverless architecture, its pros and cons, and the use\ncases of a serverless architecture. I understood the applications and the best practices of using this architecture.\nb. I learnt how to set up and configure the AWS Lambda to trigger based on REST\nAPI calls and perform CRUD operations on DynamoDB.\nc. I researched about DynamoDB and its use cases and understood when a\nNoSQL database should be used. I got hands-on experience on performing various operations in the DynamoDB.\nd. I gained insights on creating REST APIs using the AWS API Gateway. e. I also understood the importance of cloud computing and various features like\nScalability, Availability, Security etc. which is an integral part of any Enterprise level software.",
+      "full_text": "a. Firstly I learnt about the serverless architecture, its pros and cons, and the use\ncases of a serverless architecture. I understood the applications and the best practices of using this architecture.\nb. I learnt how to set up and configure the AWS Lambda to trigger based on REST\nAPI calls and perform CRUD operations on DynamoDB.\nc. I researched about DynamoDB and its use cases and understood when a\nNoSQL database should be used. I got hands-on experience on performing various operations in the DynamoDB.\nd. I gained insights on creating REST APIs using the AWS API Gateway. e. I also understood the importance of cloud computing and various features like\nScalability, Availability, Security etc. which is an integral part of any Enterprise level software.\n---",
       "word_count": 112,
       "empty": false,
       "asset_only": false
     }
   ],
-  "figures": [
-    {
-      "number": 1,
-      "caption": "on Page 3",
-      "normalized_caption": "on page 3",
-      "line_no": 59,
-      "kind": "figure"
-    }
-  ],
+  "figures": [],
   "tables": [],
   "intrinsic_metrics": {
-    "heading_count": 8,
+    "heading_count": 7,
     "duplicate_heading_count": 0,
     "suspicious_heading_count": 0,
-    "figure_caption_count": 1,
+    "figure_caption_count": 0,
     "table_caption_count": 0,
     "duplicate_figure_caption_count": 0,
     "duplicate_table_caption_count": 0,
-    "empty_section_count": 2,
-    "consecutive_heading_run_count": 1,
-    "max_consecutive_heading_run": 3
+    "empty_section_count": 0,
+    "consecutive_heading_run_count": 0,
+    "max_consecutive_heading_run": 0
   },
   "run_metadata": {
     "doc_id": "a002",
@@ -194,14 +167,51 @@
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
-      "figures": 7,
+      "figures": 6,
       "tables": 0,
       "page_images": 4
     },
-    "elapsed_ms": 19425.503,
+    "elapsed_ms": 19172.045,
     "status": "success",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/a002/paper.md",
     "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
-    "postprocess_enabled": true
+    "postprocess_enabled": false,
+    "non_ocr_document_handler": "ia_phase1",
+    "non_ocr_runs": [
+      {
+        "handler": "ia_phase1",
+        "page_numbers": [
+          1,
+          2,
+          3,
+          8
+        ]
+      }
+    ],
+    "ia_score": 14,
+    "native_score": 1,
+    "non_ocr_page_handlers": {
+      "1": "ia_phase1",
+      "2": "ia_phase1",
+      "3": "ia_phase1",
+      "8": "ia_phase1"
+    },
+    "non_ocr_scores": {
+      "ia_score": 14,
+      "native_score": 1,
+      "scholarly_score": 13,
+      "structured_visual_score": 1,
+      "report_score": 1,
+      "repeated_header_pages": 2,
+      "repeated_footer_pages": 0,
+      "prose_dominant_pages": 2,
+      "total_citations": 0,
+      "total_visual_captions": 0,
+      "total_academic_headings": 0,
+      "total_numbered_scholarly_headings": 6,
+      "total_roman_headings": 0,
+      "total_equation_lines": 18,
+      "affiliation_pages": 0
+    }
   }
 }

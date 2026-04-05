@@ -1,0 +1,56 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 7,
+  "bbox": {
+    "x0": 72.0,
+    "y0": 418.5845031738281,
+    "x1": 414.9277038574219,
+    "y1": 498.07989501953125
+  },
+  "caption": "Table 2: Dispatch tiers and their selection criteria.",
+  "n_rows": 4,
+  "n_cols": 4,
+  "headers": [
+    "Tier 1",
+    "Path Fused Backward",
+    "When Training + CUDA + Triton +",
+    "Tradeoff Fastest ab"
+  ],
+  "rows": [
+    [
+      "",
+      "",
+      "auto-gate/force-on",
+      "for bwd"
+    ],
+    [
+      "2",
+      "Fused Forward",
+      "Inference + CUDA + Triton",
+      "Speed wit"
+    ],
+    [
+      "3",
+      "Eager Fallback",
+      "CPU / no Triton / force-off /",
+      "Universal"
+    ],
+    [
+      "",
+      "",
+      "sub-crossover",
+      ""
+    ]
+  ],
+  "markdown": "| Tier 1 | Path Fused Backward | When Training + CUDA + Triton + | Tradeoff Fastest ab |\n| --- | --- | --- | --- |\n|  |  | auto-gate/force-on | for bwd |\n| 2 | Fused Forward | Inference + CUDA + Triton | Speed wit |\n| 3 | Eager Fallback | CPU / no Triton / force-off / | Universal |\n|  |  | sub-crossover |  |",
+  "csv_text": "Tier 1,Path Fused Backward,When Training + CUDA + Triton +,Tradeoff Fastest ab\r\n,,auto-gate/force-on,for bwd\r\n2,Fused Forward,Inference + CUDA + Triton,Speed wit\r\n3,Eager Fallback,CPU / no Triton / force-off /,Universal\r\n,,sub-crossover,",
+  "section_canonical": "fused_triton_kernels",
+  "section_title": "Fused Triton Kernels",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": "Figure 2: Three-tier dispatch: fused backward for training (Tier 1), fused forward for inference (Tier 2), eager fallback for CPU, no-Triton, or sub-crossover shapes (Tier 3).",
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 2,
+  "json_file": "table_0002.json"
+}

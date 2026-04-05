@@ -1,0 +1,61 @@
+{
+  "paper_id": 893555535508,
+  "page_no": 15,
+  "bbox": {
+    "x0": 58.5,
+    "y0": 505.97015380859375,
+    "x1": 542.4076538085938,
+    "y1": 565.3915710449219
+  },
+  "caption": "Table 12. NVR inference complexity, measured on one A100 GPU.",
+  "n_rows": 6,
+  "n_cols": 3,
+  "headers": [
+    "performance when these models are inferred on the",
+    "unseen",
+    ""
+  ],
+  "rows": [
+    [
+      "SemanticKITTI dataset. CVT-Occ and ALOcc achiev",
+      "e IoUs",
+      ""
+    ],
+    [
+      "",
+      "Method T rain. GPUs Train. time Recon . time (ms) Render time (ms) Pa",
+      "rams ("
+    ],
+    [
+      "of only 9.43% and 14.28%, respectively, whereas o",
+      "ur pro- CUT3R 8 A100 30 days 240.0 259.8",
+      "793.3"
+    ],
+    [
+      "posed method demonstrates superior robustness with",
+      "an IoU VGGT ×\n64×A100 ≈\n>9 days 222.2 –",
+      "1157.9"
+    ],
+    [
+      "of 24.03%.",
+      "AnySplat 16×A800 ≈2 days 251.7 17.2",
+      "1190.7"
+    ],
+    [
+      "",
+      "OccAny 16×A100 ≈1.5 days 93.8 123.2",
+      "651.1"
+    ]
+  ],
+  "markdown": "|performance when these models are inferred on the|unseen|Col3|Col4|Col5|Col6|Col7|\n|---|---|---|---|---|---|---|\n||||||||\n||||||||\n||||||||\n||||||||\n||||||||\n||||||||",
+  "csv_text": "performance when these models are inferred on the,unseen,\r\nSemanticKITTI dataset. CVT-Occ and ALOcc achiev,e IoUs,\r\n,Method T rain. GPUs Train. time Recon . time (ms) Render time (ms) Pa,rams (\r\n\"of only 9.43% and 14.28%, respectively, whereas o\",ur pro- CUT3R 8 A100 30 days 240.0 259.8,793.3\r\nposed method demonstrates superior robustness with,\"an IoU VGGT ×\n64×A100 ≈\n>9 days 222.2 –\",1157.9\r\nof 24.03%.,AnySplat 16×A800 ≈2 days 251.7 17.2,1190.7\r\n,OccAny 16×A100 ≈1.5 days 93.8 123.2,651.1",
+  "section_canonical": "appendix",
+  "section_title": "Supplementary Studies",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "text_caption_fallback",
+  "id": 7,
+  "json_file": "table_0007.json"
+}

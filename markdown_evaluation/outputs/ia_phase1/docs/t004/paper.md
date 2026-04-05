@@ -2,7 +2,7 @@
 title: "Administrative Policy Brief"
 paper_id: 683152820568
 source_pdf: "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/TextHeavy/text_heavy_placeholder_policy_brief.pdf"
-generated_at: "2026-04-04T22:55:12.697681+00:00"
+generated_at: "2026-04-05T20:58:36.473896+00:00"
 num_figures: 0
 num_tables: 0
 num_equations: 0

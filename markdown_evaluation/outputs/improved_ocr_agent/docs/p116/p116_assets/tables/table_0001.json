@@ -1,0 +1,96 @@
+{
+  "paper_id": 782351908419,
+  "page_no": 5,
+  "bbox": {
+    "x0": 158.19387817382812,
+    "y0": 274.7681884765625,
+    "x1": 421.27398681640625,
+    "y1": 330.2444152832031
+  },
+  "caption": "Table 1: MedObvious composition. Tiers increase in clinical specificity.",
+  "n_rows": 6,
+  "n_cols": 8,
+  "headers": [
+    "Tier",
+    "Name",
+    "Grid",
+    "#Mod.",
+    "Tasks",
+    "Pos.",
+    "Neg.",
+    "Clinical analog"
+  ],
+  "rows": [
+    [
+      "T1",
+      "Foundation",
+      "2 × 2",
+      "2",
+      "440",
+      "275",
+      "165",
+      "Basic QC (orientati"
+    ],
+    [
+      "T2",
+      "Diversity",
+      "2 × 2",
+      "2",
+      "480",
+      "300",
+      "180",
+      "Robustness across s"
+    ],
+    [
+      "T3",
+      "Scaling",
+      "3 × 3",
+      "4",
+      "360",
+      "225",
+      "135",
+      "Multi-view/-slice co"
+    ],
+    [
+      "T4",
+      "Semantics",
+      "2 × 2",
+      "3",
+      "320",
+      "200",
+      "120",
+      "Anatomy/viewpoint"
+    ],
+    [
+      "T5",
+      "Triage",
+      "Mixed",
+      "4",
+      "280",
+      "175",
+      "105",
+      "“Stop and verify” sa"
+    ],
+    [
+      "Total",
+      "",
+      "",
+      "4",
+      "1,880",
+      "1,175",
+      "705",
+      ""
+    ]
+  ],
+  "markdown": "| Tier | Name | Grid | #Mod. | Tasks | Pos. | Neg. | Clinical analog |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| T1 | Foundation | 2 × 2 | 2 | 440 | 275 | 165 | Basic QC (orientati |\n| T2 | Diversity | 2 × 2 | 2 | 480 | 300 | 180 | Robustness across s |\n| T3 | Scaling | 3 × 3 | 4 | 360 | 225 | 135 | Multi-view/-slice co |\n| T4 | Semantics | 2 × 2 | 3 | 320 | 200 | 120 | Anatomy/viewpoint |\n| T5 | Triage | Mixed | 4 | 280 | 175 | 105 | “Stop and verify” sa |\n| Total |  |  | 4 | 1,880 | 1,175 | 705 |  |",
+  "csv_text": "Tier,Name,Grid,#Mod.,Tasks,Pos.,Neg.,Clinical analog\r\nT1,Foundation,2 × 2,2,440,275,165,Basic QC (orientati\r\nT2,Diversity,2 × 2,2,480,300,180,Robustness across s\r\nT3,Scaling,3 × 3,4,360,225,135,Multi-view/-slice co\r\nT4,Semantics,2 × 2,3,320,200,120,Anatomy/viewpoint\r\nT5,Triage,Mixed,4,280,175,105,“Stop and verify” sa\r\nTotal,,,4,\"1,880\",\"1,175\",705,",
+  "section_canonical": "construction",
+  "section_title": "MedObvious Construction",
+  "section_source": "arxiv_source",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 1,
+  "json_file": "table_0001.json"
+}

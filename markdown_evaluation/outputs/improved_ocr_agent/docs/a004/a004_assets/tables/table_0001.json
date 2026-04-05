@@ -1,0 +1,40 @@
+{
+  "paper_id": 634343662850,
+  "page_no": 3,
+  "bbox": {
+    "x0": 54.00227425315163,
+    "y0": 75.73836263020833,
+    "x1": 558.2527077414773,
+    "y1": 277.6416422526042
+  },
+  "caption": "3. Tabular Findings",
+  "n_rows": 1,
+  "n_cols": 5,
+  "headers": [
+    "Metric",
+    "Value",
+    "Notes",
+    "Severity",
+    "Action"
+  ],
+  "rows": [
+    [
+      "Peak request window",
+      "7–8 PM",
+      "Traffic increased after\ngrade release\nnotifications.",
+      "Medium",
+      "Scale read replicas\nbefore scheduled\nannouncements."
+    ]
+  ],
+  "markdown": "|Metric|Value|Notes|Severity|Action|\n|---|---|---|---|---|\n|Peak request window|7–8 PM|Traffic increased after grade release notifications.|Medium|Scale read replicas before scheduled announcements.|\n|Highest&amp;#45;latency endpoint|/api/payments|Payment callback introduced the largest tail latency.|High|Add timeout budget and async retry handling.|\n|Most common error|401 Unauthorized|Typically triggered by expired mobile sessions.|Low|Prompt token refresh in client app.|\n|Largest error spike|5:20 PM|Short 5xx burst lasted 11 minutes during deployment.|High|Stagger deploys and warm application instances.|",
+  "csv_text": "Metric,Value,Notes,Severity,Action\r\nPeak request window,7–8 PM,\"Traffic increased after\ngrade release\nnotifications.\",Medium,\"Scale read replicas\nbefore scheduled\nannouncements.\"",
+  "section_canonical": "results",
+  "section_title": "Tabular Findings",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_lines_strict",
+  "id": 1,
+  "json_file": "table_0001.json"
+}

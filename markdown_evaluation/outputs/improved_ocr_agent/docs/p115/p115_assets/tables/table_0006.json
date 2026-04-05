@@ -1,0 +1,61 @@
+{
+  "paper_id": 893555535508,
+  "page_no": 15,
+  "bbox": {
+    "x0": 59.72050094604492,
+    "y0": 201.45472717285156,
+    "x1": 553.5032958984375,
+    "y1": 425.0340270996094
+  },
+  "caption": "Table 10. Generalization results of fully-supervised methods. Occ label is denser through temporal accumulation of LiDAR point-clouds and subsequent post-processing, whereas the LiDAR label remains sparser at each timestep. OccAny works out of the box in any evaluation settings with different inference areas, voxel resolutions and sensor configurations. In contrast, other methods require manual code modifications to align testing and training conditions. Beyond being more versatile, OccAny clearly demonstrates superior generalization.",
+  "n_rows": 6,
+  "n_cols": 3,
+  "headers": [
+    "Label",
+    "Method",
+    "Venue"
+  ],
+  "rows": [
+    [
+      "",
+      "",
+      "R es. Prec. R ec. IoU Res. Prec. Rec. IoU"
+    ],
+    [
+      "Occ",
+      "CVT-Occ [81] (Trained o n Occ3D-Waymo)",
+      "ECCV’24 1600 × 900 35.38 2 5.86 17.56 12 20 × 370 8.97 34.92 7.69"
+    ],
+    [
+      "",
+      "CVT-Occ [81] (Trained o n Occ3D-Waymo)",
+      "ECCV’24 960 × 540 29.15 2 8.33 16.78 9 60 × 292 8.92 36.84 7.73"
+    ],
+    [
+      "",
+      "CVT-Occ [81] (Trained o n Occ3D-NuScenes)",
+      "ECCV’24 in-d omain – – – 12 20 × 370 11.73 59.97 9.43"
+    ],
+    [
+      "",
+      "ALOcc [1 1] (T rained on Occ3D-NuScenes)",
+      "ICCV’25 in-d omain – – – 7 04 × 256 16.34 53.06 14.28"
+    ],
+    [
+      "LiDAR",
+      "OccAny",
+      "– 512 × 288 45.04 5 8.54 34.15 5 12 × 160 45.64 33.66 24.03"
+    ]
+  ],
+  "markdown": "| Label | Method | Venue |\n| --- | --- | --- |\n|  |  | R es. Prec. R ec. IoU Res. Prec. Rec. IoU |\n| Occ | CVT-Occ [81] (Trained o n Occ3D-Waymo) | ECCV’24 1600 × 900 35.38 2 5.86 17.56 12 20 × 370 8.97 34.92 7.69 |\n|  | CVT-Occ [81] (Trained o n Occ3D-Waymo) | ECCV’24 960 × 540 29.15 2 8.33 16.78 9 60 × 292 8.92 36.84 7.73 |\n|  | CVT-Occ [81] (Trained o n Occ3D-NuScenes) | ECCV’24 in-d omain – – – 12 20 × 370 11.73 59.97 9.43 |\n|  | ALOcc [1 1] (T rained on Occ3D-NuScenes) | ICCV’25 in-d omain – – – 7 04 × 256 16.34 53.06 14.28 |\n| LiDAR | OccAny | – 512 × 288 45.04 5 8.54 34.15 5 12 × 160 45.64 33.66 24.03 |",
+  "csv_text": "Label,Method,Venue\r\n,,R es. Prec. R ec. IoU Res. Prec. Rec. IoU\r\nOcc,CVT-Occ [81] (Trained o n Occ3D-Waymo),ECCV’24 1600 × 900 35.38 2 5.86 17.56 12 20 × 370 8.97 34.92 7.69\r\n,CVT-Occ [81] (Trained o n Occ3D-Waymo),ECCV’24 960 × 540 29.15 2 8.33 16.78 9 60 × 292 8.92 36.84 7.73\r\n,CVT-Occ [81] (Trained o n Occ3D-NuScenes),ECCV’24 in-d omain – – – 12 20 × 370 11.73 59.97 9.43\r\n,ALOcc [1 1] (T rained on Occ3D-NuScenes),ICCV’25 in-d omain – – – 7 04 × 256 16.34 53.06 14.28\r\nLiDAR,OccAny,– 512 × 288 45.04 5 8.54 34.15 5 12 × 160 45.64 33.66 24.03",
+  "section_canonical": "appendix",
+  "section_title": "Supplementary Studies",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 6,
+  "json_file": "table_0006.json"
+}

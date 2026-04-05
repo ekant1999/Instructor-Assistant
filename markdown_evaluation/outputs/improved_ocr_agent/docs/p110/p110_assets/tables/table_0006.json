@@ -1,0 +1,38 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 11,
+  "bbox": {
+    "x0": 159.15199279785156,
+    "y0": 112.98097229003906,
+    "x1": 452.8480224609375,
+    "y1": 233.35699462890625
+  },
+  "caption": "Table 6: Speedup vs. the HF PEFT DoRA baseline grows with rank; speedup vs. eager decreases modestly (H200, bf16, seq=4096, 20 repeats).",
+  "n_rows": 2,
+  "n_cols": 2,
+  "headers": [
+    "vs. PEFT DoRA Model Rank Grad. Infer.",
+    "vs. Eager Grad. Infer."
+  ],
+  "rows": [
+    [
+      "384 1.57× 1.65×\nQwen3.5-27B 512 1.61× 1.68×\n768 1.53× 1.59×",
+      "1.21× 1.16×\n1.18× 1.14×\n1.15× 1.11×"
+    ],
+    [
+      "384 1.66× 1.78×\nQwen3-VL-32B 512 1.70× 1.82×\n768 1.74× 1.87×",
+      "1.18× 1.14×\n1.16× 1.12×\n1.14× 1.10×"
+    ]
+  ],
+  "markdown": "| vs. PEFT DoRA Model Rank Grad. Infer. | vs. Eager Grad. Infer. |\n| --- | --- |\n| 384 1.57× 1.65×<br/>Qwen3.5-27B 512 1.61× 1.68×<br/>768 1.53× 1.59× | 1.21× 1.16×<br/>1.18× 1.14×<br/>1.15× 1.11× |\n| 384 1.66× 1.78×<br/>Qwen3-VL-32B 512 1.70× 1.82×<br/>768 1.74× 1.87× | 1.18× 1.14×<br/>1.16× 1.12×<br/>1.14× 1.10× |",
+  "csv_text": "vs. PEFT DoRA Model Rank Grad. Infer.,vs. Eager Grad. Infer.\r\n\"384 1.57× 1.65×\nQwen3.5-27B 512 1.61× 1.68×\n768 1.53× 1.59×\",\"1.21× 1.16×\n1.18× 1.14×\n1.15× 1.11×\"\r\n\"384 1.66× 1.78×\nQwen3-VL-32B 512 1.70× 1.82×\n768 1.74× 1.87×\",\"1.18× 1.14×\n1.16× 1.12×\n1.14× 1.10×\"",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": "Figure 5: Dense (B@A) position in the eager-to-fused gap (0% = eager, 100% = fused). Negative values: dense (B@A) is slower than eager. The benefit is GPU-bandwidth-sensitive; the factored approach is robust.",
+  "merged_fragments": 3,
+  "detection_strategy": "pymupdf_lines_strict",
+  "id": 6,
+  "json_file": "table_0006.json"
+}

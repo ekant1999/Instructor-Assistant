@@ -1,0 +1,122 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 4,
+  "bbox": {
+    "x0": 72.0,
+    "y0": 127.9985122680664,
+    "x1": 466.29510498046875,
+    "y1": 379.623779296875
+  },
+  "caption": "Table 1: The factored norm reduces rank-dependent persistent memory by 15× at d=8192, r=512 in fp32. Measured reductions are smaller (3.2×) because allocator deltas include the rank-independent base-norm transient (§2.3).",
+  "n_rows": 11,
+  "n_cols": 6,
+  "headers": [
+    "",
+    "PEFT",
+    "Factored (ours)",
+    "Factored (ours) 2",
+    "Factored (ours) 2",
+    "Factored (ours) 2"
+  ],
+  "rows": [
+    [
+      "",
+      "Rank-dependent persistent",
+      "(d\nO i",
+      "+ d outd\nn",
+      ") (d r\nin O out",
+      "+ r )"
+    ],
+    [
+      "",
+      "Chunk buffer (transient)",
+      "Incl",
+      "uded abo",
+      "ve [d , cs] per\nout",
+      "chunk†"
+    ],
+    [
+      "",
+      "Per-module temps",
+      "3–4 de",
+      "nse [d\nout",
+      ", d ] U[d , r] +\nin out",
+      "G[r, r]"
+    ],
+    [
+      "",
+      "Identity matrix",
+      "Every",
+      "forward",
+      "call Never cr",
+      "eated"
+    ],
+    [
+      "",
+      "Concrete: d =d =8192,\nout in",
+      "r=512,",
+      "fp32",
+      "",
+      ""
+    ],
+    [
+      "",
+      "Theory: dense (B@A)",
+      "",
+      "256 MB",
+      "N/A",
+      ""
+    ],
+    [
+      "",
+      "Theory: U + G",
+      "",
+      "N/A",
+      "17.0 M",
+      "B"
+    ],
+    [
+      "",
+      "Theoretical reduction",
+      "",
+      "",
+      "15.1×",
+      ""
+    ],
+    [
+      "",
+      "Measured: allocator delta",
+      "",
+      "768 MB",
+      "241 M",
+      "B"
+    ],
+    [
+      "",
+      "Measured reduction",
+      "",
+      "",
+      "3.2×",
+      ""
+    ],
+    [
+      "",
+      "cs = min(din, ⌊budget/(dout\n† ·",
+      "4) ); at\n⌋",
+      "256 MB a",
+      "nd d=8192, cs spans",
+      "full din."
+    ]
+  ],
+  "markdown": "|Col1|Col2|Col3|PEFT|Factored|(ours)|\n|---|---|---|---|---|---|\n|||||||\n||||2||2|\n||Rank&amp;#45;dependent persistent|(d O i|+ d outd n|) (d r in O out|+ r )|\n||Chunk buffer (transient)|Incl|uded abo|ve [d , cs] per out|chunk†|\n|||||||\n||Per&amp;#45;module temps|3–4 de|nse [d out|, d ] U[d , r] + in out|G[r, r]|\n||Identity matrix|Every|forward|call Never cr|eated|\n|||||||\n|||||||\n||Concrete: d =d =8192, out in|r=512,|fp32|||\n|||||||\n||Theory: dense (B@A)||256 MB|N/A||\n|||||||\n||Theory: U + G||N/A|17.0 M|B|\n|||||||\n||Theoretical reduction|||15.1×||\n|||||||\n||Measured: allocator delta||768 MB|241 M|B|\n|||||||\n||Measured reduction|||3.2×||\n|||||||\n|||||||\n||cs = min(din, ⌊budget/(dout † ·|4) ); at ⌋|256 MB a|nd d=8192, cs spans|full din.|\n|||||||\n|||||||\n|||||||\n|||||||\n|||||||",
+  "csv_text": ",PEFT,Factored (ours),Factored (ours) 2,Factored (ours) 2,Factored (ours) 2\r\n,Rank-dependent persistent,\"(d\nO i\",\"+ d outd\nn\",\") (d r\nin O out\",+ r )\r\n,Chunk buffer (transient),Incl,uded abo,\"ve [d , cs] per\nout\",chunk†\r\n,Per-module temps,3–4 de,\"nse [d\nout\",\", d ] U[d , r] +\nin out\",\"G[r, r]\"\r\n,Identity matrix,Every,forward,call Never cr,eated\r\n,\"Concrete: d =d =8192,\nout in\",\"r=512,\",fp32,,\r\n,Theory: dense (B@A),,256 MB,N/A,\r\n,Theory: U + G,,N/A,17.0 M,B\r\n,Theoretical reduction,,,15.1×,\r\n,Measured: allocator delta,,768 MB,241 M,B\r\n,Measured reduction,,,3.2×,\r\n,\"cs = min(din, ⌊budget/(dout\n† ·\",\"4) ); at\n⌋\",256 MB a,\"nd d=8192, cs spans\",full din.",
+  "section_canonical": "factored_norm_computation",
+  "section_title": "Factored Norm Computation",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "text_caption_fallback",
+  "id": 1,
+  "json_file": "table_0001.json"
+}

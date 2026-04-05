@@ -1,0 +1,187 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 26,
+  "bbox": {
+    "x0": 149.5800018310547,
+    "y0": 336.5254821777344,
+    "x1": 462.41986083984375,
+    "y1": 614.847900390625
+  },
+  "caption": "Table 13: Model-level gradient-computation peak VRAM (GB) across three GPUs, all six models. Same setup as Table 8. Values from peak_vram_mb.",
+  "n_rows": 22,
+  "n_cols": 5,
+  "headers": [
+    "Model",
+    "Method",
+    "RTX 6000 PRO",
+    "H200",
+    "B200"
+  ],
+  "rows": [
+    [
+      "",
+      "Eager",
+      "OOM",
+      "99.2",
+      "99.2"
+    ],
+    [
+      "",
+      "Fused",
+      "OOM",
+      "98.4",
+      "98.4"
+    ],
+    [
+      "Qwen2.5-VL-32B",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "Dense (B@A)",
+      "OOM",
+      "100.6",
+      "100.6"
+    ],
+    [
+      "",
+      "PEFT",
+      "OOM",
+      "103.5",
+      "103.5"
+    ],
+    [
+      "",
+      "Eager",
+      "OOM",
+      "99.2",
+      "99.1"
+    ],
+    [
+      "",
+      "Fused",
+      "OOM",
+      "98.4",
+      "98.4"
+    ],
+    [
+      "Qwen3-VL-32B",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "Dense (B@A)",
+      "OOM",
+      "100.5",
+      "100.4"
+    ],
+    [
+      "",
+      "PEFT",
+      "OOM",
+      "103.0",
+      "102.9"
+    ],
+    [
+      "",
+      "Eager",
+      "83.4",
+      "83.5",
+      "83.4"
+    ],
+    [
+      "",
+      "Fused",
+      "83.3",
+      "83.4",
+      "83.3"
+    ],
+    [
+      "Qwen3.5-27B",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "Dense (B@A)",
+      "84.3",
+      "84.4",
+      "84.3"
+    ],
+    [
+      "",
+      "PEFT",
+      "85.4",
+      "85.5",
+      "85.4"
+    ],
+    [
+      "",
+      "Eager",
+      "83.2",
+      "83.2",
+      "83.1"
+    ],
+    [
+      "",
+      "Fused",
+      "82.9",
+      "83.0",
+      "82.9"
+    ],
+    [
+      "Gemma3-27B",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "Dense (B@A)",
+      "84.3",
+      "84.4",
+      "84.3"
+    ],
+    [
+      "",
+      "PEFT",
+      "86.1",
+      "86.1",
+      "86.1"
+    ],
+    [
+      "",
+      "Eager",
+      "71.6",
+      "71.7",
+      "71.6"
+    ],
+    [
+      "",
+      "Fused",
+      "70 6",
+      "70 7",
+      "70 6"
+    ]
+  ],
+  "markdown": "| Model | Method | RTX 6000 PRO | H200 | B200 |\n| --- | --- | --- | --- | --- |\n|  | Eager | OOM | 99.2 | 99.2 |\n|  | Fused | OOM | 98.4 | 98.4 |\n| Qwen2.5-VL-32B |  |  |  |  |\n|  | Dense (B@A) | OOM | 100.6 | 100.6 |\n|  | PEFT | OOM | 103.5 | 103.5 |\n|  | Eager | OOM | 99.2 | 99.1 |\n|  | Fused | OOM | 98.4 | 98.4 |\n| Qwen3-VL-32B |  |  |  |  |\n|  | Dense (B@A) | OOM | 100.5 | 100.4 |\n|  | PEFT | OOM | 103.0 | 102.9 |\n|  | Eager | 83.4 | 83.5 | 83.4 |\n|  | Fused | 83.3 | 83.4 | 83.3 |\n| Qwen3.5-27B |  |  |  |  |\n|  | Dense (B@A) | 84.3 | 84.4 | 84.3 |\n|  | PEFT | 85.4 | 85.5 | 85.4 |\n|  | Eager | 83.2 | 83.2 | 83.1 |\n|  | Fused | 82.9 | 83.0 | 82.9 |\n| Gemma3-27B |  |  |  |  |\n|  | Dense (B@A) | 84.3 | 84.4 | 84.3 |\n|  | PEFT | 86.1 | 86.1 | 86.1 |\n|  | Eager | 71.6 | 71.7 | 71.6 |\n|  | Fused | 70 6 | 70 7 | 70 6 |",
+  "csv_text": "Model,Method,RTX 6000 PRO,H200,B200\r\n,Eager,OOM,99.2,99.2\r\n,Fused,OOM,98.4,98.4\r\nQwen2.5-VL-32B,,,,\r\n,Dense (B@A),OOM,100.6,100.6\r\n,PEFT,OOM,103.5,103.5\r\n,Eager,OOM,99.2,99.1\r\n,Fused,OOM,98.4,98.4\r\nQwen3-VL-32B,,,,\r\n,Dense (B@A),OOM,100.5,100.4\r\n,PEFT,OOM,103.0,102.9\r\n,Eager,83.4,83.5,83.4\r\n,Fused,83.3,83.4,83.3\r\nQwen3.5-27B,,,,\r\n,Dense (B@A),84.3,84.4,84.3\r\n,PEFT,85.4,85.5,85.4\r\n,Eager,83.2,83.2,83.1\r\n,Fused,82.9,83.0,82.9\r\nGemma3-27B,,,,\r\n,Dense (B@A),84.3,84.4,84.3\r\n,PEFT,86.1,86.1,86.1\r\n,Eager,71.6,71.7,71.6\r\n,Fused,70 6,70 7,70 6",
+  "section_canonical": "full_model_level_memory_table",
+  "section_title": "Full Model-Level Memory Table",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 14,
+  "json_file": "table_0014.json"
+}

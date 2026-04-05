@@ -1,0 +1,134 @@
+{
+  "paper_id": 772252517265,
+  "page_no": 7,
+  "bbox": {
+    "x0": 107.53199768066406,
+    "y0": 267.6700134277344,
+    "x1": 504.0032653808594,
+    "y1": 520.7305908203125
+  },
+  "caption": "Table 2: Length extrapolation on Needle-in-a-Haystack tasks using the LLaDA-MoE backbone, evaluated beyond its native 8K context setting. MemDLM continues to outperform Standard MDLM at 16K and 32K across RULER and BABILong.",
+  "n_rows": 11,
+  "n_cols": 7,
+  "headers": [
+    "",
+    "RULER-MV",
+    "RULER",
+    "-VT",
+    "RULER-CWE",
+    "BABIL",
+    "ong"
+  ],
+  "rows": [
+    [
+      "Method",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "16K 32K",
+      "16K",
+      "32K",
+      "16K 32K",
+      "16K",
+      "32K"
+    ],
+    [
+      "Standard MDLM",
+      "22.35 14.30",
+      "52.56",
+      "9.48",
+      "44.20 17.82",
+      "19.20",
+      "6.8 0"
+    ],
+    [
+      "MemDLM (Train-Only)",
+      "25.48 15.20",
+      "55.30",
+      "10.35",
+      "54.25 22.48",
+      "21.00",
+      "8.5 0"
+    ],
+    [
+      "MemDLM (Train & Inference)",
+      "29.40 15.35",
+      "56.84 1",
+      "1.44",
+      "57.24 24.48",
+      "22.20",
+      "9.0 0"
+    ],
+    [
+      "the response, relying purely on this",
+      "vast, uncom",
+      "pressed to",
+      "ken-sp",
+      "ace context o",
+      "ften lea",
+      "ds t o incorrect"
+    ],
+    [
+      "or hallucinated outputs.",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "We evaluatemodels on the RULER",
+      "benchmark",
+      "(focusing",
+      "on the",
+      "most challen",
+      "ging sub",
+      "-ta sks: Multi-"
+    ],
+    [
+      "Value, Variable Tracking, Common",
+      "Words Extr",
+      "action) an",
+      "d the B",
+      "ABILong lo",
+      "ng-conte",
+      "xt benchmark,"
+    ],
+    [
+      "scaling context lengths from 1K up",
+      "to 8K token",
+      "s.",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "As shown in Table 1, MemD LM co",
+      "nsistently im",
+      "proves o",
+      "ver the",
+      "baseline MD",
+      "LM acr",
+      "oss both back-"
+    ]
+  ],
+  "markdown": "|Col1|Col2|Col3|Col4|RULER&amp;#45;MV|RULER|&amp;#45;VT|RULER&amp;#45;CWE|BABIL|ong|Col11|\n|---|---|---|---|---|---|---|---|---|---|---|\n||||||||||||\n|Me|thod||||||||||\n|||||16K 32K|16K|32K|16K 32K|16K|32K||\n||||||||||||\n|Sta|ndard MDLM|||22.35 14.30|52.56|9.48|44.20 17.82|19.20|6.8|0|\n|Me|mDLM (Train&amp;#45;On|ly)||25.48 15.20|55.30|10.35|54.25 22.48|21.00|8.5|0|\n|Me|mDLM (Train &amp;|Infer|ence)|29.40 15.35|56.84 1|1.44|57.24 24.48|22.20|9.0|0|\n||||||||||||\n|the response|, relying pure|ly o|n this|vast, uncom|pressed to|ken&amp;#45;sp|ace context o|ften lea|ds t|o incorrect|\n|or hallucinat|ed outputs.||||||||||\n||||||||||||\n|We evaluate|models on th|e R|ULER|benchmark|(focusing|on the|most challen|ging sub|&amp;#45;ta|sks: Multi&amp;#45;|\n|Value, Varia|ble Tracking,|Co|mmon|Words Extr|action) an|d the B|ABILong lo|ng&amp;#45;conte|xt|benchmark,|\n|scaling conte|xt lengths fro|m|1K up|to 8K token|s.||||||\n||||||||||||\n|As shown in|Table 1, Me|mD|LM co|nsistently im|proves o|ver the|baseline MD|LM acr|oss|both back&amp;#45;|\n|bones, with|especially cle|ar|gains|on the more|challengi|ng lon|g&amp;#45;context set|tings. C|ruc|ially, even|\n|the Train&amp;#45;On|ly variant yie|lds|strong|improveme|nts, show|ing tha|t the main b|enefit is|not|solely due|\n|to re&amp;#45;runnin|g the inner l|oop|at inf|erence time|. Instead,|simul|ating denois|ing with|fa|st weights|\n|during traini|ng appears to|imp|rove t|he base mod|el’s contex|t repre|sentations an|d reduce|th|e burden of|\n|preserving l|ocal informat|ion|purely|in token sp|ace. Enab|ling th|e inner loop|at infere|nc|e time then|\n|provides an|additional pro|mpt|&amp;#45;speci|fic adaptatio|n step. Fo|r exam|ple, on the L|LaDA&amp;#45;M|oE|backbone|\n|MemDLM i|mproves RUL|ER|Varia|ble Tracking|at 8K fro|m 78.8|% to 95.8%,|while on|L|LaDA2.1 it|\n|improves BA|BILong at 8|K fr|om 47|.4% to 57.0|%.||||||\n||||||||||||\n|These results|provide stron|g e|videnc|e for the eff|icacy of P|aramet|ric Memory.|The stro|ng|Train&amp;#45;Only|",
+  "csv_text": ",RULER-MV,RULER,-VT,RULER-CWE,BABIL,ong\r\nMethod,,,,,,\r\n,16K 32K,16K,32K,16K 32K,16K,32K\r\nStandard MDLM,22.35 14.30,52.56,9.48,44.20 17.82,19.20,6.8 0\r\nMemDLM (Train-Only),25.48 15.20,55.30,10.35,54.25 22.48,21.00,8.5 0\r\nMemDLM (Train & Inference),29.40 15.35,56.84 1,1.44,57.24 24.48,22.20,9.0 0\r\n\"the response, relying purely on this\",\"vast, uncom\",pressed to,ken-sp,ace context o,ften lea,ds t o incorrect\r\nor hallucinated outputs.,,,,,,\r\nWe evaluatemodels on the RULER,benchmark,(focusing,on the,most challen,ging sub,-ta sks: Multi-\r\n\"Value, Variable Tracking, Common\",Words Extr,action) an,d the B,ABILong lo,ng-conte,\"xt benchmark,\"\r\nscaling context lengths from 1K up,to 8K token,s.,,,,\r\n\"As shown in Table 1, MemD LM co\",nsistently im,proves o,ver the,baseline MD,LM acr,oss both back-",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "text_caption_fallback",
+  "id": 2,
+  "json_file": "table_0002.json"
+}

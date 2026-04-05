@@ -6,7 +6,7 @@ import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 import pymupdf
 
@@ -763,6 +763,7 @@ def extract_and_store_paper_equations(
     pdf_path: Path | str,
     paper_id: int,
     blocks: Iterable[Dict[str, Any]],
+    page_allowlist: Optional[Sequence[int]] = None,
 ) -> Dict[str, Any]:
     """
     Detect display equations in a PDF, map them to sections, and write manifest + crops.
@@ -793,6 +794,19 @@ def extract_and_store_paper_equations(
         except Exception:
             logger.warning("Failed to remove stale equation manifest %s", manifest)
 
+    allowed_pages: Optional[Set[int]] = None
+    if page_allowlist:
+        allowed_pages = set()
+        for value in page_allowlist:
+            try:
+                page_no = int(value)
+            except (TypeError, ValueError):
+                continue
+            if page_no > 0:
+                allowed_pages.add(page_no)
+        if not allowed_pages:
+            allowed_pages = None
+
     page_blocks = _group_blocks_by_page(blocks)
     equation_records: List[Dict[str, Any]] = []
 
@@ -800,6 +814,8 @@ def extract_and_store_paper_equations(
         for page_index in range(len(doc)):
             page = doc[page_index]
             page_no = page_index + 1
+            if allowed_pages is not None and page_no not in allowed_pages:
+                continue
             page_dict = page.get_text("dict")
             page_width = max(1.0, float(page.rect.width))
             line_entries = _extract_page_line_entries(page_dict)

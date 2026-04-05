@@ -1,0 +1,114 @@
+{
+  "paper_id": 686086342880,
+  "page_no": 12,
+  "bbox": {
+    "x0": 316.6029968261719,
+    "y0": 336.6927795410156,
+    "x1": 487.4307861328125,
+    "y1": 576.5250244140625
+  },
+  "caption": "Table 6: Full hyperparameter settings used in the main experiments.",
+  "n_rows": 21,
+  "n_cols": 2,
+  "headers": [
+    "yperparameter",
+    "Value"
+  ],
+  "rows": [
+    [
+      "etrieval",
+      ""
+    ],
+    [
+      "Retriever",
+      "E5-base-v2"
+    ],
+    [
+      "Retrieval top-K",
+      "5"
+    ],
+    [
+      "Write-back retrieva l top-K",
+      "5"
+    ],
+    [
+      "Merged retrieval to p-K",
+      "5"
+    ],
+    [
+      "ating",
+      ""
+    ],
+    [
+      "Utility gate thresho ld τ\ns",
+      "0.10"
+    ],
+    [
+      "Utility gate margin τ\nδ",
+      "0.01"
+    ],
+    [
+      "Document gate mar gin τ\ndoc",
+      "0.01"
+    ],
+    [
+      "Document gate fall back n\nmin",
+      "2"
+    ],
+    [
+      "istillation",
+      ""
+    ],
+    [
+      "Distiller model",
+      "Same as ge"
+    ],
+    [
+      "Use gold answer in distillation",
+      "No"
+    ],
+    [
+      "Extractive pre-selec tion",
+      "Enabled"
+    ],
+    [
+      "Max selected evide nce sentences",
+      "8"
+    ],
+    [
+      "Fallback selected se ntences",
+      "6"
+    ],
+    [
+      "Max new tokens",
+      "128"
+    ],
+    [
+      "Temperature",
+      "0.0"
+    ],
+    [
+      "ndexing",
+      ""
+    ],
+    [
+      "Write-back storage mode",
+      "Separate FA"
+    ],
+    [
+      "Incremental indexin g",
+      "Enabled"
+    ]
+  ],
+  "markdown": "| yperparameter | Value |\n| --- | --- |\n| etrieval |  |\n| Retriever | E5-base-v2 |\n| Retrieval top-K | 5 |\n| Write-back retrieva l top-K | 5 |\n| Merged retrieval to p-K | 5 |\n| ating |  |\n| Utility gate thresho ld τ<br/>s | 0.10 |\n| Utility gate margin τ<br/>δ | 0.01 |\n| Document gate mar gin τ<br/>doc | 0.01 |\n| Document gate fall back n<br/>min | 2 |\n| istillation |  |\n| Distiller model | Same as ge |\n| Use gold answer in distillation | No |\n| Extractive pre-selec tion | Enabled |\n| Max selected evide nce sentences | 8 |\n| Fallback selected se ntences | 6 |\n| Max new tokens | 128 |\n| Temperature | 0.0 |\n| ndexing |  |\n| Write-back storage mode | Separate FA |\n| Incremental indexin g | Enabled |",
+  "csv_text": "yperparameter,Value\r\netrieval,\r\nRetriever,E5-base-v2\r\nRetrieval top-K,5\r\nWrite-back retrieva l top-K,5\r\nMerged retrieval to p-K,5\r\nating,\r\n\"Utility gate thresho ld τ\ns\",0.10\r\n\"Utility gate margin τ\nδ\",0.01\r\n\"Document gate mar gin τ\ndoc\",0.01\r\n\"Document gate fall back n\nmin\",2\r\nistillation,\r\nDistiller model,Same as ge\r\nUse gold answer in distillation,No\r\nExtractive pre-selec tion,Enabled\r\nMax selected evide nce sentences,8\r\nFallback selected se ntences,6\r\nMax new tokens,128\r\nTemperature,0.0\r\nndexing,\r\nWrite-back storage mode,Separate FA\r\nIncremental indexin g,Enabled",
+  "section_canonical": "datasets",
+  "section_title": "Datasets",
+  "section_source": "arxiv_source",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 6,
+  "json_file": "table_0006.json"
+}

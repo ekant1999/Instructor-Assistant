@@ -23,9 +23,9 @@ HTTP Traffic:
 
 DNS Traffic:
 
-![Screenshot of a network traffic capture showing HTTP requests and responses](a001_assets/figures/ocr_page_2_324_186_1536_496.png)
+![Screenshot of a network traffic capture showing HTTP requests](a001_assets/figures/ocr_page_2_256_184_1792_384.png)
 
-![Screenshot of a network traffic capture showing DNS requests and responses](a001_assets/figures/ocr_page_2_324_1092_1536_496.png)
+![Screenshot of a network traffic capture showing DNS requests](a001_assets/figures/ocr_page_2_256_1024_1792_384.png)
 
 ---
 
@@ -35,7 +35,7 @@ DNS Traffic:
 
 TCP Traffic:
 
-![Screenshot of a network traffic capture showing TCP traffic analysis](a001_assets/figures/ocr_page_3_324_312_1536_798.png)
+![Screenshot of a network traffic capture showing TCP traffic](a001_assets/figures/ocr_page_3_349_287_1567_682.png)
 
 UDP Traffic:
 
@@ -71,7 +71,7 @@ Analyze DNS Packets:
 
 Part 4: Custom Columns:
 
-![Screenshot of a network traffic capture tool showing custom columns and HTTP requests](a001_assets/figures/ocr_page_6_320_384_1568_768.png)
+![Screenshot of a network traffic capture tool showing custom columns and HTTP requests](a001_assets/figures/ocr_page_6_328_370_1568_693.png)
 
 Custom Coloring rules:
 
@@ -85,9 +85,9 @@ HTTP:
 
 DNS:
 
-![Screenshot of a network traffic capture showing HTTP requests](a001_assets/figures/ocr_page_7_256_184_1792_384.png)
+![Screenshot of a network traffic capture showing HTTP requests and responses](a001_assets/figures/ocr_page_7_186_256_1734_646.png)
 
-![Screenshot of a network traffic capture showing DNS requests](a001_assets/figures/ocr_page_7_256_1024_1792_384.png)
+![Screenshot of a network traffic capture showing DNS requests and responses](a001_assets/figures/ocr_page_7_186_1024_1734_646.png)
 
 ---
 
@@ -99,7 +99,7 @@ Part 5: Advanced Analysis
 
 Protocol Hierarchy:
 
-![Wireshark Protocol Hierarchy Statistics screenshot](a001_assets/figures/ocr_page_8_324_370_1846_1092.png)
+![Wireshark Protocol Hierarchy Statistics screenshot](a001_assets/figures/ocr_page_8_324_370_1846_1012.png)
 
 TCP Stream:
 
@@ -141,7 +141,7 @@ Harvard.edu:
 
 RTT Histogram - Combined
 
-![Histogram showing RTT (ms) distribution](a001_assets/figures/ocr_page_12_324_186_1507_1092.png)
+![RTT Histogram - Combined](a001_assets/figures/ocr_page_12_324_186_1572_1092.png)
 
 Stats:
 
@@ -293,7 +293,7 @@ Stats:
     <td>271.383</td>
     <td>32.656290000000000</td>
     <td>21.9675</td>
-    <td>36.53653678068660</td>
+    <td>36.5365367806860</td>
     <td>21.864</td>
     <td>57.739</td>
     <td>98.227</td>
@@ -479,7 +479,7 @@ Utxas.edu:
 
 <!-- OCR page 14 -->
 
-![RTT Histogram - Combined](a001_assets/figures/ocr_page_14_324_186_1572_1092.png)
+![RTT Histogram - Combined](a001_assets/figures/ocr_page_14_324_186_1574_1042.png)
 
 Stats:
 
@@ -648,7 +648,7 @@ UST:
 
 <!-- OCR page 15 -->
 
-![RTT Histogram - Combined](a001_assets/figures/ocr_page_15_324_186_1572_1042.png)
+![RTT Histogram - Combined](a001_assets/figures/ocr_page_15_324_186_1572_1092.png)
 
 Stats:
 

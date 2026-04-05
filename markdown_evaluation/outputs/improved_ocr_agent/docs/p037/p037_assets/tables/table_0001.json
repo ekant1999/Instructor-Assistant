@@ -1,0 +1,74 @@
+{
+  "paper_id": 860930833796,
+  "page_no": 6,
+  "bbox": {
+    "x0": 108.0,
+    "y0": 116.55459594726562,
+    "x1": 504.0016784667969,
+    "y1": 365.44227091471356
+  },
+  "caption": "Table 1: Maximum path lengths, per-layer complexity and minimum number of sequential operations for different layer types. n is the sequence length, d is the representation dimension, k is the kernel size of convolutions and r the size of the neighborhood in restricted self-attention.",
+  "n_rows": 7,
+  "n_cols": 4,
+  "headers": [
+    "Layer Type Complexi",
+    "ty per Layer",
+    "Sequential Maximu",
+    "m Path Length"
+  ],
+  "rows": [
+    [
+      "",
+      "",
+      "Operations",
+      ""
+    ],
+    [
+      "",
+      "2",
+      "",
+      ""
+    ],
+    [
+      "Self-Attentio n O(n",
+      "d)\n·",
+      "O(1)",
+      "O(1)"
+    ],
+    [
+      "Recurrent O(n",
+      "d2)\n·",
+      "O(n)",
+      "O(n)"
+    ],
+    [
+      "Convolution al O(k\n·",
+      "n d2)\n·",
+      "O(1) O(",
+      "log (n))\nk"
+    ],
+    [
+      "Self-Attentio n (restricted) O(r",
+      "n d)\n· ·",
+      "O(1) O",
+      "(n/r)"
+    ],
+    [
+      "3.5Positional Encoding",
+      "",
+      "",
+      ""
+    ]
+  ],
+  "markdown": "|Col1|Layer Type|Col3|Complexi|ty per Layer|Sequential Maximu|m Path Leng|th|Col9|\n|---|---|---|---|---|---|---|---|---|\n||||||Operations||||\n|||||2|||||\n||Self&amp;#45;Attentio|n|O(n|d) ·|O(1)|O(1)|||\n||Recurrent||O(n|d2) ·|O(n)|O(n)|||\n||Convolution|al|O(k ·|n d2) ·|O(1) O(|log (n)) k|||\n||Self&amp;#45;Attentio|n (restricted)|O(r|n d) · ·|O(1) O|(n/r)|||\n||||||||||\n||||||||||\n|3.5|Positional|Encoding|||||||\n||||||||||\n|Sinc|e our model|contains no recur|rence and|no convolution|, in order for the model|to make use|of|the|\n|orde|r of the sequ|ence, we must in|ject some|information ab|out the relative or abso|lute position|of|the|\n|toke|ns in the seq|uence. To this e|nd, we ad|d &quot;positional e|ncodings&quot; to the input|embeddings|at|the|\n||||||||||\n|bott|oms of the en|coder and decod|er stacks.|The positional|encodings have the sam|e dimension|d m|odel|\n|as th|e embeddin|gs, so that the tw|o can be s|ummed. There|are many choices of po|sitional enco|din|gs|\n|lear|ned and fixed|[9].|||||||\n||||||||||\n|In th|is work, we|use sine and cos|ine functi|ons of different|frequencies:||||\n||||||||||\n||||||2i/dmodel||||\n|||P|E (pos,2i)|= sin(pos/10|000 )||||\n||||||||||\n||||||2i/dmodel||||\n|||PE|(pos,2i+1)|= cos(pos/10|000 )||||",
+  "csv_text": "Layer Type Complexi,ty per Layer,Sequential Maximu,m Path Length\r\n,,Operations,\r\n,2,,\r\nSelf-Attentio n O(n,\"d)\n·\",O(1),O(1)\r\nRecurrent O(n,\"d2)\n·\",O(n),O(n)\r\n\"Convolution al O(k\n·\",\"n d2)\n·\",O(1) O(,\"log (n))\nk\"\r\nSelf-Attentio n (restricted) O(r,\"n d)\n· ·\",O(1) O,(n/r)\r\n3.5Positional Encoding,,,",
+  "section_canonical": "model_architecture",
+  "section_title": "Model Architecture",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "text_caption_fallback",
+  "id": 1,
+  "json_file": "table_0001.json"
+}

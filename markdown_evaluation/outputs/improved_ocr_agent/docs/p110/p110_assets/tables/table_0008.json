@@ -1,0 +1,145 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 15,
+  "bbox": {
+    "x0": 177.03199768066406,
+    "y0": 357.0634765625,
+    "x1": 434.9678649902344,
+    "y1": 562.7698364257812
+  },
+  "caption": "Table 8: Model-level peak VRAM (GB). Fused uses less than all baselines on every model. 32B models OOM on RTX 6000 PRO.",
+  "n_rows": 16,
+  "n_cols": 5,
+  "headers": [
+    "Model",
+    "Method",
+    "RTX",
+    "H200",
+    "B200"
+  ],
+  "rows": [
+    [
+      "",
+      "Eager",
+      "OOM",
+      "99.2",
+      "99.2"
+    ],
+    [
+      "",
+      "Fused",
+      "OOM",
+      "98.4",
+      "98.4"
+    ],
+    [
+      "Qwen2.5-VL-32B",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "Dense (B@A)",
+      "OOM",
+      "100.6",
+      "100.6"
+    ],
+    [
+      "",
+      "PEFT",
+      "OOM",
+      "103.5",
+      "103.5"
+    ],
+    [
+      "",
+      "Eager",
+      "71.6",
+      "71.7",
+      "71.6"
+    ],
+    [
+      "",
+      "Fused",
+      "70.6",
+      "70.7",
+      "70.6"
+    ],
+    [
+      "Mistral-Sm-24B",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "Dense (B@A)",
+      "73.3",
+      "73.4",
+      "73.3"
+    ],
+    [
+      "",
+      "PEFT",
+      "77.3",
+      "77.4",
+      "77.3"
+    ],
+    [
+      "",
+      "Eager",
+      "29.8",
+      "29.9",
+      "29.8"
+    ],
+    [
+      "",
+      "Fused",
+      "29.5",
+      "29.5",
+      "29.5"
+    ],
+    [
+      "Qwen3-VL-8B",
+      "",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "Dense (B@A)",
+      "30.1",
+      "30.2",
+      "30.1"
+    ],
+    [
+      "",
+      "PEFT",
+      "30.7",
+      "30.8",
+      "30.7"
+    ],
+    [
+      "Full table (all 6 mode",
+      "ls) in Appendix E",
+      ".",
+      "",
+      ""
+    ]
+  ],
+  "markdown": "| Model | Method | RTX | H200 | B200 |\n| --- | --- | --- | --- | --- |\n|  | Eager | OOM | 99.2 | 99.2 |\n|  | Fused | OOM | 98.4 | 98.4 |\n| Qwen2.5-VL-32B |  |  |  |  |\n|  | Dense (B@A) | OOM | 100.6 | 100.6 |\n|  | PEFT | OOM | 103.5 | 103.5 |\n|  | Eager | 71.6 | 71.7 | 71.6 |\n|  | Fused | 70.6 | 70.7 | 70.6 |\n| Mistral-Sm-24B |  |  |  |  |\n|  | Dense (B@A) | 73.3 | 73.4 | 73.3 |\n|  | PEFT | 77.3 | 77.4 | 77.3 |\n|  | Eager | 29.8 | 29.9 | 29.8 |\n|  | Fused | 29.5 | 29.5 | 29.5 |\n| Qwen3-VL-8B |  |  |  |  |\n|  | Dense (B@A) | 30.1 | 30.2 | 30.1 |\n|  | PEFT | 30.7 | 30.8 | 30.7 |\n| Full table (all 6 mode | ls) in Appendix E | . |  |  |",
+  "csv_text": "Model,Method,RTX,H200,B200\r\n,Eager,OOM,99.2,99.2\r\n,Fused,OOM,98.4,98.4\r\nQwen2.5-VL-32B,,,,\r\n,Dense (B@A),OOM,100.6,100.6\r\n,PEFT,OOM,103.5,103.5\r\n,Eager,71.6,71.7,71.6\r\n,Fused,70.6,70.7,70.6\r\nMistral-Sm-24B,,,,\r\n,Dense (B@A),73.3,73.4,73.3\r\n,PEFT,77.3,77.4,77.3\r\n,Eager,29.8,29.9,29.8\r\n,Fused,29.5,29.5,29.5\r\nQwen3-VL-8B,,,,\r\n,Dense (B@A),30.1,30.2,30.1\r\n,PEFT,30.7,30.8,30.7\r\nFull table (all 6 mode,ls) in Appendix E,.,,",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": "Figure 11: Memory profile (H200, bf16, d=4096, bs=4, seq=2048). (a) Fused reduces forward peak by 64 MB. (b) Savings grow with batch×seq; backward peak is unchanged.",
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 8,
+  "json_file": "table_0008.json"
+}

@@ -169,7 +169,7 @@
       "line_start": 105,
       "line_end": 172,
       "prose_text": "'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\nstudent_table.delete_item(Key={'student_id': student_id})\n'statusCode':200, 'body': json.dumps('Student record deleted successfully')\n2. Fetching record by student_id (GET):\n3. Updating the data (PUT):\n4. Deleting a record (DELETE):\n5. Edge Case - Trying to fetch a record which does not exist:\n6. Edge Case - Trying to delete a record which does not exist:\nChallenges and Learnings:",
-      "full_text": "'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\n}\nstudent_table.delete_item(Key={'student_id': student_id})\nreturn {\n'statusCode':200, 'body': json.dumps('Student record deleted successfully')\n}\n![Figure 1 on Page 3](a002_assets/figures/a002_page_3_fig_1.png)\n---\n<!-- page 4 mode: ocr -->\n<!-- OCR page 4 -->\n2. Fetching record by student_id (GET):\n---\n<!-- page 5 mode: ocr -->\n<!-- OCR page 5 -->\n3. Updating the data (PUT):\n![Screenshot showing API request to update student data](a002_assets/figures/ocr_page_5_324_312_1567_682.png)\n![Screenshot showing DynamoDB scan results](a002_assets/figures/ocr_page_5_324_1092_1567_682.png)\n---\n<!-- page 6 mode: ocr -->\n<!-- OCR page 6 -->\n4. Deleting a record (DELETE):\n![Screenshot showing API request to delete a record from Student Records Management](a002_assets/figures/ocr_page_6_328_312_1568_799.png)\n![Screenshot showing DynamoDB scan results after deletion](a002_assets/figures/ocr_page_6_328_1207_1568_799.png)\n---\n<!-- page 7 mode: ocr -->\n<!-- OCR page 7 -->\n5. Edge Case - Trying to fetch a record which does not exist:\n![Screenshot showing an API request to fetch a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_328_370_1469_670.png)\n6. Edge Case - Trying to delete a record which does not exist:\n![Screenshot showing an API request to delete a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_328_1162_1469_670.png)\n---\n<!-- page 8 mode: simple_text -->\nChallenges and Learnings:",
+      "full_text": "'statusCode': 404, 'body': json.dumps(f'Error: Record not found for student id: {student_id}')\n}\nstudent_table.delete_item(Key={'student_id': student_id})\nreturn {\n'statusCode':200, 'body': json.dumps('Student record deleted successfully')\n}\n![Figure 1 on Page 3](a002_assets/figures/a002_page_3_fig_1.png)\n---\n<!-- page 4 mode: ocr -->\n<!-- OCR page 4 -->\n2. Fetching record by student_id (GET):\n---\n<!-- page 5 mode: ocr -->\n<!-- OCR page 5 -->\n3. Updating the data (PUT):\n![Screenshot showing API request to update student data in DynamoDB](a002_assets/figures/ocr_page_5_256_287_1497_768.png)\n![Screenshot showing DynamoDB console with scan results](a002_assets/figures/ocr_page_5_256_1206_1497_768.png)\n---\n<!-- page 6 mode: ocr -->\n<!-- OCR page 6 -->\n4. Deleting a record (DELETE):\n![Screenshot showing API request to delete a record from Student Records Management](a002_assets/figures/ocr_page_6_328_312_1568_799.png)\n![Screenshot showing DynamoDB scan results for StudentRecords table](a002_assets/figures/ocr_page_6_328_1207_1568_799.png)\n---\n<!-- page 7 mode: ocr -->\n<!-- OCR page 7 -->\n5. Edge Case - Trying to fetch a record which does not exist:\n![Screenshot showing a GET request to fetch a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_370_328_1746_693.png)\n6. Edge Case - Trying to delete a record which does not exist:\n![Screenshot showing a DELETE request to delete a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_370_1162_1746_693.png)\n---\n<!-- page 8 mode: simple_text -->\nChallenges and Learnings:",
       "word_count": 66,
       "empty": false,
       "asset_only": false
@@ -232,11 +232,11 @@
     "use_pdf_page_ocr": false,
     "document_mode": "hybrid_paper",
     "asset_counts": {
-      "figures": 23,
+      "figures": 28,
       "tables": 0,
       "page_images": 4
     },
-    "elapsed_ms": 26926.924,
+    "elapsed_ms": 26890.586,
     "status": "success",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/a002/paper.md",
     "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",

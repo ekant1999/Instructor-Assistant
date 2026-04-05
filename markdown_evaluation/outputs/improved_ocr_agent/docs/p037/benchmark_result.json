@@ -9,13 +9,72 @@
   "use_pdf_page_ocr": false,
   "document_mode": "hybrid_paper",
   "asset_counts": {
-    "figures": 2,
-    "tables": 2,
+    "figures": 5,
+    "tables": 4,
     "page_images": 0
   },
-  "elapsed_ms": 3499.314,
+  "elapsed_ms": 9123.138,
   "status": "success",
   "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/improved_ocr_agent/docs/p037/paper.md",
   "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/improved_ocr_agent/hybrid_pdf_extractor.py",
-  "postprocess_enabled": true
+  "postprocess_enabled": false,
+  "non_ocr_document_handler": "ia_phase1",
+  "non_ocr_runs": [
+    {
+      "handler": "ia_phase1",
+      "page_numbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    }
+  ],
+  "ia_score": 97,
+  "native_score": 17,
+  "non_ocr_page_handlers": {
+    "1": "ia_phase1",
+    "2": "ia_phase1",
+    "3": "ia_phase1",
+    "4": "ia_phase1",
+    "5": "ia_phase1",
+    "6": "ia_phase1",
+    "7": "ia_phase1",
+    "8": "ia_phase1",
+    "9": "ia_phase1",
+    "10": "ia_phase1",
+    "11": "ia_phase1",
+    "12": "ia_phase1",
+    "13": "ia_phase1",
+    "14": "ia_phase1",
+    "15": "ia_phase1"
+  },
+  "non_ocr_scores": {
+    "ia_score": 97,
+    "native_score": 17,
+    "scholarly_score": 63,
+    "structured_visual_score": 34,
+    "report_score": 17,
+    "repeated_header_pages": 3,
+    "repeated_footer_pages": 0,
+    "prose_dominant_pages": 1,
+    "total_citations": 103,
+    "total_visual_captions": 10,
+    "total_academic_headings": 6,
+    "total_numbered_scholarly_headings": 1,
+    "total_roman_headings": 0,
+    "total_equation_lines": 26,
+    "affiliation_pages": 1
+  }
 }

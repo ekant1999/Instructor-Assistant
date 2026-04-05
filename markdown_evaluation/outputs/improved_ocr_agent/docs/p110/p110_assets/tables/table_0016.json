@@ -1,0 +1,89 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 27,
+  "bbox": {
+    "x0": 71.60700225830078,
+    "y0": 258.927978515625,
+    "x1": 481.21600341796875,
+    "y1": 485.8626403808594
+  },
+  "caption": "Table 14: Geometric mean microbenchmark speedups, fp32 (all shapes, 200 repeats). Complement to Table 9.",
+  "n_rows": 8,
+  "n_cols": 5,
+  "headers": [
+    "",
+    "Compose fwd",
+    "Backward",
+    "E2E",
+    "Norm mem"
+  ],
+  "rows": [
+    [
+      "L4",
+      "0S fp32",
+      "",
+      "1.53× 1.21× 1.04",
+      "× 3.2×"
+    ],
+    [
+      "A1",
+      "00 fp32",
+      "",
+      "1.64× 1.20× 1.02",
+      "× 3.2×"
+    ],
+    [
+      "RT",
+      "X 6000 PR",
+      "O fp32",
+      "1.97× 1.27× 1.06",
+      "× 3.2×"
+    ],
+    [
+      "H2",
+      "00 fp32",
+      "",
+      "1.84× 1.13× 1.03",
+      "× 3.2×"
+    ],
+    [
+      "B2",
+      "00 fp32",
+      "",
+      "2.35× 1.26× 1.03",
+      "× 3.2×"
+    ],
+    [
+      "B3",
+      "00 fp32",
+      "",
+      "2.23× 1.21× 1.03",
+      "× 3.2×"
+    ],
+    [
+      "G Frame",
+      "work S",
+      "urvey",
+      "",
+      ""
+    ],
+    [
+      "Table 15 summ",
+      "arizes the",
+      "DoRA norm",
+      "implementation across five",
+      "major fine-tu"
+    ]
+  ],
+  "markdown": "|  | Compose fwd | Backward | E2E | Norm mem |\n| --- | --- | --- | --- | --- |\n| L4 | 0S fp32 |  | 1.53× 1.21× 1.04 | × 3.2× |\n| A1 | 00 fp32 |  | 1.64× 1.20× 1.02 | × 3.2× |\n| RT | X 6000 PR | O fp32 | 1.97× 1.27× 1.06 | × 3.2× |\n| H2 | 00 fp32 |  | 1.84× 1.13× 1.03 | × 3.2× |\n| B2 | 00 fp32 |  | 2.35× 1.26× 1.03 | × 3.2× |\n| B3 | 00 fp32 |  | 2.23× 1.21× 1.03 | × 3.2× |\n| G Frame | work S | urvey |  |  |\n| Table 15 summ | arizes the | DoRA norm | implementation across five | major fine-tu |",
+  "csv_text": ",Compose fwd,Backward,E2E,Norm mem\r\nL4,0S fp32,,1.53× 1.21× 1.04,× 3.2×\r\nA1,00 fp32,,1.64× 1.20× 1.02,× 3.2×\r\nRT,X 6000 PR,O fp32,1.97× 1.27× 1.06,× 3.2×\r\nH2,00 fp32,,1.84× 1.13× 1.03,× 3.2×\r\nB2,00 fp32,,2.35× 1.26× 1.03,× 3.2×\r\nB3,00 fp32,,2.23× 1.21× 1.03,× 3.2×\r\nG Frame,work S,urvey,,\r\nTable 15 summ,arizes the,DoRA norm,implementation across five,major fine-tu",
+  "section_canonical": "full_model_level_memory_table",
+  "section_title": "Full Model-Level Memory Table",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 2,
+  "detection_strategy": "caption_guided_native",
+  "id": 16,
+  "json_file": "table_0016.json"
+}

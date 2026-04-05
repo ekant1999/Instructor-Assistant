@@ -648,7 +648,7 @@
       "tables": 16,
       "page_images": 0
     },
-    "elapsed_ms": 3128.921,
+    "elapsed_ms": 3019.346,
     "status": "success",
     "markdown_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/outputs/ocr_agent/docs/p118/paper.md",
     "extractor_module_path": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/ocr_agent/hybrid_pdf_extractor.py",

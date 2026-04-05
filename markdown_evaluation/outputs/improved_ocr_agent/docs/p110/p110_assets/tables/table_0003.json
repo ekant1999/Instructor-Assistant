@@ -1,0 +1,92 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 9,
+  "bbox": {
+    "x0": 116.89299774169922,
+    "y0": 114.44950103759766,
+    "x1": 495.16290283203125,
+    "y1": 210.20396423339844
+  },
+  "caption": "Table 3: Benchmark hardware. “Micro”: microbenchmark coverage. “Model”: full model-level gradient-computation and inference benchmarks.",
+  "n_rows": 5,
+  "n_cols": 9,
+  "headers": [
+    "GPU L40S",
+    "Arch SM8",
+    "Memory 9 Ada",
+    "BW (TB/s) 48",
+    "Scope GB",
+    "Scope GB",
+    "Scope GDDR6",
+    "Scope 0.86",
+    "Scope Micro"
+  ],
+  "rows": [
+    [
+      "A100-SXM4",
+      "SM80",
+      "Ampere",
+      "80",
+      "GB",
+      "",
+      "HBM2e",
+      "2.04",
+      "Micro"
+    ],
+    [
+      "RTX 6000 PRO",
+      "SM120",
+      "Blackwell",
+      "96",
+      "GB",
+      "",
+      "GDDR7",
+      "1.60",
+      "Micro+Model"
+    ],
+    [
+      "H200",
+      "SM90",
+      "Hopper",
+      "141",
+      "GB",
+      "",
+      "HBM3e",
+      "4.80",
+      "Micro+Model"
+    ],
+    [
+      "B200",
+      "SM100",
+      "Blackwell",
+      "192",
+      "GB",
+      "",
+      "HBM3e",
+      "7.70",
+      "Micro+Model"
+    ],
+    [
+      "B300",
+      "SM103",
+      "Blackwell",
+      "268",
+      "GB",
+      "",
+      "HBM3e",
+      "7.70",
+      "Micro"
+    ]
+  ],
+  "markdown": "| GPU L40S | Arch SM8 | Memory 9 Ada | BW (TB/s) 48 | Scope GB | Scope GB | Scope GDDR6 | Scope 0.86 | Scope Micro |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| A100-SXM4 | SM80 | Ampere | 80 | GB |  | HBM2e | 2.04 | Micro |\n| RTX 6000 PRO | SM120 | Blackwell | 96 | GB |  | GDDR7 | 1.60 | Micro+Model |\n| H200 | SM90 | Hopper | 141 | GB |  | HBM3e | 4.80 | Micro+Model |\n| B200 | SM100 | Blackwell | 192 | GB |  | HBM3e | 7.70 | Micro+Model |\n| B300 | SM103 | Blackwell | 268 | GB |  | HBM3e | 7.70 | Micro |",
+  "csv_text": "GPU L40S,Arch SM8,Memory 9 Ada,BW (TB/s) 48,Scope GB,Scope GB,Scope GDDR6,Scope 0.86,Scope Micro\r\nA100-SXM4,SM80,Ampere,80,GB,,HBM2e,2.04,Micro\r\nRTX 6000 PRO,SM120,Blackwell,96,GB,,GDDR7,1.60,Micro+Model\r\nH200,SM90,Hopper,141,GB,,HBM3e,4.80,Micro+Model\r\nB200,SM100,Blackwell,192,GB,,HBM3e,7.70,Micro+Model\r\nB300,SM103,Blackwell,268,GB,,HBM3e,7.70,Micro",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 3,
+  "json_file": "table_0003.json"
+}

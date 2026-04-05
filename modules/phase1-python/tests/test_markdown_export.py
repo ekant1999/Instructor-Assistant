@@ -625,6 +625,74 @@ def test_export_pdf_to_markdown_filters_page_furniture_and_bad_assets(
     assert "$$\nx = y + z\n$$" in markdown
 
 
+def test_export_pdf_to_markdown_respects_page_allowlist_and_emits_original_page_markers(
+    sample_pdf: Path,
+    tmp_path: Path,
+) -> None:
+    result = export_pdf_to_markdown(
+        sample_pdf,
+        paper_id=812,
+        output_dir=tmp_path / "filtered_bundle",
+        page_allowlist=[2],
+        config=MarkdownExportConfig(
+            ensure_assets=False,
+            include_frontmatter=False,
+            include_page_markers=True,
+        ),
+    )
+
+    markdown = result.markdown_path.read_text(encoding="utf-8")
+
+    assert "<!-- page:2 -->" in markdown
+    assert "This is the abstract block for testing." not in markdown
+    assert "Method section appears on page two." in markdown
+    assert markdown.index("<!-- page:2 -->") < markdown.index("## Method")
+
+
+def test_export_pdf_to_markdown_emits_page_markers_for_multi_page_front_matter(
+    tmp_path: Path,
+) -> None:
+    import pymupdf
+
+    pdf_path = tmp_path / "frontmatter.pdf"
+    doc = pymupdf.open()
+
+    page1 = doc.new_page()
+    page1.insert_text((72, 72), "Author One")
+    page1.insert_text((72, 96), "Institute of Testing")
+
+    page2 = doc.new_page()
+    page2.insert_text((72, 72), "More Front Matter")
+    page2.insert_text((72, 96), "Project website: example.com")
+
+    page3 = doc.new_page()
+    page3.insert_text((72, 72), "1 Introduction")
+    page3.insert_text((72, 96), "Introduction begins on page three.")
+
+    doc.save(str(pdf_path))
+    doc.close()
+
+    result = export_pdf_to_markdown(
+        pdf_path,
+        paper_id=987654321,
+        output_dir=tmp_path / "output",
+        config=MarkdownExportConfig(
+            ensure_assets=False,
+            include_frontmatter=False,
+            include_page_markers=True,
+            overwrite=True,
+        ),
+    )
+
+    markdown = result.markdown
+    assert "<!-- page:1 -->" in markdown
+    assert "<!-- page:2 -->" in markdown
+    assert "<!-- page:3 -->" in markdown
+    assert markdown.index("<!-- page:1 -->") < markdown.index("Author One")
+    assert markdown.index("<!-- page:2 -->") < markdown.index("More Front Matter")
+    assert markdown.index("<!-- page:3 -->") < markdown.index("## Introduction")
+
+
 def test_export_pdf_to_markdown_realigns_asset_sections_and_skips_raw_heading_blocks(
     sample_pdf: Path,
     tmp_path: Path,

@@ -1,0 +1,68 @@
+{
+  "paper_id": 843158947465,
+  "page_no": 10,
+  "bbox": {
+    "x0": 316.31866455078125,
+    "y0": 130.75199127197266,
+    "x1": 530.07275390625,
+    "y1": 226.2706756591797
+  },
+  "caption": "Table 3. QM9 molecule generation. UNITE-S achieves the best reconstruction accuracy (99.37% match) and uniqueness (99.71%) under single-stage training. Crystal generation results on MP20 are provided in Appendix C.2.",
+  "n_rows": 5,
+  "n_cols": 5,
+  "headers": [
+    "Method",
+    "Match (%)",
+    "RMSD (A ˚)",
+    "Valid (%)",
+    "Unique (%)"
+  ],
+  "rows": [
+    [
+      "EDM (Hoogeb oom et al., 2022)",
+      "–",
+      "–",
+      "91.9",
+      "90.7"
+    ],
+    [
+      "GeoLDM (Xu et al., 2023)",
+      "–",
+      "–",
+      "93.8",
+      "92.9"
+    ],
+    [
+      "ADiT Tokenize r (Joshi et al., 2025)",
+      "97.20",
+      "0.075",
+      "–",
+      "–"
+    ],
+    [
+      "ADiT-S QM9-o nly (Joshi et al., 2025)",
+      "–",
+      "–",
+      "96.02",
+      "97.76"
+    ],
+    [
+      "UNITE-S (Ou rs)",
+      "99.37",
+      "0.039",
+      "94.90",
+      "99.71"
+    ]
+  ],
+  "markdown": "| Method | Match (%) | RMSD (A ˚) | Valid (%) | Unique (%) |\n| --- | --- | --- | --- | --- |\n| EDM (Hoogeb oom et al., 2022) | – | – | 91.9 | 90.7 |\n| GeoLDM (Xu et al., 2023) | – | – | 93.8 | 92.9 |\n| ADiT Tokenize r (Joshi et al., 2025) | 97.20 | 0.075 | – | – |\n| ADiT-S QM9-o nly (Joshi et al., 2025) | – | – | 96.02 | 97.76 |\n| UNITE-S (Ou rs) | 99.37 | 0.039 | 94.90 | 99.71 |",
+  "csv_text": "Method,Match (%),RMSD (A ˚),Valid (%),Unique (%)\r\n\"EDM (Hoogeb oom et al., 2022)\",–,–,91.9,90.7\r\n\"GeoLDM (Xu et al., 2023)\",–,–,93.8,92.9\r\n\"ADiT Tokenize r (Joshi et al., 2025)\",97.20,0.075,–,–\r\n\"ADiT-S QM9-o nly (Joshi et al., 2025)\",–,–,96.02,97.76\r\nUNITE-S (Ou rs),99.37,0.039,94.90,99.71",
+  "section_canonical": "beyond_vision_application_to_domains_without",
+  "section_title": "Beyond Vision: Application to Domains Without",
+  "section_source": "heuristic",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": "Figure 8. Selected samples from UNITE-XL. Generated using 50 steps with CFG. This model achieves FID 1.75.",
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 2,
+  "json_file": "table_0002.json"
+}

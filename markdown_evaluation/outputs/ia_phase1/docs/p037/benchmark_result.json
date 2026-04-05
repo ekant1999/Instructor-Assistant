@@ -16,7 +16,7 @@
     "title": "Attention Is All You Need",
     "paper_id": "660930833796",
     "source_pdf": "/Users/siddhantraje/Documents/PersonalWork/ChatGPT Apps/NewCloneIA/Instructor-Assistant/markdown_evaluation/pdfs/ResearchPapers/10f9519a4068b56b.pdf",
-    "generated_at": "2026-04-04T22:52:44.664786+00:00",
+    "generated_at": "2026-04-05T20:56:14.441257+00:00",
     "num_figures": "5",
     "num_tables": "4",
     "num_equations": "24",
@@ -158,6 +158,6 @@
     "issue_count": 0,
     "issues": []
   },
-  "elapsed_ms": 9123.402,
+  "elapsed_ms": 6641.962,
   "status": "success"
 }

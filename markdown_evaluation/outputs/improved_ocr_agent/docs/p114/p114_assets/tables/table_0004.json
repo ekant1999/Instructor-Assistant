@@ -1,0 +1,58 @@
+{
+  "paper_id": 843158947465,
+  "page_no": 16,
+  "bbox": {
+    "x0": 55.13100051879883,
+    "y0": 220.91661071777344,
+    "x1": 542.0007934570312,
+    "y1": 531.6552734375
+  },
+  "caption": "Table 5. MP20 crystal generation results. Evaluation on 10K generated samples.",
+  "n_rows": 3,
+  "n_cols": 6,
+  "headers": [
+    "heavy atoms",
+    "from the set C, N, O, F { }",
+    ". Following Joshi",
+    "et al. (2025), we",
+    "represent molecules wi",
+    "th explicit hydrogen atoms"
+  ],
+  "rows": [
+    [
+      "and use 3D",
+      "Cartesian coordinates for",
+      "both training and",
+      "generation. Each",
+      "molecule is preproces",
+      "sed to ensure correct bond"
+    ],
+    [
+      "valencies an",
+      "d stable conformations, w",
+      "ith coordinates no",
+      "rmalized to have",
+      "zero center of mass.",
+      ""
+    ],
+    [
+      "Our trainin",
+      "g configuration employs t",
+      "he UNITE-S arc",
+      "hitecture with a",
+      "DiT-S backbone conta",
+      "ining approximately 33M"
+    ]
+  ],
+  "markdown": "|Col1|Col2|Col3|Col4|Col5|Col6|Col7|Col8|\n|---|---|---|---|---|---|---|---|\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||",
+  "csv_text": "heavy atoms,\"from the set C, N, O, F { }\",. Following Joshi,\"et al. (2025), we\",represent molecules wi,th explicit hydrogen atoms\r\nand use 3D,Cartesian coordinates for,both training and,generation. Each,molecule is preproces,sed to ensure correct bond\r\nvalencies an,\"d stable conformations, w\",ith coordinates no,rmalized to have,zero center of mass.,\r\nOur trainin,g configuration employs t,he UNITE-S arc,hitecture with a,DiT-S backbone conta,ining approximately 33M",
+  "section_canonical": "results",
+  "section_title": "Additional Results",
+  "section_source": "heuristic",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "text_caption_fallback",
+  "id": 4,
+  "json_file": "table_0004.json"
+}

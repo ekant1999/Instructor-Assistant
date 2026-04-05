@@ -69,6 +69,15 @@ def test_extract_pages_and_blocks(sample_pdf: Path) -> None:
     assert isinstance(first_line.get("spans"), list)
 
 
+def test_extract_text_blocks_respects_page_allowlist(sample_pdf: Path) -> None:
+    blocks = parser.extract_text_blocks(sample_pdf, page_allowlist=[2])
+
+    assert blocks
+    assert {block["page_no"] for block in blocks} == {2}
+    assert any("Method" in str(block.get("text") or "") for block in blocks)
+    assert all("Abstract" not in str(block.get("text") or "") for block in blocks)
+
+
 def _build_two_column_order_pdf(path: Path) -> None:
     doc = pymupdf.open()
     page = doc.new_page(width=595, height=842)

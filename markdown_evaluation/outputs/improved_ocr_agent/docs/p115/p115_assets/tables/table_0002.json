@@ -1,0 +1,80 @@
+{
+  "paper_id": 893555535508,
+  "page_no": 8,
+  "bbox": {
+    "x0": 103.6675033569336,
+    "y0": 159.27484130859375,
+    "x1": 204.29246520996094,
+    "y1": 225.74395751953125
+  },
+  "caption": "Table 5. Changing the base foundation models used in OccAny to DA3 [36] and SAM3 [8] results in the OccAny+ variant.",
+  "n_rows": 8,
+  "n_cols": 4,
+  "headers": [
+    "ts enc",
+    "Sem",
+    "KITTI seq.",
+    ""
+  ],
+  "rows": [
+    [
+      "+ L",
+      "",
+      "",
+      ""
+    ],
+    [
+      "tg",
+      "IoU",
+      "∆IoU",
+      "IoU"
+    ],
+    [
+      "",
+      "19.64",
+      "-6.27",
+      "11.55"
+    ],
+    [
+      "",
+      "24.23",
+      "-1.68",
+      "21.73"
+    ],
+    [
+      "",
+      "24.88",
+      "-1.03",
+      "23.02"
+    ],
+    [
+      "✗",
+      "25.04",
+      "-0.87",
+      "22.67"
+    ],
+    [
+      "✗",
+      "24.99",
+      "-0.92",
+      "23.46"
+    ],
+    [
+      "ny",
+      "25.91 —",
+      "",
+      "24.03"
+    ]
+  ],
+  "markdown": "| ts enc | Sem | KITTI seq. |  |\n| --- | --- | --- | --- |\n| + L |  |  |  |\n| tg | IoU | ∆IoU | IoU |\n|  | 19.64 | -6.27 | 11.55 |\n|  | 24.23 | -1.68 | 21.73 |\n|  | 24.88 | -1.03 | 23.02 |\n| ✗ | 25.04 | -0.87 | 22.67 |\n| ✗ | 24.99 | -0.92 | 23.46 |\n| ny | 25.91 — |  | 24.03 |",
+  "csv_text": "ts enc,Sem,KITTI seq.,\r\n+ L,,,\r\ntg,IoU,∆IoU,IoU\r\n,19.64,-6.27,11.55\r\n,24.23,-1.68,21.73\r\n,24.88,-1.03,23.02\r\n✗,25.04,-0.87,22.67\r\n✗,24.99,-0.92,23.46\r\nny,25.91 —,,24.03",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": "Figure 6. Ablating NVR inference on SemanticKITTI",
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 2,
+  "json_file": "table_0002.json"
+}

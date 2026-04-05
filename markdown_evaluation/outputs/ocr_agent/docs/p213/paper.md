@@ -30,10 +30,6 @@ However, single-robot path planning algorithms fail to address the additional co
 
 Fig. 1: An illustrative plan for a collaborative robot fleet with different specializations, such as flying, walking, or driving. During the mission the drone and the legged robot find new tasks and replan to minimize mission time.
 
-![Illustrative plan for a collaborative robot fleet with different specializations, such as flying, walking, or driving.](p213_assets/figures/ocr_page_1_1092_370_1012_682.png)
-
-![Gantt chart showing the timeline for drone, rover, and legged robot, with replanning and waiting periods.](p213_assets/figures/ocr_page_1_1092_1092_1012_282.png)
-
 ---
 
 <!-- page 2 mode: hybrid_paper -->

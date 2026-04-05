@@ -39,3 +39,4 @@ markdown_evaluation/outputs/ia_phase1/runtime/tables/**
 markdown_evaluation/outputs/ia_phase1/runtime/equations/**
 markdown_evaluation/outputs/ia_phase1/docs/*/assets/**
 markdown_evaluation/outputs/ocr_agent/docs/*/*_assets/**
+markdown_evaluation/outputs/improved_ocr_agent/docs/*/*_assets/equations/**

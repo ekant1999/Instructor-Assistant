@@ -4,7 +4,7 @@ import hashlib
 import re
 from urllib.parse import parse_qs, urlparse
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 import httpx
 import pymupdf
@@ -766,7 +766,24 @@ def extract_pages(pdf_path: Path) -> List[Tuple[int, str]]:
     return pages
 
 
-def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
+def _normalize_page_allowlist(page_allowlist: Optional[Sequence[int]]) -> Optional[Set[int]]:
+    if not page_allowlist:
+        return None
+    allowed: Set[int] = set()
+    for value in page_allowlist:
+        try:
+            page_no = int(value)
+        except (TypeError, ValueError):
+            continue
+        if page_no > 0:
+            allowed.add(page_no)
+    return allowed or None
+
+
+def extract_text_blocks(
+    pdf_path: Path,
+    page_allowlist: Optional[Sequence[int]] = None,
+) -> List[Dict[str, Any]]:
     """
     Block-level extraction using PyMuPDF with geometry + text style metadata.
     """
@@ -774,10 +791,14 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
     if not pdf_path.exists():
         raise FileNotFoundError(f"PDF not found: {pdf_path}")
 
+    allowed_pages = _normalize_page_allowlist(page_allowlist)
     doc = pymupdf.open(str(pdf_path))
     blocks: List[Dict[str, Any]] = []
     try:
         for page_num in range(len(doc)):
+            display_page_num = page_num + 1
+            if allowed_pages is not None and display_page_num not in allowed_pages:
+                continue
             page = doc[page_num]
             page_dict = page.get_text("dict", sort=False)
             text_blocks = [b for b in page_dict.get("blocks", []) if b.get("type") == 0]
@@ -785,7 +806,7 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
                 text_blocks,
                 page_width=float(page.rect.width or 0.0),
                 page_height=float(page.rect.height or 0.0),
-                page_no=page_num + 1,
+                page_no=display_page_num,
             )
 
             block_idx = 0
@@ -846,7 +867,7 @@ def extract_text_blocks(pdf_path: Path) -> List[Dict[str, Any]]:
 
                 blocks.append(
                     {
-                        "page_no": page_num + 1,
+                        "page_no": display_page_num,
                         "block_index": block_idx,
                         "text": text,
                         "bbox": bbox,

@@ -1,0 +1,41 @@
+{
+  "paper_id": 893555535508,
+  "page_no": 13,
+  "bbox": {
+    "x0": 317.2509765625,
+    "y0": 72.30876541137695,
+    "x1": 553.4993896484375,
+    "y1": 226.15421549479166
+  },
+  "caption": "Table 8. Detailed surround-view results. OccAny+ is the variant using DA3 and SAM3 base models.",
+  "n_rows": 2,
+  "n_cols": 3,
+  "headers": [
+    "Method",
+    "Extr. Intr. Fixed Ratio Fixed Rig GT LiDAR Sem. Adapt. GT Occ.",
+    "IoU mIoU"
+  ],
+  "rows": [
+    [
+      "SimpleOcc Req. Req. Req. Req. Req. Req. – 33.92 7.05\nDistillNeRF Req. Req. Req. Req. Req. – – 29.11 8.93\nSelfOcc Req. Req. Req. Req. – Req. – 45.01 9.30 3) in-domain\nPOP-3D Req. Req. Req. Req. Req. Req. – 28.17 9.31 Tab.\nOccNeRF Req. Req. Req. Req. – Req. – 39.20 9.53 GaussianOcc – Req. Req. Req. – Req. – 51.22 9.94 (ext.\nVEON Req. Req. Req. Req. Req. Req. Req. 57.92 12.38 Occ3D-NuScenes\nGaussTR Req. Req. Req. Req. – Req. – 45.19 12.27\nMUSt3R – – – – – – – 13.61 2.43\nCUT3R* – – – – – – – 19.21 3.06 out-of-domain\nVGGT† Rescale Rescale – – – – – 20.42 4.39\nAnySplat*† Rescale Rescale – – – – – 20.78 4.44\nDA3 – – – – – – – 19.65 4.55\nOccAny – – – – – – – 34.10 6.62\nOccAny+ (Pretrained) – – – – – – – 33.49 9.45",
+      "Req. Req. Req. Req. Req. Req. –\nReq. Req. Req. Req. Req. – –\nReq. Req. Req. Req. – Req. –\nReq. Req. Req. Req. Req. Req. –\nReq. Req. Req. Req. – Req. –\n– Req. Req. Req. – Req. –\nReq. Req. Req. Req. Req. Req. Req.\nReq. Req. Req. Req. – Req. –",
+      ""
+    ],
+    [
+      "",
+      "– – – – – – –\n– – – – – – –\nRescale Rescale – – – – –\nRescale Rescale – – – – –\n– – – – – – –\n– – – – – – –\n– – – – – – –",
+      ""
+    ]
+  ],
+  "markdown": "|Method|Extr. Intr. Fixed Ratio Fixed Rig GT LiDAR Sem. Adapt. GT Occ.|IoU mIoU|\n|---|---|---|\n||||\n||||",
+  "csv_text": "Method,Extr. Intr. Fixed Ratio Fixed Rig GT LiDAR Sem. Adapt. GT Occ.,IoU mIoU\r\n\"SimpleOcc Req. Req. Req. Req. Req. Req. – 33.92 7.05\nDistillNeRF Req. Req. Req. Req. Req. – – 29.11 8.93\nSelfOcc Req. Req. Req. Req. – Req. – 45.01 9.30 3) in-domain\nPOP-3D Req. Req. Req. Req. Req. Req. – 28.17 9.31 Tab.\nOccNeRF Req. Req. Req. Req. – Req. – 39.20 9.53 GaussianOcc – Req. Req. Req. – Req. – 51.22 9.94 (ext.\nVEON Req. Req. Req. Req. Req. Req. Req. 57.92 12.38 Occ3D-NuScenes\nGaussTR Req. Req. Req. Req. – Req. – 45.19 12.27\nMUSt3R – – – – – – – 13.61 2.43\nCUT3R* – – – – – – – 19.21 3.06 out-of-domain\nVGGT† Rescale Rescale – – – – – 20.42 4.39\nAnySplat*† Rescale Rescale – – – – – 20.78 4.44\nDA3 – – – – – – – 19.65 4.55\nOccAny – – – – – – – 34.10 6.62\nOccAny+ (Pretrained) – – – – – – – 33.49 9.45\",\"Req. Req. Req. Req. Req. Req. –\nReq. Req. Req. Req. Req. – –\nReq. Req. Req. Req. – Req. –\nReq. Req. Req. Req. Req. Req. –\nReq. Req. Req. Req. – Req. –\n– Req. Req. Req. – Req. –\nReq. Req. Req. Req. Req. Req. Req.\nReq. Req. Req. Req. – Req. –\",\r\n,\"– – – – – – –\n– – – – – – –\nRescale Rescale – – – – –\nRescale Rescale – – – – –\n– – – – – – –\n– – – – – – –\n– – – – – – –\",",
+  "section_canonical": "additional_details",
+  "section_title": "Additional Details",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_lines_strict",
+  "id": 4,
+  "json_file": "table_0004.json"
+}

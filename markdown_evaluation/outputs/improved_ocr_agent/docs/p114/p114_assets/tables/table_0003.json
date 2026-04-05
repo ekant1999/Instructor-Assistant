@@ -1,0 +1,62 @@
+{
+  "paper_id": 843158947465,
+  "page_no": 16,
+  "bbox": {
+    "x0": 55.13100051879883,
+    "y0": 99.42911911010742,
+    "x1": 541.4444580078125,
+    "y1": 350.4083557128906
+  },
+  "caption": "Table 4. Effect of evaluation protocol on reported FID. All rows use the same UNITE-B checkpoint (240 epochs). “Balanced” denotes 50 images per class; “Random” denotes uniformly sampled class labels. NFE = number of function evaluations.",
+  "n_rows": 3,
+  "n_cols": 7,
+  "headers": [
+    "",
+    "ODE S",
+    "olver",
+    "Class Sampling",
+    "NFE",
+    "FID ↓",
+    "IS ↑"
+  ],
+  "rows": [
+    [
+      "",
+      "Heun (",
+      "50 steps)",
+      "Balanced",
+      "100",
+      "2.789",
+      "287.6"
+    ],
+    [
+      "",
+      "dopri5",
+      "(adaptive)",
+      "Balanced",
+      "∼10",
+      "8 2.735",
+      "268.1"
+    ],
+    [
+      "",
+      "dopri5",
+      "(adaptive)",
+      "Random",
+      "∼10",
+      "8 2.885",
+      "274.7"
+    ]
+  ],
+  "markdown": "|Col1|Col2|ODE S|olver|Class|Sampling|NFE|FID ↓|IS ↑|Col10|\n|---|---|---|---|---|---|---|---|---|---|\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||\n|||||||||||",
+  "csv_text": ",ODE S,olver,Class Sampling,NFE,FID ↓,IS ↑\r\n,Heun (,50 steps),Balanced,100,2.789,287.6\r\n,dopri5,(adaptive),Balanced,∼10,8 2.735,268.1\r\n,dopri5,(adaptive),Random,∼10,8 2.885,274.7",
+  "section_canonical": "results",
+  "section_title": "Additional Results",
+  "section_source": "heuristic",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "text_caption_fallback",
+  "id": 3,
+  "json_file": "table_0003.json"
+}

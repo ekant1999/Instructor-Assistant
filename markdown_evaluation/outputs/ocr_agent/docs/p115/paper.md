@@ -377,7 +377,7 @@ Figure 5. Qualitative ablation shows the gains from Segmentation Forcing and Nov
     <td>13.61</td>
   </tr>
   <tr>
-    <td rowspan="9">out-of-domain</td>
+    <td rowspan="8">out-of-domain</td>
     <td>CUT3R [65]</td>
     <td>CVPR’25</td>
     <td>512x288</td>
@@ -456,18 +456,18 @@ Monocular. In the more challenging Monocular set-
 
 <table>
   <tr>
-    <th>Method</th>
-    <th>Venue</th>
-    <th colspan="2">Semantic KITTI sequence</th>
-    <th colspan="2">Occ3D-NuScenes surround-view</th>
+    <th rowspan="2">Method</th>
+    <th rowspan="2">Venue</th>
+    <th colspan="3">Semantic KITTI sequence</th>
+    <th colspan="3">Occ3D-NuScenes surround-view</th>
   </tr>
   <tr>
-    <th></th>
-    <th></th>
     <th>Res.</th>
     <th>mIoU</th>
+    <th>mIoU<sup>sc</sup></th>
     <th>Res.</th>
     <th>mIoU</th>
+    <th>mIoU<sup>sc</sup></th>
   </tr>
   <tr>
     <td>MUSt3R [3] + SAM2 [47]</td>
@@ -565,7 +565,7 @@ Monocular. In the more challenging Monocular set-
 
 Table 4. Semantic Occupancy Prediction with GSAM2 [48].
 
-ting on SemanticKITTI (Tab. 2), OccAny demonstrates remarkable generalization. It achieves 24.03% IoU, outperforming all other zero-shot baselines by significant margins (*e.g.*, +11.00% IoU over CUT3R* w/ TTVA). Notably, it significantly surpasses several in-domain self-supervised methods like SceneRF (+10.19%); OccAny even surpasses self-supervised SOTAs SelfOcc (+2.06%) and OccNeRF (+1.22%), despite never been trained on SemanticKITTI.
+ting on SemanticKITTI (Tab. 2), OccAny demonstrates remarkable generalization. It achieves 24.03% IoU, outperforming all other zero-shot baselines by significant margins (e.g., +11.00% IoU over CUT3R* w/ TTVA). Notably, it significantly surpasses several in-domain self-supervised methods like SceneRF (+10.19%); OccAny even surpasses self-supervised SOTAs SelfOcc (+2.06%) and OccNeRF (+1.22%), despite never been trained on SemanticKITTI.
 
 Surround-view. In the Surround-view setting on Occ3D-NuScenes Tab. 3, OccAny maintains its lead among zero-shot methods with 34.15% IoU, and achieves better performance than some in-domain approaches like Distill-NeRF/SimpleOcc, yet remains behind more recent methods.
 
@@ -1043,7 +1043,46 @@ in Fig. 9, Fig. 10, Fig. 11, Fig. 12, and Fig. 13.
 
 <!-- OCR page 17 -->
 
-[OCR unavailable for page 17]
+<table>
+  <tr>
+    <th>Input</th>
+    <th>MUSt3R</th>
+    <th>VGGT<sup>†</sup></th>
+    <th>CUT3R*</th>
+    <th>AnySplat*†</th>
+    <th>OccAny (ours)</th>
+    <th>GT</th>
+  </tr>
+  <tr>
+    <td rowspan="8">Sequence</td>
+    <td colspan="6"></td>
+  </tr>
+  <tr>
+    <td colspan="6"></td>
+  </tr>
+  <tr>
+    <td colspan="6"></td>
+  </tr>
+  <tr>
+    <td colspan="6"></td>
+  </tr>
+  <tr>
+    <td colspan="6"></td>
+  </tr>
+  <tr>
+    <td colspan="6"></td>
+  </tr>
+  <tr>
+    <td colspan="6"></td>
+  </tr>
+  <tr>
+    <td colspan="6"></td>
+  </tr>
+</table>
+
+bicycle car motorcycle truck other vehicle person, pedestrian bicyclist motorcyclist road parking sidewalk other ground building, manmade fence vegetation trunk terrain pole traffic sign barrier bus construction vehicle traffic cone trailer
+
+Figure 9. **Occupancy predictions** of OccAny and baselines on sequential data. We visualize here predicted voxels. For qualitative analysis, we overlay the semantic ground-truth colors on predicted voxels to better highlight class-wise gains. False positive voxels are painted in gray without any overlayed color. Compared to baselines, our occupancy predictions are denser and more accurate.
 
 ---
 
@@ -1062,69 +1101,7 @@ in Fig. 9, Fig. 10, Fig. 11, Fig. 12, and Fig. 13.
     <th>GT</th>
   </tr>
   <tr>
-    <td rowspan="8">Surround-view</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
+    <td colspan="7"><img src="page_256_384_1984_1344.png" alt="Occupancy predictions comparison"></td>
   </tr>
 </table>
 
@@ -1148,8 +1125,46 @@ Figure 10. **Occupancy predictions** of OccAny and baselines on surround-view da
     <th>GT</th>
   </tr>
   <tr>
-    <td colspan="4">Sequence</td>
-    <td colspan="4">Sequence</td>
+    <td rowspan="8">Sequence</td>
+    <td colspan="4"></td>
+    <td rowspan="8">Sequence</td>
+    <td colspan="4"></td>
+  </tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+
+(a) Segmentation Forcing
+
+(b) Novel-View Rendering
+
+Figure 11. **Qualitative ablation on Semantic KITTI** shows the gains from *Segmentation Forcing* and *Novel-View Rendering*. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.
+
+---
+
+<!-- page 20 mode: ocr -->
+
+<!-- OCR page 20 -->
+
+<table>
+  <tr>
+    <th>Input</th>
+    <th>w/o forcing</th>
+    <th>w/ forcing</th>
+    <th>GT</th>
+    <th>Input</th>
+    <th>w/o NVR</th>
+    <th>w/ NVR</th>
+    <th>GT</th>
+  </tr>
+  <tr>
+    <td colspan="4">Surround-view</td>
+    <td colspan="4">Surround-view</td>
   </tr>
   <tr>
     <td></td>
@@ -1233,19 +1248,9 @@ Figure 10. **Occupancy predictions** of OccAny and baselines on surround-view da
   </tr>
 </table>
 
-(a) Segmentation Forcing
+(a) Segmentation Forcing	(b) Novel-View Rendering
 
-(b) Novel-View Rendering
-
-Figure 11. **Qualitative ablation on Semantic KITTI** shows the gains from *Segmentation Forcing* and *Novel-View Rendering*. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.
-
----
-
-<!-- page 20 mode: ocr -->
-
-<!-- OCR page 20 -->
-
-[OCR unavailable for page 20]
+Figure 12. **Qualitative ablation on Occ3D-NuScenes** shows the gains from *Segmentation Forcing* and *Novel-View Rendering*. Voxel colorization follows Fig. 9. The two proposed strategies significantly improve the density and the accuracy of occupancy predictions.
 
 ---
 

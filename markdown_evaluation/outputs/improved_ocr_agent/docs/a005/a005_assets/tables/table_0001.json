@@ -1,0 +1,46 @@
+{
+  "paper_id": 704252236656,
+  "page_no": 5,
+  "bbox": {
+    "x0": 53.99722374810113,
+    "y0": 112.46626281738281,
+    "x1": 558.2577582465278,
+    "y1": 196.14251708984375
+  },
+  "caption": "A single connection was isolated and the time display was changed to “Seconds Since Previous Displayed Packet.” The sample handshake timings are shown below.",
+  "n_rows": 3,
+  "n_cols": 3,
+  "headers": [
+    "Entry",
+    "Packet Flags",
+    "Delta Time (s)"
+  ],
+  "rows": [
+    [
+      "1st",
+      "SYN",
+      "0.000000"
+    ],
+    [
+      "2nd",
+      "SYN, ACK",
+      "0.024381"
+    ],
+    [
+      "3rd",
+      "ACK",
+      "0.000241"
+    ]
+  ],
+  "markdown": "|Entry|Packet Flags|Delta Time (s)|\n|---|---|---|\n|1st|SYN|0.000000|\n|2nd|SYN, ACK|0.024381|\n|3rd|ACK|0.000241|",
+  "csv_text": "Entry,Packet Flags,Delta Time (s)\r\n1st,SYN,0.000000\r\n2nd,\"SYN, ACK\",0.024381\r\n3rd,ACK,0.000241",
+  "section_canonical": "part_5_tcp_3_way_handshake_and_observations",
+  "section_title": "Part 5: TCP 3-Way Handshake and Observations",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_lines_strict",
+  "id": 1,
+  "json_file": "table_0001.json"
+}

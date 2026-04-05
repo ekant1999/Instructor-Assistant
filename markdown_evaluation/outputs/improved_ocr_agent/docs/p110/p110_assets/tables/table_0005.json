@@ -1,0 +1,110 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 9,
+  "bbox": {
+    "x0": 111.38600158691406,
+    "y0": 472.0618591308594,
+    "x1": 500.6240539550781,
+    "y1": 560.1198120117188
+  },
+  "caption": "Table 5: Absolute gradient-computation time (seconds). Each iteration covers 8 gradient- accumulation micro-steps; 32 768 tokens total. Standard deviations ≤0.13 s (CV < 1.7%).",
+  "n_rows": 6,
+  "n_cols": 10,
+  "headers": [
+    "Model",
+    "Fused (s) RTX",
+    "Fused (s) H200",
+    "Fused (s) B200",
+    "Eager (s) RTX",
+    "Eager (s) H200",
+    "Eager (s) B200",
+    "PEFT (s) RTX",
+    "PEFT (s) H200",
+    "PEFT (s) B200"
+  ],
+  "rows": [
+    [
+      "Qwen2.5-VL-32B",
+      "OOM",
+      "30.9",
+      "23.3",
+      "OOM",
+      "37.1",
+      "28.5",
+      "OOM",
+      "53.6",
+      "40.4"
+    ],
+    [
+      "Qwen3-VL-32B",
+      "OOM",
+      "33.4",
+      "25.4",
+      "OOM",
+      "39.5",
+      "30.6",
+      "OOM",
+      "55.4",
+      "42.3"
+    ],
+    [
+      "Qwen3.5-27B",
+      "39.5",
+      "25.4",
+      "19.4",
+      "48.1",
+      "30.6",
+      "23.9",
+      "59.5",
+      "39.8",
+      "30.5"
+    ],
+    [
+      "Gemma3-27B",
+      "41.6",
+      "27.5",
+      "21.4",
+      "50.0",
+      "32.7",
+      "25.8",
+      "63.6",
+      "44.1",
+      "33.4"
+    ],
+    [
+      "Mistral-Sm-24B",
+      "32.5",
+      "20.9",
+      "15.9",
+      "39.7",
+      "25.2",
+      "19.6",
+      "53.9",
+      "39.1",
+      "29.8"
+    ],
+    [
+      "Qwen3-VL-8B",
+      "12.9",
+      "9.1",
+      "7.1",
+      "15.9",
+      "11.0",
+      "8.8",
+      "18.8",
+      "13.7",
+      "10.5"
+    ]
+  ],
+  "markdown": "| Model | Fused (s) RTX | Fused (s) H200 | Fused (s) B200 | Eager (s) RTX | Eager (s) H200 | Eager (s) B200 | PEFT (s) RTX | PEFT (s) H200 | PEFT (s) B200 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| Qwen2.5-VL-32B | OOM | 30.9 | 23.3 | OOM | 37.1 | 28.5 | OOM | 53.6 | 40.4 |\n| Qwen3-VL-32B | OOM | 33.4 | 25.4 | OOM | 39.5 | 30.6 | OOM | 55.4 | 42.3 |\n| Qwen3.5-27B | 39.5 | 25.4 | 19.4 | 48.1 | 30.6 | 23.9 | 59.5 | 39.8 | 30.5 |\n| Gemma3-27B | 41.6 | 27.5 | 21.4 | 50.0 | 32.7 | 25.8 | 63.6 | 44.1 | 33.4 |\n| Mistral-Sm-24B | 32.5 | 20.9 | 15.9 | 39.7 | 25.2 | 19.6 | 53.9 | 39.1 | 29.8 |\n| Qwen3-VL-8B | 12.9 | 9.1 | 7.1 | 15.9 | 11.0 | 8.8 | 18.8 | 13.7 | 10.5 |",
+  "csv_text": "Model,Fused (s) RTX,Fused (s) H200,Fused (s) B200,Eager (s) RTX,Eager (s) H200,Eager (s) B200,PEFT (s) RTX,PEFT (s) H200,PEFT (s) B200\r\nQwen2.5-VL-32B,OOM,30.9,23.3,OOM,37.1,28.5,OOM,53.6,40.4\r\nQwen3-VL-32B,OOM,33.4,25.4,OOM,39.5,30.6,OOM,55.4,42.3\r\nQwen3.5-27B,39.5,25.4,19.4,48.1,30.6,23.9,59.5,39.8,30.5\r\nGemma3-27B,41.6,27.5,21.4,50.0,32.7,25.8,63.6,44.1,33.4\r\nMistral-Sm-24B,32.5,20.9,15.9,39.7,25.2,19.6,53.9,39.1,29.8\r\nQwen3-VL-8B,12.9,9.1,7.1,15.9,11.0,8.8,18.8,13.7,10.5",
+  "section_canonical": "experiments",
+  "section_title": "Experiments",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 5,
+  "json_file": "table_0005.json"
+}

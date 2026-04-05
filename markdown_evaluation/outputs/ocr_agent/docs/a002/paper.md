@@ -134,9 +134,9 @@ return {
 
 3. Updating the data (PUT):
 
-![Screenshot showing API request to update student data](a002_assets/figures/ocr_page_5_324_312_1567_682.png)
+![Screenshot showing API request to update student data in DynamoDB](a002_assets/figures/ocr_page_5_256_287_1497_768.png)
 
-![Screenshot showing DynamoDB scan results](a002_assets/figures/ocr_page_5_324_1092_1567_682.png)
+![Screenshot showing DynamoDB console with scan results](a002_assets/figures/ocr_page_5_256_1206_1497_768.png)
 
 ---
 
@@ -148,7 +148,7 @@ return {
 
 ![Screenshot showing API request to delete a record from Student Records Management](a002_assets/figures/ocr_page_6_328_312_1568_799.png)
 
-![Screenshot showing DynamoDB scan results after deletion](a002_assets/figures/ocr_page_6_328_1207_1568_799.png)
+![Screenshot showing DynamoDB scan results for StudentRecords table](a002_assets/figures/ocr_page_6_328_1207_1568_799.png)
 
 ---
 
@@ -158,11 +158,11 @@ return {
 
 5. Edge Case - Trying to fetch a record which does not exist:
 
-![Screenshot showing an API request to fetch a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_328_370_1469_670.png)
+![Screenshot showing a GET request to fetch a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_370_328_1746_693.png)
 
 6. Edge Case - Trying to delete a record which does not exist:
 
-![Screenshot showing an API request to delete a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_328_1162_1469_670.png)
+![Screenshot showing a DELETE request to delete a record with student_id=100, resulting in a 404 Not Found error](a002_assets/figures/ocr_page_7_370_1162_1746_693.png)
 
 ---
 

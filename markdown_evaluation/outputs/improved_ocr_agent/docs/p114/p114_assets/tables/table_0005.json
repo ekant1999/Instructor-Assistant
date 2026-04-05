@@ -1,0 +1,124 @@
+{
+  "paper_id": 843158947465,
+  "page_no": 18,
+  "bbox": {
+    "x0": 55.439998626708984,
+    "y0": 104.16964721679688,
+    "x1": 401.94183349609375,
+    "y1": 346.9066467285156
+  },
+  "caption": "Table 6. Ablation study on ImageNet-256 generation. We systematically evaluate key design choices across architecture, normalization, training dynamics, and augmentation strategies. All ablations are done using the base backbone and trained for 120 epochs.",
+  "n_rows": 13,
+  "n_cols": 5,
+  "headers": [
+    "",
+    "Steps",
+    "FID ↓",
+    "r-FID ↓",
+    "IS ↑"
+  ],
+  "rows": [
+    [
+      "",
+      "Reconstruction noise σ (c)",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "0.0 (full noise)",
+      "2.87",
+      "1.09",
+      "281.1"
+    ],
+    [
+      "",
+      "0.6",
+      "2.80",
+      "1.21",
+      "267.1"
+    ],
+    [
+      "",
+      "0.7",
+      "2.71",
+      "1.01",
+      "282.2"
+    ],
+    [
+      "",
+      "0.8",
+      "2.87",
+      "1.42",
+      "292.1"
+    ],
+    [
+      "",
+      "1.0 (no augmentation)",
+      "6.58",
+      "1.60",
+      "275.7"
+    ],
+    [
+      "",
+      "Noise shift α (e)",
+      "",
+      "",
+      ""
+    ],
+    [
+      "",
+      "0.0 (No Shift)",
+      "3.14",
+      "1.41",
+      "267.1"
+    ],
+    [
+      "",
+      "0.5",
+      "2.71",
+      "1.01",
+      "282.2"
+    ],
+    [
+      "",
+      "0.75",
+      "2.93",
+      "1.26",
+      "278.0"
+    ],
+    [
+      "C.3. Ablation Studies on ImageN",
+      "et 256×256",
+      "",
+      "",
+      ""
+    ],
+    [
+      "In addition to the weight-sharing an",
+      "d stop-gradient ablations sho",
+      "wn in th",
+      "e main pa",
+      "per, w"
+    ],
+    [
+      "that further improve UNITE’s reco",
+      "nstruction and generation fid",
+      "elity.",
+      "",
+      ""
+    ]
+  ],
+  "markdown": "|Col1|Col2|Col3|Col4|Col5|\n|---|---|---|---|---|\n||Steps|FID ↓|r&amp;#45;FID ↓|IS ↑|\n||||||\n||||||\n||Reconstruction noise σ (c)||||\n||0.0 (full noise)|2.87|1.09|281.1|\n||0.6|2.80|1.21|267.1|\n||0.7|2.71|1.01|282.2|\n||0.8|2.87|1.42|292.1|\n||1.0 (no augmentation)|6.58|1.60|275.7|\n||||||\n||Noise shift α (e)||||\n||0.0 (No Shift)|3.14|1.41|267.1|\n||0.5|2.71|1.01|282.2|\n||0.75|2.93|1.26|278.0|\n||||||\n|C.3. Ablation Studies on ImageN|et 256×256||||\n||||||\n|In addition to the weight&amp;#45;sharing an|d stop&amp;#45;gradient ablations sho|wn in th|e main pa|per, w|\n|that further improve UNITE’s reco|nstruction and generation fid|elity.|||\n||||||\n|Reconstruction Noise Level. T|able 6 (top half) investigates|the im|pact of no|ise a|\n|training, where Gaussian noise is i|njected into latent representa|tions pr|ior to dec|oding|",
+  "csv_text": ",Steps,FID ↓,r-FID ↓,IS ↑\r\n,Reconstruction noise σ (c),,,\r\n,0.0 (full noise),2.87,1.09,281.1\r\n,0.6,2.80,1.21,267.1\r\n,0.7,2.71,1.01,282.2\r\n,0.8,2.87,1.42,292.1\r\n,1.0 (no augmentation),6.58,1.60,275.7\r\n,Noise shift α (e),,,\r\n,0.0 (No Shift),3.14,1.41,267.1\r\n,0.5,2.71,1.01,282.2\r\n,0.75,2.93,1.26,278.0\r\nC.3. Ablation Studies on ImageN,et 256×256,,,\r\nIn addition to the weight-sharing an,d stop-gradient ablations sho,wn in th,e main pa,\"per, w\"\r\nthat further improve UNITE’s reco,nstruction and generation fid,elity.,,",
+  "section_canonical": "results",
+  "section_title": "Additional Results",
+  "section_source": "heuristic",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "text_caption_fallback",
+  "id": 5,
+  "json_file": "table_0005.json"
+}

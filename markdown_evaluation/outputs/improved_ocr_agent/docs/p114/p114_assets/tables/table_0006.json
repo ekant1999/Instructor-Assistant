@@ -1,0 +1,46 @@
+{
+  "paper_id": 843158947465,
+  "page_no": 18,
+  "bbox": {
+    "x0": 157.4499969482422,
+    "y0": 572.1409912109375,
+    "x1": 439.43096923828125,
+    "y1": 691.4939880371094
+  },
+  "caption": "Table 7. Detailed architecture configurations for UNITE models.",
+  "n_rows": 3,
+  "n_cols": 3,
+  "headers": [
+    "Component",
+    "Encoder/Denoiser",
+    "Decoder"
+  ],
+  "rows": [
+    [
+      "",
+      "DiT-B DiT-L DiT-XL",
+      "ViT-B ViT-L"
+    ],
+    [
+      "Hidden Dimension\nLayers\nAttention Heads\nMLP Ratio\nPatch Size\nLatent Dimension\nLatent Resolution",
+      "768 1024 1152\n12 24 28\n12 16 16\n4 4 4\n16 16 16\n32 32 32\n16×16 16×16 16×16",
+      "768 1024\n12 24\n12 16\n4 4\n- -\n32 32\n16×16 16×16"
+    ],
+    [
+      "Parameters (M)",
+      "86.2 458.2 675.3",
+      "130.6 303.9"
+    ]
+  ],
+  "markdown": "|Component|Encoder/Denoiser|Decoder|\n|---|---|---|\n||||\n||||\n||||",
+  "csv_text": "Component,Encoder/Denoiser,Decoder\r\n,DiT-B DiT-L DiT-XL,ViT-B ViT-L\r\n\"Hidden Dimension\nLayers\nAttention Heads\nMLP Ratio\nPatch Size\nLatent Dimension\nLatent Resolution\",\"768 1024 1152\n12 24 28\n12 16 16\n4 4 4\n16 16 16\n32 32 32\n16×16 16×16 16×16\",\"768 1024\n12 24\n12 16\n4 4\n- -\n32 32\n16×16 16×16\"\r\nParameters (M),86.2 458.2 675.3,130.6 303.9",
+  "section_canonical": "results",
+  "section_title": "Additional Results",
+  "section_source": "heuristic",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_lines_strict",
+  "id": 6,
+  "json_file": "table_0006.json"
+}

@@ -1,0 +1,56 @@
+{
+  "paper_id": 860930833796,
+  "page_no": 10,
+  "bbox": {
+    "x0": 145.0500030517578,
+    "y0": 93.947021484375,
+    "x1": 466.95001220703125,
+    "y1": 236.56201171875
+  },
+  "caption": "Table 4: The Transformer generalizes well to English constituency parsing (Results are on Section 23 of WSJ)",
+  "n_rows": 5,
+  "n_cols": 3,
+  "headers": [
+    "Parser",
+    "Training",
+    "WSJ 23 F1"
+  ],
+  "rows": [
+    [
+      "Vinyals & Kaiser el al. (2014) [37]\nPetrov et al. (2006) [29]\nZhu et al. (2013) [40]\nDyer et al. (2016) [8]",
+      "WSJ only, discriminative\nWSJ only, discriminative\nWSJ only, discriminative\nWSJ only, discriminative",
+      "88.3\n90.4\n90.4\n91.7"
+    ],
+    [
+      "Transformer (4 layers)",
+      "WSJ only, discriminative",
+      "91.3"
+    ],
+    [
+      "Zhu et al. (2013) [40]\nHuang & Harper (2009) [14]\nMcClosky et al. (2006) [26]\nVinyals & Kaiser el al. (2014) [37]",
+      "semi-supervised\nsemi-supervised\nsemi-supervised\nsemi-supervised",
+      "91.3\n91.3\n92.1\n92.1"
+    ],
+    [
+      "Transformer (4 layers)",
+      "semi-supervised",
+      "92.7"
+    ],
+    [
+      "Luong et al. (2015) [23]\nDyer et al. (2016) [8]",
+      "multi-task\ngenerative",
+      "93.0\n93.3"
+    ]
+  ],
+  "markdown": "|Parser|Training|WSJ 23 F1|\n|---|---|---|\n|Vinyals &amp; Kaiser el al. (2014) [37] Petrov et al. (2006) [29] Zhu et al. (2013) [40] Dyer et al. (2016) [8]|WSJ only, discriminative WSJ only, discriminative WSJ only, discriminative WSJ only, discriminative|88.3 90.4 90.4 91.7|\n|Transformer (4 layers)|WSJ only, discriminative|91.3|\n|Zhu et al. (2013) [40] Huang &amp; Harper (2009) [14] McClosky et al. (2006) [26] Vinyals &amp; Kaiser el al. (2014) [37]|semi&amp;#45;supervised semi&amp;#45;supervised semi&amp;#45;supervised semi&amp;#45;supervised|91.3 91.3 92.1 92.1|\n|Transformer (4 layers)|semi&amp;#45;supervised|92.7|\n|Luong et al. (2015) [23] Dyer et al. (2016) [8]|multi&amp;#45;task generative|93.0 93.3|",
+  "csv_text": "Parser,Training,WSJ 23 F1\r\n\"Vinyals & Kaiser el al. (2014) [37]\nPetrov et al. (2006) [29]\nZhu et al. (2013) [40]\nDyer et al. (2016) [8]\",\"WSJ only, discriminative\nWSJ only, discriminative\nWSJ only, discriminative\nWSJ only, discriminative\",\"88.3\n90.4\n90.4\n91.7\"\r\nTransformer (4 layers),\"WSJ only, discriminative\",91.3\r\n\"Zhu et al. (2013) [40]\nHuang & Harper (2009) [14]\nMcClosky et al. (2006) [26]\nVinyals & Kaiser el al. (2014) [37]\",\"semi-supervised\nsemi-supervised\nsemi-supervised\nsemi-supervised\",\"91.3\n91.3\n92.1\n92.1\"\r\nTransformer (4 layers),semi-supervised,92.7\r\n\"Luong et al. (2015) [23]\nDyer et al. (2016) [8]\",\"multi-task\ngenerative\",\"93.0\n93.3\"",
+  "section_canonical": "results",
+  "section_title": "Results",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_lines_strict",
+  "id": 4,
+  "json_file": "table_0004.json"
+}

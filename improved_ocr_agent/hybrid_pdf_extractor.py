@@ -1,53 +1,15 @@
 import os
 import re
 import json
+import shutil
 import fitz  # PyMuPDF
 import pdfplumber
 import statistics
 from pathlib import Path
-from typing import Any, List, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-try:
-    from .document_model import DocumentOutlineEntry, PageBlock, PageModel
-    from .sectioning import normalize_heading_title, normalize_markdown
-except ImportError:
-    from document_model import DocumentOutlineEntry, PageBlock, PageModel
-    from sectioning import normalize_heading_title
-    normalize_markdown = None
-
-_FIGURE_CAPTION_NUMBER_RE = re.compile(r"\b(?:figure|fig\.?)\s*(?P<number>\d{1,3}|[IVXLCDM]{1,8})\b", re.I)
-_TABLE_CAPTION_NUMBER_RE = re.compile(r"\btable\s*(?P<number>\d{1,3}|[IVXLCDM]{1,8})\b", re.I)
-
-
-def _norm_page_furniture_text(text: str) -> str:
-    cleaned = " ".join(str(text or "").split()).strip().lower()
-    cleaned = re.sub(r"[^a-z0-9]+", " ", cleaned).strip()
-    return re.sub(r"\s+", " ", cleaned).strip()
-
-
-def _roman_to_int(value: str) -> Optional[int]:
-    cleaned = str(value or "").strip().upper()
-    if not cleaned or not re.fullmatch(r"[IVXLCDM]{1,8}", cleaned):
-        return None
-    roman_values = {
-        "I": 1,
-        "V": 5,
-        "X": 10,
-        "L": 50,
-        "C": 100,
-        "D": 500,
-        "M": 1000,
-    }
-    total = 0
-    prev = 0
-    for ch in reversed(cleaned):
-        cur = roman_values[ch]
-        if cur < prev:
-            total -= cur
-        else:
-            total += cur
-            prev = cur
-    return total if total > 0 else None
+from .ia_phase1_bridge import IaPhase1Bridge
+from .non_ocr_routing import DocumentContentProfile, build_document_content_profile
 
 class OCRBackendBase:
     """
@@ -158,19 +120,33 @@ class HybridPDFExtractor:
         self.assets_dir = os.path.join(self.output_dir, f"{self.pdf_name}_assets")
         self.figure_dir = os.path.join(self.assets_dir, "figures")
         self.table_dir = os.path.join(self.assets_dir, "tables")
+        self.equation_dir = os.path.join(self.assets_dir, "equations")
         self.page_image_dir = os.path.join(self.assets_dir, "page_images")
 
         os.makedirs(self.assets_dir, exist_ok=True)
         os.makedirs(self.figure_dir, exist_ok=True)
         os.makedirs(self.table_dir, exist_ok=True)
+        os.makedirs(self.equation_dir, exist_ok=True)
         os.makedirs(self.page_image_dir, exist_ok=True)
 
         self.ocr_backend = ocr_backend or DummyOCRBackend()
         self.image_dpi = image_dpi
         self.ocr_dpi = ocr_dpi
         self.use_pdf_page_ocr = use_pdf_page_ocr
-        self._figure_fallback_counter = 0
-        self._table_fallback_counter = 0
+        self.last_routing_info: Dict[str, Any] = {}
+
+    def _reset_asset_dirs(self) -> None:
+        for directory in (self.figure_dir, self.table_dir, self.equation_dir, self.page_image_dir):
+            os.makedirs(directory, exist_ok=True)
+            for name in os.listdir(directory):
+                path = os.path.join(directory, name)
+                try:
+                    if os.path.isdir(path):
+                        shutil.rmtree(path)
+                    else:
+                        os.remove(path)
+                except FileNotFoundError:
+                    continue
 
     # -------------------------------------------------------------------------
     # Basic helpers
@@ -194,88 +170,6 @@ class HybridPDFExtractor:
         cx = (x0 + x1) / 2
         col = 0 if cx < page_width * 0.5 else 1
         return (col, y0, x0)
-
-    def _looks_like_full_width_item(self, bbox, page_width: float) -> bool:
-        x0, _, x1, _ = bbox
-        width = x1 - x0
-        return width >= page_width * 0.6 or (x0 <= page_width * 0.18 and x1 >= page_width * 0.82)
-
-    def _page_has_two_columns(self, layout_items: List[dict], page_width: float) -> bool:
-        left_count = 0
-        right_count = 0
-        for item in layout_items:
-            x0, _, x1, _ = item["bbox"]
-            width = x1 - x0
-            if width >= page_width * 0.6:
-                continue
-            cx = (x0 + x1) / 2
-            if cx < page_width * 0.45:
-                left_count += 1
-            elif cx > page_width * 0.55:
-                right_count += 1
-        return left_count >= 2 and right_count >= 2
-
-    def _order_column_segment(
-        self,
-        layout_items: List[dict],
-        page_width: float,
-        *,
-        force_two_columns: bool = False,
-    ) -> List[dict]:
-        if not layout_items:
-            return []
-        if not force_two_columns and not self._page_has_two_columns(layout_items, page_width):
-            return sorted(layout_items, key=lambda item: (item["bbox"][1], item["bbox"][0]))
-        return sorted(layout_items, key=lambda item: self._bbox_sort_key(item["bbox"], page_width))
-
-    def _order_layout_items(self, layout_items: List[dict], page_width: float) -> List[dict]:
-        if not layout_items:
-            return []
-        page_has_two_columns = self._page_has_two_columns(layout_items, page_width)
-        if not page_has_two_columns:
-            return sorted(layout_items, key=lambda item: (item["bbox"][1], item["bbox"][0]))
-
-        full_width_items = [
-            item for item in layout_items if self._looks_like_full_width_item(item["bbox"], page_width)
-        ]
-        narrow_items = [
-            item for item in layout_items if not self._looks_like_full_width_item(item["bbox"], page_width)
-        ]
-        full_width_items.sort(key=lambda item: (item["bbox"][1], item["bbox"][0]))
-
-        ordered: List[dict] = []
-        cursor_y = float("-inf")
-        for full_item in full_width_items:
-            full_y0 = full_item["bbox"][1]
-            full_y1 = full_item["bbox"][3]
-            segment = [
-                item
-                for item in narrow_items
-                if cursor_y <= item["bbox"][1] < full_y1
-            ]
-            ordered.extend(
-                self._order_column_segment(
-                    segment,
-                    page_width,
-                    force_two_columns=page_has_two_columns,
-                )
-            )
-            ordered.append(full_item)
-            cursor_y = max(cursor_y, full_item["bbox"][3])
-
-        trailing = [
-            item
-            for item in narrow_items
-            if item["bbox"][1] >= cursor_y
-        ]
-        ordered.extend(
-            self._order_column_segment(
-                trailing,
-                page_width,
-                force_two_columns=page_has_two_columns,
-            )
-        )
-        return ordered
 
 
     def _expand_rect_with_text(self, page_fitz: fitz.Page, rect: fitz.Rect, pad: int = 12) -> fitz.Rect:
@@ -322,113 +216,13 @@ class HybridPDFExtractor:
         texts = [t for t in texts if t]
         return "\n".join(texts).strip()
 
-    def _extract_asset_number_from_caption(self, caption_text: str, kind: str) -> Optional[int]:
-        if not caption_text:
-            return None
-        pattern = _FIGURE_CAPTION_NUMBER_RE if kind == "figure" else _TABLE_CAPTION_NUMBER_RE
-        match = pattern.search(caption_text)
-        if not match:
-            return None
-        try:
-            value = match.group("number")
-            if str(value).isdigit():
-                return int(value)
-            return _roman_to_int(str(value))
-        except Exception:
-            return None
-
-    def _format_asset_caption(self, caption_text: str, kind: str, asset_number: Optional[int]) -> str:
-        cleaned = self._normalize_ws(caption_text or "")
-        if not cleaned:
-            return ""
-        if kind == "figure" and _FIGURE_CAPTION_NUMBER_RE.search(cleaned):
-            return cleaned
-        if kind == "table" and _TABLE_CAPTION_NUMBER_RE.search(cleaned):
-            return f"**{cleaned}**"
-        if asset_number is not None:
-            label = "Figure" if kind == "figure" else "Table"
-            rendered = f"{label} {asset_number}: {cleaned}"
-            return rendered if kind == "figure" else f"**{rendered}**"
-        return cleaned if kind == "figure" else f"**{cleaned}**"
-
-    def _format_asset_image_ref(
-        self,
-        *,
-        kind: str,
-        asset_path: str,
-        page_num: int,
-        asset_number: Optional[int],
-        fallback_idx: int,
-    ) -> str:
-        label = "Figure" if kind == "figure" else "Table"
-        if asset_number is not None:
-            alt_text = f"{label} {asset_number}"
-        else:
-            if kind == "figure":
-                self._figure_fallback_counter += 1
-                fallback_number = self._figure_fallback_counter
-            else:
-                self._table_fallback_counter += 1
-                fallback_number = self._table_fallback_counter
-            alt_text = f"{label} {fallback_number} on Page {page_num}"
-            if fallback_idx > 1:
-                alt_text = f"{alt_text} #{fallback_idx}"
-        return f"![{alt_text}]({self._relpath_from_output(asset_path)})"
-
     def _find_table_caption_blocks(self, text_blocks: List[dict]) -> List[dict]:
         table_caps = []
         for block in text_blocks:
             text = self._extract_block_plain_text(block)
-            if self._looks_like_asset_caption_text(text, kind="table"):
+            if re.match(r"^table\s+\d+\b", text.strip(), flags=re.IGNORECASE):
                 table_caps.append(block)
         return table_caps
-
-    def _looks_like_asset_caption_text(self, text: str, *, kind: str) -> bool:
-        cleaned = self._normalize_ws(text or "")
-        if not cleaned:
-            return False
-
-        pattern = _FIGURE_CAPTION_NUMBER_RE if kind == "figure" else _TABLE_CAPTION_NUMBER_RE
-        match = pattern.match(cleaned)
-        if not match:
-            return False
-
-        suffix = cleaned[match.end():].lstrip()
-        if not suffix:
-            return True
-        if suffix[:1] in {":", ".", "-", "—"}:
-            return True
-
-        suffix_words = suffix.split()
-        if not suffix_words:
-            return True
-
-        if suffix.upper() == suffix and re.search(r"[A-Z]", suffix):
-            return True
-
-        first_word = suffix_words[0]
-        if first_word[:1].isupper() and len(suffix_words) <= 40:
-            return True
-
-        return False
-
-    def _consume_text_blocks_in_rect(
-        self,
-        text_blocks: List[dict],
-        used_text_block_ids: set,
-        rect: fitz.Rect,
-        *,
-        min_overlap_ratio: float = 0.35,
-    ) -> None:
-        for idx, block in enumerate(text_blocks):
-            if idx in used_text_block_ids:
-                continue
-            b_rect = fitz.Rect(block["bbox"])
-            inter = b_rect & rect
-            if inter.is_empty:
-                continue
-            if inter.get_area() / max(b_rect.get_area(), 1.0) >= min_overlap_ratio or rect.contains(self._rect_center(b_rect)):
-                used_text_block_ids.add(idx)
 
     def _expand_table_from_caption(
         self,
@@ -438,88 +232,34 @@ class HybridPDFExtractor:
         max_expand_down: float = 500,
     ) -> fitz.Rect:
         """
-        Starting from a 'Table N ...' caption block, expand vertically to absorb
-        the table body near the caption.
-
-        Tables can place captions above or below the body. We therefore inspect
-        aligned row-like text blocks in both directions, while stopping before
-        obvious section headings or far-away prose.
+        Starting from a 'Table N ...' caption block, expand downward to absorb
+        the table body beneath it.
         """
         caption_rect = fitz.Rect(caption_block["bbox"])
         expanded = caption_rect
 
-        base_size = 11.0
-        candidate_blocks: List[Tuple[float, fitz.Rect, str]] = []
         for block in text_blocks:
             b_rect = fitz.Rect(block["bbox"])
             text = self._extract_block_plain_text(block)
             if not text:
                 continue
 
-            if block is caption_block:
+            # Only consider blocks below caption and roughly aligned horizontally
+            if b_rect.y0 < caption_rect.y1:
+                continue
+            if b_rect.y0 - caption_rect.y1 > max_expand_down:
                 continue
 
             horizontally_aligned = (
-                b_rect.x1 >= caption_rect.x0 - 100 and
+                b_rect.x1 >= caption_rect.x0 - 80 and
                 b_rect.x0 <= caption_rect.x1 + 300
             )
             if not horizontally_aligned:
                 continue
 
-            if b_rect.y1 <= caption_rect.y0:
-                distance = caption_rect.y0 - b_rect.y1
-            elif b_rect.y0 >= caption_rect.y1:
-                distance = b_rect.y0 - caption_rect.y1
-            else:
-                distance = 0.0
-
-            if distance > max_expand_down:
-                continue
-
-            # Stop at likely headings/prose blocks. Table rows are usually short,
-            # moderate-height, and often contain several tokens/columns.
-            if b_rect.height > 90:
-                continue
-
-            text_norm = self._normalize_ws(text)
-            if len(text_norm) > 500:
-                continue
-
-            max_size = 0.0
-            bold_chars = 0
-            total_chars = 0
-            for line in block.get("lines", []):
-                for span in line.get("spans", []):
-                    span_text = span.get("text", "")
-                    if not span_text.strip():
-                        continue
-                    max_size = max(max_size, float(span.get("size", 0.0) or 0.0))
-                    total_chars += len(span_text.strip())
-                    if "bold" in str(span.get("font", "")).lower():
-                        bold_chars += len(span_text.strip())
-            bold_ratio = (bold_chars / total_chars) if total_chars > 0 else 0.0
-            if self._is_heading_like_line(text_norm, max_size or base_size, base_size, bold_ratio=bold_ratio):
-                continue
-
-            token_count = len(text_norm.split())
-            has_row_delimiters = bool(re.search(r"\s{2,}|\||\t", text))
-            has_numeric = bool(re.search(r"\d", text_norm))
-            row_like = token_count <= 80 and (has_row_delimiters or has_numeric or token_count <= 20)
-            if not row_like:
-                continue
-
-            candidate_blocks.append((distance, b_rect, text_norm))
-
-        if not candidate_blocks:
-            return expanded.intersect(page_fitz.rect)
-
-        # Prefer the nearest aligned blocks in each direction, then merge them.
-        for _, b_rect, _ in sorted(candidate_blocks, key=lambda item: item[0]):
-            if b_rect.y1 <= expanded.y0 and expanded.y0 - b_rect.y1 > max_expand_down:
-                continue
-            if b_rect.y0 >= expanded.y1 and b_rect.y0 - expanded.y1 > max_expand_down:
-                continue
-            expanded = expanded | b_rect
+            # absorb moderate-sized text/table rows
+            if b_rect.height < 80:
+                expanded = expanded | b_rect
 
         return expanded.intersect(page_fitz.rect)
 
@@ -625,12 +365,12 @@ class HybridPDFExtractor:
             caption_score = 0
 
             if kind == "figure":
-                if self._looks_like_asset_caption_text(text, kind="figure"):
+                if re.match(r"^(figure|fig\.?)\s*\d+", text_lower):
                     caption_score += 5
                 if is_near_below:
                     caption_score += 2
             elif kind == "table":
-                if self._looks_like_asset_caption_text(text, kind="table"):
+                if re.match(r"^table\s*\d+", text_lower):
                     caption_score += 5
                 if is_near_above:
                     caption_score += 2
@@ -879,6 +619,53 @@ class HybridPDFExtractor:
 
         return "\n\n".join(p for p in merged_parts if p.strip())
 
+    def _extract_line_features(self, text_blocks: List[dict], base_size: float) -> List[Dict[str, Any]]:
+        line_features: List[Dict[str, Any]] = []
+        for block in text_blocks:
+            block_bbox = block.get("bbox") or (0.0, 0.0, 0.0, 0.0)
+            for line in block.get("lines", []):
+                line_bbox = line.get("bbox") or block_bbox
+                line_text = ""
+                max_size = 0.0
+                bold_chars = 0
+                total_chars = 0
+                for span in line.get("spans", []):
+                    txt = span.get("text", "")
+                    line_text += txt
+                    if txt.strip():
+                        max_size = max(max_size, span.get("size", 0.0))
+                        total_chars += len(txt.strip())
+                        if "bold" in str(span.get("font", "")).lower():
+                            bold_chars += len(txt.strip())
+                line_text = self._normalize_ws(line_text)
+                if not line_text:
+                    continue
+                bold_ratio = (bold_chars / total_chars) if total_chars > 0 else 0.0
+                line_features.append(
+                    {
+                        "text": line_text,
+                        "y0": float(line_bbox[1]),
+                        "y1": float(line_bbox[3]),
+                        "max_size": max_size,
+                        "bold_ratio": bold_ratio,
+                        "is_heading": self._is_heading_like_line(line_text, max_size, base_size, bold_ratio),
+                    }
+                )
+        line_features.sort(key=lambda item: (item["y0"], item["text"]))
+        return line_features
+
+    def _looks_like_paragraphish_line(self, text: str) -> bool:
+        compact = " ".join(str(text or "").split()).strip()
+        if len(compact) < 70:
+            return False
+        if compact.endswith(":"):
+            return False
+        if re.match(r"^(figure|fig\.?|table|tab\.?)\s+", compact, flags=re.IGNORECASE):
+            return False
+        if compact.count(" ") < 8:
+            return False
+        return True
+
     def _detect_two_columns(self, page_fitz: fitz.Page) -> bool:
         text_blocks = [b for b in page_fitz.get_text("dict")["blocks"] if b["type"] == 0]
         if len(text_blocks) < 4:
@@ -904,9 +691,10 @@ class HybridPDFExtractor:
     # Page analysis / classification
     # -------------------------------------------------------------------------
 
-    def _analyze_page(self, page_fitz: fitz.Page, page_plumber) -> Dict[str, Any]:
+    def _analyze_page(self, page_fitz: fitz.Page, page_plumber, *, page_num: int, base_size: float) -> Dict[str, Any]:
         text = page_fitz.get_text("text")
         text_blocks = [b for b in page_fitz.get_text("dict")["blocks"] if b["type"] == 0]
+        line_features = self._extract_line_features(text_blocks, base_size)
         image_infos = page_fitz.get_image_info()
         drawings = page_fitz.get_drawings()
         tables = page_plumber.find_tables()
@@ -923,7 +711,33 @@ class HybridPDFExtractor:
             rect = fitz.Rect(b["bbox"])
             text_area += rect.get_area()
 
+        heading_lines = [item["text"] for item in line_features if item["is_heading"]]
+        top_lines = [item["text"] for item in line_features[:4]]
+        bottom_lines = [item["text"] for item in line_features[-4:]]
+        citation_count = len(re.findall(r"\[[0-9]{1,3}(?:\s*,\s*[0-9]{1,3})*\]|\b[A-Z][A-Za-z\-]+ et al\.\b|\([A-Z][A-Za-z\-]+ et al\.,?\s*20\d{2}\)", text, flags=re.IGNORECASE))
+        figure_caption_count = sum(
+            1
+            for item in line_features
+            if re.match(r"^(?:figure|fig\.?)\s+[a-z0-9ivxlcdm]+(?:[\.:]|\s)", item["text"], flags=re.IGNORECASE)
+        )
+        table_caption_count = sum(
+            1
+            for item in line_features
+            if re.match(r"^(?:table|tab\.?)\s+[a-z0-9ivxlcdm]+(?:[\.:]|\s)", item["text"], flags=re.IGNORECASE)
+        )
+        equation_line_count = sum(1 for item in line_features if re.search(r"(?:=|≤|≥|∑|Σ|λ|μ|θ|β|→|<-|->)", item["text"]))
+        paragraph_like_count = sum(1 for item in line_features if self._looks_like_paragraphish_line(item["text"]))
+        author_affiliation_hits = 0
+        if page_num == 1:
+            lower_text = text.lower()
+            author_affiliation_hits = sum(
+                1
+                for token in ("university", "institute", "college", "school", "department", "laboratory", "arxiv", "@")
+                if token in lower_text
+            )
+
         return {
+            "page_num": page_num,
             "text_len": len(text.strip()),
             "image_count": len(image_infos),
             "drawing_count": len(drawings),
@@ -934,6 +748,15 @@ class HybridPDFExtractor:
             "garbled_text": self._looks_like_garbled_text(text),
             "page_width": page_fitz.rect.width,
             "page_height": page_fitz.rect.height,
+            "heading_lines": heading_lines,
+            "top_lines": top_lines,
+            "bottom_lines": bottom_lines,
+            "citation_count": citation_count,
+            "figure_caption_count": figure_caption_count,
+            "table_caption_count": table_caption_count,
+            "equation_line_count": equation_line_count,
+            "paragraph_like_count": paragraph_like_count,
+            "author_affiliation_hits": author_affiliation_hits,
         }
 
     def _classify_document(self, page_stats: List[Dict[str, Any]]) -> str:
@@ -1062,37 +885,17 @@ class HybridPDFExtractor:
     # Extraction modes
     # -------------------------------------------------------------------------
 
-    def _render_page_blocks(self, blocks: List[PageBlock]) -> str:
-        return "\n\n".join(block.text for block in blocks if block.text.strip()).strip()
-
-    def _order_page_model_blocks(self, page_model: PageModel) -> None:
-        if page_model.page_mode == "ocr":
-            return
-        layout_items = [
-            {
-                "type": block.kind,
-                "bbox": block.bbox,
-                "block": block,
-            }
-            for block in page_model.blocks
-        ]
-        page_model.blocks = [item["block"] for item in self._order_layout_items(layout_items, page_model.width)]
-
-    def _extract_simple_text_page_blocks(
-        self,
-        page_fitz: fitz.Page,
-        page_num: int,
-        base_size: float,
-    ) -> List[PageBlock]:
+    def _extract_simple_text_page(self, page_fitz: fitz.Page, base_size: float) -> str:
         blocks = [b for b in page_fitz.get_text("dict")["blocks"] if b["type"] == 0]
         blocks.sort(key=lambda b: (b["bbox"][1], b["bbox"][0]))
 
-        page_blocks: List[PageBlock] = []
+        out = []
         for b in blocks:
             block_text = self._normalize_block_text(b.get("lines", []), base_size)
             if not block_text:
                 continue
 
+            # heading detection for single-line block
             lines = block_text.splitlines()
             if len(lines) == 1:
                 line = lines[0].strip()
@@ -1111,24 +914,12 @@ class HybridPDFExtractor:
 
                 if self._is_heading_like_line(line, max_size, base_size, bold_ratio):
                     level = 2 if max_size >= base_size * 1.2 else 3
-                    block_text = f"{'#' * level} {line.rstrip('.').strip()}"
+                    out.append(f"{'#' * level} {line.rstrip('.').strip()}")
+                    continue
 
-            page_blocks.append(
-                PageBlock(
-                    kind="text",
-                    text=block_text.strip(),
-                    bbox=tuple(b["bbox"]),
-                    page_num=page_num,
-                    page_mode="simple_text",
-                )
-            )
+            out.append(block_text)
 
-        return page_blocks
-
-    def _extract_simple_text_page(self, page_fitz: fitz.Page, base_size: float) -> str:
-        return self._render_page_blocks(
-            self._extract_simple_text_page_blocks(page_fitz, page_num=page_fitz.number + 1, base_size=base_size)
-        )
+        return "\n\n".join(out).strip()
 
     def _extract_page_text_blocks(self, page_fitz: fitz.Page) -> List[dict]:
         page_dict = page_fitz.get_text("dict")
@@ -1201,29 +992,14 @@ class HybridPDFExtractor:
             )
 
             used_text_block_ids.add(text_blocks.index(cap_block))
-            self._consume_text_blocks_in_rect(
-                text_blocks=text_blocks,
-                used_text_block_ids=used_text_block_ids,
-                rect=table_clip_rect,
-                min_overlap_ratio=0.25,
-            )
             caption_text = self._extract_block_plain_text(cap_block)
-            table_number = self._extract_asset_number_from_caption(caption_text, "table")
-            caption_md = self._format_asset_caption(caption_text, "table", table_number) or f"**Table {idx} (Page {page_num})**"
-            image_md = self._format_asset_image_ref(
-                kind="table",
-                asset_path=table_img_path,
-                page_num=page_num,
-                asset_number=table_number,
-                fallback_idx=idx,
-            )
 
             layout_items.append({
                 "type": "table",
                 "bbox": (table_clip_rect.x0, table_clip_rect.y0, table_clip_rect.x1, table_clip_rect.y1),
                 "content": "\n\n".join([
-                    caption_md,
-                    image_md,
+                    f"**{caption_text}**",
+                    f"![Table {idx}]({self._relpath_from_output(table_img_path)})",
                 ]),
             })
 
@@ -1278,31 +1054,16 @@ class HybridPDFExtractor:
                 for block in caption_blocks:
                     used_text_block_ids.add(text_blocks.index(block))
 
-                self._consume_text_blocks_in_rect(
-                    text_blocks=text_blocks,
-                    used_text_block_ids=used_text_block_ids,
-                    rect=table_clip_rect,
-                    min_overlap_ratio=0.25,
-                )
-
                 caption_text = self._join_caption_blocks(caption_blocks)
-                table_number = self._extract_asset_number_from_caption(caption_text, "table")
 
                 content_parts = []
-                content_parts.append(
-                    self._format_asset_caption(caption_text, "table", table_number) or f"**Table {idx} (Page {page_num})**"
-                )
+                if caption_text:
+                    content_parts.append(f"**{caption_text}**")
+                else:
+                    content_parts.append(f"**Table {idx} (Page {page_num})**")
 
                 content_parts.append(table_md)
-                content_parts.append(
-                    self._format_asset_image_ref(
-                        kind="table",
-                        asset_path=table_img_path,
-                        page_num=page_num,
-                        asset_number=table_number,
-                        fallback_idx=idx,
-                    )
-                )
+                content_parts.append(f"![Table {idx}]({self._relpath_from_output(table_img_path)})")
 
                 layout_items.append({
                     "type": "table",
@@ -1363,21 +1124,11 @@ class HybridPDFExtractor:
                 used_text_block_ids.add(text_blocks.index(block))
 
             caption_text = self._join_caption_blocks(caption_blocks)
-            figure_number = self._extract_asset_number_from_caption(caption_text, "figure")
 
             content_parts = []
-            caption_md = self._format_asset_caption(caption_text, "figure", figure_number)
-            if caption_md:
-                content_parts.append(caption_md)
-            content_parts.append(
-                self._format_asset_image_ref(
-                    kind="figure",
-                    asset_path=fig_path,
-                    page_num=page_num,
-                    asset_number=figure_number,
-                    fallback_idx=idx,
-                )
-            )
+            if caption_text:
+                content_parts.append(caption_text)
+            content_parts.append(f"![Figure {idx} on Page {page_num}]({self._relpath_from_output(fig_path)})")
 
             layout_items.append({
                 "type": "image",
@@ -1435,40 +1186,10 @@ class HybridPDFExtractor:
 
 
     def _assemble_layout_items(self, layout_items: List[dict], page_width: float) -> str:
-        ordered_items = self._order_layout_items(layout_items, page_width)
-        return "\n\n".join(item["content"] for item in ordered_items if item["content"].strip()).strip()
+        layout_items.sort(key=lambda item: self._bbox_sort_key(item["bbox"], page_width))
+        return "\n\n".join(item["content"] for item in layout_items if item["content"].strip()).strip()
 
-    def _layout_items_to_page_blocks(
-        self,
-        layout_items: List[dict],
-        page_num: int,
-        page_mode: str,
-        page_width: float,
-    ) -> List[PageBlock]:
-        layout_items = self._order_layout_items(layout_items, page_width)
-        page_blocks: List[PageBlock] = []
-        for item in layout_items:
-            content = str(item.get("content", "")).strip()
-            if not content:
-                continue
-            page_blocks.append(
-                PageBlock(
-                    kind="asset" if item.get("type") in {"image", "table"} else "text",
-                    text=content,
-                    bbox=tuple(item["bbox"]),
-                    page_num=page_num,
-                    page_mode=page_mode,
-                )
-            )
-        return page_blocks
-
-    def _extract_hybrid_page_blocks(
-        self,
-        page_fitz: fitz.Page,
-        page_plumber,
-        page_num: int,
-        base_size: float,
-    ) -> List[PageBlock]:
+    def _extract_hybrid_page(self, page_fitz: fitz.Page, page_plumber, page_num: int, base_size: float) -> str:
         text_blocks = self._extract_page_text_blocks(page_fitz)
         used_text_block_ids = set()
         layout_items = []
@@ -1519,49 +1240,15 @@ class HybridPDFExtractor:
         )
         layout_items.extend(body_items)
 
-        return self._layout_items_to_page_blocks(
-            layout_items=layout_items,
-            page_num=page_num,
-            page_mode="hybrid_paper",
-            page_width=page_fitz.rect.width,
-        )
-
-    def _extract_hybrid_page(self, page_fitz: fitz.Page, page_plumber, page_num: int, base_size: float) -> str:
-        return self._render_page_blocks(
-            self._extract_hybrid_page_blocks(
-                page_fitz=page_fitz,
-                page_plumber=page_plumber,
-                page_num=page_num,
-                base_size=base_size,
-            )
-        )
+        # 5. assemble
+        return self._assemble_layout_items(layout_items, page_fitz.rect.width)
 
 
-    def _extract_ocr_page_blocks(
-        self,
-        page_fitz: fitz.Page,
-        page_num: int,
-        page_hint: Optional[Dict[str, Any]] = None,
-    ) -> List[PageBlock]:
+    def _extract_ocr_page(self, page_fitz: fitz.Page, page_num: int, page_hint: Optional[Dict[str, Any]] = None) -> str:
         if self.use_pdf_page_ocr:
             try:
                 md = self.ocr_backend.ocr_pdf_page(self.pdf_path, page_num=page_num, page_hint=page_hint)
-                return [
-                    PageBlock(
-                        kind="text",
-                        text=f"<!-- OCR page {page_num} -->",
-                        bbox=(0.0, 0.0, float(page_fitz.rect.width), 1.0),
-                        page_num=page_num,
-                        page_mode="ocr",
-                    ),
-                    PageBlock(
-                        kind="text",
-                        text=str(md or "").strip(),
-                        bbox=(0.0, 1.0, float(page_fitz.rect.width), float(page_fitz.rect.height)),
-                        page_num=page_num,
-                        page_mode="ocr",
-                    ),
-                ]
+                return f"\n\n<!-- OCR page {page_num} -->\n\n{md}\n\n"
             except Exception:
                 pass
 
@@ -1569,335 +1256,192 @@ class HybridPDFExtractor:
         try:
             md = self.ocr_backend.ocr_page_image(page_img_path, page_num=page_num, page_hint=page_hint)
         except Exception as exc:
+            # OCR server unavailable or failed — fall back to empty placeholder
+            # so the rest of the document can still be extracted.
             print(f"[HybridPDFExtractor] OCR failed for page {page_num}: {exc}")
             md = f"[OCR unavailable for page {page_num}]"
-        return [
-            PageBlock(
-                kind="text",
-                text=f"<!-- OCR page {page_num} -->",
-                bbox=(0.0, 0.0, float(page_fitz.rect.width), 1.0),
-                page_num=page_num,
-                page_mode="ocr",
-            ),
-            PageBlock(
-                kind="text",
-                text=str(md or "").strip(),
-                bbox=(0.0, 1.0, float(page_fitz.rect.width), float(page_fitz.rect.height)),
-                page_num=page_num,
-                page_mode="ocr",
-            ),
-        ]
+        return f"\n\n<!-- OCR page {page_num} -->\n\n{md}\n\n"
 
-    def _extract_ocr_page(self, page_fitz: fitz.Page, page_num: int, page_hint: Optional[Dict[str, Any]] = None) -> str:
-        return self._render_page_blocks(
-            self._extract_ocr_page_blocks(page_fitz, page_num=page_num, page_hint=page_hint)
-        )
-
-    def _suppress_repeated_page_furniture(self, page_models: List[PageModel]) -> List[PageModel]:
-        non_ocr_pages = [page_model for page_model in page_models if page_model.page_mode != "ocr"]
-        if len(non_ocr_pages) < 2:
-            return page_models
-
-        repeated_counts: Dict[str, int] = {}
-        block_norms_by_page: List[set[str]] = []
-        for page_model in non_ocr_pages:
-            page_norms: set[str] = set()
-            top_y = page_model.height * 0.12
-            bottom_y = page_model.height * 0.88
-            for block in page_model.blocks:
-                if block.kind != "text":
-                    continue
-                _, y0, _, y1 = block.bbox
-                if y0 > top_y and y1 < bottom_y:
-                    continue
-                normalized = _norm_page_furniture_text(block.text)
-                if len(normalized) < 12 or normalized.isdigit():
-                    continue
-                page_norms.add(normalized)
-            block_norms_by_page.append(page_norms)
-            for normalized in page_norms:
-                repeated_counts[normalized] = repeated_counts.get(normalized, 0) + 1
-
-        min_repeat = 2 if len(non_ocr_pages) <= 4 else 3
-        furniture_norms = {
-            normalized
-            for normalized, count in repeated_counts.items()
-            if count >= min_repeat and count / max(len(non_ocr_pages), 1) >= 0.3
-        }
-        if not furniture_norms:
-            return page_models
-
-        cleaned_pages: List[PageModel] = []
-        for page_model in page_models:
-            if page_model.page_mode == "ocr":
-                cleaned_pages.append(page_model)
-                continue
-            top_y = page_model.height * 0.12
-            bottom_y = page_model.height * 0.88
-            cleaned_blocks: List[PageBlock] = []
-            for block in page_model.blocks:
-                if block.kind != "text":
-                    cleaned_blocks.append(block)
-                    continue
-                _, y0, _, y1 = block.bbox
-                if y0 > top_y and y1 < bottom_y:
-                    cleaned_blocks.append(block)
-                    continue
-                normalized = _norm_page_furniture_text(block.text)
-                if normalized in furniture_norms:
-                    continue
-                cleaned_blocks.append(block)
-            cleaned_pages.append(
-                PageModel(
-                    page_num=page_model.page_num,
-                    page_mode=page_model.page_mode,
-                    width=page_model.width,
-                    height=page_model.height,
-                    blocks=cleaned_blocks,
-                )
-            )
-        return cleaned_pages
-
-    def _infer_document_title_hint(self, page_models: List[PageModel]) -> str:
-        for page_model in page_models[:2]:
-            if page_model.page_mode == "ocr":
-                continue
-            for block in page_model.blocks:
-                if block.kind != "text":
-                    continue
-                text = str(block.text or "").strip()
-                if not text:
-                    continue
-                if text.startswith("<!--"):
-                    continue
-                if text.startswith("#"):
-                    text = re.sub(r"^#{1,6}\s+", "", text).strip()
-                normalized = _norm_page_furniture_text(text)
-                if len(normalized) < 8:
-                    continue
-                if normalized.startswith("arxiv ") or normalized.startswith("name ") or normalized.startswith("student id"):
-                    continue
-                if normalized in {"abstract", "introduction", "keywords"}:
-                    continue
-                return text
-        return self.pdf_name
-
-    def _extract_document_outline_entries(self, doc_fitz: fitz.Document) -> List[DocumentOutlineEntry]:
-        outline_entries: List[DocumentOutlineEntry] = []
-        try:
-            raw_toc = doc_fitz.get_toc(simple=False)
-        except Exception:
-            return outline_entries
-
-        for entry in raw_toc or []:
-            if not entry or len(entry) < 3:
-                continue
-            try:
-                level = max(1, int(entry[0]))
-                title = " ".join(str(entry[1] or "").split()).strip()
-                page_num = int(entry[2] or 0)
-                dest = entry[3] if len(entry) >= 4 and isinstance(entry[3], dict) else {}
-                point = dest.get("to")
-                x = float(getattr(point, "x", 0.0) or 0.0)
-                y = float(getattr(point, "y", 0.0) or 0.0)
-            except Exception:
-                continue
-            if not title:
-                continue
-            outline_entries.append(
-                DocumentOutlineEntry(
-                    title=title,
-                    level=level,
-                    page_num=page_num,
-                    x=x,
-                    y=y,
-                )
-            )
-        return outline_entries
-
-    def _infer_outline_y_uses_top_origin(
+    def _build_non_ocr_document_profile(
         self,
-        page_models: List[PageModel],
-        outline_entries: List[DocumentOutlineEntry],
-    ) -> bool:
-        page_model_by_num = {page_model.page_num: page_model for page_model in page_models if page_model.page_mode != "ocr"}
-        top_error = 0.0
-        bottom_error = 0.0
-        matched = 0
-
-        for entry in outline_entries:
-            page_model = page_model_by_num.get(entry.page_num)
-            if page_model is None or not entry.title:
-                continue
-
-            entry_norm = normalize_heading_title(entry.title)
-            if not entry_norm:
-                continue
-
-            candidate_y_values: List[float] = []
-            for block in page_model.blocks:
-                if block.kind != "text":
-                    continue
-                block_text = re.sub(r"^#{1,6}\s+", "", str(block.text or "").strip()).strip()
-                if normalize_heading_title(block_text) == entry_norm:
-                    candidate_y_values.append(float(block.bbox[1]))
-
-            if not candidate_y_values:
-                continue
-
-            target_y = min(candidate_y_values, key=lambda y0: abs(y0 - float(entry.y or 0.0)))
-            entry_y = float(entry.y or 0.0)
-            top_error += abs(target_y - entry_y)
-            bottom_error += abs(target_y - (page_model.height - entry_y))
-            matched += 1
-
-        if matched == 0:
-            return False
-        return top_error <= bottom_error
-
-    def _inject_missing_outline_headings(
-        self,
-        page_models: List[PageModel],
-        outline_entries: List[DocumentOutlineEntry],
         *,
-        title_hint: str,
-    ) -> List[PageModel]:
-        if not outline_entries:
-            return page_models
+        page_numbers: List[int],
+        page_stats: List[Dict[str, Any]],
+        total_pages: int,
+    ) -> DocumentContentProfile:
+        page_info_by_num = {
+            int(page_stat.get("page_num") or 0): page_stat
+            for page_stat in page_stats
+            if int(page_stat.get("page_num") or 0) > 0
+        }
+        routing_pages = [
+            page_info_by_num[page_num]
+            for page_num in page_numbers
+            if page_num in page_info_by_num
+        ]
+        return build_document_content_profile(routing_pages, total_pages=total_pages)
 
-        page_model_by_num = {page_model.page_num: page_model for page_model in page_models}
-        title_norm = normalize_heading_title(title_hint)
-        existing_norms_by_page: Dict[int, set] = {}
-        outline_y_uses_top_origin = self._infer_outline_y_uses_top_origin(page_models, outline_entries)
+    def _extract_non_ocr_segments(self, page_numbers: List[int]):
+        bridge = IaPhase1Bridge(
+            pdf_path=self.pdf_path,
+            pdf_name=self.pdf_name,
+            assets_root=self.assets_dir,
+        )
+        result = bridge.extract_non_ocr_pages(page_allowlist=page_numbers)
+        missing = sorted(set(page_numbers) - set(result.page_segments))
+        if missing:
+            raise ValueError(f"ia_phase1 bridge did not return markdown for non-OCR pages: {missing}")
+        return result
 
-        for page_model in page_models:
-            norms = set()
-            for block in page_model.blocks:
-                if block.kind != "text":
-                    continue
-                text = re.sub(r"^#{1,6}\s+", "", str(block.text or "").strip()).strip()
-                norm = normalize_heading_title(text)
-                if norm:
-                    norms.add(norm)
-            existing_norms_by_page[page_model.page_num] = norms
+    def _extract_native_non_ocr_page(
+        self,
+        *,
+        page_fitz: fitz.Page,
+        page_plumber,
+        page_num: int,
+        page_mode: str,
+        base_size: float,
+    ) -> str:
+        if page_mode == "hybrid_paper":
+            return self._extract_hybrid_page(page_fitz, page_plumber, page_num, base_size)
+        return self._extract_simple_text_page(page_fitz, base_size)
 
-        for entry in outline_entries:
-            page_model = page_model_by_num.get(entry.page_num)
-            if page_model is None or page_model.page_mode == "ocr":
+    def _extract_native_non_ocr_runs(
+        self,
+        *,
+        runs,
+        page_modes: Dict[int, str],
+        doc_fitz: fitz.Document,
+        doc_plumber,
+        base_size: float,
+    ) -> Dict[int, str]:
+        segments: Dict[int, str] = {}
+        for run in runs:
+            if run.handler != "native":
                 continue
-
-            entry_norm = normalize_heading_title(entry.title)
-            if not entry_norm or entry_norm == title_norm:
-                continue
-            if entry_norm in existing_norms_by_page.get(entry.page_num, set()):
-                continue
-
-            level = max(2, min(int(entry.level) + 1, 6))
-            entry_y = float(entry.y or 0.0)
-            y0 = max(entry_y if outline_y_uses_top_origin else (page_model.height - entry_y), 0.0) if entry_y > 0 else 0.0
-            x0 = max(float(entry.x or 0.0), 0.0)
-            x1 = min(x0 + max(120.0, page_model.width * 0.24), page_model.width)
-            y1 = min(y0 + 14.0, page_model.height)
-            page_model.blocks.append(
-                PageBlock(
-                    kind="text",
-                    text=f"{'#' * level} {entry.title}",
-                    bbox=(x0, y0, max(x1, x0 + 1.0), max(y1, y0 + 1.0)),
-                    page_num=entry.page_num,
-                    page_mode=page_model.page_mode,
+            for page_num in run.page_numbers:
+                page_index = page_num - 1
+                segments[page_num] = self._extract_native_non_ocr_page(
+                    page_fitz=doc_fitz[page_index],
+                    page_plumber=doc_plumber.pages[page_index],
+                    page_num=page_num,
+                    page_mode=page_modes[page_num],
+                    base_size=base_size,
                 )
-            )
-            existing_norms_by_page.setdefault(entry.page_num, set()).add(entry_norm)
-
-        for page_model in page_models:
-            self._order_page_model_blocks(page_model)
-        return page_models
-
-    def _render_page_models(self, page_models: List[PageModel], doc_mode: str) -> str:
-        full_markdown = [f"# {self.pdf_name}\n", f"<!-- document_mode: {doc_mode} -->\n"]
-        for page_model in page_models:
-            full_markdown.append(f"\n<!-- page {page_model.page_num} mode: {page_model.page_mode} -->\n")
-            full_markdown.append(self._render_page_blocks(page_model.blocks))
-            full_markdown.append("\n---\n")
-        md = "\n".join(full_markdown)
-        md = re.sub(r"\n{3,}", "\n\n", md)
-        return md.strip()
+        return segments
 
     # -------------------------------------------------------------------------
     # Main public APIs
     # -------------------------------------------------------------------------
 
     def extract_to_markdown(self) -> str:
+        self.last_routing_info = {}
+        self._reset_asset_dirs()
         doc_fitz = fitz.open(self.pdf_path)
         doc_plumber = pdfplumber.open(self.pdf_path)
         base_size = self._get_base_font_size(doc_fitz)
-        outline_entries = self._extract_document_outline_entries(doc_fitz)
 
         page_stats = []
         for i in range(len(doc_fitz)):
-            page_stats.append(self._analyze_page(doc_fitz[i], doc_plumber.pages[i]))
+            page_stats.append(
+                self._analyze_page(
+                    doc_fitz[i],
+                    doc_plumber.pages[i],
+                    page_num=i + 1,
+                    base_size=base_size,
+                )
+            )
 
         doc_mode = self._classify_document(page_stats)
 
-        page_models: List[PageModel] = []
+        page_modes: Dict[int, str] = {}
+        non_ocr_pages: List[int] = []
+        for page_index, page_stat in enumerate(page_stats):
+            display_page_num = page_index + 1
+            page_mode = self._classify_page(page_stat, doc_mode)
+            page_modes[display_page_num] = page_mode
+            if page_mode != "ocr":
+                non_ocr_pages.append(display_page_num)
+
+        non_ocr_segments: Dict[int, str] = {}
+        document_title = self.pdf_name
+        routing_profile = None
+        if non_ocr_pages:
+            routing_profile = self._build_non_ocr_document_profile(
+                page_numbers=non_ocr_pages,
+                page_stats=page_stats,
+                total_pages=len(doc_fitz),
+            )
+
+            native_segments = self._extract_native_non_ocr_runs(
+                runs=routing_profile.runs,
+                page_modes=page_modes,
+                doc_fitz=doc_fitz,
+                doc_plumber=doc_plumber,
+                base_size=base_size,
+            )
+            non_ocr_segments.update(native_segments)
+
+            for run in routing_profile.runs:
+                if run.handler != "ia_phase1":
+                    continue
+                bridge_result = self._extract_non_ocr_segments(run.page_numbers)
+                non_ocr_segments.update(bridge_result.page_segments)
+                if 1 in run.page_numbers and str(bridge_result.document_title or "").strip():
+                    document_title = str(bridge_result.document_title).strip()
+
+            self.last_routing_info = {
+                "document_handler": routing_profile.document_handler,
+                "ia_score": routing_profile.scores.get("ia_score"),
+                "native_score": routing_profile.scores.get("native_score"),
+                "scores": dict(routing_profile.scores),
+                "page_handlers": {
+                    int(profile.page_num): str(profile.handler)
+                    for profile in routing_profile.page_profiles
+                },
+                "runs": [
+                    {
+                        "handler": str(run.handler),
+                        "page_numbers": list(run.page_numbers),
+                    }
+                    for run in routing_profile.runs
+                ],
+            }
+        else:
+            self.last_routing_info = {
+                "document_handler": "native",
+                "ia_score": 0,
+                "native_score": 0,
+                "scores": {"ia_score": 0, "native_score": 0},
+                "page_handlers": {},
+                "runs": [],
+            }
+
+        full_markdown = [f"# {document_title}\n"]
+        full_markdown.append(f"<!-- document_mode: {doc_mode} -->\n")
 
         for page_index in range(len(doc_fitz)):
             display_page_num = page_index + 1
             page_fitz = doc_fitz[page_index]
-            page_plumber = doc_plumber.pages[page_index]
             page_stat = page_stats[page_index]
-            page_mode = self._classify_page(page_stat, doc_mode)
+            page_mode = page_modes[display_page_num]
 
-            if page_mode == "simple_text":
-                page_blocks = self._extract_simple_text_page_blocks(
-                    page_fitz,
-                    page_num=display_page_num,
-                    base_size=base_size,
-                )
-            elif page_mode == "hybrid_paper":
-                page_blocks = self._extract_hybrid_page_blocks(
-                    page_fitz,
-                    page_plumber,
-                    display_page_num,
-                    base_size,
-                )
+            full_markdown.append(f"\n<!-- page {display_page_num} mode: {page_mode} -->\n")
+
+            if page_mode == "ocr":
+                page_md = self._extract_ocr_page(page_fitz, display_page_num, page_hint=page_stat)
             else:
-                page_blocks = self._extract_ocr_page_blocks(
-                    page_fitz,
-                    display_page_num,
-                    page_hint=page_stat,
-                )
-            page_models.append(
-                PageModel(
-                    page_num=display_page_num,
-                    page_mode=page_mode,
-                    width=float(page_fitz.rect.width),
-                    height=float(page_fitz.rect.height),
-                    blocks=page_blocks,
-                )
-            )
+                page_md = non_ocr_segments.get(display_page_num, "")
+
+            full_markdown.append(page_md)
+            full_markdown.append("\n---\n")
 
         doc_fitz.close()
         doc_plumber.close()
 
-        page_models = self._suppress_repeated_page_furniture(page_models)
-        title_hint = self._infer_document_title_hint(page_models)
-        page_models = self._inject_missing_outline_headings(
-            page_models,
-            outline_entries,
-            title_hint=title_hint,
-        )
-        md = self._render_page_models(page_models, doc_mode=doc_mode)
-        if normalize_markdown is not None:
-            try:
-                md = normalize_markdown(
-                    md,
-                    title_hint=title_hint,
-                    outline_entries=outline_entries,
-                ).strip()
-            except Exception as exc:
-                print(f"[HybridPDFExtractor] markdown post-processing skipped: {exc}")
-        return md
+        md = "\n".join(full_markdown)
+        md = re.sub(r"\n{3,}", "\n\n", md)
+        return md.strip()
 
     def save_markdown(self, output_path: Optional[str] = None) -> str:
         md = self.extract_to_markdown()
@@ -1914,6 +1458,7 @@ class HybridPDFExtractor:
             "pdf_name": self.pdf_name,
             "assets_dir": self.assets_dir,
             "markdown": md,
+            "routing": dict(self.last_routing_info),
         }
 
 

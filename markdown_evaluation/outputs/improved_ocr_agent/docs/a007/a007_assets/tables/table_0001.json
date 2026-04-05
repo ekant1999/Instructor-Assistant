@@ -1,0 +1,66 @@
+{
+  "paper_id": 601530298732,
+  "page_no": 3,
+  "bbox": {
+    "x0": 54.00227425315163,
+    "y0": 75.74431501116071,
+    "x1": 558.2527077414773,
+    "y1": 192.08570207868303
+  },
+  "caption": "3. Summary Table and Findings",
+  "n_rows": 4,
+  "n_cols": 6,
+  "headers": [
+    "Run",
+    "RPS",
+    "Avg Latency (ms)",
+    "P95 (ms)",
+    "CPU Peak %",
+    "Outcome"
+  ],
+  "rows": [
+    [
+      "baseline",
+      "228",
+      "146",
+      "212",
+      "54",
+      "stable"
+    ],
+    [
+      "cache enabled",
+      "281",
+      "132",
+      "198",
+      "57",
+      "stable"
+    ],
+    [
+      "write burst",
+      "244",
+      "188",
+      "326",
+      "71",
+      "watch"
+    ],
+    [
+      "reduced worker\ncount",
+      "208",
+      "201",
+      "352",
+      "68",
+      "degraded"
+    ]
+  ],
+  "markdown": "|Run|RPS|Avg Latency (ms)|P95 (ms)|CPU Peak %|Outcome|\n|---|---|---|---|---|---|\n|baseline|228|146|212|54|stable|\n|cache enabled|281|132|198|57|stable|\n|write burst|244|188|326|71|watch|\n|reduced worker count|208|201|352|68|degraded|",
+  "csv_text": "Run,RPS,Avg Latency (ms),P95 (ms),CPU Peak %,Outcome\r\nbaseline,228,146,212,54,stable\r\ncache enabled,281,132,198,57,stable\r\nwrite burst,244,188,326,71,watch\r\n\"reduced worker\ncount\",208,201,352,68,degraded",
+  "section_canonical": "results",
+  "section_title": "Summary Table and Findings",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_lines_strict",
+  "id": 1,
+  "json_file": "table_0001.json"
+}

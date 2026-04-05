@@ -1,0 +1,44 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 17,
+  "bbox": {
+    "x0": 71.60700225830078,
+    "y0": 216.1017608642578,
+    "x1": 540.5101318359375,
+    "y1": 533.8458862304688
+  },
+  "caption": "Table 11 consolidates practitioner recommendations.",
+  "n_rows": 2,
+  "n_cols": 4,
+  "headers": [
+    "0 500 1000",
+    "1500 2000",
+    "5 00 1000 1500 2 000 0 500",
+    "1000 1500 2000"
+  ],
+  "rows": [
+    [
+      "Training",
+      "step",
+      "Training step Trai",
+      "ning step"
+    ],
+    [
+      "Figure 12: Converg",
+      "ence: eager vs.",
+      "fused are visuallyindistinguishable (Qwen3.5-9",
+      "B-Base, r=384,"
+    ]
+  ],
+  "markdown": "|0 500 1000|1500 2000|5|00 1000|1500 2|000|0 500|1000 1500 2000|\n|---|---|---|---|---|---|---|---|\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||\n|||||||||",
+  "csv_text": "0 500 1000,1500 2000,5 00 1000 1500 2 000 0 500,1000 1500 2000\r\nTraining,step,Training step Trai,ning step\r\nFigure 12: Converg,ence: eager vs.,fused are visuallyindistinguishable (Qwen3.5-9,\"B-Base, r=384,\"",
+  "section_canonical": "discussion",
+  "section_title": "Discussion",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": "Figure 12: Convergence: eager vs. fused are visually indistinguishable (Qwen3.5-9B-Base, r=384, seed 3 of 3). (a) Training loss (25-step smoothing). (b) Eval loss (200-step intervals). (c) Gradient norms.",
+  "merged_fragments": 1,
+  "detection_strategy": "text_caption_fallback",
+  "id": 11,
+  "json_file": "table_0011.json"
+}

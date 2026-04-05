@@ -1,0 +1,81 @@
+{
+  "paper_id": 809605950643,
+  "page_no": 18,
+  "bbox": {
+    "x0": 72.0,
+    "y0": 100.9004898071289,
+    "x1": 395.71417236328125,
+    "y1": 266.8318176269531
+  },
+  "caption": "Table 11: Recommended configuration by scenario.",
+  "n_rows": 10,
+  "n_cols": 3,
+  "headers": [
+    "Scenario Training, CUDA,",
+    "Config Tier 1 (fu sed bwd)",
+    "Rationale Full speedup; 0.1–1 .0 GB le"
+  ],
+  "rows": [
+    [
+      "above crossover",
+      "",
+      ""
+    ],
+    [
+      "Training,",
+      "Tier 1 + frozen mag",
+      "inner skipped; low er peak"
+    ],
+    [
+      "memory-constrained",
+      "",
+      ""
+    ],
+    [
+      "Inference, CUDA",
+      "Tier 2 (fu sed fwd)",
+      "Compose speedup, no back"
+    ],
+    [
+      "CPU / no Triton",
+      "Tier 3 (ea ger)",
+      "Automatic fallback"
+    ],
+    [
+      "r 384, any single\n≥",
+      "Factored norm",
+      "PEFT path 46–87% slower"
+    ],
+    [
+      "GPU",
+      "",
+      ""
+    ],
+    [
+      "r 64, d 4096\n≤ ≤",
+      "Either no rm",
+      "Factored overhead minimal"
+    ],
+    [
+      "Colocated train +",
+      "Factored norm",
+      "Dense temporaries compete"
+    ],
+    [
+      "infer",
+      "",
+      ""
+    ]
+  ],
+  "markdown": "| Scenario Training, CUDA, | Config Tier 1 (fu sed bwd) | Rationale Full speedup; 0.1–1 .0 GB le |\n| --- | --- | --- |\n| above crossover |  |  |\n| Training, | Tier 1 + frozen mag | inner skipped; low er peak |\n| memory-constrained |  |  |\n| Inference, CUDA | Tier 2 (fu sed fwd) | Compose speedup, no back |\n| CPU / no Triton | Tier 3 (ea ger) | Automatic fallback |\n| r 384, any single<br/>≥ | Factored norm | PEFT path 46–87% slower |\n| GPU |  |  |\n| r 64, d 4096<br/>≤ ≤ | Either no rm | Factored overhead minimal |\n| Colocated train + | Factored norm | Dense temporaries compete |\n| infer |  |  |",
+  "csv_text": "\"Scenario Training, CUDA,\",Config Tier 1 (fu sed bwd),Rationale Full speedup; 0.1–1 .0 GB le\r\nabove crossover,,\r\n\"Training,\",Tier 1 + frozen mag,inner skipped; low er peak\r\nmemory-constrained,,\r\n\"Inference, CUDA\",Tier 2 (fu sed fwd),\"Compose speedup, no back\"\r\nCPU / no Triton,Tier 3 (ea ger),Automatic fallback\r\n\"r 384, any single\n≥\",Factored norm,PEFT path 46–87% slower\r\nGPU,,\r\n\"r 64, d 4096\n≤ ≤\",Either no rm,Factored overhead minimal\r\nColocated train +,Factored norm,Dense temporaries compete\r\ninfer,,",
+  "section_canonical": "discussion",
+  "section_title": "Discussion",
+  "section_source": "pdf_toc",
+  "section_confidence": 0.98,
+  "figure_caption_nearby": null,
+  "merged_fragments": 1,
+  "detection_strategy": "pymupdf_text_reconstructed",
+  "id": 12,
+  "json_file": "table_0012.json"
+}
