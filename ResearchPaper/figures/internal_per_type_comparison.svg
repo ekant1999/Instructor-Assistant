@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="700" viewBox="0 0 1280 700" role="img">
+<rect width="1280" height="700" fill="#ffffff"/>
+<text x="40.0" y="36.0" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#18222d" text-anchor="start">Internal Benchmark: Performance by Document Family</text>
+<text x="40.0" y="60.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="400" fill="#5a6875" text-anchor="start">Per-type results on the expanded 120-document corpus</text>
+<text x="40.0" y="108.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#18222d" text-anchor="start">Heading F1 by document family</text>
+<line x1="96.0" y1="514.0" x2="596.0" y2="514.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="86.0" y="518.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">0.0</text>
+<line x1="96.0" y1="436.0" x2="596.0" y2="436.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="86.0" y="440.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">0.2</text>
+<line x1="96.0" y1="358.0" x2="596.0" y2="358.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="86.0" y="362.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">0.4</text>
+<line x1="96.0" y1="280.0" x2="596.0" y2="280.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="86.0" y="284.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">0.6</text>
+<line x1="96.0" y1="202.0" x2="596.0" y2="202.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="86.0" y="206.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">0.8</text>
+<line x1="96.0" y1="124.0" x2="596.0" y2="124.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="86.0" y="128.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">1.0</text>
+<line x1="96.0" y1="124.0" x2="96.0" y2="514.0" stroke="#24323f" stroke-width="1.3"/>
+<line x1="96.0" y1="514.0" x2="596.0" y2="514.0" stroke="#24323f" stroke-width="1.3"/>
+<text x="179.3" y="538.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#18222d" text-anchor="middle">ResearchPapers</text>
+<rect x="117.7" y="247.2" width="37.8" height="266.8" fill="#1f4b7a" rx="2" ry="2"/>
+<text x="136.6" y="241.2" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.684</text>
+<rect x="160.4" y="369.3" width="37.8" height="144.7" fill="#b55d2d" rx="2" ry="2"/>
+<text x="179.3" y="363.3" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.371</text>
+<rect x="203.2" y="268.7" width="37.8" height="245.3" fill="#2f6b3f" rx="2" ry="2"/>
+<text x="222.1" y="262.7" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.629</text>
+<text x="346.0" y="538.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#18222d" text-anchor="middle">Hybrid</text>
+<rect x="284.3" y="453.2" width="37.8" height="60.8" fill="#1f4b7a" rx="2" ry="2"/>
+<text x="303.2" y="447.2" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.156</text>
+<rect x="327.1" y="456.7" width="37.8" height="57.3" fill="#b55d2d" rx="2" ry="2"/>
+<text x="346.0" y="450.7" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.147</text>
+<rect x="369.8" y="455.5" width="37.8" height="58.5" fill="#2f6b3f" rx="2" ry="2"/>
+<text x="388.8" y="449.5" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.150</text>
+<text x="512.7" y="538.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#18222d" text-anchor="middle">TextHeavy</text>
+<rect x="451.0" y="355.3" width="37.8" height="158.7" fill="#1f4b7a" rx="2" ry="2"/>
+<text x="469.9" y="349.3" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.407</text>
+<rect x="493.8" y="222.3" width="37.8" height="291.7" fill="#b55d2d" rx="2" ry="2"/>
+<text x="512.7" y="216.3" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.748</text>
+<rect x="536.5" y="222.3" width="37.8" height="291.7" fill="#2f6b3f" rx="2" ry="2"/>
+<text x="555.4" y="216.3" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.748</text>
+<text x="660.0" y="108.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#18222d" text-anchor="start">Anchor assignment accuracy by document family</text>
+<line x1="716.0" y1="514.0" x2="1216.0" y2="514.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="706.0" y="518.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">0.0</text>
+<line x1="716.0" y1="436.0" x2="1216.0" y2="436.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="706.0" y="440.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">0.2</text>
+<line x1="716.0" y1="358.0" x2="1216.0" y2="358.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="706.0" y="362.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">0.4</text>
+<line x1="716.0" y1="280.0" x2="1216.0" y2="280.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="706.0" y="284.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">0.6</text>
+<line x1="716.0" y1="202.0" x2="1216.0" y2="202.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="706.0" y="206.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">0.8</text>
+<line x1="716.0" y1="124.0" x2="1216.0" y2="124.0" stroke="#d6dde5" stroke-width="1"/>
+<text x="706.0" y="128.0" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5a6875" text-anchor="end">1.0</text>
+<line x1="716.0" y1="124.0" x2="716.0" y2="514.0" stroke="#24323f" stroke-width="1.3"/>
+<line x1="716.0" y1="514.0" x2="1216.0" y2="514.0" stroke="#24323f" stroke-width="1.3"/>
+<text x="799.3" y="538.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#18222d" text-anchor="middle">ResearchPapers</text>
+<rect x="737.7" y="290.9" width="37.8" height="223.1" fill="#1f4b7a" rx="2" ry="2"/>
+<text x="756.6" y="284.9" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.572</text>
+<rect x="780.4" y="380.6" width="37.8" height="133.4" fill="#b55d2d" rx="2" ry="2"/>
+<text x="799.3" y="374.6" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.342</text>
+<rect x="823.2" y="295.6" width="37.8" height="218.4" fill="#2f6b3f" rx="2" ry="2"/>
+<text x="842.1" y="289.6" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.560</text>
+<text x="966.0" y="538.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#18222d" text-anchor="middle">Hybrid</text>
+<rect x="904.3" y="464.5" width="37.8" height="49.5" fill="#1f4b7a" rx="2" ry="2"/>
+<text x="923.2" y="458.5" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.127</text>
+<rect x="947.1" y="454.7" width="37.8" height="59.3" fill="#b55d2d" rx="2" ry="2"/>
+<text x="966.0" y="448.7" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.152</text>
+<rect x="989.8" y="454.7" width="37.8" height="59.3" fill="#2f6b3f" rx="2" ry="2"/>
+<text x="1008.8" y="448.7" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.152</text>
+<text x="1132.7" y="538.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#18222d" text-anchor="middle">TextHeavy</text>
+<rect x="1071.0" y="424.7" width="37.8" height="89.3" fill="#1f4b7a" rx="2" ry="2"/>
+<text x="1089.9" y="418.7" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.229</text>
+<rect x="1113.8" y="180.2" width="37.8" height="333.8" fill="#b55d2d" rx="2" ry="2"/>
+<text x="1132.7" y="174.2" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.856</text>
+<rect x="1156.5" y="180.2" width="37.8" height="333.8" fill="#2f6b3f" rx="2" ry="2"/>
+<text x="1175.4" y="174.2" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#5a6875" text-anchor="middle">0.856</text>
+<rect x="215.0" y="602.0" width="14.0" height="14.0" fill="#1f4b7a" rx="2" ry="2"/>
+<text x="237.0" y="613.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#18222d" text-anchor="start">scholar_parser</text>
+<rect x="405.0" y="602.0" width="14.0" height="14.0" fill="#b55d2d" rx="2" ry="2"/>
+<text x="427.0" y="613.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#18222d" text-anchor="start">ocr_agent</text>
+<rect x="595.0" y="602.0" width="14.0" height="14.0" fill="#2f6b3f" rx="2" ry="2"/>
+<text x="617.0" y="613.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#18222d" text-anchor="start">improved_ocr_agent</text>
+</svg>

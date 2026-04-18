@@ -1,0 +1,55 @@
+\begin{tikzpicture}
+\begin{axis}[
+    width=\columnwidth,
+    height=0.72\columnwidth,
+    ybar,
+    bar width=8pt,
+    ymin=0,
+    ymax=1.05,
+    ylabel={Score},
+    symbolic x coords={Heading F1,Anchor Acc.,Figure Rec.,Table Rec.},
+    xtick=data,
+    x tick label style={font=\footnotesize, align=center},
+    ytick={0,0.2,0.4,0.6,0.8,1.0},
+    legend style={font=\footnotesize, draw=none, at={(0.5,1.02)}, anchor=south, legend columns=3},
+    nodes near coords,
+    nodes near coords style={
+        font=\tiny,
+        /pgf/number format/fixed,
+        /pgf/number format/precision=2
+    },
+    enlarge x limits=0.18,
+    axis line style={black!70},
+    ymajorgrids=true,
+    grid style={draw=black!12}
+]
+\addplot+[
+    fill=blue!70!black,
+    every node near coord/.append style={anchor=south east, xshift=-2pt}
+] coordinates {
+    (Heading F1,0.416)
+    (Anchor Acc.,0.309)
+    (Figure Rec.,1.000)
+    (Table Rec.,0.957)
+};
+\addplot+[
+    fill=orange!85!black,
+    every node near coord/.append style={anchor=south, yshift=1pt}
+] coordinates {
+    (Heading F1,0.422)
+    (Anchor Acc.,0.450)
+    (Figure Rec.,0.573)
+    (Table Rec.,1.000)
+};
+\addplot+[
+    fill=green!55!black,
+    every node near coord/.append style={anchor=south west, xshift=2pt}
+] coordinates {
+    (Heading F1,0.509)
+    (Anchor Acc.,0.523)
+    (Figure Rec.,0.980)
+    (Table Rec.,0.952)
+};
+\legend{\scholar,\ocragent,\improvedocr}
+\end{axis}
+\end{tikzpicture}

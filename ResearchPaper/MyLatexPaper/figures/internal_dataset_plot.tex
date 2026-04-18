@@ -1,0 +1,27 @@
+\begin{tikzpicture}
+\begin{axis}[
+    width=\columnwidth,
+    height=0.62\columnwidth,
+    ybar,
+    bar width=16pt,
+    ymin=0,
+    ymax=50,
+    ylabel={Documents},
+    symbolic x coords={Research,Hybrid,Text-heavy},
+    xtick=data,
+    x tick label style={font=\footnotesize},
+    ytick={0,10,20,30,40,50},
+    nodes near coords,
+    nodes near coords style={font=\scriptsize},
+    enlarge x limits=0.28,
+    axis line style={black!70},
+    ymajorgrids=true,
+    grid style={draw=black!12}
+]
+\addplot+[fill=green!55!black] coordinates {
+    (Research,40)
+    (Hybrid,40)
+    (Text-heavy,40)
+};
+\end{axis}
+\end{tikzpicture}
