@@ -131,6 +131,48 @@ class HeaderFooterTests(unittest.TestCase):
         self.assertIs(result.provenance["top_margin"]["emitted"], False)
         self.assertEqual(result.provenance["bottom_margin"]["drop_reason"], "boilerplate_pattern")
 
+    def test_page_assembler_strips_outer_markdown_code_fence(self):
+        body = _block("body", BlockType.PARAGRAPH, "body")
+        graph = _graph([body])
+        page = PageImageBundle(page_id="page_1", image_path="page.png", width=1000, height=2000)
+        selected = {
+            "body": _selected(body, "```markdown\n# Title\n\nBody text\n```", emit=True),
+        }
+
+        result = MarkdownPageAssembler().assemble(page, graph, selected)
+
+        self.assertEqual(result.markdown, "# Title\n\nBody text")
+        self.assertEqual(result.provenance["body"]["content_preview"], "# Title\n\nBody text")
+
+    def test_page_assembler_strips_unclosed_outer_markdown_code_fence(self):
+        body = _block("body", BlockType.PARAGRAPH, "body")
+        graph = _graph([body])
+        page = PageImageBundle(page_id="page_1", image_path="page.png", width=1000, height=2000)
+        selected = {
+            "body": _selected(body, "```markdown\n# Title\n\nBody text", emit=True),
+        }
+
+        result = MarkdownPageAssembler().assemble(page, graph, selected)
+
+        self.assertEqual(result.markdown, "# Title\n\nBody text")
+
+    def test_page_assembler_suppresses_margin_duplicate_of_body_prefix(self):
+        top = _block("top_margin", BlockType.HEADER_FOOTER, "top")
+        body = _block("body", BlockType.PARAGRAPH, "body")
+        graph = _graph([top, body])
+        page = PageImageBundle(page_id="page_1", image_path="page.png", width=1000, height=2000)
+        selected = {
+            "top_margin": _selected(top, "Chapter 1\nElementary and Secondary", emit=True),
+            "body": _selected(body, "# Chapter 1\nElementary and Secondary\nMathematics", emit=True),
+        }
+
+        result = MarkdownPageAssembler().assemble(page, graph, selected)
+
+        self.assertEqual(result.markdown, "# Chapter 1\nElementary and Secondary\nMathematics")
+        self.assertEqual(result.ordered_blocks, ["body"])
+        self.assertIs(result.provenance["top_margin"]["emitted"], False)
+        self.assertEqual(result.provenance["top_margin"]["drop_reason"], "duplicate_body_prefix")
+
 
 def _write_png_header(path: Path, *, width: int, height: int) -> None:
     path.write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x00" * 8 + struct.pack(">II", width, height))
