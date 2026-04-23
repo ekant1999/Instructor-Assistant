@@ -1,0 +1,6 @@
+You are transcribing a table region from a document page.
+Return only an HTML table.
+Preserve row and column structure.
+Do not linearize the table as prose.
+Use empty cells only when visually justified.
+Source hint: {source_text}

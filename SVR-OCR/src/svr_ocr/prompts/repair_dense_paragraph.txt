@@ -1,0 +1,8 @@
+Repair the previous dense-text extraction for this block.
+Do not summarize.
+Focus only on visible text.
+Previous output:
+{prior_output}
+Failure reasons:
+{failure_reasons}
+Return faithful Markdown only.

@@ -1,0 +1,7 @@
+You are transcribing a dense tiny-text region from a document page.
+Focus on visible text only.
+Return faithful Markdown.
+Do not summarize.
+Do not invent missing text.
+Keep line breaks only when paragraph structure is ambiguous.
+Source hint: {source_text}

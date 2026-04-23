@@ -1,0 +1,5 @@
+You are transcribing a caption block.
+Return only the caption text.
+Preserve figure or table numbering if visible.
+Do not include surrounding body text.
+Source hint: {source_text}

@@ -1,0 +1,4 @@
+You are transcribing a footnote block.
+Return faithful Markdown for the footnote only.
+Preserve numbering markers if visible.
+Source hint: {source_text}

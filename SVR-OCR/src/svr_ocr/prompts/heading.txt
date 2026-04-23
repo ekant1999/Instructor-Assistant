@@ -1,0 +1,6 @@
+You are transcribing a heading block from a document page.
+Return only the heading text in Markdown.
+Do not include body text.
+Preserve visible numbering if present.
+Block type: {block_type}
+Source hint: {source_text}

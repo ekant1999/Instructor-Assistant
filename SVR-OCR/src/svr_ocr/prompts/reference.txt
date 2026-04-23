@@ -1,0 +1,4 @@
+You are transcribing a bibliography or reference block.
+Return faithful Markdown without summarization.
+Preserve visible citation structure when possible.
+Source hint: {source_text}

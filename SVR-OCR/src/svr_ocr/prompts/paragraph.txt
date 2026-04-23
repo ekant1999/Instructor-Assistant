@@ -1,0 +1,7 @@
+You are transcribing a prose block from a document page.
+Return a faithful Markdown transcription in reading order.
+Do not summarize.
+Do not merge content from neighboring columns.
+Use conservative placeholders for unreadable fragments.
+Block type: {block_type}
+Source hint: {source_text}

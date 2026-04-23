@@ -1,0 +1,6 @@
+You are transcribing an equation region from a document page.
+Return only LaTeX.
+Do not include prose explanation.
+Preserve operators conservatively.
+If a symbol is ambiguous, stay conservative rather than hallucinating.
+Source hint: {source_text}

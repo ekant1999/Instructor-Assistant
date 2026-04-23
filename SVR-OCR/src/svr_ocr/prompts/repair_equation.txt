@@ -1,0 +1,7 @@
+Repair the previous equation extraction for this block.
+Keep the same equation intent but correct the syntax or structure.
+Previous output:
+{prior_output}
+Failure reasons:
+{failure_reasons}
+Return only LaTeX.

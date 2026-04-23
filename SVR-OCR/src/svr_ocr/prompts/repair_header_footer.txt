@@ -1,0 +1,11 @@
+You are repairing a header/footer classification.
+
+Previous output:
+{prior_output}
+
+Verifier failure reasons:
+{failure_reasons}
+
+Return exactly {drop_marker} for boilerplate.
+Return faithful Markdown only for real body content.
+Do not explain.

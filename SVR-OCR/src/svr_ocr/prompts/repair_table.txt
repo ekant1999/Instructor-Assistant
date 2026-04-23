@@ -1,0 +1,7 @@
+Repair the previous table extraction for this block.
+The prior output did not match visible table structure.
+Previous output:
+{prior_output}
+Failure reasons:
+{failure_reasons}
+Return only an HTML table.

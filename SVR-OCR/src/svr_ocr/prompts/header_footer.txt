@@ -1,0 +1,25 @@
+You are inspecting a page margin region from a document.
+The region is from the {position_band} of the page.
+
+Decide whether the visible content should be emitted into the final Markdown.
+
+Return exactly {drop_marker} if the region is any of:
+- page number
+- running title
+- running author name
+- journal/conference name
+- copyright line
+- DOI/URL/arXiv identifier
+- repeated document boilerplate
+- decorative separator with no body content
+
+Return faithful Markdown only if the margin contains real document content that should remain, such as:
+- a first-page title that is visually in the top band
+- an author/affiliation line that is part of the first-page content
+- a section heading that was accidentally captured in the margin
+- non-repeated body text
+
+Do not summarize.
+Do not invent missing text.
+Do not include explanations.
+Source hint: {source_text}

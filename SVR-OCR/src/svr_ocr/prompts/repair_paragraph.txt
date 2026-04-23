@@ -1,0 +1,7 @@
+Repair the previous prose extraction for this block.
+Use the failure reasons to fix only the local block.
+Previous output:
+{prior_output}
+Failure reasons:
+{failure_reasons}
+Return faithful Markdown only.
