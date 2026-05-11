@@ -1,2 +1,5 @@
 tqdm>=4.66
 huggingface_hub>=0.23
+datasets>=4.8
+jiwer>=4.0
+soundfile>=0.13
