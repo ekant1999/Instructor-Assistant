@@ -211,13 +211,6 @@ Run the full conversion and benchmark:
 Instructor-Assistant/olmocr_bench_workspace/scripts/run_nvidia_pdf_eval.sh
 ```
 
-For a demo recording, reuse existing converted Markdown files and only rerun scoring:
-
-```bash
-NVIDIA_SKIP_CONVERT=1 \
-Instructor-Assistant/olmocr_bench_workspace/scripts/run_nvidia_pdf_eval.sh
-```
-
 Useful overrides:
 
 ```bash
